@@ -12,8 +12,8 @@ import numpy as np
 
 import requests
 
-from . import LightkurveError
-from .interact_sky_provider import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
+from .. import LightkurveError
+from .core import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
 
 
 def _parse_limit_mag_uncertainty_band(text):

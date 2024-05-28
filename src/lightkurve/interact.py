@@ -27,6 +27,7 @@ from astropy.time import Time
 import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
 
+from .interact_sky_providers import create_catalog_provider
 from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
 
 log = logging.getLogger(__name__)
@@ -1154,23 +1155,6 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def _create_catalog_provider(name):
-    if name == "gaiadr3":
-        from . import interact_sky_provider_gaia_tic as gaia_t
-        return gaia_t.GaiaDR3InteractSkyCatalogProvider()
-    elif name == "gaiadr3_tic":
-        from . import interact_sky_provider_gaia_tic as gaia_t
-        return gaia_t.GaiaDR3TICInteractSkyCatalogProvider()
-    elif name == "ztf":
-        from . import interact_sky_provider_ztf as ztf
-        return ztf.ZTFInteractSkyCatalogProvider()
-    elif name == "vsx":
-        from . import interact_sky_provider_vsx as vsx
-        return vsx.VSXInteractSkyCatalogProvider()
-    else:
-        raise ValueError(f"Unsupported catalog: {name}")
-
-
 def _create_select_catalog_ui(providers, catalog_renderers):
     select_catalog_ui = CheckboxGroup(
         labels=[p.label for p in providers],
@@ -1291,7 +1275,7 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
                 provider, extra_kwargs = catalog_spec, None
 
             if isinstance(provider, str):
-                provider = _create_catalog_provider(provider)
+                provider = create_catalog_provider(provider)
             # else assume it's a InteractSkyCatalogProvider object
 
             # pass all the parameters for query, plotting, etc. to the provider

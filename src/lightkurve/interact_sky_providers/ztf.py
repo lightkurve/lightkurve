@@ -9,7 +9,7 @@ from astroquery.ipac.irsa import Irsa
 
 import numpy as np
 
-from .interact_sky_provider import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
+from .core import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
 
 
 def _to_lc_url(oid, data_release, format):
