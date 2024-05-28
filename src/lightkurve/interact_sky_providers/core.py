@@ -32,7 +32,7 @@ class InteractSkyCatalogProvider(ABC):
         coord: SkyCoord,
         radius: Union[float, u.Quantity],
         magnitude_limit: float,
-        scatter_kwargs: dict,
+        scatter_kwargs: dict = None,
     ) -> None:
         self.coord = coord
         self.radius = radius

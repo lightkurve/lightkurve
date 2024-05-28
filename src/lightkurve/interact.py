@@ -1182,6 +1182,24 @@ margin: 5px 10px;
     return select_catalog_ui
 
 
+def make_interact_sky_selection_elements(fig_tpf):
+    # a widget that displays some of the selected star's metadata
+    # so that they can be copied (e.g., GAIA ID).
+    # Generally the content is a more detailed version of the on-hover tooltip.
+    message_selected_target = Div(text="")
+
+    # an arrow that serves as the marker of the selected star.
+    arrow_4_selected = Arrow(
+        end=VeeHead(size=16, fill_color="red", line_color="black"),
+        line_color="red", line_width=4,
+        x_start=0, y_start=0, x_end=0, y_end=0, tags=["selected"],
+        visible=False,
+    )
+    fig_tpf.add_layout(arrow_4_selected)
+
+    return message_selected_target, arrow_4_selected
+
+
 def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=None, magnitude_limit=18):
     """skyview
 
@@ -1252,19 +1270,7 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
         # Add a marker (cross) to indicate the coordinate of the target
         add_target_figure_elements(tpf, fig_tpf)
 
-        # a widget that displays some of the selected star's metadata
-        # so that they can be copied (e.g., GAIA ID).
-        # Generally the content is a more detailed version of the on-hover tooltip.
-        message_selected_target = Div(text="")
-
-        # an arrow that serves as the marker of the selected star.
-        arrow_4_selected = Arrow(
-            end=VeeHead(size=16, fill_color="red", line_color="black"),
-            line_color="red", line_width=4,
-            x_start=0, y_start=0, x_end=0, y_end=0, tags=["selected"],
-            visible=False,
-        )
-        fig_tpf.add_layout(arrow_4_selected)
+        message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
         providers = []
         catalog_renderers = []
