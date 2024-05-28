@@ -1,6 +1,7 @@
 """Tests the features of the lightkurve.interact module."""
 import warnings
 
+from astropy.coordinates import SkyCoord
 from astropy.table import Table
 from astropy.time import Time
 from astropy import units as u
@@ -312,83 +313,72 @@ def test_interact_sky_functions_case_no_target_coordinate():
         add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
 
 
-# TODO: interact_sky() refactor
-@pytest.mark.xfail
-@pytest.mark.remote_data
-def test_interact_sky_functions_add_nearby_tics():
-    """Test the backend of interact_sky() that combine Nearby TIC report with Gaia result."""
-    from lightkurve.interact import (
-        _get_nearby_gaia_objects,
-        _add_nearby_tics_if_tess,
-    )
-    # This TIC's nearby report has a mix of stars with Gaia and without Gaia IDs.
-    # https://exofop.ipac.caltech.edu/tess/nearbytarget.php?id=233087860
-    tpf = search_targetpixelfile("TIC233087860", mission="TESS")[0].download()
-    magnitude_limit = 17
-
-    df_before = _get_nearby_gaia_objects(tpf, magnitude_limit)
-    df, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, df_before)
-
-    # based on what we know about the nearby report of the specific TIC,
-    # some existing Gaia entries are added with tic data
-    assert len(df[(df['Source'] > 0) & (df['tic'] != '')]) > 0
-
-    # Some new entries with data only from TIC nearby report are added (hence no Gaia info)
-    assert len(df[(df['Source'] == 0) & (df['tic'] != '')]) > 0
-
-
-# TODO: interact_sky() refactor
-@pytest.mark.xfail
-@pytest.mark.remote_data
-def test_interact_sky_functions_add_nearby_tics_weird_dtype():
-    """Test the backend of interact_sky() that combine Nearby TIC report with Gaia result.
-    Case the dtype from Gaia result dataframe is weird.
-    """
-    from lightkurve.interact import (
-        _get_nearby_gaia_objects,
-        _add_nearby_tics_if_tess,
-    )
-    # For this TIC, the dataframe from Gaia search has weird DType:
-    # df['Source'].dtype is an instance of pd.Int64Dtype, not the type class itself.
-    # existing type check logic with np.issubdtype() fails with TypeError: Cannot interpret 'Int64Dtype()' as a data type
-    tpf = search_targetpixelfile("TIC135100529", mission="TESS")[0].download()
-    magnitude_limit = 18
-
-    df_before = _get_nearby_gaia_objects(tpf, magnitude_limit)
-    df, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, df_before)
-
-    # some TICs are added successfully, without any error raised.
-    assert len(df['tic'] != '') > 0
-
-
-# TODO: interact_sky() refactor
-@pytest.mark.xfail
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
-def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
-    """Test to ensure in case Nearby TIC service from ExoFOP not available,
-       interact_sky will still function (without the TIC information) rather
-       than raising exceptions.
-    """
+def test_interact_sky_functions_providers_sanity():
+    """Basic sanity tests for supplied providers (ensure there is no syntax error, etc.)"""
     import bokeh
     from lightkurve.interact import (
         prepare_tpf_datasource,
         make_tpf_figure_elements,
-        add_gaia_figure_elements,
+        add_target_figure_elements,
+        make_interact_sky_selection_elements,
+        init_provider,
+        add_catalog_figure_elements
     )
-    import lightkurve.interact as lk_interact
+    from lightkurve.interact_sky_providers import create_catalog_provider
 
-    def mock_raise(*args):
-        raise IOError("simulated service unavailable")
-
-    monkeypatch.setattr(lk_interact, "_search_nearby_of_tess_target", mock_raise)
-
-    tpf = TessTargetPixelFile(example_tpf_tess)
-    mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+    # known there are some data from all supported catalogs near this target
+    tic, sector = 400621146, 71
+    tpf = search_targetpixelfile(f"TIC{tic}", mission="TESS", sector=sector, author="SPOC", exptime="short").download()
+    mask = tpf._parse_aperture_mask("pipeline")
     tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
-    fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
-    with pytest.warns(LightkurveWarning, match="cannot obtain nearby TICs"):
-        add_gaia_figure_elements(tpf, fig1)
+    fig_tpf, slider1 = make_tpf_figure_elements(tpf, tpf_source, tpf_source_selectable=False)
+    add_target_figure_elements(tpf, fig_tpf)
+    message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
+
+    for provider_name in [
+        "gaiadr3",
+        "gaiadr3_tic",
+        "vsx",
+        "ztf",
+    ]:
+        provider = create_catalog_provider(provider_name)
+        init_provider(provider, tpf, magnitude_limit=18)
+        renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+        assert renderer is not None
+
+
+@pytest.mark.remote_data
+def test_interact_sky_provider_gaiadr3_tic():
+    """Test Gaia DR3 + TIC join"""
+    from lightkurve.interact_sky_providers import create_catalog_provider
+
+    # TIC 233087860
+    # Is nearby results has a mix of TIC with and without Gaia cross-match
+    #   https://exofop.ipac.caltech.edu/tess/nearbytarget.php?id=233087860
+    #   ^^^ the page is for Gaia DR2, but Gaia DR3 result is similar.
+    ra, dec = 272.20452, 60.678785
+    tpf_coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
+
+    provider = create_catalog_provider("gaiadr3_tic")
+
+    provider.init(
+        coord=tpf_coord,
+        radius=75*u.arcsec,
+        magnitude_limit=18,
+    )
+    rs = provider.query_catalog()
+    # print(rs)  # for debugging
+    # known there are multiple rows that have both Gaia DR3 Source and TIC (cross-matched)
+    assert len(rs[(rs["Source"] != "") & (rs["TIC"] != "")]) > 1
+    # known there are rows that have nave  no Gaia DR3 Source (TIC without Gaia)
+    assert len(rs[(rs["Source"] == "") & (rs["TIC"] != "")]) > 0
+    # Expected cross-match of the target
+    assert rs[rs["TIC"] == "233087860"]["Source"][0] == "2158781336134901760"
+
+
+# TODO: test VSX parsing edge cases
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
