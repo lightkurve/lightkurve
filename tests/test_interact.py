@@ -354,7 +354,8 @@ def test_interact_sky_provider_gaiadr3_tic():
     """Test Gaia DR3 + TIC join"""
     from lightkurve.interact_sky_providers import create_catalog_provider
 
-    # TIC 233087860
+    #
+    # Test 1: TIC 233087860
     # Is nearby results has a mix of TIC with and without Gaia cross-match
     #   https://exofop.ipac.caltech.edu/tess/nearbytarget.php?id=233087860
     #   ^^^ the page is for Gaia DR2, but Gaia DR3 result is similar.
@@ -362,13 +363,9 @@ def test_interact_sky_provider_gaiadr3_tic():
     tpf_coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
 
     provider = create_catalog_provider("gaiadr3_tic")
-
-    provider.init(
-        coord=tpf_coord,
-        radius=75*u.arcsec,
-        magnitude_limit=18,
-    )
+    provider.init(coord=tpf_coord, radius=75*u.arcsec, magnitude_limit=18)
     rs = provider.query_catalog()
+
     # print(rs)  # for debugging
     # known there are multiple rows that have both Gaia DR3 Source and TIC (cross-matched)
     assert len(rs[(rs["Source"] != "") & (rs["TIC"] != "")]) > 1
@@ -376,6 +373,23 @@ def test_interact_sky_provider_gaiadr3_tic():
     assert len(rs[(rs["Source"] == "") & (rs["TIC"] != "")]) > 0
     # Expected cross-match of the target
     assert rs[rs["TIC"] == "233087860"]["Source"][0] == "2158781336134901760"
+
+    #
+    # Test 2: TIC 167092385
+    # - the TIC has not Gaia DR2 Source (in TIC v8.2)
+    # - so the actual correspond Gaia DR3 entry appears as a separate row
+    ra, dec = 318.72463517654, 38.09423368095
+
+    tpf_coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
+
+    provider = create_catalog_provider("gaiadr3_tic")
+    provider.init(coord=tpf_coord, radius=15*u.arcsec, magnitude_limit=18)
+    rs = provider.query_catalog()
+
+    # Expected cross-match failure
+    assert rs[rs["TIC"] == "167092385"]["Source"][0] == ""
+    # the actual correspond Gaia DR3 entry
+    assert rs[rs["Source"] == "1964797660741411072"]["TIC"][0] == ""
 
 
 # TODO: test VSX parsing edge cases
