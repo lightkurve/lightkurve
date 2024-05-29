@@ -186,6 +186,8 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
     label: str = "Gaia DR3 + TIC"
 
     tic_catalog_name = "IV/39/tic82"
+    exclude_tic_duplicates = True
+    exclude_tic_artifacts = True
 
     def __init__(self) -> None:
         super().__init__()
@@ -204,8 +206,16 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
                 self.coord,
                 self.radius,
                 self.tic_catalog_name,
-                columns=["TIC", "GAIA", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Tmag"],
+                columns=["TIC", "GAIA", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Tmag", "Disp"],
             )[self.tic_catalog_name]
+        if self.exclude_tic_duplicates:
+            # exclude duplicates: 2MASS source split into multiple entries
+            # https://outerspace.stsci.edu/display/TESS/TIC+v8.2+and+CTL+v8.xx+Data+Release+Notes#:~:text=SPLIT%20stars
+            tic_rs = tic_rs[tic_rs["Disp"] != "DUPLICATE"]
+        if self.exclude_tic_artifacts:
+            # exclude artifacts: spurious data (usually from 2MASS)
+            # https://outerspace.stsci.edu/display/TESS/TIC+v8.2+and+CTL+v8.xx+Data+Release+Notes#:~:text=Artifacts%20are%20generally%20spurious
+            tic_rs = tic_rs[tic_rs["Disp"] != "ARTIFACT"]
         if self.magnitude_limit is not None:
             tic_rs = tic_rs[tic_rs["Tmag"] < self.magnitude_limit]
 
