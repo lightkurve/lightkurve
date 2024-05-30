@@ -88,7 +88,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         self.catalog_name = "I/355/gaiadr3"
         self.columns = ["*", "RAJ2000", "DEJ2000", "VarFlag", "NSS"]
         self.magnitude_limit_column_name = "Gmag"
-        self.extra_cols_for_source = [
+        self.cols_for_source = [
             "Source",
             "Gmag",
             "Plx",
@@ -96,7 +96,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             "NSS",
         ]
         # Gaia columns that could have large integers
-        self.extra_cols_as_str_for_source = ["Source", "SolID"]
+        self.cols_as_str_for_source = ["Source", "SolID"]
         self.extra_cols_in_detail_view = None
 
     def init(
@@ -127,7 +127,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             cols = extra_cols_in_detail_view.keys()
             # include them in the query, and the data source
             self.columns += cols
-            self.extra_cols_for_source += cols
+            self.cols_for_source += cols
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
         # Use RAJ200/ DEJ2000 instead of Gaia DR3's native RA_IRCS in J2016.0 for ease of
@@ -218,7 +218,7 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
     def __init__(self) -> None:
         super().__init__()
         # TIC-specific
-        self.extra_cols_for_source += ["TIC", "Tmag"]
+        self.cols_for_source += ["TIC", "Tmag"]
         self.tic_catalog_name = "IV/39/tic82"
         self.exclude_tic_duplicates = True
         self.exclude_tic_artifacts = True
