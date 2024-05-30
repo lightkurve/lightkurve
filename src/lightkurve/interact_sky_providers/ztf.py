@@ -22,27 +22,24 @@ def _to_lc_url(oid, data_release, format):
 
 
 class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
-    # query: ZTF-specific
-    ngoodobsrel_min: int
-    filtercode: str
-    data_release: int
-    # for ZTF LC URL
-    lc_format: str
     # OPEN: support BAD_CATFLAGS_MASK parameter in the ZTF LC URL
     label: str = "ZTF"
 
-    extra_cols_for_source = [  # extra columns to be included in bokeh data source
-        "oid",
-        "filtercode",
-        "ngoodobsrel",  # num. of good observations in the release
-        "refmag",
-        "refmagerr",
-        "medianmag",
-        "medmagerr",
-        "maxmag",
-        "minmag",
-        "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
-    ]
+    def __init__(self) -> None:
+        super().__init__()
+        # ZTF-specific
+        self.extra_cols_for_source = [  # extra columns to be included in bokeh data source
+            "oid",
+            "filtercode",
+            "ngoodobsrel",  # num. of good observations in the release
+            "refmag",
+            "refmagerr",
+            "medianmag",
+            "medmagerr",
+            "maxmag",
+            "minmag",
+            "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
+        ]
 
     def init(
         self,
@@ -57,19 +54,8 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         lc_format: str = "csv",
         scatter_kwargs: dict = None,
     ) -> None:
-        self.coord = coord
-        self.radius = radius
-        self.magnitude_limit = magnitude_limit
-        # ZTF-specific query criteria
-        self.ngoodobsrel_min = ngoodobsrel_min
-        self.filtercode = filtercode
-        self.data_release = data_release
-        # for ZTF LC URL
-        self.lc_format = lc_format
-        if scatter_kwargs is not None:
-            self.scatter_kwargs = scatter_kwargs
-        else:
-            self.scatter_kwargs = dict(
+        if scatter_kwargs is None:
+            scatter_kwargs = dict(
                 marker="square",
                 fill_alpha=0.3,
                 line_color=None,
@@ -82,6 +68,13 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
                 hover_alpha=0.9,
                 hover_line_color="white",
             )
+        super().init(coord, radius, magnitude_limit, scatter_kwargs)
+        # ZTF-specific query criteria
+        self.ngoodobsrel_min = ngoodobsrel_min
+        self.filtercode = filtercode
+        self.data_release = data_release
+        # for ZTF LC URL
+        self.lc_format = lc_format
 
     def query_catalog(self) -> Table:
         # Optimization: ZTF coverage is about north of -30deg dec.

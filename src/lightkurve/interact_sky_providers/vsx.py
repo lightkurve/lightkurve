@@ -212,17 +212,20 @@ def _to_mag_text(tab):
 
 class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
-    extra_cols_for_source = [
-        "Name",
-        "OID",
-        "Type",
-        "Period",
-        "magText",
-    ]
-
     label: str = "VSX"
 
     J2000 = Time(2000.0, format="jyear", scale="tt")
+
+    def __init__(self) -> None:
+        super().__init__()
+        # VSX-specific
+        self.extra_cols_for_source = [
+            "Name",
+            "OID",
+            "Type",
+            "Period",
+            "magText",
+        ]
 
     def init(
         self,
