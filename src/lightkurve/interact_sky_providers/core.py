@@ -22,8 +22,13 @@ class InteractSkyCatalogProvider(ABC):
 
     def __init__(self) -> None:
         super().__init__()
-        self.extra_cols_for_source = []  # extra columns to be included in bokeh data source
-        self.extra_cols_as_str_for_source = []  # columns to be converted to string in bokeh data source
+        # (extra) columns to be included in bokeh data source
+        # interact_sky() logic always adds the following to the data source:
+        # - ra, dec, x, y, separation, size
+        self.cols_for_source = []
+        # columns to be converted to string in bokeh data source
+        # (primarily to workaround bokeh issue of handling large integers)
+        self.cols_as_str_for_source = []
 
     def init(
         self,
@@ -55,12 +60,12 @@ class InteractSkyCatalogProvider(ABC):
 
     def add_to_data_source(self, result: Table, source: dict):
         more_data = dict()
-        for col in self.extra_cols_for_source:
+        for col in self.cols_for_source:
             # bokeh ColumnDataSource-specific workaround: convert some columns to string
             # usually it is for columns with large integers, to avoid
             # BokehUserWarning: out of range integer may result in loss of precision
             col_val = result[col]
-            if col in self.extra_cols_as_str_for_source:
+            if col in self.cols_as_str_for_source:
                 col_val = col_val.astype(str)
             more_data[col] = col_val
         source.update(more_data)

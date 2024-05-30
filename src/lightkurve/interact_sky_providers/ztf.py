@@ -28,7 +28,7 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
     def __init__(self) -> None:
         super().__init__()
         # ZTF-specific
-        self.extra_cols_for_source = [  # extra columns to be included in bokeh data source
+        self.cols_for_source = [  # extra columns to be included in bokeh data source
             "oid",
             "filtercode",
             "ngoodobsrel",  # num. of good observations in the release
@@ -83,7 +83,7 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         # https://irsa.ipac.caltech.edu/data/ZTF/docs/releases/ztf_release_notes_latest
         if self.coord.dec < -35 * u.deg:
             empty_data = dict(RA=[], DEC=[], magForSize=[])
-            for c in self.extra_cols_for_source:
+            for c in self.cols_for_source:
                 empty_data[c] = []
             return Table(data=empty_data)
 

@@ -219,7 +219,7 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
     def __init__(self) -> None:
         super().__init__()
         # VSX-specific
-        self.extra_cols_for_source = [
+        self.cols_for_source = [
             "Name",
             "OID",
             "Type",
