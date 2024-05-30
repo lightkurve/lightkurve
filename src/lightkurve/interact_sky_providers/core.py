@@ -17,15 +17,13 @@ ProperMotionCorrectionMeta = namedtuple(
 
 
 class InteractSkyCatalogProvider(ABC):
-    # query: generic
-    coord: SkyCoord
-    radius: Union[float, u.Quantity]
-    magnitude_limit: float
-    # for plotting
-    scatter_kwargs: dict
-    extra_cols_for_source = []  # extra columns to be included in bokeh data source
-    extra_cols_as_str_for_source = []  # columns to be converted to string in bokeh data source
+    # implementation should define it
     label: str = None
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.extra_cols_for_source = []  # extra columns to be included in bokeh data source
+        self.extra_cols_as_str_for_source = []  # columns to be converted to string in bokeh data source
 
     def init(
         self,
@@ -34,9 +32,11 @@ class InteractSkyCatalogProvider(ABC):
         magnitude_limit: float,
         scatter_kwargs: dict = None,
     ) -> None:
+        # query: generic
         self.coord = coord
         self.radius = radius
         self.magnitude_limit = magnitude_limit
+        # for plotting
         if scatter_kwargs is None:
             scatter_kwargs = dict(  # some default rendering that should be overridden
                 marker="circle",

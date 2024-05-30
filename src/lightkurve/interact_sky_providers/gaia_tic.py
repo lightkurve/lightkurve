@@ -22,10 +22,13 @@ def _query_cone_region(coord, radius, catalog, columns=["*"], query_kwargs=dict(
 
 
 class VizierInteractSkyCatalogProvider(InteractSkyCatalogProvider):
-    # Vizier-specific query
-    catalog_name = None
-    columns = ["*"]
-    magnitude_limit_column_name = None
+
+    def __init__(self) -> None:
+        super().__init__()
+        # Vizier-specific query
+        self.catalog_name = None
+        self.columns = ["*"]
+        self.magnitude_limit_column_name = None
 
     def query_catalog(self) -> Table:
         with warnings.catch_warnings():
@@ -70,11 +73,6 @@ def _decode_gaiadr3_nss_flag(nss_flag):
 
 class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
-    # Gaia DR3 Vizier specific
-    catalog_name = "I/355/gaiadr3"
-    columns = ["*", "RAJ2000", "DEJ2000", "VarFlag", "NSS"]
-    magnitude_limit_column_name = "Gmag"
-
     label: str = "Gaia DR3"
 
     # Gaia DR3 reference epoch: 2016.0,  time coordinate: barycentric coordinate time (TCB).
@@ -84,18 +82,22 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
     # OPEN: unsure if the epoch RAJ200/DEJ200 is in tt or possibly tdb, etc.
     J2000 = Time(2000.0, format="jyear", scale="tt")
 
-    extra_cols_for_source = [
-        "Source",
-        "Gmag",
-        "Plx",
-        "VarFlag",
-        "NSS",
-    ]
-
-    extra_cols_in_detail_view = None
-
-    # Gaia columns that could have large integers
-    extra_cols_as_str_for_source = ["Source", "SolID"]
+    def __init__(self) -> None:
+        super().__init__()
+        # Gaia DR3 Vizier specific
+        self.catalog_name = "I/355/gaiadr3"
+        self.columns = ["*", "RAJ2000", "DEJ2000", "VarFlag", "NSS"]
+        self.magnitude_limit_column_name = "Gmag"
+        self.extra_cols_for_source = [
+            "Source",
+            "Gmag",
+            "Plx",
+            "VarFlag",
+            "NSS",
+        ]
+        # Gaia columns that could have large integers
+        self.extra_cols_as_str_for_source = ["Source", "SolID"]
+        self.extra_cols_in_detail_view = None
 
     def init(
         self,
@@ -213,13 +215,13 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
 
     label: str = "Gaia DR3 + TIC"
 
-    tic_catalog_name = "IV/39/tic82"
-    exclude_tic_duplicates = True
-    exclude_tic_artifacts = True
-
     def __init__(self) -> None:
         super().__init__()
+        # TIC-specific
         self.extra_cols_for_source += ["TIC", "Tmag"]
+        self.tic_catalog_name = "IV/39/tic82"
+        self.exclude_tic_duplicates = True
+        self.exclude_tic_artifacts = True
 
     def query_catalog(self) -> Table:
         gaia_rs = super().query_catalog()
