@@ -23,8 +23,14 @@ def _query_cone_region(coord, radius, catalog, columns=["*"], query_kwargs=dict(
 
 class VizierInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
-    def __init__(self) -> None:
-        super().__init__()
+    def init(
+        self,
+        coord: SkyCoord,
+        radius: Union[float, u.Quantity],
+        magnitude_limit: float,
+        scatter_kwargs: dict = None,
+    ) -> None:
+        super().init(coord, radius, magnitude_limit, scatter_kwargs)
         # Vizier-specific query
         self.catalog_name = None
         self.columns = ["*"]
@@ -82,23 +88,6 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
     # OPEN: unsure if the epoch RAJ200/DEJ200 is in tt or possibly tdb, etc.
     J2000 = Time(2000.0, format="jyear", scale="tt")
 
-    def __init__(self) -> None:
-        super().__init__()
-        # Gaia DR3 Vizier specific
-        self.catalog_name = "I/355/gaiadr3"
-        self.columns = ["*", "RAJ2000", "DEJ2000", "VarFlag", "NSS"]
-        self.magnitude_limit_column_name = "Gmag"
-        self.cols_for_source = [
-            "Source",
-            "Gmag",
-            "Plx",
-            "VarFlag",
-            "NSS",
-        ]
-        # Gaia columns that could have large integers
-        self.cols_as_str_for_source = ["Source", "SolID"]
-        self.extra_cols_in_detail_view = None
-
     def init(
         self,
         coord: SkyCoord,
@@ -122,12 +111,27 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
                 hover_line_color="white",
             )
         super().init(coord, radius, magnitude_limit, scatter_kwargs)
+        # Gaia DR3 Vizier specific
+        self.catalog_name = "I/355/gaiadr3"
+        self.columns = ["*", "RAJ2000", "DEJ2000", "VarFlag", "NSS"]
+        self.magnitude_limit_column_name = "Gmag"
+        self.cols_for_source = [
+            "Source",
+            "Gmag",
+            "Plx",
+            "VarFlag",
+            "NSS",
+        ]
+        # Gaia columns that could have large integers
+        self.cols_as_str_for_source = ["Source", "SolID"]
         if extra_cols_in_detail_view is not None:
             self.extra_cols_in_detail_view = extra_cols_in_detail_view
             cols = extra_cols_in_detail_view.keys()
             # include them in the query, and the data source
             self.columns += cols
             self.cols_for_source += cols
+        else:
+            self.extra_cols_in_detail_view = None
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
         # Use RAJ200/ DEJ2000 instead of Gaia DR3's native RA_IRCS in J2016.0 for ease of
@@ -215,8 +219,15 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
 
     label: str = "Gaia DR3 + TIC"
 
-    def __init__(self) -> None:
-        super().__init__()
+    def init(
+        self,
+        coord: SkyCoord,
+        radius: Union[float, u.Quantity],
+        magnitude_limit: float,
+        scatter_kwargs: dict = None,
+        extra_cols_in_detail_view: dict = None,
+    ) -> None:
+        super().init(coord, radius, magnitude_limit, scatter_kwargs, extra_cols_in_detail_view)
         # TIC-specific
         self.cols_for_source += ["TIC", "Tmag"]
         self.tic_catalog_name = "IV/39/tic82"

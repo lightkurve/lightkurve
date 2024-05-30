@@ -216,17 +216,6 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
     J2000 = Time(2000.0, format="jyear", scale="tt")
 
-    def __init__(self) -> None:
-        super().__init__()
-        # VSX-specific
-        self.cols_for_source = [
-            "Name",
-            "OID",
-            "Type",
-            "Period",
-            "magText",
-        ]
-
     def init(
         self,
         coord: SkyCoord,
@@ -241,6 +230,14 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
                 line_width=2,
             )
         super().init(coord, radius, magnitude_limit, scatter_kwargs)
+        # VSX-specific
+        self.cols_for_source = [
+            "Name",
+            "OID",
+            "Type",
+            "Period",
+            "magText",
+        ]
 
     def query_catalog(self) -> Table:
         cj2000 = self.coord.transform_to("icrs")
