@@ -329,7 +329,8 @@ def test_interact_sky_functions_providers_sanity():
         make_tpf_figure_elements,
         add_target_figure_elements,
         make_interact_sky_selection_elements,
-        parse_and_add_catalogs_figure_elements
+        parse_and_add_catalogs_figure_elements,
+        _row_to_dict
     )
 
     # known there are some data from all supported catalogs near this target
@@ -361,6 +362,47 @@ def test_interact_sky_functions_providers_sanity():
         # For the purpose of the sanity test, each provider should have at least 1 record to exercise typical code path
         # The coordinate / radius is selected to be so, and should be stable.
         assert len(renderer.data_source.data["ra"]) > 0, f"Provider {provider.label} should have at least 1 record."
+
+        assert len(provider.get_tooltips()) > 0,  "get_tooltips() should not cause error, and return a non-empty list"
+        # simulate getting the detail view of the target (tap it)
+        details, extra_rows = provider.get_detail_view(_row_to_dict(renderer.data_source, 0))
+        assert len(details) > 0,  "get_detail_view() should not cause error, and return a non-empty dict"
+
+
+@pytest.mark.remote_data
+def test_interact_sky_provider_gaiadr3_detail_view():
+    """Sanity test for Gaia DR3 detail view, which has some extra logic, e.g., NSS flag parsing."""
+    import bokeh
+    from lightkurve.interact import (
+        prepare_tpf_datasource,
+        make_tpf_figure_elements,
+        add_target_figure_elements,
+        make_interact_sky_selection_elements,
+        parse_and_add_catalogs_figure_elements,
+        _row_to_dict
+    )
+
+    # known target with both VARIABLE flag and NSS flag on, which would
+    # require the special logic in get_detail_view()
+    tic, sector = 229647506, 73
+    tpf = search_targetpixelfile(f"TIC{tic}", mission="TESS", sector=sector, author="SPOC", exptime="short").download()
+    mask = tpf._parse_aperture_mask("pipeline")
+    tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
+    fig_tpf, slider1 = make_tpf_figure_elements(tpf, tpf_source, tpf_source_selectable=False)
+    add_target_figure_elements(tpf, fig_tpf)
+    message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
+
+    catalogs = [
+        ("gaiadr3", dict(radius=5*u.arcsec)),
+    ]
+    magnitude_limit = 18
+
+    provider, renderer = parse_and_add_catalogs_figure_elements(
+        catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+        )
+    provider, renderer = provider[0], renderer[0]  # only 1 catalog
+    details, extra_rows = provider.get_detail_view(_row_to_dict(renderer.data_source, 0))
+    # for now, just to ensure the call do not cause errors, so no extra assertion
 
 
 @pytest.mark.remote_data
