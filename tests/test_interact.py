@@ -243,7 +243,7 @@ class StubEmptyResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProv
 
 
 class StubNoneResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
-    label = "stub_empty_result"
+    label = "stub_none_result"
 
     # some providers would return None for Empty result
     stub_data = None
