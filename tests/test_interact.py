@@ -265,9 +265,9 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
         make_tpf_figure_elements,
         add_target_figure_elements,
         make_interact_sky_selection_elements,
-        init_provider,
-        add_catalog_figure_elements
+        parse_and_add_catalogs_figure_elements
     )
+
     tpf = tpf_class(tpf_file)
     mask = tpf._parse_aperture_mask(aperture_mask)
     tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
@@ -275,15 +275,18 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
     add_target_figure_elements(tpf, fig_tpf)
     message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
-    for provider in [
+    catalogs = [
         StubNoPMInteractSkyCatalogProvider(),
         StubWithPMInteractSkyCatalogProvider(),
         # test boundary cases
         StubEmptyResultInteractSkyCatalogProvider(),
         StubNoneResultInteractSkyCatalogProvider(),
-    ]:
-        init_provider(provider, tpf, magnitude_limit=18)
-        renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+    ]
+    magnitude_limit = 18
+    providers, renderers = parse_and_add_catalogs_figure_elements(
+        catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+        )
+    for _, _, renderer in zip(catalogs, providers, renderers):  # zip to ensure they are all of the same length
         assert renderer is not None
 
 
@@ -295,8 +298,7 @@ def test_interact_sky_functions_case_no_target_coordinate():
         make_tpf_figure_elements,
         add_target_figure_elements,
         make_interact_sky_selection_elements,
-        init_provider,
-        add_catalog_figure_elements
+        parse_and_add_catalogs_figure_elements
     )
     tpf_class, tpf_file = TessTargetPixelFile, example_tpf_no_target_position
 
@@ -308,25 +310,27 @@ def test_interact_sky_functions_case_no_target_coordinate():
     message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
     with pytest.raises(LightkurveError, match=r".* no valid coordinate.*"):
-        provider = StubWithPMInteractSkyCatalogProvider()
-        init_provider(provider, tpf, magnitude_limit=18)
-        add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+        catalogs = [ StubWithPMInteractSkyCatalogProvider() ]
+        magnitude_limit = 18
+        parse_and_add_catalogs_figure_elements(
+            catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+        )
 
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions_providers_sanity():
-    """Basic sanity tests for supplied providers (ensure there is no syntax error, etc.)"""
+    """Basic sanity tests for supplied providers (ensure there is no syntax error, etc.)
+    It also test the parsing of catalogs parameter.
+    """
     import bokeh
     from lightkurve.interact import (
         prepare_tpf_datasource,
         make_tpf_figure_elements,
         add_target_figure_elements,
         make_interact_sky_selection_elements,
-        init_provider,
-        add_catalog_figure_elements
+        parse_and_add_catalogs_figure_elements
     )
-    from lightkurve.interact_sky_providers import create_catalog_provider
 
     # known there are some data from all supported catalogs near this target
     tic, sector = 400621146, 71
@@ -337,19 +341,26 @@ def test_interact_sky_functions_providers_sanity():
     add_target_figure_elements(tpf, fig_tpf)
     message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
-    for provider_name in [
+    catalogs = [
         "gaiadr3",
         "gaiadr3_tic",
-        "vsx",
-        "ztf",
-    ]:
-        provider = create_catalog_provider(provider_name)
-        init_provider(provider, tpf, magnitude_limit=18)
-        renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+        # case a catalog is defined with override parameter
+        ("ztf", dict(radius=6*u.arcsec)),
+        # the commented override parameter part of the test,
+        # simulating case an user comments it out, leaving a tuple
+        ("vsx",
+            #  dict(radius=4*u.arsec),
+        ),
+    ]
+    magnitude_limit = 18
+    providers, renderers = parse_and_add_catalogs_figure_elements(
+        catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+        )
+    for _, provider, renderer in zip(catalogs, providers, renderers):  # zip to ensure they are all of the same length
         assert renderer is not None
         # For the purpose of the sanity test, each provider should have at least 1 record to exercise typical code path
         # The coordinate / radius is selected to be so, and should be stable.
-        assert len(renderer.data_source.data["ra"]) > 0, f"Provider {provider_name} should have at least 1 record."
+        assert len(renderer.data_source.data["ra"]) > 0, f"Provider {provider.label} should have at least 1 record."
 
 
 @pytest.mark.remote_data

@@ -615,6 +615,38 @@ Selected:<br>
     return r
 
 
+def parse_and_add_catalogs_figure_elements(catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected):
+    providers = []
+    catalog_renderers = []
+
+    for catalog_spec in catalogs:
+        if isinstance(catalog_spec, (tuple, list)):
+            if len(catalog_spec) == 2:
+                provider, extra_kwargs = catalog_spec
+            elif len(catalog_spec) == 1:
+                # to support the form of ("gaiadr3", )
+                # say, when users comment out the keyword arguments in their code
+                provider, extra_kwargs = catalog_spec[0], None
+            else:
+                raise ValueError(
+                    "A catalog should be the catalog, or a tuple of catalog and keyword arguments. "
+                    f"Actual: {catalog_spec}"
+                    )
+        else:
+            provider, extra_kwargs = catalog_spec, None
+
+        if isinstance(provider, str):
+            provider = create_catalog_provider(provider)
+        # else assume it's a InteractSkyCatalogProvider object
+
+        # pass all the parameters for query, plotting, etc. to the provider
+        init_provider(provider, tpf, magnitude_limit, extra_kwargs=extra_kwargs)
+        renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+        providers.append(provider)
+        catalog_renderers.append(renderer)
+    return providers, catalog_renderers
+
+
 def to_selected_pixels_source(tpf_source):
     xx = tpf_source.data["xx"].flatten()
     yy = tpf_source.data["yy"].flatten()
@@ -1272,23 +1304,9 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
 
         message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
-        providers = []
-        catalog_renderers = []
-        for catalog_spec in catalogs:
-            if isinstance(catalog_spec, (tuple, list)):
-                provider, extra_kwargs = catalog_spec
-            else:
-                provider, extra_kwargs = catalog_spec, None
-
-            if isinstance(provider, str):
-                provider = create_catalog_provider(provider)
-            # else assume it's a InteractSkyCatalogProvider object
-
-            # pass all the parameters for query, plotting, etc. to the provider
-            init_provider(provider, tpf, magnitude_limit, extra_kwargs=extra_kwargs)
-            renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
-            providers.append(provider)
-            catalog_renderers.append(renderer)
+        providers, catalog_renderers = parse_and_add_catalogs_figure_elements(
+            catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+            )
 
         # Optionally override the default title
         if tpf.mission == "K2":
