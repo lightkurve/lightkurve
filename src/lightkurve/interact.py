@@ -449,6 +449,11 @@ def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
     provider.init(**provider_kwargs)
 
 
+def _row_to_dict(source, idx):
+    """convert a target at index `idx in the `ColumnDataSource` to a dict object"""
+    return {k: source.data[k][idx] for k in source.data}
+
+
 def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arrow_4_selected):
 
     result = provider.query_catalog()
@@ -533,9 +538,6 @@ def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arr
     )
 
     # 2. render the detail table on click
-    def row_to_dict(idx):
-        # convert a target at index idx in the column data source to a dict
-        return {k: source.data[k][idx] for k in source.data}
 
     def show_target_info(attr, old, new):
         # the following is essentially redoing the bokeh tooltip template above in plain HTML
@@ -556,7 +558,7 @@ Selected:<br>
 <table class="target_details">
 """
             for idx in new:
-                details, extra_rows = provider.get_detail_view(row_to_dict(idx))
+                details, extra_rows = provider.get_detail_view(_row_to_dict(source, idx))
                 for header, val_html in details.items():
                     msg += f"<tr><td>{header}</td><td>{val_html}</td>"
                 if extra_rows is not None:
