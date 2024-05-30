@@ -25,22 +25,6 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
     # OPEN: support BAD_CATFLAGS_MASK parameter in the ZTF LC URL
     label: str = "ZTF"
 
-    def __init__(self) -> None:
-        super().__init__()
-        # ZTF-specific
-        self.cols_for_source = [  # extra columns to be included in bokeh data source
-            "oid",
-            "filtercode",
-            "ngoodobsrel",  # num. of good observations in the release
-            "refmag",
-            "refmagerr",
-            "medianmag",
-            "medmagerr",
-            "maxmag",
-            "minmag",
-            "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
-        ]
-
     def init(
         self,
         coord: SkyCoord,
@@ -75,6 +59,19 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         self.data_release = data_release
         # for ZTF LC URL
         self.lc_format = lc_format
+        # ZTF-specific
+        self.cols_for_source = [  # extra columns to be included in bokeh data source
+            "oid",
+            "filtercode",
+            "ngoodobsrel",  # num. of good observations in the release
+            "refmag",
+            "refmagerr",
+            "medianmag",
+            "medmagerr",
+            "maxmag",
+            "minmag",
+            "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
+        ]
 
     def query_catalog(self) -> Table:
         # Optimization: ZTF coverage is about north of -30deg dec.

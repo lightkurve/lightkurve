@@ -20,15 +20,16 @@ class InteractSkyCatalogProvider(ABC):
     # implementation should define it
     label: str = None
 
-    def __init__(self) -> None:
-        super().__init__()
-        # (extra) columns to be included in bokeh data source
-        # interact_sky() logic always adds the following to the data source:
-        # - ra, dec, x, y, separation, size
-        self.cols_for_source = []
-        # columns to be converted to string in bokeh data source
-        # (primarily to workaround bokeh issue of handling large integers)
-        self.cols_as_str_for_source = []
+    # Design note:
+    # `init()` does most of what typically built-in `__init__()` does
+    # because the pattern supported would let users to
+    # supply custom provider by giving a provider instance.
+    # The actual `interact_sky()` initialization, e.g., defining
+    # the search coordinate and radius, can then be carried out
+    # `interact_sky()` logic, where it has all the necessary values.
+    #
+    # To keep things simple, sub classes should generally implement
+    # all initialization logic in `init()`, rather than the `__init__()`.
 
     def init(
         self,
@@ -49,6 +50,14 @@ class InteractSkyCatalogProvider(ABC):
                 fill_color="red",
             )
         self.scatter_kwargs = scatter_kwargs
+
+        # (extra) columns to be included in bokeh data source
+        # interact_sky() logic always adds the following to the data source:
+        # - ra, dec, x, y, separation, size
+        self.cols_for_source = []
+        # columns to be converted to string in bokeh data source
+        # (primarily to workaround bokeh issue of handling large integers)
+        self.cols_as_str_for_source = []
 
     @abstractmethod
     def query_catalog(self) -> Table:
