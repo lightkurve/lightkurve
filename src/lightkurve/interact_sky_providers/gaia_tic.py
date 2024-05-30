@@ -52,11 +52,27 @@ class VizierInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         return result
 
 
+def _decode_gaiadr3_nss_flag(nss_flag):
+    """Decode NSS (NON_SINGLE_STAR) flag in Gaia DR3 Main.
+    Reference:
+    https://gea.esac.esa.int/archive/documentation/GDR3/Gaia_archive/chap_datamodel/sec_dm_main_source_catalogue/ssec_dm_gaia_source.html#p344
+    """
+    flags = []
+    for mask, nss_type in [
+        (0b1, "AB"),  # astrometric binary
+        (0b10, "SB"),  # spectroscopic binary
+        (0b100, "EB"),  # eclipsing binary
+    ]:
+        if nss_flag & mask > 0:
+            flags.append(nss_type)
+    return flags
+
+
 class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
     # Gaia DR3 Vizier specific
     catalog_name = "I/355/gaiadr3"
-    columns = ["*", "RAJ2000", "DEJ2000", "VarFlag"]
+    columns = ["*", "RAJ2000", "DEJ2000", "VarFlag", "NSS"]
     magnitude_limit_column_name = "Gmag"
 
     label: str = "Gaia DR3"
@@ -73,6 +89,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         "Gmag",
         "Plx",
         "VarFlag",
+        "NSS",
     ]
 
     extra_cols_in_detail_view = None
@@ -130,6 +147,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             ("column", "@x{0.0}"),
             ("row", "@y{0.0}"),
             ("Variable", "@VarFlag"),
+            ("NSS", "@NSS"),
         ]
 
     def get_detail_view(self, data: dict) -> Tuple[dict, list]:
@@ -160,6 +178,15 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             )
             var_html += f' (<a href="{gaiadr3_var_url}" target="_blank">Vizier</a>)'
 
+        nss_html = str(data["NSS"])
+        if data["NSS"] != 0:
+            flags_text = ", ".join(_decode_gaiadr3_nss_flag(data["NSS"]))
+            gaiadr3_nss_url = (
+                "https://vizier.cds.unistra.fr/viz-bin/VizieR-4?-ref=VIZ65a1a2351812e4&-source=I%2F357"
+                f"&Source={data['Source']}"
+            )
+            nss_html += f' ({flags_text})&emsp;(<a href="{gaiadr3_nss_url}" target="_blank">Vizier</a>)'
+
         key_vals = {
             "Source": source_val_html,
             'Separation (")': f"{data['separation']:.2f}",
@@ -170,7 +197,8 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             "column": f"{data['x']:.1f}",
             "row": f"{data['y']:.1f}",
             "Variable": var_html,
-        }
+            "NSS": nss_html,
+            }
 
         if self.extra_cols_in_detail_view is not None:
             for col, label in self.extra_cols_in_detail_view.items():
