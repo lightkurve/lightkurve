@@ -347,6 +347,9 @@ def test_interact_sky_functions_providers_sanity():
         init_provider(provider, tpf, magnitude_limit=18)
         renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
         assert renderer is not None
+        # For the purpose of the sanity test, each provider should have at least 1 record to exercise typical code path
+        # The coordinate / radius is selected to be so, and should be stable.
+        assert len(renderer.data_source.data["ra"]) > 0, f"Provider {provider_name} should have at least 1 record."
 
 
 @pytest.mark.remote_data
