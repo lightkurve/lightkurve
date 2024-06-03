@@ -133,6 +133,18 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         else:
             self.extra_cols_in_detail_view = None
 
+    def query_catalog(self) -> Table:
+        tab = super().query_catalog()
+
+        # set custom fill_value for some columns, typically integer columns,
+        # so that for rows with missing values, the custom `fill_value` is used
+        # for column NSS, without setting fill_value, the astropy default `fill_value`
+        # is often 63, confusing  users.
+        if "NSS" in tab.colnames:
+            tab["NSS"].fill_value = 0
+
+        return tab
+
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
         # Use RAJ200/ DEJ2000 instead of Gaia DR3's native RA_IRCS in J2016.0 for ease of
         # merging with the result from TIC
