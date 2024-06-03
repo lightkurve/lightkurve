@@ -7,6 +7,8 @@ from astropy.coordinates import SkyCoord
 from astropy.table import Table, join
 from astropy.time import Time
 
+import astroquery.simbad as simbad
+import astroquery.vizier as vizier
 from astroquery.vizier import Vizier
 
 from .core import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
@@ -77,6 +79,10 @@ def _decode_gaiadr3_nss_flag(nss_flag):
     return flags
 
 
+def _fill_template(template, var_value, var_name="%s"):
+    return template.replace(var_name, str(var_value))
+
+
 class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
     label: str = "Gaia DR3"
@@ -88,6 +94,25 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
     # OPEN: unsure if the epoch RAJ200/DEJ200 is in tt or possibly tdb, etc.
     J2000 = Time(2000.0, format="jyear", scale="tt")
 
+    @property
+    def urls_template_defaults(self):
+        """The default URL templates for links to Gaia / SIMBAD data.
+        For most templates, the string `%s` will be replaced by Gaia Source value.
+        The one exception is `simbad_url_by_coord`. `%ra` and `%dec` will be replaced
+        by the target's RA / DEC values in degrees.
+        """
+        # reuse the Vizier / SIMBAD servers specified in astroquery
+        vizier_server = vizier.conf.server
+        simbad_server = simbad.conf.server
+        return dict(
+            gaiadr3_main_url=f"https://{vizier_server}/viz-bin/VizieR-4?-source=+I%2F355%2Fgaiadr3+I%2F355%2Fparamp&Source=%s",
+            gaiadr3_var_url=f"https://{vizier_server}/viz-bin/VizieR-4?-source=+I%2F358%2Fvarisum+I%2F358%2Fvclassre&Source=%s",
+            gaiadr3_nss_url=f"https://{vizier_server}/viz-bin/VizieR-4?-ref=VIZ65a1a2351812e4&-source=I%2F357&Source=%s",
+            simbad_url_by_gaia_source=f"https://{simbad_server}/simbad/sim-id?Ident=Gaia DR3 %s",
+            # the by_coord template is special with 2 variables, %ra and %dec
+            simbad_url_by_coord=f"https://{simbad_server}/simbad/sim-coo?Coord=%ra+%dec&Radius=2&Radius.unit=arcmin",
+        )
+
     def init(
         self,
         coord: SkyCoord,
@@ -95,6 +120,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         magnitude_limit: float,
         scatter_kwargs: dict = None,
         extra_cols_in_detail_view: dict = None,
+        urls_template: dict = None,
     ) -> None:
         if scatter_kwargs is None:
             scatter_kwargs = dict(
@@ -132,6 +158,9 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             self.cols_for_source += cols
         else:
             self.extra_cols_in_detail_view = None
+        self.urls_template = self.urls_template_defaults
+        if urls_template is not None:
+            self.urls_template.update(urls_template)
 
     def query_catalog(self) -> Table:
         tab = super().query_catalog()
@@ -170,16 +199,12 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
     def get_detail_view(self, data: dict) -> Tuple[dict, list]:
         # the vizier URL returns both Gaia DR3 Main and Gaia DR3 Astrophysical parameters table for convenience
-        vizier_url = (
-            "https://vizier.cds.unistra.fr/viz-bin/VizieR-4?-source=+I%2F355%2Fgaiadr3+I%2F355%2Fparamp"
-            f"&Source={data['Source']}"
-        )
-        simbad_url_by_gaia_source = f"https://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR3 {data['Source']}"
-        simbad_url_by_coord = (
-            f"https://simbad.u-strasbg.fr/simbad/sim-coo?Coord={data['ra']}+{data['dec']}&Radius=2&Radius.unit=arcmin"
-        )
+        gaiadr3_main_url = _fill_template(self.urls_template["gaiadr3_main_url"], data['Source'])
+        simbad_url_by_gaia_source = _fill_template(self.urls_template["simbad_url_by_gaia_source"], data['Source'])
+        simbad_url_by_coord = _fill_template(self.urls_template["simbad_url_by_coord"], data['ra'], var_name="%ra")
+        simbad_url_by_coord = _fill_template(simbad_url_by_coord, data['dec'], var_name="%dec")
         if data["Source"] != "":
-            source_val_html = f"""{data['Source']} (<a href="{vizier_url}" target="_blank">Vizier</a>)"""
+            source_val_html = f"""{data['Source']} (<a href="{gaiadr3_main_url}" target="_blank">Vizier</a>)"""
             extra_rows = [
                 f'<a target="_blank" href="{simbad_url_by_gaia_source}">SIMBAD by Gaia Source</a>',
                 f'<a target="_blank" href="{simbad_url_by_coord}">SIMBAD by coordinate</a>',
@@ -190,19 +215,13 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
         var_html = data["VarFlag"]
         if var_html == "VARIABLE":
-            gaiadr3_var_url = (
-                "https://vizier.cds.unistra.fr/viz-bin/VizieR-4?-source=+I%2F358%2Fvarisum+I%2F358%2Fvclassre"
-                f"&Source={data['Source']}"
-            )
+            gaiadr3_var_url = _fill_template(self.urls_template["gaiadr3_var_url"], data['Source'])
             var_html += f' (<a href="{gaiadr3_var_url}" target="_blank">Vizier</a>)'
 
         nss_html = str(data["NSS"])
         if data["NSS"] != 0:
             flags_text = ", ".join(_decode_gaiadr3_nss_flag(data["NSS"]))
-            gaiadr3_nss_url = (
-                "https://vizier.cds.unistra.fr/viz-bin/VizieR-4?-ref=VIZ65a1a2351812e4&-source=I%2F357"
-                f"&Source={data['Source']}"
-            )
+            gaiadr3_nss_url = _fill_template(self.urls_template["gaiadr3_nss_url"], data['Source'])
             nss_html += f' ({flags_text})&emsp;(<a href="{gaiadr3_nss_url}" target="_blank">Vizier</a>)'
 
         key_vals = {
@@ -238,8 +257,9 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         magnitude_limit: float,
         scatter_kwargs: dict = None,
         extra_cols_in_detail_view: dict = None,
+        urls_template: dict = None,
     ) -> None:
-        super().init(coord, radius, magnitude_limit, scatter_kwargs, extra_cols_in_detail_view)
+        super().init(coord, radius, magnitude_limit, scatter_kwargs, extra_cols_in_detail_view, urls_template)
         # TIC-specific
         self.cols_for_source += ["TIC", "Tmag"]
         self.tic_catalog_name = "IV/39/tic82"
