@@ -430,6 +430,11 @@ def test_interact_sky_provider_gaiadr3_tic():
     # Expected cross-match of the target
     assert rs[rs["TIC"] == "233087860"]["Source"][0] == "2158781336134901760"
 
+    # Test 1a,for rows with no Gaia data, ensure correct `fill_value` is used for missing values
+    # (bokeh data source does not support missing value)
+    nss_filled = rs[(rs["Source"] == "") & (rs["TIC"] != "")]["NSS"].filled()
+    assert_array_equal(nss_filled,  np.full_like(nss_filled, 0))
+
     #
     # Tests 2 and 3: TIC 167092385
     # - the TIC has not Gaia DR2 Source (in TIC v8.2),
