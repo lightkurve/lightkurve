@@ -241,9 +241,19 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         ]
 
     def query_catalog(self) -> Table:
-        cj2000 = self.coord.transform_to("icrs")
+        # delay the import to here to avoid circular import
+        from ..interact import _correct_with_proper_motion
+
+        # VSX data is in J2000 coordinate, so we transform the given coordinate, usually PM corrected,
+        # back to one in J2000
+        ra2000, dec2000, _ = _correct_with_proper_motion(
+            self.coord.ra, self.coord.dec,
+            self.coord.pm_ra_cosdec, self.coord.pm_dec, self.coord.obstime,
+            self.J2000
+        )
+
         rs = _query_cone_region(
-            cj2000.ra.to(u.deg).value, cj2000.dec.to(u.deg).value, self.radius.to(u.deg).value, self.magnitude_limit
+            ra2000.to(u.deg).value, dec2000.to(u.deg).value, self.radius.to(u.deg).value, self.magnitude_limit
         )
         if rs is not None:
             rs["magForSize"] = 10  # use constant marker size

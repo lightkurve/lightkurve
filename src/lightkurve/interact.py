@@ -122,7 +122,7 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     return new_c.ra, new_c.dec, True
 
 
-def _get_corrected_coordinate(tpf_or_lc):
+def _get_corrected_coordinate(tpf_or_lc, as_skycoord=False):
     """Extract coordinate from Kepler/TESS FITS, with proper motion corrected
        to the start of observation if proper motion is available."""
     h = tpf_or_lc.meta
@@ -137,7 +137,10 @@ def _get_corrected_coordinate(tpf_or_lc):
 
     if ra is None or dec is None or pm_ra is None or pm_dec is None or equinox is None:
         # case cannot apply proper motion due to missing parameters
-        return ra, dec, False
+        if as_skycoord:
+            return SkyCoord(ra * u.deg, dec * u.deg, frame='icrs')
+        else:
+            return ra, dec, False
 
     # Note: it'd be better / extensible if the unit is a property of the tpf or lc
     if tpf_or_lc.meta.get("TICID") is not None:
@@ -146,12 +149,19 @@ def _get_corrected_coordinate(tpf_or_lc):
         pm_unit = u.arcsecond / u.year
 
     ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
-            ra * u.deg, dec *u.deg,
+            ra * u.deg, dec * u.deg,
             pm_ra * pm_unit, pm_dec * pm_unit,
             # we assume the data is in J2000 epoch
             Time('2000', format='byear'),
             new_time)
-    return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value, pm_corrected
+    if as_skycoord:
+        return SkyCoord(
+            ra_corrected, dec_corrected,
+            pm_ra_cosdec=pm_ra * pm_unit, pm_dec=pm_dec * pm_unit,
+            frame='icrs',
+            obstime=new_time)
+    else:
+        return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value, pm_corrected
 
 
 def _to_unitless(items):
@@ -423,10 +433,7 @@ def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
     provider_kwargs = extra_kwargs.copy()
 
     try:
-        ra, dec, pm_corrected = _get_corrected_coordinate(tpf)
-        c1 = SkyCoord(ra, dec, frame="icrs", unit="deg")
-        # OPEN: for now do not issue warning for no PM correction,
-        # as users would likely get multiple warnings (from code path of plotting the target as a cross)
+        c1 = _get_corrected_coordinate(tpf, as_skycoord=True)
     except Exception as err:
         msg = ("Cannot get nearby stars because TargetPixelFile has no valid coordinate. "
                f"ra: {getattr(tpf, 'ra', None)}, dec: {getattr(tpf, 'dec', None)}")
