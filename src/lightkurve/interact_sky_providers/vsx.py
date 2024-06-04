@@ -180,11 +180,11 @@ def _query_cone_region(ra2000, dec2000, radius_deg, magnitude_limit=None):
     if magnitude_limit is None:
         query_url += f"&tomag={magnitude_limit}"
 
-    result = _do_remote_query(query_url)
     try:
+        result = _do_remote_query(query_url)
         return _parse_response(result)
     except Exception as e:
-        raise LightkurveError(f"Unexpected error in parsing VSX result from {query_url}", e)
+        raise LightkurveError(f"Error in querying VSX with {query_url}", e)
 
 
 def _to_mag_text(tab):
