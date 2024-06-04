@@ -236,6 +236,7 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
             "OID",
             "Type",
             "Period",
+            "Epoch",
             "magText",
         ]
 
@@ -266,12 +267,19 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
     def get_detail_view(self, data: dict) -> Tuple[dict, list]:
         vsx_url = f"https://www.aavso.org/vsx/index.php?view=detail.top&oid={data['OID']}"
+        if np.isnan(data["Epoch"]):
+            epoch_text = ""
+        else:
+            # iso date, e.g. 2019-07-31, followed by HJD
+            epoch_text = Time(data["Epoch"], format="jd", scale="utc").to_value("iso", subfmt="date")
+            epoch_text += f' (HJD {data["Epoch"]})'
         return {
             "Name": f"""{data['Name']} (<a href="{vsx_url}" target="_blank">VSX</a>)""",
             'Separation (")': f"{data['separation']:.2f}",
             "Variability type": data["Type"],
             "Magnitude": data["magText"],
             "Period (d)": data["Period"],
+            "Epoch": epoch_text,
             "RA": f"{data['ra']:.8f}",
             "DEC": f"{data['dec']:.8f}",
             "column": f"{data['x']:.1f}",
