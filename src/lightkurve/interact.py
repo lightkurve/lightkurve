@@ -152,7 +152,7 @@ def _get_corrected_coordinate(tpf_or_lc, as_skycoord=False):
             ra * u.deg, dec * u.deg,
             pm_ra * pm_unit, pm_dec * pm_unit,
             # we assume the data is in J2000 epoch
-            Time('2000', format='byear'),
+            Time(2000.0, format="jyear"),
             new_time)
     if as_skycoord:
         return SkyCoord(
