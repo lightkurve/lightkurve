@@ -212,8 +212,6 @@ def _to_mag_text(tab):
 
 class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
-    label: str = "VSX"
-
     J2000 = Time(2000.0, format="jyear", scale="tt")
 
     def init(
@@ -239,6 +237,10 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
             "Epoch",
             "magText",
         ]
+
+    @property
+    def label(self) -> str:
+        return "VSX"
 
     def query_catalog(self) -> Table:
         # delay the import to here to avoid circular import

@@ -85,8 +85,6 @@ def _fill_template(template, var_value, var_name="%s"):
 
 class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
-    label: str = "Gaia DR3"
-
     # Gaia DR3 reference epoch: 2016.0,  time coordinate: barycentric coordinate time (TCB).
     # https://www.cosmos.esa.int/web/gaia/dr3
     # J2016 = Time(2016.0, format="jyear", scale="tcb")
@@ -161,6 +159,10 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         self.url_templates = self.url_templates_defaults
         if url_templates is not None:
             self.url_templates.update(url_templates)
+
+    @property
+    def label(self) -> str:
+        return "Gaia DR3"
 
     def query_catalog(self) -> Table:
         tab = super().query_catalog()
@@ -248,8 +250,6 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
     # OPEN: composition (with GaiaDR3InteractSkyCatalogProvider as a member, instead of inheriting it)
     # would be cleaner conceptually
 
-    label: str = "Gaia DR3 + TIC"
-
     def init(
         self,
         coord: SkyCoord,
@@ -265,6 +265,10 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         self.tic_catalog_name = "IV/39/tic82"
         self.exclude_tic_duplicates = True
         self.exclude_tic_artifacts = True
+
+    @property
+    def label(self) -> str:
+        return "Gaia DR3 + TIC"
 
     def query_catalog(self) -> Table:
         gaia_rs = super().query_catalog()

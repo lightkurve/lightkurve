@@ -23,7 +23,6 @@ def _to_lc_url(oid, data_release, format):
 
 class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
     # OPEN: support BAD_CATFLAGS_MASK parameter in the ZTF LC URL
-    label: str = "ZTF"
 
     def init(
         self,
@@ -72,6 +71,10 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
             "minmag",
             "astrometricrms",  # Root Mean Squared deviation in epochal positions relative to object RA,Dec
         ]
+
+    @property
+    def label(self) -> str:
+        return "ZTF"
 
     def query_catalog(self) -> Table:
         # Optimization: ZTF coverage is about north of -30deg dec.
