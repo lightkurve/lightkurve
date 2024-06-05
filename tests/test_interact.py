@@ -472,6 +472,31 @@ def test_interact_sky_provider_gaiadr3_tic():
     assert len(rs[rs["TIC"] == "440100538"]) == 0, "The nearby 2MASS artifact should be excluded"
 
 
+@pytest.mark.remote_data
+def test_interact_sky_provider_vsx():
+    """Test VSX"""
+    from lightkurve.interact_sky_providers import create_catalog_provider
+
+    # case the coordinate has PM
+    tpf_coord = SkyCoord(
+        196.421 * u.deg, 18.01 * u.deg, frame="icrs",
+        pm_ra_cosdec=1.0 * u.milliarcsecond / u.year, pm_dec=1.0 * u.milliarcsecond / u.year, obstime=Time(1234, format="btjd")
+    )
+    provider = create_catalog_provider("vsx")
+    provider.init(coord=tpf_coord, radius=60*u.arcsec, magnitude_limit=20)
+    rs = provider.query_catalog()
+    assert len(rs) > 0
+
+    # case the coordinate has no PM
+    tpf_coord = SkyCoord(
+        196.421 * u.deg, 18.01 * u.deg, frame="icrs",
+    )
+    provider = create_catalog_provider("vsx")
+    provider.init(coord=tpf_coord, radius=60*u.arcsec, magnitude_limit=20)
+    rs = provider.query_catalog()
+    assert len(rs) > 0
+
+
 VSX_RESPONSE_TEST_CASES = dict(
     # implementation-specific tests:
     # astropy table by default would interpret columns Period as str (general case, e.g., values with uncertain flag ":"), or float (when the data are all numbers)
