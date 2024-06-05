@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import Tuple, Union
 
@@ -14,6 +15,8 @@ import requests
 
 from .. import LightkurveError
 from .core import ProperMotionCorrectionMeta, InteractSkyCatalogProvider
+
+log = logging.getLogger(__name__)
 
 
 def _parse_limit_mag_uncertainty_band(text):
@@ -181,6 +184,7 @@ def _query_cone_region(ra2000, dec2000, radius_deg, magnitude_limit=None):
         query_url += f"&tomag={magnitude_limit}"
 
     try:
+        log.debug(f"Query VSX with: {query_url}")
         result = _do_remote_query(query_url)
         return _parse_response(result)
     except Exception as e:
