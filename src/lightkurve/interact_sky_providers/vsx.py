@@ -252,11 +252,23 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
         # VSX data is in J2000 coordinate, so we transform the given coordinate, usually PM corrected,
         # back to one in J2000
-        ra2000, dec2000, _ = _correct_with_proper_motion(
-            self.coord.ra, self.coord.dec,
-            self.coord.pm_ra_cosdec, self.coord.pm_dec, self.coord.obstime,
-            self.J2000
-        )
+
+        # Perform PM correction only if the supplied coordinate has PM info
+        # otherwise, if a coordinate has no PM
+        # - calling apply_space_motion() would raise ValueError: SkyCoord requires velocity data to evolve the position.
+        # - one cannot test if the coordinate has PM with `.pm_ra_cosdec` or `.pm_dec` attributes, as accessing them
+        #   would lead to TypeError: Frame data has no associated differentials (i.e. the frame has no velocity
+        #   data) - represent_as() only accepts a new representation.
+        # - so for now we use a rather obscure implementation details to test if the coord as PM.
+        # see: https://github.com/astropy/astropy/issues/16541
+        if "s" in self.coord.frame.data.differentials:
+            ra2000, dec2000, _ = _correct_with_proper_motion(
+                self.coord.ra, self.coord.dec,
+                self.coord.pm_ra_cosdec, self.coord.pm_dec, self.coord.obstime,
+                self.J2000
+            )
+        else:
+            ra2000, dec2000 = self.coord.ra, self.coord.dec
 
         rs = _query_cone_region(
             ra2000.to(u.deg).value, dec2000.to(u.deg).value, self.radius.to(u.deg).value, self.magnitude_limit
