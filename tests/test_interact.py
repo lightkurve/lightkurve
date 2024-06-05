@@ -209,44 +209,53 @@ class AbstractStubInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
 
 class StubNoPMInteractSkyCatalogProvider(AbstractStubInteractSkyCatalogProvider):
-    label = "stub_no_pm"
-
     stub_data = """\
     ID,RA,DEC,Mag
     1,30.00,45.00,11.0
     2,30.01,45.01,12.0
 """
 
+    @property
+    def label(self):
+        return "stub_no_pm"
+
     def get_proper_motion_correction_meta(self):
         return None
 
 
 class StubWithPMInteractSkyCatalogProvider(AbstractStubInteractSkyCatalogProvider):
-    label = "stub_with_pm"
-
     stub_data = """\
     ID,RAJ2000,DEJ2000,pmRA,pmDE,Mag
     1,30.00,45.00,1.1,1.2,11.0
     2,30.01,45.01,1.1,1.2,12.0
 """
 
+
+    @property
+    def label(self):
+        return "stub_with_pm"
+
     def get_proper_motion_correction_meta(self):
         J2000 = Time(2000.0, format="jyear", scale="tt")
         return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", J2000)
 
 class StubEmptyResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
-    label = "stub_empty_result"
-
     stub_data = """\
     ID,RAJ2000,DEJ2000,pmRA,pmDE,Mag
 """
 
+    @property
+    def label(self):
+        return "stub_empty_result"
+
 
 class StubNoneResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
-    label = "stub_none_result"
-
     # some providers would return None for Empty result
     stub_data = None
+
+    @property
+    def label(self):
+        return "stub_none_result"
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
