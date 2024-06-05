@@ -17,8 +17,6 @@ ProperMotionCorrectionMeta = namedtuple(
 
 
 class InteractSkyCatalogProvider(ABC):
-    # implementation should define it
-    label: str = None
 
     # Design note:
     # `init()` does most of what typically built-in `__init__()` does
@@ -58,6 +56,12 @@ class InteractSkyCatalogProvider(ABC):
         # columns to be converted to string in bokeh data source
         # (primarily to workaround bokeh issue of handling large integers)
         self.cols_as_str_for_source = []
+
+    @property
+    @abstractmethod
+    def label(self) -> str:
+        """Label to identify the catalog in UI."""
+        pass
 
     @abstractmethod
     def query_catalog(self) -> Table:
