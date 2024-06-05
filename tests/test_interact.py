@@ -472,7 +472,79 @@ def test_interact_sky_provider_gaiadr3_tic():
     assert len(rs[rs["TIC"] == "440100538"]) == 0, "The nearby 2MASS artifact should be excluded"
 
 
-# TODO: test VSX parsing edge cases
+VSX_RESPONSE_TEST_CASES = dict(
+    # implementation-specific tests:
+    # astropy table by default would interpret columns Period as str (general case, e.g., values with uncertain flag ":"), or float (when the data are all numbers)
+    #
+    # https://www.aavso.org/vsx/index.php?view=api.list&ra=283.2372404664148&dec=58.21640948105657&radius=0.06416666666666666&format=json
+    has_epoch_period_as_float_1row="""\
+{"VSXObjects":{"VSXObject":[{"Name":"ASASSN-V J185256.94+581259.1","RA2000":"283.23724","Declination2000":"58.21641","VariabilityType":"EA","Period":"5.09843","Epoch":"2457991.86","MaxMag":"14.21 V","MinMag":"14.37 V","Category":"Variable","OID":"1526644","Constellation":"Dra"}]}}
+""",
+
+    # handle case a column (Epoch) is missing in JSON
+    # https://www.aavso.org/vsx/index.php?view=api.list&ra=316.12157123252234&dec=70.76451425946803&radius=0.06416666666666666&format=json
+    no_epoch_as_float_1row="""\
+{"VSXObjects":{"VSXObject":[{"Name":"ASAS J210430+7045.9","RA2000":"316.12069","Declination2000":"70.76411","ProperMotionRA":"96.7230","ProperMotionDec":"13.3200","VariabilityType":"EW","Period":"0.306243","MaxMag":"8.794 V","MinMag":"(0.20) V","SpectralType":"K2","Category":"Variable","OID":"300626","Constellation":"Cep"}]}}
+""",
+
+    # https://www.aavso.org/vsx/index.php?view=api.list&ra=285.31165553284677&dec=60.87812797101079&radius=0.07583333333333334&format=json
+    empty_result="""\
+{"VSXObjects":[]}
+""",
+
+    # Average case with multiple rows, which also tests various edge cases, including
+    # - uncertain period: Y Com
+    # - no epoch: GP Com
+    # - limit flags on Max/MinFlag: Z Com [*]
+    # - MinMag is amplitude: ASAS J130830+1828.1
+    # - MinFlag amplitude has a different passband: CSS_J130149.6+181629 [*]
+    # - MinMag is "?": LINEAR 8078628 [*]
+    # - minimum info (no PM, variability type, magnitude range/amplitude, etc.) : CSS_J130246.9+182141 [*]
+    # [*] the JSON response is modified (from actual VSX response) to test edge case
+    # https://www.aavso.org/vsx/index.php?view=api.list&ra=196.421&dec=18.01&radius=2.1&format=json
+    avg_case="""\
+{"VSXObjects":{"VSXObject":[
+{"Name": "Y Com", "AUID": "000-BDM-173", "RA2000": "196.64292", "Declination2000": "18.97247", "ProperMotionRA": "-6.2000", "ProperMotionDec": "-3.4000", "VariabilityType": "SRB", "Period": "95:", "Epoch": "2452994", "MaxMag": "13.4 B", "MinMag": "14.39 B", "Category": "Variable", "OID": "9610", "Constellation": "Com"},
+{"Name": "Z Com", "AUID": "000-BDM-174", "RA2000": "197.07607", "Declination2000": "18.54055", "ProperMotionRA": "4.5000", "ProperMotionDec": "-22.3000", "VariabilityType": "RRAB", "Period": "0.5466892", "Epoch": "2453469.8819", "RiseDuration": "13", "MaxMag": "<13.14 V", "MinMag": ">14.29 V", "Category": "Variable", "OID": "9611", "Constellation": "Com"},
+{"Name": "GP Com", "AUID": "000-BCV-502", "RA2000": "196.42667", "Declination2000": "18.01772", "ProperMotionRA": "-343.0000", "ProperMotionDec": "37.0000", "VariabilityType": "IBWD", "Period": "0.032339", "MaxMag": "15.7 V", "MinMag": "16.2 V", "SpectralType": "DBe", "Category": "Variable", "OID": "9800", "Constellation": "Com"},
+{"Name": "ASAS J130830+1828.1", "RA2000": "197.12658", "Declination2000": "18.47531", "ProperMotionRA": "-20.1000", "ProperMotionDec": "-2.7000", "VariabilityType": "ED", "Period": "0.448945", "MaxMag": "12.382 V", "MinMag": "(0.160) V", "Category": "Variable", "OID": "281437", "Constellation": "Com"},
+{"Name": "LINEAR 8078628", "RA2000": "195.73021", "Declination2000": "17.55149", "ProperMotionRA": "-32.5000", "ProperMotionDec": "-9.7000", "VariabilityType": "EW", "Period": "0.940526", "MaxMag": "15.51 CV", "MinMag": "?", "Category": "Variable", "OID": "319884", "Constellation": "Com"},
+{"Name": "CSS_J130149.6+181629", "RA2000": "195.45693", "Declination2000": "18.27497", "ProperMotionRA": "-2.4000", "ProperMotionDec": "-5.3000", "VariabilityType": "RRAB", "Period": "0.6422550", "Epoch": "2453470.3198", "MaxMag": "16.773 CV", "MinMag": "(0.85) TESS", "Category": "Variable", "OID": "291920", "Constellation": "Com"},
+{"Name": "CSS_J130246.9+182141", "RA2000": "195.69565", "Declination2000": "18.36147", "MaxMag": "18.399 CV", "Category": "Suspected", "OID": "291928", "Constellation": "Com"},
+{"Name": "CSS_J130256.1+182529", "RA2000": "195.73391", "Declination2000": "18.42494", "VariabilityType": "RRAB", "Period": "0.5606905", "Epoch": "2453470.1252", "MaxMag": "17.903 CV", "MinMag": "(0.54) CV", "Category": "Variable", "OID": "291929", "Constellation": "Com"},
+{"Name": "CSS_J130323.8+183610", "RA2000": "195.84935", "Declination2000": "18.60292", "VariabilityType": "RRAB", "Period": "0.6153327", "Epoch": "2453469.8706", "MaxMag": "18.745 CV", "MinMag": "(0.59) CV", "Category": "Variable", "OID": "291935", "Constellation": "Com"},
+{"Name": "CSS_J130450.2+183549", "RA2000": "196.20921", "Declination2000": "18.59704", "ProperMotionRA": "2.3000", "ProperMotionDec": "0.5000", "VariabilityType": "RRAB", "Period": "0.71316", "Epoch": "2455323.7766", "MaxMag": "16.943 CV", "MinMag": "(0.75) CV", "Category": "Variable", "OID": "291955", "Constellation": "Com"},
+{"Name": "CSS_J130655.9+180243", "RA2000": "196.73313", "Declination2000": "18.04544", "ProperMotionRA": "-0.8000", "ProperMotionDec": "-5.9000", "VariabilityType": "RRAB", "Period": "0.65192", "Epoch": "2455664.7858", "MaxMag": "16.654 CV", "MinMag": "(0.73) CV", "Category": "Variable", "OID": "291984", "Constellation": "Com"},
+{"Name": "CSS_J130829.7+175900", "RA2000": "197.12409", "Declination2000": "17.98351", "VariabilityType": "RRAB", "Period": "0.5290068", "Epoch": "2453470.3275", "MaxMag": "18.679 CV", "MinMag": "(1.07) CV", "Category": "Variable", "OID": "292001", "Constellation": "Com"},
+{"Name": "V0337 Com", "RA2000": "195.55312", "Declination2000": "17.83928", "VariabilityType": "RRD", "Period": "0.355745", "Epoch": "2455000.342", "MaxMag": "18.1 CV", "MinMag": "18.9 CV", "Category": "Variable", "OID": "382137", "Constellation": "Com"},
+{"Name": "V0338 Com", "RA2000": "195.93631", "Declination2000": "17.96857", "VariabilityType": "RRD", "Period": "0.361005", "Epoch": "2455000.295", "MaxMag": "18.2 CV", "MinMag": "19.2 CV", "Category": "Variable", "OID": "382159", "Constellation": "Com"},
+{"Name": "CSS_J130600.1+180046", "AUID": "000-BPF-391", "RA2000": "196.50058", "Declination2000": "18.01297", "VariabilityType": "EB", "Period": "1.30748", "MaxMag": "16.68 CV", "MinMag": "(0.14) CV", "Category": "Variable", "OID": "382191", "Constellation": "Com"},
+{"Name": "CSS_J130915.4+181943", "RA2000": "197.31458", "Declination2000": "18.32863", "ProperMotionRA": "11.1000", "ProperMotionDec": "-8.3000", "VariabilityType": "EA", "Period": "0.82638", "Epoch": "2458526.9851", "MaxMag": "15.951 r", "MinMag": "(0.284) r", "Category": "Variable", "OID": "382234", "Constellation": "Com"},
+{"Name": "ZTF J130403.26+184147.6", "RA2000": "196.01360", "Declination2000": "18.69656", "VariabilityType": "BY", "Period": "1.2442269", "Epoch": "2458487.0296", "MaxMag": "16.900 r", "MinMag": "(0.099) r", "Discoverer": "Zwicky Transient Facility (ZTF)", "Category": "Variable", "OID": "1704066", "Constellation": "Com"},
+{"Name": "ZTF J130429.63+180459.3", "RA2000": "196.12348", "Declination2000": "18.08316", "VariabilityType": "BY", "Period": "0.5901588", "Epoch": "2458295.7337", "MaxMag": "16.524 r", "MinMag": "(0.106) r", "Discoverer": "Zwicky Transient Facility (ZTF)", "Category": "Variable", "OID": "1704070", "Constellation": "Com"},
+{"Name": "ZTF J130917.23+175650.1", "RA2000": "197.32183", "Declination2000": "17.94727", "VariabilityType": "RS", "Period": "0.2722320", "Epoch": "2458210.8244", "MaxMag": "13.397 g", "MinMag": "(0.117) g", "Discoverer": "Zwicky Transient Facility (ZTF)", "Category": "Variable", "OID": "1750641", "Constellation": "Com"},
+{"Name": "ASASSN-V J130329.61+184723.0", "RA2000": "195.87340", "Declination2000": "18.78974", "VariabilityType": "ROT", "Period": "2.9103", "Epoch": "2458933.393", "MaxMag": "15.07 g", "MinMag": "(0.34) g", "Category": "Variable", "OID": "2272914", "Constellation": "Com"},
+{"Name": "ASASSN-V J130647.48+182752.4", "RA2000": "196.69797", "Declination2000": "18.46471", "VariabilityType": "ROT", "Period": "16.919", "Epoch": "2459363.613", "MaxMag": "13.16 g", "MinMag": "(0.13) g", "Category": "Variable", "OID": "2273094", "Constellation": "Com"},
+{"Name": "ASASSN-V J130651.61+174203.2", "RA2000": "196.71500", "Declination2000": "17.70097", "VariabilityType": "ROT", "Period": "12.311", "Epoch": "2458923.442", "MaxMag": "15.26 g", "MinMag": "(0.32) g", "Category": "Variable", "OID": "2273100", "Constellation": "Com"}
+]}}
+"""
+)
+
+
+@pytest.mark.parametrize("case_name", list(VSX_RESPONSE_TEST_CASES.keys()))
+def test_interact_sky_vsx_parse_json(case_name):
+    """Test various edge cases in parsing VSX JSON result as astropy table"""
+    import json
+    from lightkurve.interact_sky_providers.vsx import _parse_response
+
+    json_obj = json.loads(VSX_RESPONSE_TEST_CASES.get(case_name))
+    tab = _parse_response(json_obj)
+    # if tab is not None:
+    #     tab.pprint_all()  # for debug purpose
+
+    # just test the parsing does not cause errors, and return
+    # None or a table
+    assert tab is None or len(tab) >= 0
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
