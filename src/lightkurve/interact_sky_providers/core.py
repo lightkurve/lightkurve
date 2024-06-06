@@ -18,18 +18,7 @@ ProperMotionCorrectionMeta = namedtuple(
 
 class InteractSkyCatalogProvider(ABC):
 
-    # Design note:
-    # `init()` does most of what typically built-in `__init__()` does
-    # because the pattern supported would let users to
-    # supply custom provider by giving a provider instance.
-    # The actual `interact_sky()` initialization, e.g., defining
-    # the search coordinate and radius, can then be carried out
-    # `interact_sky()` logic, where it has all the necessary values.
-    #
-    # To keep things simple, sub classes should generally implement
-    # all initialization logic in `init()`, rather than the `__init__()`.
-
-    def init(
+    def __init__(
         self,
         coord: SkyCoord,
         radius: Union[float, u.Quantity],

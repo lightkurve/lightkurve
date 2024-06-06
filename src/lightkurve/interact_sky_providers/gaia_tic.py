@@ -25,14 +25,14 @@ def _query_cone_region(coord, radius, catalog, columns=["*"], query_kwargs=dict(
 
 class VizierInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
-    def init(
+    def __init__(
         self,
         coord: SkyCoord,
         radius: Union[float, u.Quantity],
         magnitude_limit: float,
         scatter_kwargs: dict = None,
     ) -> None:
-        super().init(coord, radius, magnitude_limit, scatter_kwargs)
+        super().__init__(coord, radius, magnitude_limit, scatter_kwargs)
         # Vizier-specific query
         self.catalog_name = None
         self.columns = ["*"]
@@ -111,7 +111,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             simbad_url_by_coord=f"https://{simbad_server}/simbad/sim-coo?Coord=%ra+%dec&Radius=2&Radius.unit=arcmin",
         )
 
-    def init(
+    def __init__(
         self,
         coord: SkyCoord,
         radius: Union[float, u.Quantity],
@@ -134,7 +134,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
                 hover_alpha=0.9,
                 hover_line_color="white",
             )
-        super().init(coord, radius, magnitude_limit, scatter_kwargs)
+        super().__init__(coord, radius, magnitude_limit, scatter_kwargs)
         # Gaia DR3 Vizier specific
         self.catalog_name = "I/355/gaiadr3"
         self.columns = ["*", "RAJ2000", "DEJ2000", "VarFlag", "NSS"]
@@ -250,7 +250,7 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
     # OPEN: composition (with GaiaDR3InteractSkyCatalogProvider as a member, instead of inheriting it)
     # would be cleaner conceptually
 
-    def init(
+    def __init__(
         self,
         coord: SkyCoord,
         radius: Union[float, u.Quantity],
@@ -259,7 +259,7 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         extra_cols_in_detail_view: dict = None,
         url_templates: dict = None,
     ) -> None:
-        super().init(coord, radius, magnitude_limit, scatter_kwargs, extra_cols_in_detail_view, url_templates)
+        super().__init__(coord, radius, magnitude_limit, scatter_kwargs, extra_cols_in_detail_view, url_templates)
         # TIC-specific
         self.cols_for_source += ["TIC", "Tmag"]
         self.tic_catalog_name = "IV/39/tic82"

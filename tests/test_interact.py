@@ -239,6 +239,7 @@ class StubWithPMInteractSkyCatalogProvider(AbstractStubInteractSkyCatalogProvide
         J2000 = Time(2000.0, format="jyear", scale="tt")
         return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", J2000)
 
+
 class StubEmptyResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
     stub_data = """\
     ID,RAJ2000,DEJ2000,pmRA,pmDE,Mag
@@ -285,11 +286,11 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
     message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
     catalogs = [
-        StubNoPMInteractSkyCatalogProvider(),
-        StubWithPMInteractSkyCatalogProvider(),
+        StubNoPMInteractSkyCatalogProvider,
+        StubWithPMInteractSkyCatalogProvider,
         # test boundary cases
-        StubEmptyResultInteractSkyCatalogProvider(),
-        StubNoneResultInteractSkyCatalogProvider(),
+        StubEmptyResultInteractSkyCatalogProvider,
+        StubNoneResultInteractSkyCatalogProvider,
     ]
     magnitude_limit = 18
     providers, renderers = parse_and_add_catalogs_figure_elements(
@@ -319,7 +320,7 @@ def test_interact_sky_functions_case_no_target_coordinate():
     message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
     with pytest.raises(LightkurveError, match=r".* no valid coordinate.*"):
-        catalogs = [ StubWithPMInteractSkyCatalogProvider() ]
+        catalogs = [StubWithPMInteractSkyCatalogProvider]
         magnitude_limit = 18
         parse_and_add_catalogs_figure_elements(
             catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
@@ -417,7 +418,7 @@ def test_interact_sky_provider_gaiadr3_detail_view():
 @pytest.mark.remote_data
 def test_interact_sky_provider_gaiadr3_tic():
     """Test Gaia DR3 + TIC join"""
-    from lightkurve.interact_sky_providers import create_catalog_provider
+    from lightkurve.interact_sky_providers import resolve_catalog_provider_class
 
     #
     # Test 1: TIC 233087860
@@ -427,8 +428,7 @@ def test_interact_sky_provider_gaiadr3_tic():
     ra, dec = 272.20452, 60.678785
 
     tpf_coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
-    provider = create_catalog_provider("gaiadr3_tic")
-    provider.init(coord=tpf_coord, radius=75*u.arcsec, magnitude_limit=18)
+    provider = resolve_catalog_provider_class("gaiadr3_tic")(coord=tpf_coord, radius=75*u.arcsec, magnitude_limit=18)
     rs = provider.query_catalog()
 
     # print(rs)  # for debugging
@@ -452,8 +452,7 @@ def test_interact_sky_provider_gaiadr3_tic():
     ra, dec = 318.72463517654, 38.09423368095
 
     tpf_coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
-    provider = create_catalog_provider("gaiadr3_tic")
-    provider.init(coord=tpf_coord, radius=15*u.arcsec, magnitude_limit=18)
+    provider = resolve_catalog_provider_class("gaiadr3_tic")(coord=tpf_coord, radius=15*u.arcsec, magnitude_limit=18)
     rs = provider.query_catalog()
 
     # Expected cross-match failure
@@ -472,8 +471,7 @@ def test_interact_sky_provider_gaiadr3_tic():
     ra, dec = 4.35804798287, 42.28232330179
 
     tpf_coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
-    provider = create_catalog_provider("gaiadr3_tic")
-    provider.init(coord=tpf_coord, radius=10*u.arcsec, magnitude_limit=18)
+    provider = resolve_catalog_provider_class("gaiadr3_tic")(coord=tpf_coord, radius=10*u.arcsec, magnitude_limit=18)
     rs = provider.query_catalog()
 
     # Expected the target is found
@@ -484,15 +482,14 @@ def test_interact_sky_provider_gaiadr3_tic():
 @pytest.mark.remote_data
 def test_interact_sky_provider_vsx():
     """Test VSX"""
-    from lightkurve.interact_sky_providers import create_catalog_provider
+    from lightkurve.interact_sky_providers import resolve_catalog_provider_class
 
     # case the coordinate has PM
     tpf_coord = SkyCoord(
         196.421 * u.deg, 18.01 * u.deg, frame="icrs",
         pm_ra_cosdec=1.0 * u.milliarcsecond / u.year, pm_dec=1.0 * u.milliarcsecond / u.year, obstime=Time(1234, format="btjd")
     )
-    provider = create_catalog_provider("vsx")
-    provider.init(coord=tpf_coord, radius=60*u.arcsec, magnitude_limit=20)
+    provider = resolve_catalog_provider_class("vsx")(coord=tpf_coord, radius=60*u.arcsec, magnitude_limit=20)
     rs = provider.query_catalog()
     assert len(rs) > 0
 
@@ -500,8 +497,7 @@ def test_interact_sky_provider_vsx():
     tpf_coord = SkyCoord(
         196.421 * u.deg, 18.01 * u.deg, frame="icrs",
     )
-    provider = create_catalog_provider("vsx")
-    provider.init(coord=tpf_coord, radius=60*u.arcsec, magnitude_limit=20)
+    provider = resolve_catalog_provider_class("vsx")(coord=tpf_coord, radius=60*u.arcsec, magnitude_limit=20)
     rs = provider.query_catalog()
     assert len(rs) > 0
 

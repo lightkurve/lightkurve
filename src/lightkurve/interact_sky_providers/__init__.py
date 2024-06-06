@@ -9,14 +9,14 @@ from . import (
 )
 
 
-def create_catalog_provider(name):
+def resolve_catalog_provider_class(name):
     if name == "gaiadr3":
-        return gaia_tic.GaiaDR3InteractSkyCatalogProvider()
+        return gaia_tic.GaiaDR3InteractSkyCatalogProvider
     elif name == "gaiadr3_tic":
-        return gaia_tic.GaiaDR3TICInteractSkyCatalogProvider()
+        return gaia_tic.GaiaDR3TICInteractSkyCatalogProvider
     elif name == "ztf":
-        return ztf.ZTFInteractSkyCatalogProvider()
+        return ztf.ZTFInteractSkyCatalogProvider
     elif name == "vsx":
-        return vsx.VSXInteractSkyCatalogProvider()
+        return vsx.VSXInteractSkyCatalogProvider
     else:
         raise ValueError(f"Unsupported catalog: {name}")

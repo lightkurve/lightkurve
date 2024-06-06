@@ -218,7 +218,7 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
     J2000 = Time(2000.0, format="jyear", scale="tt")
 
-    def init(
+    def __init__(
         self,
         coord: SkyCoord,
         radius: Union[float, u.Quantity],
@@ -231,7 +231,7 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
                 line_color="firebrick",
                 line_width=2,
             )
-        super().init(coord, radius, magnitude_limit, scatter_kwargs)
+        super().__init__(coord, radius, magnitude_limit, scatter_kwargs)
         # VSX-specific
         self.cols_for_source = [
             "Name",
