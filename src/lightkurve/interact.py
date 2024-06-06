@@ -27,7 +27,7 @@ from astropy.time import Time
 import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
 
-from .interact_sky_providers import create_catalog_provider
+from .interact_sky_providers import resolve_catalog_provider_class
 from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
 
 log = logging.getLogger(__name__)
@@ -425,7 +425,7 @@ def add_target_figure_elements(tpf, fig):
                            category=LightkurveWarning)
 
 
-def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
+def create_provider(provider_class, tpf, magnitude_limit, extra_kwargs=None):
     """Supplying the given provider all the parameters needed (for query, plotting, etc)."""
     if extra_kwargs is None:
         extra_kwargs = {}
@@ -453,7 +453,7 @@ def init_provider(provider, tpf, magnitude_limit, extra_kwargs=None):
 
     provider_kwargs["magnitude_limit"] = magnitude_limit
 
-    provider.init(**provider_kwargs)
+    return provider_class(**provider_kwargs)
 
 
 def _row_to_dict(source, idx):
@@ -631,25 +631,25 @@ def parse_and_add_catalogs_figure_elements(catalogs, magnitude_limit, tpf, fig_t
     for catalog_spec in catalogs:
         if isinstance(catalog_spec, (tuple, list)):
             if len(catalog_spec) == 2:
-                provider, extra_kwargs = catalog_spec
+                provider_class, extra_kwargs = catalog_spec
             elif len(catalog_spec) == 1:
                 # to support the form of ("gaiadr3", )
                 # say, when users comment out the keyword arguments in their code
-                provider, extra_kwargs = catalog_spec[0], None
+                provider_class, extra_kwargs = catalog_spec[0], None
             else:
                 raise ValueError(
                     "A catalog should be the catalog, or a tuple of catalog and keyword arguments. "
                     f"Actual: {catalog_spec}"
                     )
         else:
-            provider, extra_kwargs = catalog_spec, None
+            provider_class, extra_kwargs = catalog_spec, None
 
-        if isinstance(provider, str):
-            provider = create_catalog_provider(provider)
-        # else assume it's a InteractSkyCatalogProvider object
+        if isinstance(provider_class, str):
+            provider_class = resolve_catalog_provider_class(provider_class)
+        # else assume it's a InteractSkyCatalogProvider class
 
         # pass all the parameters for query, plotting, etc. to the provider
-        init_provider(provider, tpf, magnitude_limit, extra_kwargs=extra_kwargs)
+        provider = create_provider(provider_class, tpf, magnitude_limit, extra_kwargs=extra_kwargs)
         renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
         providers.append(provider)
         catalog_renderers.append(renderer)

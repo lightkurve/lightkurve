@@ -24,7 +24,7 @@ def _to_lc_url(oid, data_release, format):
 class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
     # OPEN: support BAD_CATFLAGS_MASK parameter in the ZTF LC URL
 
-    def init(
+    def __init__(
         self,
         coord: SkyCoord,
         radius: Union[float, u.Quantity],
@@ -51,7 +51,7 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
                 hover_alpha=0.9,
                 hover_line_color="white",
             )
-        super().init(coord, radius, magnitude_limit, scatter_kwargs)
+        super().__init__(coord, radius, magnitude_limit, scatter_kwargs)
         # ZTF-specific query criteria
         self.ngoodobsrel_min = ngoodobsrel_min
         self.filtercode = filtercode
