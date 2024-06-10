@@ -12,7 +12,7 @@ __all__ = ["InteractSkyCatalogProvider", "ProperMotionCorrectionMeta"]
 
 
 ProperMotionCorrectionMeta = namedtuple(
-    "ProperMotionCorrectionMeta", "ra_colname dec_colname pmra_colname pmdec_colname equinox"
+    "ProperMotionCorrectionMeta", "ra_colname dec_colname pmra_colname pmdec_colname frame equinox"
 )
 
 

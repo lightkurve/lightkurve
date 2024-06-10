@@ -237,7 +237,17 @@ class StubWithPMInteractSkyCatalogProvider(AbstractStubInteractSkyCatalogProvide
 
     def get_proper_motion_correction_meta(self):
         J2000 = Time(2000.0, format="jyear", scale="tt")
-        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", J2000)
+        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", "icrs", J2000)
+
+
+class StubWithPMnFK5CoordInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
+    @property
+    def label(self):
+        return "stub_with_pm_and_fk5_coord"
+
+    def get_proper_motion_correction_meta(self):
+        J2000 = Time(2000.0, format="jyear", scale="tt")
+        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", "fk5", J2000)
 
 
 class StubEmptyResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
@@ -288,6 +298,7 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
     catalogs = [
         StubNoPMInteractSkyCatalogProvider,
         StubWithPMInteractSkyCatalogProvider,
+        StubWithPMnFK5CoordInteractSkyCatalogProvider,  # catalog coordinate in FK5 rather than ICRS
         # test boundary cases
         StubEmptyResultInteractSkyCatalogProvider,
         StubNoneResultInteractSkyCatalogProvider,
