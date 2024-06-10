@@ -455,6 +455,11 @@ def test_interact_sky_provider_gaiadr3_tic():
     nss_filled = rs[(rs["Source"] == "") & (rs["TIC"] != "")]["NSS"].filled()
     assert_array_equal(nss_filled,  np.full_like(nss_filled, 0))
 
+    # Test 1b: ensure it can properly return empty result
+    provider = resolve_catalog_provider_class("gaiadr3_tic")(coord=tpf_coord, radius=75*u.arcsec, magnitude_limit=1)
+    rs = provider.query_catalog()
+    assert len(rs) == 0
+
     #
     # Tests 2 and 3: TIC 167092385
     # - the TIC has not Gaia DR2 Source (in TIC v8.2),

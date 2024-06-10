@@ -1,10 +1,13 @@
 from typing import Tuple, Union
 import warnings
 
+import numpy as np
+
+
 import astropy.units as u
 
 from astropy.coordinates import SkyCoord
-from astropy.table import Table, join
+from astropy.table import Table, MaskedColumn, join
 from astropy.time import Time
 
 import astroquery.simbad as simbad
@@ -44,18 +47,11 @@ class VizierInteractSkyCatalogProvider(InteractSkyCatalogProvider):
             # for Gaia
             warnings.filterwarnings("ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard")
             result = _query_cone_region(self.coord, self.radius, self.catalog_name, columns=self.columns)
-        no_targets_found_message = ValueError("Either no sources were found in the query region " "or Vizier is unavailable")
-        too_few_found_message = ValueError("No sources found brighter than {:0.1f}".format(self.magnitude_limit))
-        if result is None:
-            raise no_targets_found_message
-        elif len(result) == 0:
-            raise too_few_found_message
+        if result is None or len(result) == 0:
+            return None
         result = result[self.catalog_name]
         if self.magnitude_limit_column_name is not None and self.magnitude_limit is not None:
             result = result[result[self.magnitude_limit_column_name] < self.magnitude_limit]
-        if len(result) == 0:
-            raise no_targets_found_message
-
         # to be used as the basis for sizing the dots in plots
         if self.magnitude_limit_column_name is not None:
             result["magForSize"] = result[self.magnitude_limit_column_name]
@@ -246,6 +242,30 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         return key_vals, extra_rows
 
 
+def _join_for_empty_right_table(left, right):
+    # astropy.table.join() throws ValueError if 1 or both tables are empty
+    # this helper is used to populate the dummy columns
+    # so that the resulting table still has all the columns
+
+    rs = left.copy()
+    for c in right.colnames:
+        if np.issubdtype(right[c].info.dtype.type, str):
+            fill_val, dtype = "", str
+        elif np.issubdtype(right[c].info.dtype.type, np.integer):
+            fill_val, dtype = 0, int
+        else:
+            fill_val, dtype = np.nan, float
+        # use MaskedColumn because that's what astroquery returns
+        # (some subsequent codes would use MaskedColumn-specific APIs)
+        rs.add_column(MaskedColumn(
+            np.full_like(rs, fill_val, dtype=dtype),
+            name=c,
+            mask=np.full_like(rs, True, dtype=bool),
+            fill_value=fill_val
+        ))
+    return rs
+
+
 class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
     # OPEN: composition (with GaiaDR3InteractSkyCatalogProvider as a member, instead of inheriting it)
     # would be cleaner conceptually
@@ -304,7 +324,12 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
             [f"t_{c}" for c in cols_to_rename],
         )
         tic_rs["GAIA"] = tic_rs["GAIA"].filled(-1)  # avoid table merge error (it requires  no missing key)
-        rs = join(gaia_rs, tic_rs, join_type="outer", keys_left="Source", keys_right="GAIA", metadata_conflicts="silent")
+        if len(gaia_rs) > 0 and len(tic_rs) > 0:
+            rs = join(gaia_rs, tic_rs, join_type="outer", keys_left="Source", keys_right="GAIA", metadata_conflicts="silent")
+        elif len(tic_rs) == 0:
+            rs = _join_for_empty_right_table(gaia_rs, tic_rs)
+        else:
+            rs = _join_for_empty_right_table(tic_rs, gaia_rs)
 
         # Post-join massaging the data
         # handle case missing TIC
