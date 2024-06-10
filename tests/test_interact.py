@@ -174,6 +174,17 @@ def test_interact_functions():
     make_tpf_figure_elements(tpf, tpf_source)
     show_interact_widget(tpf)
 
+
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
+def test_ylim_with_nans():
+    """Regression test for #679: y limits should not be NaN."""
+    lc_source = ColumnDataSource({"flux": [-1, np.nan, 1]})
+    ymin, ymax = get_lightcurve_y_limits(lc_source)
+    # ymin/ymax used to return nan, make sure this is no longer the case
+    assert ymin == -1.176
+    assert ymax == 1.176
+
+
 #
 # Tests for interact_sky()
 #
@@ -591,13 +602,3 @@ def test_interact_sky_vsx_parse_json(case_name):
     # just test the parsing does not cause errors, and return
     # None or a table
     assert tab is None or len(tab) >= 0
-
-
-@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
-def test_ylim_with_nans():
-    """Regression test for #679: y limits should not be NaN."""
-    lc_source = ColumnDataSource({"flux": [-1, np.nan, 1]})
-    ymin, ymax = get_lightcurve_y_limits(lc_source)
-    # ymin/ymax used to return nan, make sure this is no longer the case
-    assert ymin == -1.176
-    assert ymax == 1.176
