@@ -180,7 +180,7 @@ def _query_cone_region(ra2000, dec2000, radius_deg, magnitude_limit=None):
     """
 
     query_url = f"https://www.aavso.org/vsx/index.php?view=api.list&ra={ra2000}&dec={dec2000}&radius={radius_deg}&format=json"
-    if magnitude_limit is None:
+    if magnitude_limit is not None:
         query_url += f"&tomag={magnitude_limit}"
 
     try:
