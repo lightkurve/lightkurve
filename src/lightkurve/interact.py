@@ -80,7 +80,7 @@ def _fill_masked_or_nan_with(ary, fill_value):
     return ary
 
 
-def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
+def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, frame, equinox, new_time):
     """Return proper-motion corrected RA / Dec.
        It also return whether proper motion correction is applied or not."""
     # all parameters have units
@@ -106,7 +106,7 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
     #    and huge proper motion, does not change the result in any noticeable way.
     #
     c = SkyCoord(ra, dec, pm_ra_cosdec=pm_ra, pm_dec=pm_dec,
-                frame='icrs', obstime=equinox)
+                 frame=frame, obstime=equinox)
 
     with warnings.catch_warnings():
         # Suppress ErfaWarning temporarily as a workaround for:
@@ -119,6 +119,8 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
         # as some rows could have missing PM
         warnings.filterwarnings("ignore", message="invalid value encountered in pmsafe")
         new_c = c.apply_space_motion(new_obstime=new_time)
+    if frame != "icrs":
+        new_c = new_c.transform_to("icrs")
     return new_c.ra, new_c.dec, True
 
 
@@ -151,6 +153,7 @@ def _get_corrected_coordinate(tpf_or_lc, as_skycoord=False):
     ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
             ra * u.deg, dec * u.deg,
             pm_ra * pm_unit, pm_dec * pm_unit,
+            "icrs",
             # we assume the data is in J2000 epoch
             Time(2000.0, format="jyear"),
             new_time)
@@ -474,6 +477,7 @@ def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arr
         ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
             result[m.ra_colname].quantity, result[m.dec_colname].quantity,
             result[m.pmra_colname].quantity, result[m.pmdec_colname].quantity,
+            m.frame,
             m.equinox,
             tpf.time[0])
         result["RA"] = ra_corrected.to(u.deg).value

@@ -264,7 +264,8 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         if "s" in self.coord.frame.data.differentials:
             ra2000, dec2000, _ = _correct_with_proper_motion(
                 self.coord.ra, self.coord.dec,
-                self.coord.pm_ra_cosdec, self.coord.pm_dec, self.coord.obstime,
+                self.coord.pm_ra_cosdec, self.coord.pm_dec,
+                "icrs", self.coord.obstime,
                 self.J2000
             )
         else:
@@ -279,7 +280,7 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         return rs
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
-        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", self.J2000)
+        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", "icrs", self.J2000)
 
     def get_tooltips(self) -> list:
         return [
