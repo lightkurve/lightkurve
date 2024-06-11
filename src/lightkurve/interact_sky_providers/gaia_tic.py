@@ -175,7 +175,13 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
         # Use RAJ200/ DEJ2000 instead of Gaia DR3's native RA_IRCS in J2016.0 for ease of
-        # merging with the result from TIC
+        # merging with the result from TIC (which also has J2000 coordinate)
+        # If more precise correction is needed for Gaia + TIC,
+        # we need to do the correction on case-by-case basis
+        # - Gaia DR3: use RA_ICRS in J2016.0
+        # - TICs without Gaia DR3 match: use RA_orig,
+        #   the origin of the coordinate is denoted in POSflag (Gaia DR2 / 1, 2MASS, hip, etc.)
+        #   need to find the reference epoch of each of the origin catalog, e.g. J2015.5 for Gaia DR2
         return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", "icrs", self.J2000)
 
     def add_to_data_source(self, result: Table, source: dict) -> None:
