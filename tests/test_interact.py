@@ -450,14 +450,17 @@ def test_interact_sky_provider_gaiadr3_tic():
     ra, dec = 272.20452, 60.678785
 
     tpf_coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
-    provider = resolve_catalog_provider_class("gaiadr3_tic")(coord=tpf_coord, radius=75*u.arcsec, magnitude_limit=18)
+    provider = resolve_catalog_provider_class("gaiadr3_tic")(coord=tpf_coord, radius=120*u.arcsec, magnitude_limit=18)
     rs = provider.query_catalog()
 
     # print(rs)  # for debugging
     # known there are multiple rows that have both Gaia DR3 Source and TIC (cross-matched)
     assert len(rs[(rs["Source"] != "") & (rs["TIC"] != "")]) > 1
-    # known there are rows that have nave  no Gaia DR3 Source (TIC without Gaia)
-    assert len(rs[(rs["Source"] == "") & (rs["TIC"] != "")]) > 0
+    # the result should contain TIC 233087856 / Gaia DR2 2158781679732285056,
+    # the Gaia DR3 source is different: Gaia DR3 2158781684028652928
+    # cases like this should be seen result in 2 rows for a target
+    assert len(rs[(rs["Source"] == "") & (rs["TIC"] != "")]) > 0, "TIC without Gaia"
+    assert len(rs[(rs["Source"] != "") & (rs["TIC"] == "")]) > 0,  "Gaia without TIC"
     # Expected cross-match of the target
     assert rs[rs["TIC"] == "233087860"]["Source"][0] == "2158781336134901760"
 
