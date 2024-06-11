@@ -162,15 +162,16 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
     def query_catalog(self) -> Table:
         tab = super().query_catalog()
+        self._post_process_gaiadr3_result(tab)
+        return tab
 
+    def _post_process_gaiadr3_result(self, tab):
         # set custom fill_value for some columns, typically integer columns,
         # so that for rows with missing values, the custom `fill_value` is used
         # for column NSS, without setting fill_value, the astropy default `fill_value`
         # is often 63, confusing  users.
         if "NSS" in tab.colnames:
             tab["NSS"].fill_value = 0
-
-        return tab
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
         # Use RAJ200/ DEJ2000 instead of Gaia DR3's native RA_IRCS in J2016.0 for ease of
@@ -291,20 +292,29 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         return "Gaia DR3 + TIC"
 
     def query_catalog(self) -> Table:
-        gaia_rs = super().query_catalog()
-
+        # do my own custom query so that only one Vizier call is needed to get the result from both Gaia and TIC,
+        # reducing time needed.
         with warnings.catch_warnings():
             # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
-            # for Gaia
-            warnings.filterwarnings(
+            warnings.filterwarnings( # for Gaia
+                "ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard"
+            )
+            warnings.filterwarnings(  # for TIC
                 "ignore", category=u.UnitsWarning, message="Unit 'Sun' not supported by the VOUnit standard"
             )
-            tic_rs = _query_cone_region(
+
+            tic_cols = ["TIC", "GAIA", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Tmag", "Disp"]
+            gaia_cols = self.columns
+            rs_list = _query_cone_region(
                 self.coord,
                 self.radius,
-                self.tic_catalog_name,
-                columns=["TIC", "GAIA", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Tmag", "Disp"],
-            )[self.tic_catalog_name]
+                [self.catalog_name, self.tic_catalog_name],
+                columns=gaia_cols + tic_cols,
+            )
+        gaia_rs = rs_list[self.catalog_name]
+        self._post_process_gaiadr3_result(gaia_rs)
+
+        tic_rs = rs_list[self.tic_catalog_name]
         if self.exclude_tic_duplicates:
             # exclude duplicates: 2MASS source split into multiple entries
             # https://outerspace.stsci.edu/display/TESS/TIC+v8.2+and+CTL+v8.xx+Data+Release+Notes#:~:text=SPLIT%20stars
@@ -313,17 +323,16 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
             # exclude artifacts: spurious data (usually from 2MASS)
             # https://outerspace.stsci.edu/display/TESS/TIC+v8.2+and+CTL+v8.xx+Data+Release+Notes#:~:text=Artifacts%20are%20generally%20spurious
             tic_rs = tic_rs[tic_rs["Disp"] != "ARTIFACT"]
-        if self.magnitude_limit is not None:
-            tic_rs = tic_rs[tic_rs["Tmag"] < self.magnitude_limit]
 
-        # Do some preparation then join the 2 tables
+        # Join Gaia and TIC results
+        # first do some preparation then join the 2 tables
         # avoid names conflicts in  join
         cols_to_rename = ["RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx"]
         tic_rs.rename_columns(
             cols_to_rename,
             [f"t_{c}" for c in cols_to_rename],
         )
-        tic_rs["GAIA"] = tic_rs["GAIA"].filled(-1)  # avoid table merge error (it requires  no missing key)
+        tic_rs["GAIA"] = tic_rs["GAIA"].filled(-1)  # avoid table merge error (it requires no missing key)
         if len(gaia_rs) > 0 and len(tic_rs) > 0:
             rs = join(gaia_rs, tic_rs, join_type="outer", keys_left="Source", keys_right="GAIA", metadata_conflicts="silent")
         elif len(tic_rs) == 0:
@@ -331,18 +340,28 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         else:
             rs = _join_for_empty_right_table(tic_rs, gaia_rs)
 
+        #
         # Post-join massaging the data
-        # handle case missing TIC
+        #
+
+        # honor mag limit filter with a more liberal policy: either Gmag or Tmag within the limit is okay.
+        if self.magnitude_limit is not None:
+            rs = rs[(rs[self.magnitude_limit_column_name] < self.magnitude_limit) | (rs["Tmag"] < self.magnitude_limit)]
+
+        # add column magForSize
+        rs["magForSize"] = rs[self.magnitude_limit_column_name]  # Gmag
+        rs["magForSize"][rs["Source"].mask] = rs["Tmag"][rs["Source"].mask]  # use Tmag when Gaia data is missing
+
+        # handle case missing TIC data
         # make missing integer value as empty string
         for c in ["TIC"]:
             rs[c] = rs[c].astype(str).filled("")
             rs[c].format = None
 
-        # handle cases missing Gaia
+        # handle cases missing Gaia data
         # use TIC values for columns
         for c in ["RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx"]:
             rs[c][rs["Source"].mask] = rs[f"t_{c}"][rs["Source"].mask]
-        rs["magForSize"][rs["Source"].mask] = rs["Tmag"][rs["Source"].mask]  # use Tmag when Gaia data is missing
         # make missing integer value as empty string
         for c in ["Source"]:
             rs[c] = rs[c].astype(str).filled("")
