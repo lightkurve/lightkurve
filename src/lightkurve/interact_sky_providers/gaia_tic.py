@@ -133,7 +133,6 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         super().__init__(coord, radius, magnitude_limit, scatter_kwargs)
         # Gaia DR3 Vizier specific
         self.catalog_name = "I/355/gaiadr3"
-        self.columns = ["*", "RAJ2000", "DEJ2000", "VarFlag", "NSS"]
         self.magnitude_limit_column_name = "Gmag"
         self.cols_for_source = [
             "Source",
@@ -142,6 +141,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             "VarFlag",
             "NSS",
         ]
+        self.columns = self.cols_for_source + ["RAJ2000", "DEJ2000", "pmRA", "pmDE"]
         # Gaia columns that could have large integers
         self.cols_as_str_for_source = ["Source", "SolID"]
         if extra_cols_in_detail_view is not None:
@@ -303,8 +303,8 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
                 "ignore", category=u.UnitsWarning, message="Unit 'Sun' not supported by the VOUnit standard"
             )
 
-            tic_cols = ["TIC", "GAIA", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Tmag", "Disp"]
             gaia_cols = self.columns
+            tic_cols = ["TIC", "GAIA", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Tmag", "Disp"]
             rs_list = _query_cone_region(
                 self.coord,
                 self.radius,
@@ -327,7 +327,7 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         # Join Gaia and TIC results
         # first do some preparation then join the 2 tables
         # avoid names conflicts in  join
-        cols_to_rename = ["RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx"]
+        cols_to_rename = ["RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Gmag"]
         tic_rs.rename_columns(
             cols_to_rename,
             [f"t_{c}" for c in cols_to_rename],
