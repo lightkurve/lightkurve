@@ -87,6 +87,14 @@ def read(path_or_url, **kwargs):
         # Raise an explicit FileNotFoundError if file not found
         if "No such file" in str(e):
             raise e
+    except Exception as exc2:
+        # case unexpected error during detection, e.g., if a file is corrupted such that FITS headers are truncated
+        raise LightkurveError(
+            f"Unexpected error in detecting the type of the data product: '{type(exc2).__name__}: {exc2}'\n"
+            f"{path_or_url}\n"
+            "This file may be corrupt due to an interrupted download. "
+            "Please remove it from your disk and try again."
+        ) from exc2
 
     try:
         if filetype == "KeplerLightCurve":
@@ -129,6 +137,14 @@ def read(path_or_url, **kwargs):
                 f"Data product f{path_or_url} of type {filetype} is not supported "
                 "in this version of Lightkurve."
             ) from exc
+        except Exception as exc2:
+            # case the FITS has enough info from header to pass detection, but cannot be fully opened
+            raise LightkurveError(
+                f"Unexpected error in reading data product: '{type(exc2).__name__}: {exc2}'\n"
+                f"{path_or_url}\n"
+                "This file may be corrupt due to an interrupted download. "
+                "Please remove it from your disk and try again."
+            ) from exc2
     else:
         # if these keywords don't exist, raise `ValueError`
         raise LightkurveError(

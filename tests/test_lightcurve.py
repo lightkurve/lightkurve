@@ -222,6 +222,19 @@ def test_bitmasking(quality_bitmask, answer):
     assert len(lc) == answer
 
 
+def test_hdu_property():
+    """Test to ensure lc.hdu property is in functional HDU, independent from the LightCurve object."""
+    lc = read(filename_tess)
+    with lc.hdu as hdul:
+        # 1. ensure that the hdu is fully functional, e.g., the data table can be accessed.
+        num_cadences = len(hdul[1].data)
+        assert num_cadences > 0
+
+    # 2. ensure that lc object is not tied to the life cycle of the hdulist from lc.hdu:
+    #    after hdul is closed, the lc object is still fully functional
+    assert len(lc.flux) > 0
+
+
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = KeplerLightCurve(
@@ -235,6 +248,8 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
+    assert np.min(fold.cycle) == 0  # for #1397, case lc.fold() without epoch_time
+    assert np.max(fold.cycle) == 10
     assert fold.targetid == lc.targetid
     assert fold.label == lc.label
     assert set(lc.meta).issubset(set(fold.meta))
@@ -245,6 +260,8 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
+    assert np.min(fold.cycle) == 0
+    assert np.max(fold.cycle) == 10
     with warnings.catch_warnings():
         # `transit_midpoint` is deprecated and its use will emit a warning
         warnings.simplefilter("ignore", LightkurveWarning)
@@ -780,7 +797,7 @@ def test_normalize():
 
     # already in relative units
     lc = LightCurve(time=np.arange(10), flux=np.ones(10)).normalize()
-    with pytest.warns(None) as warn_record:
+    with warnings.catch_warnings(record=True) as warn_record:
         lc.normalize()
     assert len(warn_record) == 0
     assert lc.meta["NORMALIZED"]
@@ -1545,7 +1562,7 @@ def test_attr_access_columns():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)
         lc.foo = "bar"
-    with pytest.warns(None) as warn_record:
+    with warnings.catch_warnings(record=True) as warn_record:
         lc.foo = "bar2"
     assert len(warn_record) == 0
 
@@ -1630,7 +1647,7 @@ def test_meta_assignment(lc):
 
     # ensure lc.meta assignment does not emit any warnings.
     meta_new = {'TSTART': 123456789.0}
-    with pytest.warns(None) as record:
+    with warnings.catch_warnings(record=True) as record:
         lc.meta = meta_new
 
     if (len(record) > 0):

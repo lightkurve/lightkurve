@@ -1,6 +1,22 @@
 2.5.0 (unreleased)
 =====================
 
+- Fixed memory leak in reading Lightcurve / TargetPixel FITS files in v2.4.2 [#1390]
+- Added support for changes in QLP High Level Science Product
+  in TESS sectors 56 and later. [#1392]
+- Added an informative error message when data products downloaded are
+  corrupted. [#1399]
+- Fixed to ensure file handles are properly released when reading
+  corrupted TargetPixelFile. [#1399]
+- Fixed ``FoldedLightCurve.cycle``, case ``epoch_time`` not specified [#1398]
+- Various improvements to the online documentation. [#1400, #1425]
+- Fixed a bug in ``tpf.interact()`` so that proper y label is displayed when
+  lightcurve is normalized with ``transform_func``. [#1387]
+- Fixed ``lightkurve.utils.centroid_quadratic()`` in edge cases, e.g., fluxes are
+  all negative with mask specified, NaN in the identified brightest 3X3 patch. [#1426]
+- Fixed interact features, e.g. ``tpf.interact()``, to be compliant
+  with Bokeh v3.4.0. The minimum Bokeh version is raised to v2.3.2 accordingly. [#1428]
+
 
 2.4.2 (2023-11-03)
 =====================
