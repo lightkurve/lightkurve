@@ -234,9 +234,12 @@ def test_flatten():
         np.mean(p.flatten(method="logmedian").power.value), 1.0, atol=0.05
     )
 
-    # Check return trend works
-    s, b = p.flatten(return_trend=True)
-    assert all(b.power == p.smooth(method="logmedian", filter_width=0.01).power)
+    # Check that the background trend returned to SNRPeriodogram works
+    s = p.flatten()
+    b = s.background
+    assert all(b.power == p.smooth(method="logmedian", filter_width=0.1).power)
+    
+    # Check that the SNRPeriodogram works
     assert all(s.power == p.flatten().power)
     str(s)
     s.plot()
