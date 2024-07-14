@@ -22,7 +22,6 @@ from astropy.units import Quantity
 import astropy.units as u
 
 import matplotlib
-from matplotlib import animation
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
