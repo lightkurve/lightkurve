@@ -610,21 +610,17 @@ def test_interact_sky():
 def test_get_models():
     """Can we obtain PRF and TPF models?"""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
+
     with warnings.catch_warnings():
         # Ignore "RuntimeWarning: All-NaN slice encountered"
         warnings.simplefilter("ignore", RuntimeWarning)
         tpf.get_prf_model()
-
-    # tpfmodels require oktopus
-    try:
-        with warnings.catch_warnings():
-            # Ignore "RuntimeWarning: All-NaN slice encountered"; "tpfmodel module not available"
-            warnings.simplefilter("ignore", RuntimeWarning)
-            warnings.simplefilter("ignore", UserWarning)
+        # tpfmodels require oktopus
+        try:
             from oktopus import Prior
             tpf.get_model()
-    except ModuleNotFoundError:
-        pass
+        except ModuleNotFoundError:
+            pass
 
 
 @pytest.mark.remote_data

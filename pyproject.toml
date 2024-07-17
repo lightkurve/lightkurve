@@ -83,3 +83,11 @@ testpaths = [
     "tests",
     "src",
 ]
+filterwarnings = [
+    "default",
+    "always::DeprecationWarning",
+    "once::ResourceWarning",
+    "ignore:Warning. the tpfmodel module is not available without oktopus:UserWarning",
+    "ignore:More than 20 figures have been opened:RuntimeWarning",
+    "always::lightkurve.utils.LightkurveWarning",
+]
