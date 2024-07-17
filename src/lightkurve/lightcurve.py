@@ -1222,7 +1222,7 @@ class LightCurve(TimeSeries):
         if hasattr(lc, "cadenceno"):
             dt = lc.time.value - np.median(np.diff(lc.time.value)) * lc.cadenceno.value
             ncad = np.arange(lc.cadenceno.value[0], lc.cadenceno.value[-1] + 1, 1)
-            in_original = np.in1d(ncad, lc.cadenceno.value)
+            in_original = np.isin(ncad, lc.cadenceno.value)
             ncad = ncad[~in_original]
             ndt = np.interp(ncad, lc.cadenceno.value, dt)
 
@@ -1242,7 +1242,7 @@ class LightCurve(TimeSeries):
                     prevtime = ntime[-1]
                 ntime.append(t)
             ntime = np.asarray(ntime, float)
-            in_original = np.in1d(ntime, lc.time.value)
+            in_original = np.isin(ntime, lc.time.value)
 
         # Fill in time points
         newdata["time"] = Time(ntime, format=lc.time.format, scale=lc.time.scale)
@@ -1817,7 +1817,7 @@ class LightCurve(TimeSeries):
             show_progress=show_progress,
         )
         if return_mask:
-            return res, np.in1d(self.time.jd, res.epoch)
+            return res, np.isin(self.time.jd, res.epoch)
         return res
 
     def _create_plot(

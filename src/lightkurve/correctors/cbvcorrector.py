@@ -707,7 +707,7 @@ class CBVCorrector(RegressionCorrector):
                         cbv_idx_loop = cbvs.cbv_indices
                     # Trim to nCBVs in cbvs
                     cbv_idx_loop = np.array([idx for idx in cbv_idx_loop if
-                        bool(np.in1d(idx, cbvs.cbv_indices))])
+                        bool(np.isin(idx, cbvs.cbv_indices))])
             
                     if cbv_type[idx].find('MultiScale') >= 0:
                         # Find the correct band if this is a multi-scale CBV set
@@ -1243,7 +1243,7 @@ class CotrendingBasisVectors(TimeSeries):
 
             # NaN any CBV cadences that are in the light curve and not in CBVs
             # This requires us to add rows to the CBV table
-            lc_nan_mask = np.logical_not(np.in1d(lc.cadenceno, cbvs.cadenceno))
+            lc_nan_mask = np.logical_not(np.isin(lc.cadenceno, cbvs.cadenceno))
             # Determine if the CBVs are poorly aligned to the light curve
             if ((np.count_nonzero(lc_nan_mask) / len(lc_nan_mask)) >
                             poorly_aligned_threshold):
@@ -1271,7 +1271,7 @@ class CotrendingBasisVectors(TimeSeries):
             # REALLY slow.
             try:
                 # This method is fast but might cause errors
-                keep_indices = np.nonzero(np.in1d(cbvs.cadenceno, lc.cadenceno))[0]
+                keep_indices = np.nonzero(np.isin(cbvs.cadenceno, lc.cadenceno))[0]
                 # Determine if the CBVs are poorly aligned to the light curve
                 if (len(keep_indices) / len(cbvs)) < poorly_aligned_threshold:
                     poorly_aligned_flag = True
@@ -1279,7 +1279,7 @@ class CotrendingBasisVectors(TimeSeries):
             except:
                 # This method is slow but appears to be more robust
                 trim_indices = np.nonzero(np.logical_not(
-                    np.in1d(cbvs.cadenceno, lc.cadenceno)))[0]
+                    np.isin(cbvs.cadenceno, lc.cadenceno)))[0]
                 # Determine if the CBVs are poorly aligned to the light curve
                 if (len(trim_indices) / len(cbvs)) > poorly_aligned_threshold:
                     poorly_aligned_flag = True
