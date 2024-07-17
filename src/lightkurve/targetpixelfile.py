@@ -30,6 +30,7 @@ import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
+import s3fs
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
@@ -102,6 +103,11 @@ class TargetPixelFile(object):
         self.path = path
         if isinstance(path, fits.HDUList):
             self.hdu = path
+        elif (isinstance(path, str) and path.startswith('s3://')):
+            # Filename is an S3 cloud URI
+            fs = s3fs.S3FileSystem(anon=True)
+            self.fs_file = fs.open(path, 'rb')
+            self.hdu = fits.open(self.fs_file)
         else:
             self.hdu = fits.open(self.path, **kwargs)
         try:
@@ -113,6 +119,7 @@ class TargetPixelFile(object):
         except Exception as e:
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
             self.hdu.close()
+            self.fs_file.close()
             raise e
 
     def __getitem__(self, key):
@@ -2126,6 +2133,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except Exception as e:
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
             self.hdu.close()
+            self.fs_file.close()
             raise e
 
     def __repr__(self):
@@ -2806,6 +2814,7 @@ class TessTargetPixelFile(TargetPixelFile):
         except Exception as e:
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
             self.hdu.close()
+            self.fs_file.close()
             raise e
 
     def __repr__(self):

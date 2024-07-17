@@ -3,6 +3,7 @@ import logging
 
 from astropy.io import fits
 from astropy.utils import deprecated
+import s3fs
 
 from ..lightcurve import KeplerLightCurve, TessLightCurve
 from ..utils import LightkurveDeprecationWarning, LightkurveError
@@ -40,7 +41,7 @@ def read(path_or_url, **kwargs):
     Parameters
     ----------
     path_or_url : str
-        Path or URL of a FITS file.
+        Path, URL, or S3 URI of a FITS file.
     quality_bitmask : str or int, optional
         Bitmask (integer) which identifies the quality flag bitmask that should
         be used to mask out bad cadences. If a string is passed, it has the
@@ -79,9 +80,16 @@ def read(path_or_url, **kwargs):
     log.debug("Opening {}.".format(path_or_url))
     # pass header into `detect_filetype()`
     try:
-        with fits.open(path_or_url) as temp:
-            filetype = detect_filetype(temp)
-            log.debug("Detected filetype: '{}'.".format(filetype))
+        if (isinstance(path_or_url, str) and path_or_url.startswith('s3://')):
+            # path_or_url is an S3 cloud URI
+            fs = s3fs.S3FileSystem(anon=True)
+            with fs.open(path_or_url, 'rb') as f:
+                with fits.open(f) as temp:
+                    filetype = detect_filetype(temp)
+        else:
+            with fits.open(path_or_url) as temp:
+                filetype = detect_filetype(temp)
+        log.debug("Detected filetype: '{}'.".format(filetype))
     except OSError as e:
         filetype = None
         # Raise an explicit FileNotFoundError if file not found
