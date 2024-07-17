@@ -613,8 +613,18 @@ def test_get_models():
     with warnings.catch_warnings():
         # Ignore "RuntimeWarning: All-NaN slice encountered"
         warnings.simplefilter("ignore", RuntimeWarning)
-        tpf.get_model()
         tpf.get_prf_model()
+
+    # tpfmodels require oktopus
+    try:
+        with warnings.catch_warnings():
+            # Ignore "RuntimeWarning: All-NaN slice encountered"; "tpfmodel module not available"
+            warnings.simplefilter("ignore", RuntimeWarning)
+            warnings.simplefilter("ignore", UserWarning)
+            from oktopus import Prior
+            tpf.get_model()
+    except ModuleNotFoundError:
+        pass
 
 
 @pytest.mark.remote_data
