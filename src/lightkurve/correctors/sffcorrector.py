@@ -176,7 +176,7 @@ class SFFCorrector(RegressionCorrector):
                 ar = ar.unmasked
 
             knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins + 1)[1:-1]))
-            ar[~np.in1d(ar, ar[a:b])] = 0
+            ar[~np.isin(ar, ar[a:b])] = 0
 
             dm = spline(ar, knots=knots, degree=degree).copy()
             dm.columns = [
