@@ -26,9 +26,10 @@ include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
 python = ">=3.8"
 numpy = ">=1.18"
 astropy = ">=5.0"
-scipy = { version = ">=1.7", python = ">=3.8,<3.11" }
+scipy = { version = ">=1.7", python = ">=3.8,<3.13" }
 matplotlib = ">=3.1"
 astroquery = ">=0.3.10"
+oktopus = { version = ">=0.1.2", python = ">=3.8,<3.10" }
 beautifulsoup4 = ">=4.6.0"
 requests = ">=2.22.0"
 urllib3 = { version = ">=1.23", python = ">=3.8,<4.0" }  # necessary to make requests work on py310
@@ -57,7 +58,6 @@ pytest-cov = ">=2.10.1"
 pytest-remotedata = ">=0.3.2"
 pytest-doctestplus = ">=0.8.0"
 pytest-xdist = ">=2.1.0"
-oktopus = ">=0.1.2"
 jupyter = ">=1.0.0"
 Sphinx = ">=4.3.0"
 nbsphinx = ">=0.8.7"

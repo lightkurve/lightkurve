@@ -5,6 +5,7 @@
 # 2) pytest on Linux, Python 3.8, with --remote-data enabled (i.e. get data from MAST).
 # 3) pytest on Linux, Python 3.9.
 # 4) pytest on Linux, Python 3.10.
+# 4) pytest on Linux, Python 3.12.
 # 5) pytest on Windows, Python 3.8.
 # 6) pytest on OSX, Python 3.8.
 # 7) flake8 syntax check.
@@ -26,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.8-remote-data, 3.8-memtest, 3.9, '3.10']
+        name: [3.8-remote-data, 3.8-memtest, 3.9, '3.10', '3.11']
         include:
           - name: 3.8-remote-data
             python-version: 3.8
@@ -39,6 +40,9 @@ jobs:
             pytest-command: poetry run pytest
           - name: '3.10'
             python-version: '3.10'
+            pytest-command: poetry run pytest
+          - name: '3.11'
+            python-version: '3.11'
             pytest-command: poetry run pytest
     steps:
     - uses: actions/checkout@v4
