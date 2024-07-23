@@ -202,7 +202,7 @@ def _read_collection(path_list, products, *, stitch=False, **kwargs):
     else:
         return TargetPixelFileCollection(prod_list)
     
-def read_lc_collection(path_list, *, stitch=True, **kwargs):
+def read_lc_collection(path_list, *, stitch=False, **kwargs):
     return _read_collection(path_list, [TessLightCurve, KeplerLightCurve], stitch=stitch, **kwargs)
 
 def read_tpf_collection(path_list, **kwargs):

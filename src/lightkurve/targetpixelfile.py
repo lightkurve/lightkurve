@@ -102,6 +102,8 @@ class TargetPixelFile(object):
 
     def __init__(self, path, quality_bitmask="default", targetid=None, **kwargs):
         self.path = path
+        self.fs_file = None
+        self.gz_file = None
         if isinstance(path, fits.HDUList):
             self.hdu = path
         elif (isinstance(path, str) and path.startswith('s3://')):
@@ -2143,7 +2145,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 self.targetid = self.get_header().get("KEPLERID")
         except Exception as e:
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
-            self.close_files()
+            self._close_files()
             raise e
 
     def __repr__(self):
@@ -2823,7 +2825,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 self.targetid = self.get_header().get("TICID")
         except Exception as e:
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
-            self.close_files()
+            self._close_files()
             raise e
 
     def __repr__(self):
