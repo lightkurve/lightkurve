@@ -2488,7 +2488,10 @@ class LightCurve(TimeSeries):
             ).any():
                 cols.append(
                     fits.Column(
-                        name=flux_column_name, format="E", unit="e-/s", array=self.flux
+                        name=flux_column_name,
+                        format="E",
+                        unit=self.flux.unit.to_string(),
+                        array=self.flux,
                     )
                 )
             if hasattr(self,'flux_err'):
@@ -2497,7 +2500,7 @@ class LightCurve(TimeSeries):
                         fits.Column(
                             name=flux_column_name.upper() + "_ERR",
                             format="E",
-                            unit="e-/s",
+                            unit=self.flux_err.unit.to_string(),
                             array=self.flux_err,
                         )
                     )

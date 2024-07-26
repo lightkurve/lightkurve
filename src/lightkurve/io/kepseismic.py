@@ -21,7 +21,7 @@ def read_kepseismic_lightcurve(filename, **kwargs):
 
     lc = read_generic_lightcurve(
         filename,
-        time_format='bkjd')
+        time_format='mjd')
 
     lc.meta["AUTHOR"] = "KEPSEISMIC"
     lc.meta["TARGETID"] = lc.meta.get("KEPLERID")
