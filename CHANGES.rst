@@ -12,11 +12,13 @@
 - Various improvements to the online documentation. [#1400, #1425]
 - Fixed a bug in ``tpf.interact()`` so that proper y label is displayed when
   lightcurve is normalized with ``transform_func``. [#1387]
+- Changed 'short' cadence in search.py to be <200s so the new TESS FFI cadence is excluded [#1394]
 - Fixed ``lightkurve.utils.centroid_quadratic()`` in edge cases, e.g., fluxes are
   all negative with mask specified, NaN in the identified brightest 3X3 patch. [#1426]
 - Fixed interact features, e.g. ``tpf.interact()``, to be compliant
   with Bokeh v3.4.0. The minimum Bokeh version is raised to v2.3.2 accordingly. [#1428]
 - Fixed time format for KEPSEISMIC light curves from bjkd to mjd. [#1443]
+
 
 
 2.4.2 (2023-11-03)
