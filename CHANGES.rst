@@ -18,6 +18,7 @@
 - Fixed interact features, e.g. ``tpf.interact()``, to be compliant
   with Bokeh v3.4.0. The minimum Bokeh version is raised to v2.3.2 accordingly. [#1428]
 - Fixed time format for KEPSEISMIC light curves from bjkd to mjd. [#1443]
+- Fixed flux unit bug in to_fits [#1454]
 
 
 
