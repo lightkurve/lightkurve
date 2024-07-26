@@ -932,6 +932,25 @@ def test_to_fits():
         )
 
 
+def test_to_fits_flux_units_in_header():
+    # Test the units
+    hdu = LightCurve(
+        time=[0, 1, 2, 3, 4] * u.s,
+        flux=[1, 1, 1, 1, 1] * u.dimensionless_unscaled,
+        flux_err=[0.1, 0.1, 0.1, 0.1, 0.1] * u.dimensionless_unscaled,
+    ).to_fits()
+    assert "TUNIT2" not in hdu[1].header
+    assert "TUNIT3" not in hdu[1].header
+
+    hdu = LightCurve(
+        time=[0, 1, 2, 3, 4] * u.s,
+        flux=[1, 1, 1, 1, 1] * u.Jy,
+        flux_err=[0.1, 0.1, 0.1, 0.1, 0.1] * u.Jy,
+    ).to_fits()
+    assert hdu[1].header["TUNIT2"] == "Jy"
+    assert hdu[1].header["TUNIT3"] == "Jy"
+
+
 def test_astropy_time_bkjd():
     """Does `KeplerLightCurve` support bkjd?"""
     bkjd = np.array([100, 200])
