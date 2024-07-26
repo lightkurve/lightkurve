@@ -16,6 +16,7 @@
   all negative with mask specified, NaN in the identified brightest 3X3 patch. [#1426]
 - Fixed interact features, e.g. ``tpf.interact()``, to be compliant
   with Bokeh v3.4.0. The minimum Bokeh version is raised to v2.3.2 accordingly. [#1428]
+- Updated aperture plotting to speed it up in the case of large (bleed column) apertures. [#1434]
 
 
 2.4.2 (2023-11-03)
