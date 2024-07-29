@@ -250,7 +250,7 @@ class PLDCorrector(RegressionCorrector):
             # Create a DesignMatrix for each PLD order
             all_pld = []
             for order in range(1, pld_order + 1):
-                reg_n = np.product(list(multichoose(regressors_pld.T, order)), axis=1).T
+                reg_n = np.prod(list(multichoose(regressors_pld.T, order)), axis=1).T
                 pld_n = DesignMatrix(
                     reg_n,
                     prior_sigma=np.ones(reg_n.shape[1]) * prior_sigma / reg_n.shape[1],

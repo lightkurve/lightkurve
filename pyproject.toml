@@ -26,10 +26,10 @@ include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
 python = ">=3.8"
 numpy = ">=1.18"
 astropy = ">=5.0"
-scipy = { version = ">=1.7", python = ">=3.8,<3.11" }
+scipy = { version = ">=1.7", python = ">=3.8,<3.13" }
 matplotlib = ">=3.1"
 astroquery = ">=0.3.10"
-oktopus = ">=0.1.2"
+oktopus = { version = ">=0.1.2", python = ">=3.8,<3.10" }
 beautifulsoup4 = ">=4.6.0"
 requests = ">=2.22.0"
 urllib3 = { version = ">=1.23", python = ">=3.8,<4.0" }  # necessary to make requests work on py310
@@ -89,4 +89,12 @@ build-backend = "poetry.core.masonry.api"
 testpaths = [
     "tests",
     "src",
+]
+filterwarnings = [
+    "default",
+    "always::DeprecationWarning",
+    "once::ResourceWarning",
+    "ignore:Warning. the tpfmodel module is not available without oktopus:UserWarning",
+    "ignore:More than 20 figures have been opened:RuntimeWarning",
+    "always::lightkurve.utils.LightkurveWarning",
 ]

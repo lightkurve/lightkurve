@@ -473,7 +473,7 @@ def test_tpf_from_images():
     w.wcs.crval = [0, -90]
     w.wcs.ctype = ["RA---AIR", "DEC--AIR"]
     w.wcs.set_pv([(2, 1, 45.0)])
-    pixcrd = np.array([[0, 0], [24, 38], [45, 98]], np.float_)
+    pixcrd = np.array([[0, 0], [24, 38], [45, 98]], np.float64)
     header = w.to_header()
     header["CRVAL1P"] = 10
     header["CRVAL2P"] = 20
@@ -610,11 +610,17 @@ def test_interact_sky():
 def test_get_models():
     """Can we obtain PRF and TPF models?"""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
+
     with warnings.catch_warnings():
         # Ignore "RuntimeWarning: All-NaN slice encountered"
         warnings.simplefilter("ignore", RuntimeWarning)
-        tpf.get_model()
         tpf.get_prf_model()
+        # tpfmodels require oktopus
+        try:
+            from oktopus import Prior
+            tpf.get_model()
+        except ModuleNotFoundError:
+            pass
 
 
 @pytest.mark.remote_data
@@ -725,7 +731,7 @@ def test_cutout():
         assert ntpf.flux.shape[2] == 1
         ntpf = tpf.cutout(SkyCoord(tpf.ra, tpf.dec, unit="deg"), size=2)
         ntpf = tpf.cutout(size=2)
-        assert np.product(ntpf.flux.shape[1:]) == 4
+        assert np.prod(ntpf.flux.shape[1:]) == 4
         assert ntpf.targetid == tpf.targetid
 
 

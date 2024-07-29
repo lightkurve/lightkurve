@@ -7,20 +7,28 @@ import numpy as np
 from numpy.testing import assert_allclose
 from scipy.stats import mode
 
-from lightkurve.prf import FixedValuePrior, GaussianPrior, UniformPrior
-from lightkurve.prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior
-from lightkurve.prf import TPFModel, PRFPhotometry
 from lightkurve.prf import SimpleKeplerPRF, KeplerPRF
+
+try:
+    from oktopus import PoissonPosterior
+    from lightkurve.prf import FixedValuePrior, GaussianPrior, UniformPrior
+    from lightkurve.prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior
+    from lightkurve.prf import TPFModel, PRFPhotometry
+    NO_OKTOPUS = False
+except ModuleNotFoundError:
+    NO_OKTOPUS = True
 
 from .. import TESTDATA
 
 
+@pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 def test_fixedvalueprior():
     fvp = FixedValuePrior(1.5)
     assert fvp.mean == 1.5
     assert fvp(1.5) == 0
 
 
+@pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 def test_starprior():
     """Tests the StarPrior class."""
     col, row, flux = 1, 2, 3
@@ -41,6 +49,7 @@ def test_starprior():
     assert "StarPrior" in str(sp)
 
 
+@pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 def test_backgroundprior():
     """Tests the BackgroundPrior class."""
     flux = 2.0
@@ -50,6 +59,7 @@ def test_backgroundprior():
     assert not np.isfinite(bp(flux + 0.1))
 
 
+@pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_tpf_model_simple():
     prf = SimpleKeplerPRF(channel=16, shape=[10, 10], column=15, row=15)
@@ -57,6 +67,7 @@ def test_tpf_model_simple():
     assert model.prfmodel.channel == 16
 
 
+@pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_tpf_model():
     col, row, flux, bgflux = 1, 2, 3, 4
@@ -102,6 +113,7 @@ def test_tpf_model():
     assert "TESTSTAR" in str(model)
 
 
+@pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 # Tagging the test below as `remote_data` because AppVeyor hangs on this test;
 # at present we don't understand why.
 @pytest.mark.remote_data
@@ -138,6 +150,7 @@ def test_tpf_model_fitting():
     phot.run([tpf[1].data])
 
 
+@pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_empty_model():
     """Can we fit the background flux in a model without stars?"""
@@ -150,6 +163,7 @@ def test_empty_model():
     assert np.isclose(results.background.flux, bgflux, rtol=1e-2)
 
 
+@pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
 def test_model_with_one_star():
     """Can we fit the background flux in a model with one star?"""
