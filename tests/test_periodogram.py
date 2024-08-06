@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal, assert_array_equal
 
 from astropy import units as u
 from astropy.time import Time
-from astropy.stats.bls import BoxLeastSquares
+from astropy.timeseries import BoxLeastSquares
 from astropy.utils.masked import Masked
 
 from lightkurve.lightcurve import LightCurve

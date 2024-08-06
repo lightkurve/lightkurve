@@ -3,7 +3,7 @@
 from __future__ import division, print_function
 
 from astropy.utils.data import get_pkg_data_filename
-from astropy.stats.bls import BoxLeastSquares
+from astropy.timeseries import BoxLeastSquares
 
 import numpy as np
 import pytest

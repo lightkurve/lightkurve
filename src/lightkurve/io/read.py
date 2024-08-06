@@ -1,17 +1,22 @@
 """Functions for reading light curve data."""
 import logging
+import gzip
 
 from astropy.io import fits
 from astropy.utils import deprecated
+import s3fs
+
+from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 
 from ..lightcurve import KeplerLightCurve, TessLightCurve
+from ..collections import LightCurveCollection, TargetPixelFileCollection
 from ..utils import LightkurveDeprecationWarning, LightkurveError
 from .detect import detect_filetype
 
 log = logging.getLogger(__name__)
 
 
-__all__ = ["open", "read"]
+__all__ = ["open", "read", "read_lc_collection", "read_tpf_collection"]
 
 
 @deprecated("2.0", alternative="read()", warning_type=LightkurveDeprecationWarning)
@@ -40,7 +45,7 @@ def read(path_or_url, **kwargs):
     Parameters
     ----------
     path_or_url : str
-        Path or URL of a FITS file.
+        Path, URL, or S3 URI of a FITS file.
     quality_bitmask : str or int, optional
         Bitmask (integer) which identifies the quality flag bitmask that should
         be used to mask out bad cadences. If a string is passed, it has the
@@ -79,9 +84,22 @@ def read(path_or_url, **kwargs):
     log.debug("Opening {}.".format(path_or_url))
     # pass header into `detect_filetype()`
     try:
-        with fits.open(path_or_url) as temp:
-            filetype = detect_filetype(temp)
-            log.debug("Detected filetype: '{}'.".format(filetype))
+        if (isinstance(path_or_url, str) and path_or_url.startswith('s3://')):
+            # path_or_url is an S3 cloud URI
+            fs = s3fs.S3FileSystem(anon=True)
+            with fs.open(path_or_url, 'rb') as f:
+                if f.key.endswith('.gz'):
+                    # Unpack if file is in gzip format (Kepler TPFs)
+                    with gzip.open(f) as g:
+                        with fits.open(g) as temp:
+                            filetype = detect_filetype(temp)
+                else:
+                    with fits.open(f) as temp:
+                        filetype = detect_filetype(temp)
+        else:
+            with fits.open(path_or_url) as temp:
+                filetype = detect_filetype(temp)
+        log.debug("Detected filetype: '{}'.".format(filetype))
     except OSError as e:
         filetype = None
         # Raise an explicit FileNotFoundError if file not found
@@ -153,3 +171,39 @@ def read(path_or_url, **kwargs):
             "This file may be corrupt due to an interrupted download. "
             "Please remove it from your disk and try again."
         )
+
+def _read_collection(path_list, products, *, stitch=False, **kwargs):
+    prod_list = []
+    is_lc = (products[0] == TessLightCurve)
+    product_type = "lightcurve" if is_lc else "target pixel file"
+
+    for path in path_list:
+        try:
+            new_prod = read(path, **kwargs)
+
+            if (type(new_prod) in products):
+                prod_list.append(new_prod)
+            else:
+                log.debug(f'Unable to read {path}: The file is not a TESS or Kepler {product_type}.')
+
+        except Exception as e:
+            log.warning(
+                f'Unable to read {path}: {e}. This file will not be added to the collection.'
+            )
+
+    if not prod_list:
+        log.warning(
+            'The resulting collection contains no products.'
+        )
+        return LightCurveCollection([]) if is_lc else TargetPixelFileCollection([])
+    
+    if is_lc:
+        return LightCurveCollection(prod_list).stitch() if stitch else LightCurveCollection(prod_list)
+    else:
+        return TargetPixelFileCollection(prod_list)
+    
+def read_lc_collection(path_list, *, stitch=False, **kwargs):
+    return _read_collection(path_list, [TessLightCurve, KeplerLightCurve], stitch=stitch, **kwargs)
+
+def read_tpf_collection(path_list, **kwargs):
+    return _read_collection(path_list, [TessTargetPixelFile, KeplerTargetPixelFile], stitch=False, **kwargs)
