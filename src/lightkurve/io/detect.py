@@ -1,5 +1,4 @@
 """Provides a function to automatically detect Kepler/TESS file types."""
-from astropy.io import fits
 from astropy.io.fits import HDUList
 
 __all__ = ["detect_filetype"]
