@@ -1184,23 +1184,18 @@ class TargetPixelFile(object):
         # Overlay the aperture mask if given
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
-            for i in range(self.shape[1]):
-                for j in range(self.shape[2]):
-                    if aperture_mask[i, j]:
-                        if hasattr(ax, "wcs"):
-                            # When using WCS coordinates, do not add col/row to mask coords
-                            xy = (j - 0.5, i - 0.5)
-                        else:
-                            xy = (j + self.column - 0.5, i + self.row - 0.5)
-                        rect = patches.Rectangle(
-                            xy=xy,
-                            width=1,
-                            height=1,
-                            color=mask_color,
-                            fill=False,
-                            hatch="//",
-                        )
-                        ax.add_patch(rect)
+            in_aperture = np.where(aperture_mask)
+            if hasattr(ax, "wcs"):
+                ap_row = in_aperture[0] - 0.5
+                ap_col = in_aperture[1] - 0.5
+            else:
+                ap_row = in_aperture[0] + self.row - 0.5
+                ap_col = in_aperture[1] + self.column - 0.5    
+            for ii in range(len(ap_row)):
+                
+                rect=patches.Rectangle((ap_col[ii],ap_row[ii]),1,1, fill=False, hatch="//", color=mask_color)
+                ax.add_patch(rect)
+                
         return ax
 
     def _to_matplotlib_animation(
