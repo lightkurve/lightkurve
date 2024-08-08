@@ -22,13 +22,12 @@ import numpy as np
 from astropy.coordinates import SkyCoord, Angle
 from astropy.io import ascii
 from astropy.stats import sigma_clip
+from astropy.table import Table, Column, MaskedColumn
 from astropy.time import Time
 import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
-import pandas as pd
-from pandas import Series
 
-
+from .interact_sky_providers import resolve_catalog_provider_class
 from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
 
 log = logging.getLogger(__name__)
@@ -51,10 +50,13 @@ try:
         BasicTicker,
         Arrow,
         VeeHead,
+        InlineStyleSheet,
+        Row,
+        Column,
     )
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
-    from bokeh.models.widgets import Button, Div
+    from bokeh.models.widgets import Button, Div, CheckboxGroup
     from bokeh.models.formatters import PrintfTickFormatter
 except Exception as e:
     # We will print a nice error message in the `show_interact_widget` function
@@ -62,28 +64,23 @@ except Exception as e:
     _BOKEH_IMPORT_ERROR = e
 
 
-def _search_nearby_of_tess_target(tic_id):
-    # To avoid warnings / overflow error in attempting to convert GAIA DR2, TIC ID, TOI
-    # as int32 (the default) in some cases
-    return ascii.read(f"https://exofop.ipac.caltech.edu/tess/download_nearbytarget.php?id={tic_id}&output=csv",
-                      format="csv",
-                      fast_reader=False,
-                      converters={
-                          "GAIA DR2": [ascii.convert_numpy(str)],
-                          "TIC ID": [ascii.convert_numpy(str)],
-                          "TOI": [ascii.convert_numpy(str)],
-                          })
+def _fill_masked_or_nan_with(ary, fill_value):
+    if not isinstance(ary, np.ndarray):
+        # assume to be scalar
+        if np.isnan(ary) or ary is np.ma.masked:
+            return fill_value
+        else:
+            return ary
+
+    # case ndarray (also astropy Column)
+    ary = ary.copy()
+    ary[np.isnan(ary)] = fill_value
+    if isinstance(ary, np.ma.MaskedArray):  # also astropy MaskedColumn
+        ary = ary.filled(fill_value)
+    return ary
 
 
-def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
-    res = tab[tab['GAIA DR2'] == str(nearby_gaia_id)]
-    if len(res) > 0:
-        return res[0][key]
-    else:
-        return default
-
-
-def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
+def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, frame, equinox, new_time):
     """Return proper-motion corrected RA / Dec.
        It also return whether proper motion correction is applied or not."""
     # all parameters have units
@@ -93,29 +90,41 @@ def _correct_with_proper_motion(ra, dec, pm_ra, pm_dec, equinox, new_time):
        equinox is None:
         return ra, dec, False
 
+    # handle cases pm_ra, pm_dec has some nan or masked value
+    # we treat them as 0 for the PM correction below
+    # (otherwise the result would be nan)
+    pm_ra = _fill_masked_or_nan_with(pm_ra, 0.0)
+    pm_dec = _fill_masked_or_nan_with(pm_dec, 0.0)
+
     # To be more accurate, we should have supplied distance to SkyCoord
     # in theory, for Gaia DR2 data, we can infer the distance from the parallax provided.
     # It is not done for 2 reasons:
     # 1. Gaia DR2 data has negative parallax values occasionally. Correctly handling them could be tricky. See:
     #    https://www.cosmos.esa.int/documents/29201/1773953/Gaia+DR2+primer+version+1.3.pdf/a4459741-6732-7a98-1406-a1bea243df79
-    # 2. For our purpose (ploting in various interact usage) here, the added distance does not making
+    # 2. For our purpose (plotting in various interact usage) here, the added distance does not making
     #    noticeable significant difference. E.g., applying it to Proxima Cen, a target with large parallax
     #    and huge proper motion, does not change the result in any noticeable way.
     #
     c = SkyCoord(ra, dec, pm_ra_cosdec=pm_ra, pm_dec=pm_dec,
-                frame='icrs', obstime=equinox)
+                 frame=frame, obstime=equinox)
 
-    # Suppress ErfaWarning temporarily as a workaround for:
-    #   https://github.com/astropy/astropy/issues/11747
     with warnings.catch_warnings():
+        # Suppress ErfaWarning temporarily as a workaround for:
+        #   https://github.com/astropy/astropy/issues/11747
         # the same warning appears both as an ErfaWarning and a astropy warning
         # so we filter by the message instead
         warnings.filterwarnings("ignore", message="ERFA function")
+
+        # ignore RuntimeWarning: invalid value encountered in pmsafe
+        # as some rows could have missing PM
+        warnings.filterwarnings("ignore", message="invalid value encountered in pmsafe")
         new_c = c.apply_space_motion(new_obstime=new_time)
+    if frame != "icrs":
+        new_c = new_c.transform_to("icrs")
     return new_c.ra, new_c.dec, True
 
 
-def _get_corrected_coordinate(tpf_or_lc):
+def _get_corrected_coordinate(tpf_or_lc, as_skycoord=False):
     """Extract coordinate from Kepler/TESS FITS, with proper motion corrected
        to the start of observation if proper motion is available."""
     h = tpf_or_lc.meta
@@ -130,7 +139,10 @@ def _get_corrected_coordinate(tpf_or_lc):
 
     if ra is None or dec is None or pm_ra is None or pm_dec is None or equinox is None:
         # case cannot apply proper motion due to missing parameters
-        return ra, dec, False
+        if as_skycoord:
+            return SkyCoord(ra * u.deg, dec * u.deg, frame='icrs')
+        else:
+            return ra, dec, False
 
     # Note: it'd be better / extensible if the unit is a property of the tpf or lc
     if tpf_or_lc.meta.get("TICID") is not None:
@@ -139,12 +151,20 @@ def _get_corrected_coordinate(tpf_or_lc):
         pm_unit = u.arcsecond / u.year
 
     ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
-            ra * u.deg, dec *u.deg,
+            ra * u.deg, dec * u.deg,
             pm_ra * pm_unit, pm_dec * pm_unit,
+            "icrs",
             # we assume the data is in J2000 epoch
-            Time('2000', format='byear'),
+            Time(2000.0, format="jyear"),
             new_time)
-    return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value, pm_corrected
+    if as_skycoord:
+        return SkyCoord(
+            ra_corrected, dec_corrected,
+            pm_ra_cosdec=pm_ra * pm_unit, pm_dec=pm_dec * pm_unit,
+            frame='icrs',
+            obstime=new_time)
+    else:
+        return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value, pm_corrected
 
 
 def _to_unitless(items):
@@ -385,255 +405,16 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     return fig, vertical_line
 
 
-def _add_tics_with_matching_gaia_ids_to(result, tab, gaia_ids):
-    # use pandas Series rather than plain list, so they look like the existing columns in the source
-    #
-    # Note: we convert all the data to string to better handles cases when a star has no TIC
-    # In such cases, if we supply None as a value in a pandas Series,
-    # bokeh's tooltip template will render it as NaN (rather than empty string)
-    # To avoid NaN display, we force the Series to use string dtype, and for stars with missing TICs,
-    # empty string will be used as the value. bokeh's tooltip template can correctly render it as empty string
-
-    col_tic_id = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TIC ID', "") for id in gaia_ids],
-                        dtype=str)
-    col_tess_mag = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'TESS Mag', "") for id in gaia_ids],
-                          dtype=str)
-    col_separation = Series(data=[_get_tic_meta_of_gaia_in_nearby(tab, id, 'Separation (arcsec)', "") for id in gaia_ids],
-                            dtype=str)
-
-    result['tic'] = col_tic_id
-    result['TESSmag'] = col_tess_mag
-    result['separation'] = col_separation
-    return result
-
-# use case: signify Gaia ID (Source, int type) as missing
-_MISSING_INT_VAL = 0
-
-def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limit):
-    def _add_to(data_dict, dest_colname, src):
-        # the data_dict should ultimately have the same columns/dtype as the result,
-        # as it will be appended to the result at the end
-        data_dict[dest_colname] = Series(data=src, dtype=result[dest_colname].dtype)
-
-    def _dummy_like(ary, dtype):
-        dummy_val = None
-        if pd.api.types.is_integer_dtype(dtype):
-            dummy_val = _MISSING_INT_VAL
-        elif pd.api.types.is_float_dtype(dtype):
-            dummy_val = np.nan
-        return [dummy_val for i in range(len(ary))]
-
-    # filter out those with matching gaia ids
-    # (handled in `_add_tics_with_matching_gaia_ids_to()`)
-    gaia_str_ids = [str(id) for id in gaia_ids]
-    tab = tab[np.isin(tab['GAIA DR2'], gaia_str_ids, invert=True)]
-
-    # filter out those with gaia ids, but Gaia Mag is smaller than magnitude_limit
-    # (they won't appear in the given gaia_ids list)
-    tab = tab[tab['GAIA Mag'] < magnitude_limit]
-
-    # apply magnitude_limit filter for those with no Gaia data using TESS mag
-    tab = tab[tab['TESS Mag'] < magnitude_limit]
-
-    # convert the filtered tab to a dataframe, so as to append to the existing result
-    data = dict()
-    _add_to(data, 'tic', tab['TIC ID'])
-    _add_to(data, 'TESSmag', tab['TESS Mag'])
-    _add_to(data, 'magForSize', tab['TESS Mag'])
-    _add_to(data, 'separation', tab['Separation (arcsec)'])
-    # convert the string Ra/Dec to float
-    # we assume the equinox is the same as those from Gaia DR2
-    coords = SkyCoord(tab['RA'], tab['Dec'], unit=(u.hourangle, u.deg), frame='icrs')
-    _add_to(data, 'RA_ICRS', coords.ra.value)
-    _add_to(data, 'DE_ICRS', coords.dec.value)
-    _add_to(data, 'pmRA', tab['PM RA (mas/yr)'])
-    _add_to(data, 'e_pmRA', tab['PM RA Err (mas/yr)'])
-    _add_to(data, 'pmDE', tab['PM Dec (mas/yr)'])
-    _add_to(data, 'e_pmDE', tab['PM Dec Err (mas/yr)'])
-
-    # add dummy columns so that the resulting data frame would match the existing one
-    nontic_colnames = [c for c in result.keys() if c not in data.keys()]
-    for c in nontic_colnames:
-        data[c] = Series(data=_dummy_like(tab, result[c].dtype), dtype=result[c].dtype)
-
-    # finally, append the entries to existing result dataframe
-    return pd.concat([result, pd.DataFrame(data)])
+def _add_separation(result: Table, target_coord: SkyCoord):
+    """Calculate angular separation of the catalog result from the target."""
+    result_coord = SkyCoord(result["RA"], result["DEC"], unit="deg")
+    separation = target_coord.separation(result_coord)
+    result["Separation"] = separation.arcsec
+    result["Separation"].unit = u.arcsec
 
 
-def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
-    tic_id = tpf.meta.get('TICID', None)
-    # handle 3 cases:
-    # - TESS tpf has a valid id, type integer
-    # - Some TESSCut has empty string while and some others has None
-    # - Kepler tpf does not have the header
-    if tic_id is None or tic_id == "":
-        return result, []
-
-    if isinstance(tic_id, str):
-        # for cases tpf is from tpf.cutout() call in #1089
-        tic_id = tic_id.replace("_CUTOUT", "")
-
-    # nearby TICs from ExoFOP
-    tab = _search_nearby_of_tess_target(tic_id)
-    gaia_ids = result['Source'].array
-
-    # merge the TICs with matching Gaia entries
-    result = _add_tics_with_matching_gaia_ids_to(result, tab, gaia_ids)
-
-    # add new entries for the TICs with no matching Gaia ones
-    result = _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limit)
-
-    source_colnames_extras = ['tic', 'TESSmag', 'separation']
-    tooltips_extras = [("TIC", "@tic"), ("TESS Mag", "@TESSmag"), ("Separation (\")", "@separation")]
-    return result, source_colnames_extras, tooltips_extras
-
-
-def _to_display(series):
-    def _format(val):
-        if val == _MISSING_INT_VAL or np.isnan(val):
-            return ""
-        else:
-            return str(val)
-    return pd.Series(data=[_format(v) for v in series], dtype=str)
-
-
-def _get_nearby_gaia_objects(tpf, magnitude_limit=18):
-    """Get nearby objects (of the target defined in tpf) from Gaia.
-    The result is formatted for the use of plot."""
-    # Get the positions of the Gaia sources
-    try:
-        c1 = SkyCoord(tpf.ra, tpf.dec, frame="icrs", unit="deg")
-    except Exception as err:
-        msg = ("Cannot get nearby stars in GAIA because TargetPixelFile has no valid coordinate. "
-               f"ra: {tpf.ra}, dec: {tpf.dec}")
-        raise LightkurveError(msg) from err
-
-    # Use pixel scale for query size
-    pix_scale = 4.0  # arcseconds / pixel for Kepler, default
-    if tpf.mission == "TESS":
-        pix_scale = 21.0
-    # We are querying with a diameter as the radius, overfilling by 2x.
-    from astroquery.vizier import Vizier
-
-    Vizier.ROW_LIMIT = -1
-    with warnings.catch_warnings():
-        # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
-        warnings.filterwarnings(
-            "ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard"
-        )
-        result = Vizier.query_region(
-            c1,
-            catalog=["I/345/gaia2"],
-            radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"),
-        )
-    no_targets_found_message = ValueError(
-        "Either no sources were found in the query region " "or Vizier is unavailable"
-    )
-    too_few_found_message = ValueError(
-        "No sources found brighter than {:0.1f}".format(magnitude_limit)
-    )
-    if result is None:
-        raise no_targets_found_message
-    elif len(result) == 0:
-        raise too_few_found_message
-    result = result["I/345/gaia2"].to_pandas()
-    result = result[result.Gmag < magnitude_limit]
-    if len(result) == 0:
-        raise no_targets_found_message
-    # drop all the filtered rows, it makes subsequent TESS-specific processing easier (to add rows/columns)
-    result.reset_index(drop=True, inplace=True)
-    result['magForSize'] = result['Gmag']  # to be used as the basis for sizing the dots in plots
-    return result
-
-
-def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
-    """Make the Gaia Figure Elements"""
-
-    result = _get_nearby_gaia_objects(tpf, magnitude_limit)
-
-    source_colnames_extras = []
-    tooltips_extras = []
-    try:
-        result, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, result)
-    except Exception as err:
-        warnings.warn(
-            f"interact_sky() - cannot obtain nearby TICs. Skip it. The error: {err}",
-            LightkurveWarning,
-        )
-
-    ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
-            np.nan_to_num(np.asarray(result.RA_ICRS)) * u.deg, np.nan_to_num(np.asarray(result.DE_ICRS)) * u.deg,
-            np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond / u.year,
-            np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond / u.year,
-            Time(2457206.375, format="jd", scale="tdb"),
-            tpf.time[0])
-    result.RA_ICRS = ra_corrected.to(u.deg).value
-    result.DE_ICRS = dec_corrected.to(u.deg).value
-    # Convert to pixel coordinates
-    radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
-    coords = tpf.wcs.all_world2pix(radecs, 0)
-
-    # Gently size the points by their Gaia magnitude
-    sizes = 64.0 / 2 ** (result["magForSize"] / 5.0)
-    one_over_parallax = 1.0 / (result["Plx"] / 1000.0)
-    source = ColumnDataSource(
-        data=dict(
-            ra=result["RA_ICRS"],
-            dec=result["DE_ICRS"],
-            pmra=result["pmRA"],
-            pmde=result["pmDE"],
-            source=_to_display(result["Source"]),
-            Gmag=result["Gmag"],
-            plx=result["Plx"],
-            one_over_plx=one_over_parallax,
-            x=coords[:, 0] + tpf.column,
-            y=coords[:, 1] + tpf.row,
-            size=sizes,
-        )
-    )
-    for c in source_colnames_extras:
-        source.data[c] = result[c]
-
-    tooltips = [
-        ("Gaia source", "@source"),
-        ("G", "@Gmag"),
-        ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
-        ("RA", "@ra{0,0.00000000}"),
-        ("DEC", "@dec{0,0.00000000}"),
-        ("pmRA", "@pmra{0,0.000} mas/yr"),
-        ("pmDE", "@pmde{0,0.000} mas/yr"),
-        ("column", "@x{0.0}"),
-        ("row", "@y{0.0}"),
-        ]
-    tooltips = tooltips_extras + tooltips
-
-    r = fig.scatter(
-        "x",
-        "y",
-        source=source,
-        fill_alpha=0.3,
-        size="size",
-        line_color=None,
-        selection_color="firebrick",
-        nonselection_fill_alpha=0.3,
-        nonselection_line_color=None,
-        nonselection_line_alpha=1.0,
-        fill_color="firebrick",
-        hover_fill_color="firebrick",
-        hover_alpha=0.9,
-        hover_line_color="white",
-    )
-
-    fig.add_tools(
-        HoverTool(
-            tooltips=tooltips,
-            renderers=[r],
-            mode="mouse",
-            point_policy="snap_to_data",
-        )
-    )
-
-    # mark the target's position too
+def add_target_figure_elements(tpf, fig):
+    # mark the target's position
     target_ra, target_dec, pm_corrected = _get_corrected_coordinate(tpf)
     target_x, target_y = None, None
     if target_ra is not None and target_dec is not None:
@@ -646,30 +427,169 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                            "if it has large proper motion."),
                            category=LightkurveWarning)
 
-    # display an arrow on the selected target
-    arrow_head = VeeHead(size=16)
-    arrow_4_selected = Arrow(end=arrow_head, line_color="red", line_width=4,
-                             x_start=0, y_start=0, x_end=0, y_end=0, tags=["selected"],
-                             visible=False)
-    fig.add_layout(arrow_4_selected)
 
+def create_provider(provider_class, tpf, magnitude_limit, extra_kwargs=None):
+    """Supplying the given provider all the parameters needed (for query, plotting, etc)."""
+    if extra_kwargs is None:
+        extra_kwargs = {}
+
+    provider_kwargs = extra_kwargs.copy()
+
+    try:
+        c1 = _get_corrected_coordinate(tpf, as_skycoord=True)
+    except Exception as err:
+        msg = ("Cannot get nearby stars because TargetPixelFile has no valid coordinate. "
+               f"ra: {getattr(tpf, 'ra', None)}, dec: {getattr(tpf, 'dec', None)}")
+        raise LightkurveError(msg) from err
+
+    provider_kwargs["coord"] = c1
+
+    if provider_kwargs.get("radius") is None:
+        # use the default search radius, scaled to the TargePixelFile size
+
+        # Use pixel scale for query size
+        pix_scale = 4.0  # arcseconds / pixel for Kepler, default
+        if tpf.mission == "TESS":
+            pix_scale = 21.0
+        # We are querying with a diameter as the radius, overfilling by 2x.
+        provider_kwargs["radius"] = Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec")
+
+    provider_kwargs["magnitude_limit"] = magnitude_limit
+
+    return provider_class(**provider_kwargs)
+
+
+def _row_to_dict(source, idx):
+    """convert a target at index `idx in the `ColumnDataSource` to a dict object"""
+    return {k: source.data[k][idx] for k in source.data}
+
+
+def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arrow_4_selected):
+
+    result = provider.query_catalog()
+    if result is None:
+        # case empty result, return a dummy renderer
+        return fig.scatter()
+
+    # do proper motion correction, if needed
+    m = provider.get_proper_motion_correction_meta()
+    if m is not None:
+        ra_corrected, dec_corrected, _ = _correct_with_proper_motion(
+            result[m.ra_colname].quantity, result[m.dec_colname].quantity,
+            result[m.pmra_colname].quantity, result[m.pmdec_colname].quantity,
+            m.frame,
+            m.equinox,
+            tpf.time[0])
+        result["RA"] = ra_corrected.to(u.deg).value
+        result["RA"].unit = u.deg
+        result["DEC"] = dec_corrected.to(u.deg).value
+        result["DEC"].unit = u.deg
+
+    _add_separation(result, provider.coord)
+
+    # Prepare the data source for plotting
+    # Convert to pixel coordinates
+    result_px_coords = tpf.wcs.all_world2pix(result["RA"], result["DEC"], 0)
+
+    # Gently size the points by their magnitude
+    sizes = 64.0 / 2 ** (result["magForSize"] / 5.0)
+    source = dict(
+        ra=result["RA"],
+        dec=result["DEC"],
+        x=result_px_coords[0] + tpf.column,
+        y=result_px_coords[1] + tpf.row,
+        separation=result["Separation"],
+        size=sizes,
+    )
+    provider.add_to_data_source(result, source)
+    # Workaround https://github.com/bokeh/bokeh/issues/13904
+    # Convert astropy column to plain ndarray, otherwise some columns (MaskedColumn of type int)
+    # could raise error during bokeh's serialization:
+    # ValueError: cannot convert float NaN to integer
+    # ...
+    # numpy.ma TypeError: Cannot convert fill_value nan to dtype int64
+    for c in source.keys():
+        val = source[c]
+        if isinstance(val, (MaskedColumn, np.ma.MaskedArray)):
+            if np.issubdtype(val.dtype, np.integer):
+                # use the default fill_value.
+                # It might not be what one actually wants, but that's the best we could do
+                val = val.filled()
+            else:
+                # mimic bokeh's serialization logic (which ignores fill_value, as it's often untrustworthy)
+                val = val.filled(np.nan)
+        # to be on the safe side, convert astropy Column to nd array to avoid any behavioral difference
+        if hasattr(val, "value"):  # Column, Quantity, etc.
+            source[c] = val.value
+        else:
+            source[c] = val
+
+    source = ColumnDataSource(source)
+
+    #
+    # Do the actual UI work
+    #
+
+    # 1. plot the data, along with a hover pop-in
+    r = fig.scatter(
+        "x",
+        "y",
+        source=source,
+        size="size",
+        **provider.scatter_kwargs
+    )
+
+    fig.add_tools(
+        HoverTool(
+            tooltips=provider.get_tooltips(),
+            renderers=[r],
+            mode="mouse",
+            point_policy="snap_to_data",
+        )
+    )
+
+    # 2. render the detail table on click
+
+    def show_target_info(attr, old, new):
+        # the following is essentially redoing the bokeh tooltip template above in plain HTML
+        # with some slight tweak, mainly to add some helpful links.
+        if len(new) > 0:
+            msg = """
+<style type="text/css">
+    .target_details .error {
+        font-size: 80%;
+        font-color: gray;
+        margin-left: 1ch;
+    }
+    .target_details .error:before {
+        content: "± ";
+    }
+</style>
+Selected:<br>
+<table class="target_details">
+"""
+            for idx in new:
+                details, extra_rows = provider.get_detail_view(_row_to_dict(source, idx))
+                for header, val_html in details.items():
+                    msg += f"<tr><td>{header}</td><td>{val_html}</td>"
+                if extra_rows is not None:
+                    for row_html in extra_rows:
+                        msg += f'<tr><td colspan="2">{row_html}</td></tr>'
+                msg += '<tr><td colspan="2">&nbsp;</td></tr>'  # space between multiple targets
+            msg += "\n<table>"
+            message_selected_target.text = msg
+        # else do nothing (not clearing the widget) for now.
+
+    source.selected.on_change("indices", show_target_info)
+
+    # 3. show arrow of the selected target, requires the arrow construct to be supplied to the function
+    # display an arrow on the selected target
     def show_arrow_at_target(attr, old, new):
         if len(new) > 0:
             x, y = source.data["x"][new[0]], source.data["y"][new[0]]
 
-            # workaround: the arrow_head color should have been specified once
-            # in its creation, but it seems to hit a bokeh bug, resulting in an error
-            # of the form  ValueError("expected ..., got {'value': 'red'}")
-            # in actual websocket call, it seems that the color value is
-            # sent as "{'value': 'red'}", but they are expdecting "red" instead.
-            # somehow the error is bypassed if I specify it later in here.
-            #
-            # The issue is present in bokeh 2.2.3 / 2.1.1, but  not in bokeh 2.3.1
-            # I cannot identify a specific issue /PR on github about it though.
-            arrow_head.fill_color = "red"
-            arrow_head.line_color = "black"
-
             # place the arrow near (x,y), taking care of boundary cases (at the edge of the plot)
+            x_midpoint = fig.x_range.start + (fig.x_range.end - fig.x_range.start) / 2
             if x < fig.x_range.start + 1:
                 # boundary case: the point is at the left edge of the plot
                 arrow_4_selected.x_start = x + 0.85
@@ -678,13 +598,13 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                 # boundary case: the point is at the right edge of the plot
                 arrow_4_selected.x_start = x - 0.85
                 arrow_4_selected.x_end = x - 0.2
-            elif target_x is None or x < target_x:
-                # normal case 1 : point is to the left of the target
+            elif x < x_midpoint:
+                # normal case 1 : point is at the left side of the plot
                 arrow_4_selected.x_start = x - 0.85
                 arrow_4_selected.x_end = x - 0.2
             else:
-                # normal case 2 : point is to the right of the target
-                # flip arrow's direction so that it won't overlap with the target
+                # normal case 2 : point is at the right side of the plot
+                # flip arrow's direction
                 arrow_4_selected.x_start = x + 0.85
                 arrow_4_selected.x_end = x + 0.2
 
@@ -705,67 +625,39 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
             arrow_4_selected.visible = False
 
     source.selected.on_change("indices", show_arrow_at_target)
+    return r
 
 
-    # a widget that displays some of the selected star's metadata
-    # so that they can be copied (e.g., GAIA ID).
-    # It is a workaround, because bokeh's hover tooltip disappears as soon as the mouse is away from the star.
-    message_selected_target = Div(text="")
+def parse_and_add_catalogs_figure_elements(catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected):
+    providers = []
+    catalog_renderers = []
 
-    def show_target_info(attr, old, new):
-        # the following is essentially redoing the bokeh tooltip template above in plain HTML
-        # with some slight tweak, mainly to add some helpful links.
-        #
-        # Note: in source, columns "x" and "y" are ndarray while other column are pandas Series,
-        # so the access api is slightly different.
-        if len(new) > 0:
-            msg = "Selected:<br><table>"
-            for idx in new:
-                tic_id = source.data['tic'].iat[idx] if source.data.get('tic') is not None else None
-                if tic_id is not None and tic_id != "":  # TESS-specific meta data, if available
-                    msg += f"""
-<tr><td>TIC</td><td>{tic_id}
-(<a target="_blank" href="https://exofop.ipac.caltech.edu/tess/target.php?id={tic_id}">ExoFOP</a>)</td></tr>
-<tr><td>TESS Mag</td><td>{source.data['TESSmag'].iat[idx]}</td></tr>
-<tr><td>Separation (")</td><td>{source.data['separation'].iat[idx]}</td></tr>
-"""
-                # the main meta data
-                msg += f"""
-<tr><td>Gaia source</td><td>{source.data['source'].iat[idx]}
-(<a target="_blank"
-    href="http://vizier.u-strasbg.fr/viz-bin/VizieR-S?Gaia DR2 {source.data['source'].iat[idx]}">Vizier</a>)</td></tr>
-<tr><td>G</td><td>{source.data['Gmag'].iat[idx]:.3f}</td></tr>
-<tr><td>Parallax (mas)</td>
-    <td>{source.data['plx'].iat[idx]:,.3f} (~ {source.data['one_over_plx'].iat[idx]:,.0f} pc)</td>
-</tr>
-<tr><td>RA</td><td>{source.data['ra'].iat[idx]:,.8f}</td></tr>
-<tr><td>DEC</td><td>{source.data['dec'].iat[idx]:,.8f}</td></tr>
-<tr><td>pmRA</td><td>{source.data['pmra'].iat[idx]} mas/yr</td></tr>
-<tr><td>pmDE</td><td>{source.data['pmde'].iat[idx]} mas/yr</td></tr>
-<tr><td>column</td><td>{source.data['x'][idx]:.1f}</td></tr>
-<tr><td>row</td><td>{source.data['y'][idx]:.1f}</td></tr>
-<tr><td colspan="2">Search
-<a target="_blank"
-   href="http://simbad.u-strasbg.fr/simbad/sim-id?Ident=Gaia DR2 {source.data['source'].iat[idx]}">
-SIMBAD by Gaia ID</a></td></tr>
-<tr><td colspan="2">
-<a target="_blank"
-   href="http://simbad.u-strasbg.fr/simbad/sim-coo?Coord={source.data['ra'].iat[idx]}+{source.data['dec'].iat[idx]}&Radius=2&Radius.unit=arcmin">
-SIMBAD by coordinate</a></td></tr>
-<tr><td colspan="2">&nbsp;</td></tr>
-"""
+    for catalog_spec in catalogs:
+        if isinstance(catalog_spec, (tuple, list)):
+            if len(catalog_spec) == 2:
+                provider_class, extra_kwargs = catalog_spec
+            elif len(catalog_spec) == 1:
+                # to support the form of ("gaiadr3", )
+                # say, when users comment out the keyword arguments in their code
+                provider_class, extra_kwargs = catalog_spec[0], None
+            else:
+                raise ValueError(
+                    "A catalog should be the catalog, or a tuple of catalog and keyword arguments. "
+                    f"Actual: {catalog_spec}"
+                    )
+        else:
+            provider_class, extra_kwargs = catalog_spec, None
 
-            msg += "\n<table>"
-            message_selected_target.text = msg
-        # else do nothing (not clearing the widget) for now.
+        if isinstance(provider_class, str):
+            provider_class = resolve_catalog_provider_class(provider_class)
+        # else assume it's a InteractSkyCatalogProvider class
 
-    def on_selected_change(*args):
-        show_arrow_at_target(*args)
-        show_target_info(*args)
-
-    source.selected.on_change("indices", show_target_info)
-
-    return fig, r, message_selected_target
+        # pass all the parameters for query, plotting, etc. to the provider
+        provider = create_provider(provider_class, tpf, magnitude_limit, extra_kwargs=extra_kwargs)
+        renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+        providers.append(provider)
+        catalog_renderers.append(renderer)
+    return providers, catalog_renderers
 
 
 def to_selected_pixels_source(tpf_source):
@@ -1308,8 +1200,52 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
+def _create_select_catalog_ui(providers, catalog_renderers):
+    select_catalog_ui = CheckboxGroup(
+        labels=[p.label for p in providers],
+        active=list(range(0, len(providers))),  # make all checked
+        inline=True,
+        )
+    # add more horizontal spacing between checkboxes
+    select_catalog_ui.stylesheets = [InlineStyleSheet(css="""\
+.bk-input-group.bk-inline > label {
+margin: 5px 10px;
+}
+""")]
 
-def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitude_limit=18):
+    def select_catalog_handler(attr, old, new):
+        # new is the list of indices of active (i.e., checked) catalogs
+        for i in range(len(catalog_renderers)):
+            r = catalog_renderers[i]
+            if i in new:
+                r.visible = True
+            else:
+                r.visible = False
+
+    select_catalog_ui.on_change("active", select_catalog_handler)
+
+    return select_catalog_ui
+
+
+def make_interact_sky_selection_elements(fig_tpf):
+    # a widget that displays some of the selected star's metadata
+    # so that they can be copied (e.g., GAIA ID).
+    # Generally the content is a more detailed version of the on-hover tooltip.
+    message_selected_target = Div(text="")
+
+    # an arrow that serves as the marker of the selected star.
+    arrow_4_selected = Arrow(
+        end=VeeHead(size=16, fill_color="red", line_color="black"),
+        line_color="red", line_width=4,
+        x_start=0, y_start=0, x_end=0, y_end=0, tags=["selected"],
+        visible=False,
+    )
+    fig_tpf.add_layout(arrow_4_selected)
+
+    return message_selected_target, arrow_4_selected
+
+
+def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=None, magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1343,6 +1279,12 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitud
 
     notebook_url = finalize_notebook_url(notebook_url)
 
+    if catalogs is None:
+        if tpf.mission == "TESS":
+            catalogs = ["gaiadr3_tic"]
+        else:
+            catalogs = ["gaiadr3"]
+
     # Try to identify the "fiducial frame", for which the TPF WCS is exact
     zp = (tpf.pos_corr1 == 0) & (tpf.pos_corr2 == 0)
     (zp_loc,) = np.where(zp)
@@ -1353,6 +1295,7 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitud
         fiducial_frame = 0
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
+
     def create_interact_ui(doc):
         tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
@@ -1368,9 +1311,15 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitud
             height=600,
             tools="tap,box_zoom,wheel_zoom,reset"
         )
-        fig_tpf, r, message_selected_target = add_gaia_figure_elements(
-            tpf, fig_tpf, magnitude_limit=magnitude_limit
-        )
+
+        # Add a marker (cross) to indicate the coordinate of the target
+        add_target_figure_elements(tpf, fig_tpf)
+
+        message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
+
+        providers, catalog_renderers = parse_and_add_catalogs_figure_elements(
+            catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+            )
 
         # Optionally override the default title
         if tpf.mission == "K2":
@@ -1391,7 +1340,21 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitud
             )
 
         # Layout all of the plots
-        widgets_and_figures = layout([fig_tpf, message_selected_target], [stretch_slider])
+        if len(catalogs) < 2:
+            widgets_and_figures = layout(
+                Row(
+                    Column(fig_tpf, stretch_slider),
+                    message_selected_target,
+                )
+            )
+        else:
+            select_catalog_ui = _create_select_catalog_ui(providers, catalog_renderers)
+            widgets_and_figures = layout(
+                Row(
+                    Column(fig_tpf,  select_catalog_ui, stretch_slider),
+                    message_selected_target,
+                )
+            )
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
