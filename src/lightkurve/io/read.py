@@ -1,10 +1,8 @@
 """Functions for reading light curve data."""
 import logging
-import gzip
 
 from astropy.io import fits
 from astropy.utils import deprecated
-import s3fs
 
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 
@@ -86,16 +84,8 @@ def read(path_or_url, **kwargs):
     try:
         if (isinstance(path_or_url, str) and path_or_url.startswith('s3://')):
             # path_or_url is an S3 cloud URI
-            fs = s3fs.S3FileSystem(anon=True)
-            with fs.open(path_or_url, 'rb') as f:
-                if f.key.endswith('.gz'):
-                    # Unpack if file is in gzip format (Kepler TPFs)
-                    with gzip.open(f) as g:
-                        with fits.open(g) as temp:
-                            filetype = detect_filetype(temp)
-                else:
-                    with fits.open(f) as temp:
-                        filetype = detect_filetype(temp)
+            with fits.open(path_or_url, use_fsspec=True, fsspec_kwargs={"anon": True}) as temp:
+                filetype = detect_filetype(temp)
         else:
             with fits.open(path_or_url) as temp:
                 filetype = detect_filetype(temp)

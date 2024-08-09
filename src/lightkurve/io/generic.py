@@ -7,7 +7,6 @@ from astropy.table import Table
 from astropy.time import Time
 from astropy.units import UnitsWarning
 import numpy as np
-import s3fs
 
 from ..utils import validate_method
 from ..lightcurve import LightCurve
@@ -32,17 +31,15 @@ def read_generic_lightcurve(
     """Generic helper function to convert a Kepler ot TESS light curve file
     into a generic `LightCurve` object.
     """
-    to_close_fs, to_close_hdul = False, False
+    to_close_hdul = True
     if (isinstance(filename, str) and filename.startswith('s3://')):
         # Filename is an S3 cloud URI
         log.debug('Reading file from AWS S3 cloud.')
-        fs = s3fs.S3FileSystem(anon=True)
-        f, to_close_fs = fs.open(filename, 'rb'), True
-        hdulist, to_close_hdul = fits.open(f), True
+        hdulist = fits.open(filename, use_fsspec=True, fsspec_kwargs={"anon": True})
     elif isinstance(filename, fits.HDUList):
-        hdulist = filename  # Allow HDUList to be passed
+        hdulist, to_close_hdul = filename, False # Allow HDUList to be passed
     else:
-        hdulist, to_close_hdul = fits.open(filename), True
+        hdulist = fits.open(filename)
 
     try:
         # Raise an exception if the requested extension is invalid
@@ -146,5 +143,3 @@ def read_generic_lightcurve(
         if to_close_hdul:
             # avoid hdulist closing from emitting exceptions
             hdulist.close(output_verify="warn")
-        if to_close_fs:
-            f.close()

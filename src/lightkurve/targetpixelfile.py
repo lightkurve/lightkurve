@@ -5,7 +5,6 @@ import datetime
 import os
 import warnings
 import logging
-import gzip
 
 import collections
 
@@ -31,7 +30,6 @@ import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
-import s3fs
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
@@ -102,20 +100,11 @@ class TargetPixelFile(object):
 
     def __init__(self, path, quality_bitmask="default", targetid=None, **kwargs):
         self.path = path
-        self.fs_file = None
-        self.gz_file = None
         if isinstance(path, fits.HDUList):
             self.hdu = path
         elif (isinstance(path, str) and path.startswith('s3://')):
             # Filename is an S3 cloud URI
-            fs = s3fs.S3FileSystem(anon=True)
-            self.fs_file = fs.open(path, 'rb')
-            if self.fs_file.key.endswith('gz'):
-                # Unpack if file is in gzip format (Kepler TPFs)
-                self.gz_file = gzip.open(self.fs_file)
-                self.hdu = fits.open(self.gz_file)
-            else:
-                self.hdu = fits.open(self.fs_file)
+            self.hdu = fits.open(path, use_fsspec=True, fsspec_kwargs={"anon": True}, **kwargs)
         else:
             self.hdu = fits.open(self.path, **kwargs)
         try:
@@ -126,7 +115,7 @@ class TargetPixelFile(object):
             self.meta = HduToMetaMapping(self.hdu[0])
         except Exception as e:
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
-            self._close_files()
+            self.hdu.close()
             raise e
 
     def __getitem__(self, key):
@@ -210,12 +199,6 @@ class TargetPixelFile(object):
 
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
-    
-    def _close_files(self):
-        to_close = [self.hdu, self.fs_file, self.gz_file]
-        for f in to_close:
-            if f is not None:
-                f.close()
 
     @property
     @deprecated("2.0", alternative="time", warning_type=LightkurveDeprecationWarning)
@@ -2145,7 +2128,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 self.targetid = self.get_header().get("KEPLERID")
         except Exception as e:
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
-            self._close_files()
+            self.hdu.close()
             raise e
 
     def __repr__(self):
@@ -2825,7 +2808,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 self.targetid = self.get_header().get("TICID")
         except Exception as e:
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
-            self._close_files()
+            self.hdu.close()
             raise e
 
     def __repr__(self):
