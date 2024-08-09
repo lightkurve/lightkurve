@@ -1375,9 +1375,9 @@ def _mask_by_exptime(products, exptime):
         if exptime in ["fast"]:
             mask &= products["exptime"] < 60
         elif exptime in ["short"]:
-            mask &= (products["exptime"] >= 60) & (products["exptime"] < 300)
+            mask &= (products["exptime"] >= 60) & (products["exptime"] < 200)
         elif exptime in ["long", "ffi"]:
-            mask &= products["exptime"] >= 300
+            mask &= products["exptime"] >= 200
     return mask
 
 
