@@ -4,9 +4,9 @@ import logging
 from astropy.io import fits
 from astropy.utils import deprecated
 
-from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from lightkurve.targetpixelfile import TargetPixelFile
 
-from ..lightcurve import KeplerLightCurve, TessLightCurve
+from ..lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 from ..utils import LightkurveDeprecationWarning, LightkurveError
 from .detect import detect_filetype
@@ -162,19 +162,17 @@ def read(path_or_url, **kwargs):
             "Please remove it from your disk and try again."
         )
 
-def _read_collection(path_list, products, *, stitch=False, **kwargs):
+def _read_collection(path_list, product, *, stitch=False, **kwargs):
+    """Read multiple product files into a collection"""
     prod_list = []
-    is_lc = (products[0] == TessLightCurve)
-    product_type = "lightcurve" if is_lc else "target pixel file"
-
     for path in path_list:
         try:
             new_prod = read(path, **kwargs)
 
-            if (type(new_prod) in products):
+            if isinstance(new_prod, product):
                 prod_list.append(new_prod)
             else:
-                log.debug(f'Unable to read {path}: The file is not a TESS or Kepler {product_type}.')
+                log.debug(f'Unable to read {path}: The file is not a TESS or Kepler {product.__name__}.')
 
         except Exception as e:
             log.warning(
@@ -185,15 +183,57 @@ def _read_collection(path_list, products, *, stitch=False, **kwargs):
         log.warning(
             'The resulting collection contains no products.'
         )
-        return LightCurveCollection([]) if is_lc else TargetPixelFileCollection([])
     
-    if is_lc:
+    if isinstance(product(), LightCurve):
+        # stitch into single LightCurve if indicated
         return LightCurveCollection(prod_list).stitch() if stitch else LightCurveCollection(prod_list)
     else:
         return TargetPixelFileCollection(prod_list)
     
 def read_lc_collection(path_list, *, stitch=False, **kwargs):
-    return _read_collection(path_list, [TessLightCurve, KeplerLightCurve], stitch=stitch, **kwargs)
+    """Reads a list of valid Kepler or TESS light curve(s) and returns an instance of
+    `~lightkurve.collections.LightCurveCollection`.
+
+    File types currently supported include::
+        * `KeplerLightCurve` (typical suffix "llc.fits");
+        * `TessLightCurve` (typical suffix "_lc.fits").
+
+    Parameters
+    ----------
+    path_list : list
+        List of paths to light curve FITS files. Can be a filepath, URL, or S3 URI.
+    stitch : bool, optional
+        Whether to stitch the `~lightkurve.collections.LightCurveCollection` into a single
+        `~lightkurve.lightcurve.LightCurve`.
+    **kwargs : dict
+        Dictionary of arguments to be passed to underlying data product type specific reader.
+
+    Returns
+    -------
+    collection : a `~lightkurve.collections.LightCurveCollection` containing all valid light curves
+                 from ``path_list`` or a single stitched `~lightkurve.lightcurve.LightCurve` if
+                 parameter ``stitch=True``.
+    """
+    return _read_collection(path_list, LightCurve, stitch=stitch, **kwargs)
 
 def read_tpf_collection(path_list, **kwargs):
-    return _read_collection(path_list, [TessTargetPixelFile, KeplerTargetPixelFile], stitch=False, **kwargs)
+    """Reads a list of valid Kepler or TESS target pixel files (TPFs) and returns an instance of
+    `~lightkurve.collections.TargetPixelFileCollection`.
+
+    File types currently supported include::
+        * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
+        * `TessTargetPixelFile` (typical suffix "_tp.fits");
+
+    Parameters
+    ----------
+    path_list : list
+        List of paths to TPF FITS files. Can be a filepath, URL, or S3 URI.
+    **kwargs : dict
+        Dictionary of arguments to be passed to underlying data product type specific reader.
+
+    Returns
+    -------
+    collection : a `~lightkurve.collections.TargetPixelFileCollection` containing all valid TPFs
+                 from ``path_list``.
+    """
+    return _read_collection(path_list, TargetPixelFile, stitch=False, **kwargs)
