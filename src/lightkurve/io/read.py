@@ -184,7 +184,7 @@ def _read_collection(path_list, product, *, stitch=False, **kwargs):
             'The resulting collection contains no products.'
         )
     
-    if isinstance(product(), LightCurve):
+    if product is LightCurve:
         # stitch into single LightCurve if indicated
         return LightCurveCollection(prod_list).stitch() if stitch else LightCurveCollection(prod_list)
     else:
