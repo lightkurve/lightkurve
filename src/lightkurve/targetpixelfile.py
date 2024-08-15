@@ -102,6 +102,9 @@ class TargetPixelFile(object):
         self.path = path
         if isinstance(path, fits.HDUList):
             self.hdu = path
+        elif (isinstance(path, str) and path.startswith('s3://')):
+            # Filename is an S3 cloud URI
+            self.hdu = fits.open(path, use_fsspec=True, fsspec_kwargs={"anon": True}, **kwargs)
         else:
             self.hdu = fits.open(self.path, **kwargs)
         try:

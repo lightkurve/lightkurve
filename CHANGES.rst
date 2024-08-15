@@ -20,7 +20,8 @@
 - Updated aperture plotting to speed it up in the case of large (bleed column) apertures. [#1434]
 - Fixed time format for KEPSEISMIC light curves from bjkd to mjd. [#1443]
 - Fixed flux unit bug in to_fits [#1454]
-
+- Added support to read data products hosted on public AWS S3 buckets. [#1451]
+- Added functions to read in collections of light curves or target pixel files. [#1451]
 
 2.4.2 (2023-11-03)
 =====================

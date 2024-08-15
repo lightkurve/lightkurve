@@ -42,6 +42,7 @@ fbpca = ">=1.0"
 bokeh = ">=2.3.2"
 memoization = { version = ">=0.3.1", python = ">=3.8,<4.0" }
 scikit-learn = ">=0.24.0"
+s3fs = ">=2024.6.1"
 
 [tool.poetry.dev-dependencies]
 jupyterlab = ">=2.0.0"
