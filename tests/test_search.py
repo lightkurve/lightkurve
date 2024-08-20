@@ -614,3 +614,37 @@ def test_customize_search_result_display_case_nonexistent_column():
     search = search_lightcurve("TIC390021728")
     search.display_extra_columns = ['foo_col']
     assert 'foo_col' not in search.__repr__()
+
+@pytest.mark.remote_data
+def test_set_search_result_use_cloud_uri():
+
+    search = search_lightcurve("TIC390021728")
+    # default display is set to False
+    assert not search.use_cloud_uri
+
+    # custom config: has proposal_id in display
+    try:
+        use_custom_config_file("data/lightkurve_sr_use_cloud.cfg")
+        # Note: here a *different* TIC is used for search to avoid the complication
+        # of caching.
+        # if the same TIC is used, the cached result would be returned, without
+        # consiering the customization specified.
+        # the TIC used is in multiple sectors, with some rows having proposal_id and some rows
+        # have none. So it's also a sanity test the for the actual proposal_id display logic.
+        search = search_lightcurve("TIC298734307")
+        assert search.use_cloud_uri
+    finally:
+        remove_custom_config()  # restore default to avoid side effects
+
+    # test changing config at runtime
+    try:
+        lk.conf.search_result_use_cloud_uri = True
+
+        search = search_lightcurve("TIC169175503")  # again use a different TIC to avoid caching complication
+        assert search.use_cloud_uri
+    finally:
+        lk.conf.search_result_use_cloud_uri = False  # restore default to avoid side effects
+
+    # Test per-object customization
+    search.use_cloud_uri = True
+    assert search.use_cloud_uri
