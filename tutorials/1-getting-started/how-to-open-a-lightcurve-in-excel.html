@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -226,7 +226,7 @@
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>First we must install and import the <a class="reference external" href="https://docs.lightkurve.org/index.html">Lightkurve</a> package. We can do this as follows:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This step is not necessary if you have already installed Lightkurve</span>
@@ -235,7 +235,7 @@
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
@@ -250,7 +250,7 @@
 <p><em>Lightkurve’s</em> built-in tools allow us to search for light curve files in the archive, and download them and their metadata. In this example, we will start by downloading one sector of TESS data for a star named V1357 Cyg, also known as <a class="reference external" href="https://en.wikipedia.org/wiki/Cygnus_X-1">Cygnus X-1</a>. V1357 Cyg is a galactic X-ray source in the constellation Cygnus.</p>
 <p>Using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve">search_lightcurve</a> function, we can find an itemized list of light curves produced by different data analysis pipelines:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;V1357 Cyg&quot;</span><span class="p">)</span>
@@ -259,24 +259,37 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-SearchResult containing 3 data products.
+SearchResult containing 16 data products.
 
-<table id="table6349561040">
+<table id="table10897261776">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>102604645</td><td>0.0</td></tr>
-<tr><td>1</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>102604645</td><td>0.0</td></tr>
-<tr><td>2</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>1</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>2</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>3</td><td>TESS Sector 74</td><td>2024</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>4</td><td>TESS Sector 75</td><td>2024</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>5</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>6</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>600</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>7</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>600</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>8</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>9</td><td>TESS Sector 54</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>10</td><td>TESS Sector 55</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>11</td><td>TESS Sector 74</td><td>2024</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>12</td><td>TESS Sector 75</td><td>2024</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>13</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tasoc'>TASOC</a></td><td>120</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>14</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tasoc'>TASOC</a></td><td>1800</td><td>102604645</td><td>0.0</td></tr>
+<tr><td>15</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tasoc'>TASOC</a></td><td>1800</td><td>102604645</td><td>0.0</td></tr>
 </table></div>
 </div>
 <p>By clicking on each of the “author” links above, you will obtain a description of the product and how each one is different from the other. The acronym <em>SPOC</em> refers to the TESS data calibration pipeline provided by NASA Ames, and <em>QLP</em> refers to the Quiclook Pipeline in use by the mission team at MIT.</p>
 <p>We can <a class="reference external" href="https://docs.lightkurve.org/reference/search.html?highlight=download">download</a> the first data product by specifying its index number in rectangular brackets:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
@@ -288,7 +301,7 @@ SearchResult containing 3 data products.
 <h2>2. Plotting a light curve<a class="headerlink" href="#2.-Plotting-a-light-curve" title="Permalink to this headline">#</a></h2>
 <p>Before loading the light curve data into Excel, it can be useful to have a quick look at the data using <em>Lightkurve’s</em> <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.plot.html?highlight=plot#lightkurve.LightCurve.plot">plot</a> function:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
@@ -307,7 +320,7 @@ SearchResult containing 3 data products.
 <h2>3. Download the light curve as an Excel spreadsheet<a class="headerlink" href="#3.-Download-the-light-curve-as-an-Excel-spreadsheet" title="Permalink to this headline">#</a></h2>
 <p>If you are new to Python, it is likely that you feel more comfortable inspecting and analyzing a light curve in Excel than in Python. That is fine! We can save the light curve data as an Excel spreadsheet named “V1357Cyg.xlsx” as follows:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s2">&quot;V1357Cyg.xlsx&quot;</span><span class="p">)</span>

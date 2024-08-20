@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -1267,6 +1267,11 @@
      lightkurve.TessQualityFlags
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.utils.plot_image.html">
+     lightkurve.utils.plot_image
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -1327,7 +1332,7 @@ appropriate object. File types currently supported include:</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>path_or_url</strong><span class="classifier">str</span></dt><dd><p>Path or URL of a FITS file.</p>
+<dt><strong>path_or_url</strong><span class="classifier">str</span></dt><dd><p>Path, URL, or S3 URI of a FITS file.</p>
 </dd>
 <dt><strong>quality_bitmask</strong><span class="classifier">str or int, optional</span></dt><dd><p>Bitmask (integer) which identifies the quality flag bitmask that should
 be used to mask out bad cadences. If a string is passed, it has the

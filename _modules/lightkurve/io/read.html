@@ -59,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -176,14 +176,17 @@
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
 <span class="kn">from</span> <span class="nn">astropy.utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
 
-<span class="kn">from</span> <span class="nn">..lightcurve</span> <span class="kn">import</span> <span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="n">TessLightCurve</span>
+<span class="kn">from</span> <span class="nn">lightkurve.targetpixelfile</span> <span class="kn">import</span> <span class="n">TargetPixelFile</span>
+
+<span class="kn">from</span> <span class="nn">..lightcurve</span> <span class="kn">import</span> <span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="n">TessLightCurve</span><span class="p">,</span> <span class="n">LightCurve</span>
+<span class="kn">from</span> <span class="nn">..collections</span> <span class="kn">import</span> <span class="n">LightCurveCollection</span><span class="p">,</span> <span class="n">TargetPixelFileCollection</span>
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">LightkurveDeprecationWarning</span><span class="p">,</span> <span class="n">LightkurveError</span>
 <span class="kn">from</span> <span class="nn">.detect</span> <span class="kn">import</span> <span class="n">detect_filetype</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;read_lc_collection&quot;</span><span class="p">,</span> <span class="s2">&quot;read_tpf_collection&quot;</span><span class="p">]</span>
 
 
 <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;read()&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
@@ -212,7 +215,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path_or_url : str</span>
-<span class="sd">        Path or URL of a FITS file.</span>
+<span class="sd">        Path, URL, or S3 URI of a FITS file.</span>
 <span class="sd">    quality_bitmask : str or int, optional</span>
 <span class="sd">        Bitmask (integer) which identifies the quality flag bitmask that should</span>
 <span class="sd">        be used to mask out bad cadences. If a string is passed, it has the</span>
@@ -251,14 +254,27 @@
     <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Opening </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">))</span>
     <span class="c1"># pass header into `detect_filetype()`</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">temp</span><span class="p">:</span>
-            <span class="n">filetype</span> <span class="o">=</span> <span class="n">detect_filetype</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Detected filetype: &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">path_or_url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;s3://&#39;</span><span class="p">)):</span>
+            <span class="c1"># path_or_url is an S3 cloud URI</span>
+            <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="n">use_fsspec</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fsspec_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;anon&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span> <span class="k">as</span> <span class="n">temp</span><span class="p">:</span>
+                <span class="n">filetype</span> <span class="o">=</span> <span class="n">detect_filetype</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">temp</span><span class="p">:</span>
+                <span class="n">filetype</span> <span class="o">=</span> <span class="n">detect_filetype</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Detected filetype: &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">))</span>
     <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">filetype</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Raise an explicit FileNotFoundError if file not found</span>
         <span class="k">if</span> <span class="s2">&quot;No such file&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc2</span><span class="p">:</span>
+        <span class="c1"># case unexpected error during detection, e.g., if a file is corrupted such that FITS headers are truncated</span>
+        <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unexpected error in detecting the type of the data product: &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc2</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc2</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;This file may be corrupt due to an interrupted download. &quot;</span>
+            <span class="s2">&quot;Please remove it from your disk and try again.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc2</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;KeplerLightCurve&quot;</span><span class="p">:</span>
@@ -301,6 +317,14 @@
                 <span class="sa">f</span><span class="s2">&quot;Data product f</span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="n">filetype</span><span class="si">}</span><span class="s2"> is not supported &quot;</span>
                 <span class="s2">&quot;in this version of Lightkurve.&quot;</span>
             <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc2</span><span class="p">:</span>
+            <span class="c1"># case the FITS has enough info from header to pass detection, but cannot be fully opened</span>
+            <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected error in reading data product: &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc2</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc2</span><span class="si">}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_or_url</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;This file may be corrupt due to an interrupted download. &quot;</span>
+                <span class="s2">&quot;Please remove it from your disk and try again.&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc2</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># if these keywords don&#39;t exist, raise `ValueError`</span>
         <span class="k">raise</span> <span class="n">LightkurveError</span><span class="p">(</span>
@@ -309,6 +333,82 @@
             <span class="s2">&quot;This file may be corrupt due to an interrupted download. &quot;</span>
             <span class="s2">&quot;Please remove it from your disk and try again.&quot;</span>
         <span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_read_collection</span><span class="p">(</span><span class="n">path_list</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stitch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read multiple product files into a collection&quot;&quot;&quot;</span>
+    <span class="n">prod_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">path_list</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_prod</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_prod</span><span class="p">,</span> <span class="n">product</span><span class="p">):</span>
+                <span class="n">prod_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_prod</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to read </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">: The file is not a TESS or Kepler </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Unable to read </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">. This file will not be added to the collection.&#39;</span>
+            <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">prod_list</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s1">&#39;The resulting collection contains no products.&#39;</span>
+        <span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">product</span> <span class="ow">is</span> <span class="n">LightCurve</span><span class="p">:</span>
+        <span class="c1"># stitch into single LightCurve if indicated</span>
+        <span class="k">return</span> <span class="n">LightCurveCollection</span><span class="p">(</span><span class="n">prod_list</span><span class="p">)</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span> <span class="k">if</span> <span class="n">stitch</span> <span class="k">else</span> <span class="n">LightCurveCollection</span><span class="p">(</span><span class="n">prod_list</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">TargetPixelFileCollection</span><span class="p">(</span><span class="n">prod_list</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">read_lc_collection</span><span class="p">(</span><span class="n">path_list</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stitch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads a list of valid Kepler or TESS light curve(s) and returns an instance of</span>
+<span class="sd">    `~lightkurve.collections.LightCurveCollection`.</span>
+
+<span class="sd">    File types currently supported include::</span>
+<span class="sd">        * `KeplerLightCurve` (typical suffix &quot;llc.fits&quot;);</span>
+<span class="sd">        * `TessLightCurve` (typical suffix &quot;_lc.fits&quot;).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path_list : list</span>
+<span class="sd">        List of paths to light curve FITS files. Can be a filepath, URL, or S3 URI.</span>
+<span class="sd">    stitch : bool, optional</span>
+<span class="sd">        Whether to stitch the `~lightkurve.collections.LightCurveCollection` into a single</span>
+<span class="sd">        `~lightkurve.lightcurve.LightCurve`.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Dictionary of arguments to be passed to underlying data product type specific reader.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    collection : a `~lightkurve.collections.LightCurveCollection` containing all valid light curves</span>
+<span class="sd">                 from ``path_list`` or a single stitched `~lightkurve.lightcurve.LightCurve` if</span>
+<span class="sd">                 parameter ``stitch=True``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_read_collection</span><span class="p">(</span><span class="n">path_list</span><span class="p">,</span> <span class="n">LightCurve</span><span class="p">,</span> <span class="n">stitch</span><span class="o">=</span><span class="n">stitch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">read_tpf_collection</span><span class="p">(</span><span class="n">path_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads a list of valid Kepler or TESS target pixel files (TPFs) and returns an instance of</span>
+<span class="sd">    `~lightkurve.collections.TargetPixelFileCollection`.</span>
+
+<span class="sd">    File types currently supported include::</span>
+<span class="sd">        * `KeplerTargetPixelFile` (typical suffix &quot;-targ.fits.gz&quot;);</span>
+<span class="sd">        * `TessTargetPixelFile` (typical suffix &quot;_tp.fits&quot;);</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path_list : list</span>
+<span class="sd">        List of paths to TPF FITS files. Can be a filepath, URL, or S3 URI.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Dictionary of arguments to be passed to underlying data product type specific reader.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    collection : a `~lightkurve.collections.TargetPixelFileCollection` containing all valid TPFs</span>
+<span class="sd">                 from ``path_list``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_read_collection</span><span class="p">(</span><span class="n">path_list</span><span class="p">,</span> <span class="n">TargetPixelFile</span><span class="p">,</span> <span class="n">stitch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
               </div>

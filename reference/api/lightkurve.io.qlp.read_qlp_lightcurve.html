@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -1267,6 +1267,11 @@
      lightkurve.TessQualityFlags
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.utils.plot_image.html">
+     lightkurve.utils.plot_image
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -1312,21 +1317,23 @@
 <h1>lightkurve.io.qlp.read_qlp_lightcurve<a class="headerlink" href="#lightkurve-io-qlp-read-qlp-lightcurve" title="Permalink to this headline">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="lightkurve.io.qlp.read_qlp_lightcurve">
-<span class="sig-prename descclassname"><span class="pre">lightkurve.io.qlp.</span></span><span class="sig-name descname"><span class="pre">read_qlp_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sap_flux'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kspsap_flux_err'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_bitmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/io/qlp.html#read_qlp_lightcurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.io.qlp.read_qlp_lightcurve" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lightkurve.io.qlp.</span></span><span class="sig-name descname"><span class="pre">read_qlp_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sap_flux'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_err_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_bitmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/io/qlp.html#read_qlp_lightcurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.io.qlp.read_qlp_lightcurve" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns a <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object given a light curve file from the MIT Quicklook Pipeline (QLP).</p>
 <p>By default, QLP’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">sap_flux</span></code> column is used to populate the <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code> values,
-and ‘kspsap_flux_err’ is used to populate <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code>. For a discussion
+and <code class="xref py py-obj docutils literal notranslate"><span class="pre">kspsap_flux_err</span></code> / <code class="xref py py-obj docutils literal notranslate"><span class="pre">det_flux_err</span></code> is used to populate <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code>. For a discussion
 related to this choice, see <a class="reference external" href="https://github.com/lightkurve/lightkurve/issues/1083">https://github.com/lightkurve/lightkurve/issues/1083</a></p>
+<p>For detrended flux, the columns are named with <code class="xref py py-obj docutils literal notranslate"><span class="pre">kspsap_</span></code> prefix in sectors 1-55,
+and <code class="xref py py-obj docutils literal notranslate"><span class="pre">det_</span></code> prefix in sectors 56+. Column <code class="xref py py-obj docutils literal notranslate"><span class="pre">sys_rm_flux</span></code> is available in sectors 56+.</p>
 <p>More information: <a class="reference external" href="https://archive.stsci.edu/hlsp/qlp">https://archive.stsci.edu/hlsp/qlp</a></p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
 <dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Local path or remote url of a QLP light curve FITS file.</p>
 </dd>
-<dt><strong>flux_column</strong><span class="classifier">‘sap_flux’, ‘kspsap_flux’, ‘kspsap_flux_sml’, ‘kspsap_flux_lag’, or ‘sap_bkg’</span></dt><dd><p>Which column in the FITS file contains the preferred flux data?
+<dt><strong>flux_column</strong><span class="classifier">‘sap_flux’, ‘kspsap_flux’, ‘kspsap_flux_sml’, ‘kspsap_flux_lag’, ‘det_flux’, ‘det_flux_sml’, ‘det_flux_lag’, ‘sys_rm_flux’, or ‘sap_bkg’</span></dt><dd><p>Which column in the FITS file contains the preferred flux data?
 By default the “Simple Aperture Photometry” flux (sap_flux) is used.</p>
 </dd>
-<dt><strong>flux_err_column: ‘kspsap_flux_err’, or ‘sap_bkg_err’</strong></dt><dd><p>Which column in the FITS file contains the preferred flux_err data?</p>
+<dt><strong>flux_err_column: ‘kspsap_flux_err’,’det_flux_err’, or ‘sap_bkg_err’</strong></dt><dd><p>Which column in the FITS file contains the preferred flux_err data?</p>
 </dd>
 <dt><strong>quality_bitmask</strong><span class="classifier">str or int</span></dt><dd><p>Bitmask (integer) which identifies the quality flag bitmask that should
 be used to mask out bad cadences. If a string is passed, it has the
@@ -1341,6 +1348,8 @@ This is known to remove good data.</p></li>
 This mask is not recommended.</p></li>
 </ul>
 </div></blockquote>
+<p>QLP-specific “Low precision points” (bit 13 in sectors 1-55, bit 31 in sectors 56+)
+is included in “hard” and “hardest” bitmasks.</p>
 <p>See the <a class="reference internal" href="lightkurve.TessQualityFlags.html#lightkurve.TessQualityFlags" title="lightkurve.utils.TessQualityFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessQualityFlags</span></code></a> class for details on the bitmasks.</p>
 </dd>
 </dl>

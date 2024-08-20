@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -435,10 +435,10 @@ array([[False, False, False, False, False],
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-SIMPLE  =                    T / conforms to FITS standard
+SIMPLE  =                    T / conforms to FITS standards
 BITPIX  =                    8 / array data type
 NAXIS   =                    0 / number of array dimensions
-EXTEND  =                    T
+EXTEND  =                    T / file contains extensions
 NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
@@ -462,19 +462,19 @@ CREATOR = &#39;917482 TargetPixelExporterPipelineModule&#39; / pipeline job and 
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-TTYPE1  = &#39;TIME    &#39;
-TTYPE2  = &#39;TIMECORR&#39;
-TTYPE3  = &#39;CADENCENO&#39;
-TTYPE4  = &#39;RAW_CNTS&#39;
-TTYPE5  = &#39;FLUX    &#39;
-TTYPE6  = &#39;FLUX_ERR&#39;
-TTYPE7  = &#39;FLUX_BKG&#39;
-TTYPE8  = &#39;FLUX_BKG_ERR&#39;
-TTYPE9  = &#39;COSMIC_RAYS&#39;
-TTYPE10 = &#39;QUALITY &#39;
-TTYPE11 = &#39;POS_CORR1&#39;
-TTYPE12 = &#39;POS_CORR2&#39;
-TTYPE13 = &#39;RB_LEVEL&#39;
+TTYPE1  = &#39;TIME    &#39;           / column title: data time stamps
+TTYPE2  = &#39;TIMECORR&#39;           / column title: barycenter - timeslice correction
+TTYPE3  = &#39;CADENCENO&#39;          / column title: unique cadence number
+TTYPE4  = &#39;RAW_CNTS&#39;           / column title: raw pixel counts
+TTYPE5  = &#39;FLUX    &#39;           / column title: calibrated pixel flux
+TTYPE6  = &#39;FLUX_ERR&#39;           / column title: 1-sigma calibrated uncertainty
+TTYPE7  = &#39;FLUX_BKG&#39;           / column title: calibrated background flux
+TTYPE8  = &#39;FLUX_BKG_ERR&#39;       / column title: 1-sigma cal. background uncertain
+TTYPE9  = &#39;COSMIC_RAYS&#39;        / column title: cosmic ray detections
+TTYPE10 = &#39;QUALITY &#39;           / column title: pixel quality flags
+TTYPE11 = &#39;POS_CORR1&#39;          / column title: column position correction
+TTYPE12 = &#39;POS_CORR2&#39;          / column title: row position correction
+TTYPE13 = &#39;RB_LEVEL&#39;           / column title: rolling band level
 </pre></div></div>
 </div>
 </section>

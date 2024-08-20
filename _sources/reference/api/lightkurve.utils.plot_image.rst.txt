@@ -1,0 +1,6 @@
+﻿lightkurve.utils.plot\_image
+============================
+
+.. currentmodule:: lightkurve.utils
+
+.. autofunction:: plot_image

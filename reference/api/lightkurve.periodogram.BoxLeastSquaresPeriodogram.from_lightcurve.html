@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -1267,6 +1267,11 @@
      lightkurve.TessQualityFlags
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.utils.plot_image.html">
+     lightkurve.utils.plot_image
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -1313,27 +1318,28 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">BoxLeastSquaresPeriodogram.</span></span><span class="sig-name descname"><span class="pre">from_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/periodogram.html#BoxLeastSquaresPeriodogram.from_lightcurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="Permalink to this definition">#</a></dt>
-<dd><p>Creates a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> from a LightCurve using the Box Least Squares (BLS) method.</p>
+<dd><p>Creates a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> from a LightCurve using the Box Least Squares (BLS) method
+in <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy</span></code>’s <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.timeseries.BoxLeastSquares.html#astropy.timeseries.BoxLeastSquares" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquares</span></code></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
 <dt><strong>lc</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> object</span></dt><dd><p>The LightCurve from which to compute the Periodogram.</p>
 </dd>
-<dt><strong>duration</strong><span class="classifier">float, array_like, or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, optional</span></dt><dd><p>The set of durations that will be considered.
+<dt><strong>duration</strong><span class="classifier">float, array_like, or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, optional</span></dt><dd><p>The set of durations that will be considered.
 Default to <code class="xref py py-obj docutils literal notranslate"><span class="pre">[0.05,</span> <span class="pre">0.10,</span> <span class="pre">0.15,</span> <span class="pre">0.20,</span> <span class="pre">0.25,</span> <span class="pre">0.33]</span></code> if not specified.</p>
 </dd>
-<dt><strong>period</strong><span class="classifier">array_like or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, optional</span></dt><dd><p>The periods where the Periodogram should be computed.
+<dt><strong>period</strong><span class="classifier">array_like or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, optional</span></dt><dd><p>The periods where the Periodogram should be computed.
 If not provided, a default will be created using
-<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.BoxLeastSquares.html#astropy.timeseries.BoxLeastSquares.autoperiod" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquares.autoperiod()</span></code></a>.</p>
+<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.timeseries.BoxLeastSquares.html#astropy.timeseries.BoxLeastSquares.autoperiod" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquares.autoperiod()</span></code></a>.</p>
 </dd>
-<dt><strong>minimum_period, maximum_period</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, optional</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">period</span></code> is not provided, the minimum/maximum periods to search.
+<dt><strong>minimum_period, maximum_period</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>, optional</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">period</span></code> is not provided, the minimum/maximum periods to search.
 The defaults will be computed as described in the notes below.</p>
 </dd>
 <dt><strong>frequency_factor</strong><span class="classifier">float, optional</span></dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">period</span></code> is not provided, a factor to control the frequency spacing of periods
 to be considered.</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keyword arguments passed to
-<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.BoxLeastSquares.html#astropy.timeseries.BoxLeastSquares.power" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquares.power()</span></code></a></p>
+<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.timeseries.BoxLeastSquares.html#astropy.timeseries.BoxLeastSquares.power" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquares.power()</span></code></a></p>
 </dd>
 </dl>
 </dd>

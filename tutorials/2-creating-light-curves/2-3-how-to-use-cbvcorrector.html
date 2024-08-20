@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -416,7 +416,7 @@ Kepler and TESS lightcurves. Let’s look at the CBVCorrector goodness metrics t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.7126149574495612
+Over fitting Metric: 0.7125989007737277
 Under fitting Metric: 0.9703478826925148
 </pre></div></div>
 </div>
@@ -450,9 +450,9 @@ probably injected signals into our lightcurve and we should not trust this reall
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996578702189283
-Optimized Under-fitting metric: 0.8255781316730026
-Optimized Alpha: 9.656e+03
+Optimized Over-fitting metric: 0.9996607168810382
+Optimized Under-fitting metric: 0.8255782134322698
+Optimized Alpha: 9.974e+03
 </pre></div></div>
 </div>
 <p>Much better! We see the thermal settling systematic is still being removed, but the stellar variabity is better preserved. Note that the optimizer did not set the alpha parameter at exactly the red and blue curve intersection point. The default target goodness scores is 0.8 or above, which is fulfilled at alpha=1.45e-1. If we want to optimize the fit even more, by perhaps ensuring we are not over-fitting at all, then we can adjust the target over and under scores to emphasize which metric we are
@@ -475,9 +475,9 @@ more interested in. Below we more greatly emphasize improving the over-fitting m
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996569267677275
-Optimized Under-fitting metric: 0.8255781330421909
-Optimized Alpha: 9.662e+03
+Optimized Over-fitting metric: 0.9996608811431773
+Optimized Under-fitting metric: 0.8255781979112463
+Optimized Alpha: 9.919e+03
 </pre></div></div>
 </div>
 <p>We are now perhaps biasing too far towards under-fitting, but depending on your research interests, this might be best.</p>
@@ -514,7 +514,7 @@ Optimized Alpha: 9.662e+03
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.2633104475330727
+Over fitting Metric: 0.2637174624425573
 Under fitting Metric: 0.9995877972880245
 </pre></div></div>
 </div>
@@ -552,9 +552,9 @@ you are only looking at the low frequency signals in the data then perhaps you d
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.8001426013816765
-Optimized Under-fitting metric: 0.4687789542372483
-Optimized Alpha: 3.340e+00
+Optimized Over-fitting metric: 0.8004015801623732
+Optimized Under-fitting metric: 0.46872043385256545
+Optimized Alpha: 3.342e+00
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -624,8 +624,8 @@ ideal fit.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting Metric: 0.6262886935335121
-Under-fitting Metric: 0.880152175383505
+Over-fitting Metric: 0.6272676806404435
+Under-fitting Metric: 0.8801521753835001
 </pre></div></div>
 </div>
 <p>So, which CBVs are best to use? There is no one single answer, but generally speaking, the Multi-Scale Basis vectors are more versatile. The trade-off is there are also more of them, which means more degrees of freedom in your fit. More degrees of freedom can result in more over-fitting without proper regularization. It is recommened the user tries different combinations of CBVs and use objective metrics to decide which fit is the best for their particular needs.</p>
@@ -673,8 +673,8 @@ the CBVCorrector object the CBVs will be downloaded, but the CBVs are for 2-minu
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.08088984759691169
-CDPP: 230.75800309519127 ppm
+Over-fitting metric: 0.0816282342291478
+CDPP: 230.75800277933004 ppm
 </pre></div></div>
 </div>
 <p>The least-squares fit did remove the background flux trend and at first sight the resultant might look good, but the over-fitting goodness metric is <code class="docutils literal notranslate"><span class="pre">0.08</span></code>. That’s not very good! It looks like we are dramatically over-fitting. We can see this in the bottom plot where the corrected curve has more high-frequency noise than the original. Let’s now add in the multi-scale basis vectors and see if we can do better. Note that we are joint fitting the CBVs and the external pixel-derived design matrix.</p>
@@ -697,8 +697,8 @@ CDPP: 230.75800309519127 ppm
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over-fitting metric: 0.3103857337957571
-CDPP: 55.83742644726604 ppm
+Over-fitting metric: 0.3109047470424417
+CDPP: 55.837426438197035 ppm
 </pre></div></div>
 </div>
 <p>That looks a lot better! Could we do a bit better by adding in a regularization term? Let’s do a goodness metric scan.</p>
@@ -732,9 +732,9 @@ we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.</p
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.34981996985663844
-Optimized Alpha: 4.436e-04
-CDPP: 60.654244871847794 ppm
+Optimized Over-fitting metric: 0.348340381967964
+Optimized Alpha: 6.188e-04
+CDPP: 64.0714721560366 ppm
 </pre></div></div>
 </div>
 <p>This is looking like a pretty good light curve. However, the CDPP increased a little as we optimized the over-fitting metric. Which correction to use may depend on your application. Since we are interested in the transiting planet, we will choose the corrected light curve with the lowest CDPP. Below we compare the light curve between just using the pixel-derived design matrix to also adding in the CBVs as a joint, regularized fit.</p>
@@ -756,7 +756,7 @@ CDPP: 60.654244871847794 ppm
 <h2>Some final comments on CBVCorrector<a class="headerlink" href="#Some-final-comments-on-CBVCorrector" title="Permalink to this headline">#</a></h2>
 <section id="Application-to-Kepler-vs-K2-vs-TESS">
 <h3>Application to Kepler vs K2 vs TESS<a class="headerlink" href="#Application-to-Kepler-vs-K2-vs-TESS" title="Permalink to this headline">#</a></h3>
-<p>CBVCorrector works equally across Kepler, K2 and TESS. However the Multi-Scale and Spike basis vectors are only available for TESS1. For K2, the <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.html">PLDCorrector</a> and <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-sffcorrector.html">SFFCorrector</a> classes might work better than <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>.</p>
+<p>CBVCorrector works equally across Kepler, K2 and TESS. However the Multi-Scale and Spike basis vectors are only available for TESS<a class="reference external" href="#fn1">1</a>. For K2, the <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.html">PLDCorrector</a> and <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-3-k2-sffcorrector.html">SFFCorrector</a> classes might work better than <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>.</p>
 <p>If you want to just get the CBVs but not generate a CBVCorrector object then use the functions <em>load_kepler_cbvs</em> and <em>load_tess_cbvs</em> within the cbvcorrector module as explained <a class="reference external" href="https://docs.lightkurve.org/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.html">here</a>.</p>
 <p>1 Unfortunately, the Multi-Scale and Spike CBVs are not archived at MAST for Kepler/K2.</p>
 </section>

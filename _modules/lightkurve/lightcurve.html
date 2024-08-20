@@ -59,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -225,7 +225,7 @@
 
 
 <span class="k">def</span> <span class="nf">_is_dict_like</span><span class="p">(</span><span class="n">data1</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_is_list_like</span><span class="p">(</span><span class="n">data1</span><span class="p">):</span>
@@ -787,9 +787,7 @@
         <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">def</span> <span class="nf">hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdulist</span><span class="p">:</span>
-            <span class="n">hdulist</span> <span class="o">=</span> <span class="n">hdulist</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">hdulist</span>
+        <span class="k">return</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;2.0&quot;</span><span class="p">,</span> <span class="n">warning_type</span><span class="o">=</span><span class="n">LightkurveDeprecationWarning</span><span class="p">)</span>
@@ -930,7 +928,7 @@
                     <span class="n">res</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;res&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">}</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
@@ -2442,7 +2440,8 @@
 <span class="sd">        path_or_buf : string or file handle</span>
 <span class="sd">            File path or object. By default, the result is returned as a string.</span>
 <span class="sd">        **kwargs : dict</span>
-<span class="sd">            Dictionary of arguments to be passed to `TimeSeries.write()`.</span>
+<span class="sd">            Dictionary of arguments to be passed to</span>
+<span class="sd">            `astropy`&#39;s `~astropy.timeseries.TimeSeries.write`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2466,8 +2465,8 @@
 
 <span class="sd">        The data frame will be indexed by `time` using values corresponding</span>
 <span class="sd">        to the light curve&#39;s time format.  This is different from the</span>
-<span class="sd">        default behavior of `Table.to_pandas()` in AstroPy, which converts</span>
-<span class="sd">        time values into ISO timestamps.</span>
+<span class="sd">        default behavior of `astropy`&#39;s `~astropy.timeseries.TimeSeries.to_pandas`,</span>
+<span class="sd">        which converts time values into ISO timestamps.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2661,7 +2660,10 @@
             <span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
                 <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
-                        <span class="n">name</span><span class="o">=</span><span class="n">flux_column_name</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;e-/s&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">flux_column_name</span><span class="p">,</span>
+                        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;E&quot;</span><span class="p">,</span>
+                        <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span>
+                        <span class="n">array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;flux_err&#39;</span><span class="p">):</span>
@@ -2670,7 +2672,7 @@
                         <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
                             <span class="n">name</span><span class="o">=</span><span class="n">flux_column_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;_ERR&quot;</span><span class="p">,</span>
                             <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;E&quot;</span><span class="p">,</span>
-                            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;e-/s&quot;</span><span class="p">,</span>
+                            <span class="n">unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span>
                             <span class="n">array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">,</span>
                         <span class="p">)</span>
                     <span class="p">)</span>
@@ -3168,7 +3170,12 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The cycle of the correspond `time_original`.</span>
 <span class="sd">        The first cycle is cycle 0, irrespective of whether it is a complete one or not.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cycle_epoch_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">epoch_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EPOCH_TIME&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">epoch_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># explicit check needed (cannot be the default value in get() function call above)</span>
+            <span class="c1"># because Lightcurve.fold() will put an explicit None in meta, if epoch_time is not specified.</span>
+            <span class="n">epoch_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">cycle_epoch_start</span> <span class="o">=</span> <span class="n">epoch_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">time_original</span> <span class="o">-</span> <span class="n">cycle_epoch_start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">-</span> <span class="n">result</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">result</span>

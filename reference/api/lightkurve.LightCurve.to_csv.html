@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -1267,6 +1267,11 @@
      lightkurve.TessQualityFlags
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.utils.plot_image.html">
+     lightkurve.utils.plot_image
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -1323,7 +1328,8 @@ a file name or handle via the <code class="xref py py-obj docutils literal notra
 <dd class="field-odd"><dl class="simple">
 <dt><strong>path_or_buf</strong><span class="classifier">string or file handle</span></dt><dd><p>File path or object. By default, the result is returned as a string.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries.write()</span></code>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy</span></code>’s <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries.write" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>.</p>
 </dd>
 </dl>
 </dd>

@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -296,7 +296,7 @@ Manual</a>, Section 2.3.2 for more information.)</p>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table11116159664">
+<table id="table10779518288">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -305,7 +305,11 @@ SearchResult containing 18 data products.
 <tr><td>3</td><td>Kepler Quarter 03</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>4</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>5</td><td>Kepler Quarter 05</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
-<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>6</td><td>Kepler Quarter 06</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>7</td><td>Kepler Quarter 07</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>8</td><td>Kepler Quarter 10</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>9</td><td>Kepler Quarter 08</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
+<tr><td>10</td><td>Kepler Quarter 09</td><td>2011</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>11</td><td>Kepler Quarter 11</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>12</td><td>Kepler Quarter 12</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>13</td><td>Kepler Quarter 13</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -313,8 +317,7 @@ SearchResult containing 18 data products.
 <tr><td>15</td><td>Kepler Quarter 16</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>16</td><td>Kepler Quarter 15</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
 <tr><td>17</td><td>Kepler Quarter 17</td><td>2013</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
-</table>
-Length = 18 rows</div>
+</table></div>
 </div>
 <p>In this list, each row represents a different observing period. We find that <em>Kepler</em> recorded 18 quarters of data for this target across four years. The <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> function takes several additional arguments, such as the <code class="docutils literal notranslate"><span class="pre">quarter</span></code> number or the <code class="docutils literal notranslate"><span class="pre">mission</span></code> name. You can find examples of its use in the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">online documentation</a> for this function.</p>
 <p>The search function returns a <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> object which has several convenient operations. For example, we can select the fourth data product in the list as follows:</p>
@@ -333,7 +336,7 @@ Length = 18 rows</div>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table4382484128">
+<table id="table10776960272">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -412,7 +415,7 @@ keyword arguments. You can type <code class="docutils literal notranslate"><span
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&#39;/Users/chedges/.lightkurve/cache/mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz&#39;
+&#39;/Users/tapritc2/.lightkurve/cache/mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz&#39;
 </pre></div></div>
 </div>
 </section>
@@ -436,10 +439,10 @@ keyword arguments. You can type <code class="docutils literal notranslate"><span
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-SIMPLE  =                    T / conforms to FITS standard
+SIMPLE  =                    T / conforms to FITS standards
 BITPIX  =                    8 / array data type
 NAXIS   =                    0 / number of array dimensions
-EXTEND  =                    T
+EXTEND  =                    T / file contains extensions
 NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
@@ -528,38 +531,38 @@ CHECKSUM= &#39;HkS5JjR5HjR5HjR5&#39;   / HDU checksum updated 2015-09-23T02:52:4
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-   Attribute                                                                 Description
---------------- --------------------------------------------------------------------------------------------------------------------------------------
-        channel                                                                                                                                     31
-         column                                                                                                                                    680
-         module                                                                                                                                     10
-         output                                                                                                                                      3
-        quarter                                                                                                                                      4
-            row                                                                                                                                    188
-       targetid                                                                                                                                6922244
-        mission                                                                                                                                 Kepler
-        obsmode                                                                                                                           long cadence
-           path /Users/chedges/.lightkurve/cache/mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz
-quality_bitmask                                                                                                                                default
-            hdu                                                                                                        PRIMARY, TARGETTABLES, APERTURE
-      cadenceno                                                                                                                          array (4116,)
-           flux                                                                                                                     array (4116, 5, 5)
-       flux_bkg                                                                                                                     array (4116, 5, 5)
-   flux_bkg_err                                                                                                                     array (4116, 5, 5)
-       flux_err                                                                                                                     array (4116, 5, 5)
-  nan_time_mask                                                                                                                          array (4116,)
-  pipeline_mask                                                                                                                           array (5, 5)
-      pos_corr1                                                                                                                          array (4116,)
-      pos_corr2                                                                                                                          array (4116,)
-        quality                                                                                                                          array (4116,)
-   quality_mask                                                                                                                          array (4397,)
-       campaign                                                                                                                     &lt;class &#39;NoneType&#39;&gt;
-            dec                                                                                                                        &lt;class &#39;float&#39;&gt;
-           meta                                                                                  &lt;class &#39;lightkurve.targetpixelfile.HduToMetaMapping&#39;&gt;
-             ra                                                                                                                        &lt;class &#39;float&#39;&gt;
-          shape                                                                                                                        &lt;class &#39;tuple&#39;&gt;
-           time                                                                                                       &lt;class &#39;astropy.time.core.Time&#39;&gt;
-            wcs                                                                                                                    astropy.wcs.wcs.WCS
+   Attribute                                                                  Description
+--------------- ---------------------------------------------------------------------------------------------------------------------------------------
+        channel                                                                                                                                      31
+         column                                                                                                                                     680
+         module                                                                                                                                      10
+         output                                                                                                                                       3
+        quarter                                                                                                                                       4
+            row                                                                                                                                     188
+       targetid                                                                                                                                 6922244
+        mission                                                                                                                                  Kepler
+        obsmode                                                                                                                            long cadence
+           path /Users/tapritc2/.lightkurve/cache/mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz
+quality_bitmask                                                                                                                                 default
+            hdu                                                                                                         PRIMARY, TARGETTABLES, APERTURE
+      cadenceno                                                                                                                           array (4116,)
+           flux                                                                                                                      array (4116, 5, 5)
+       flux_bkg                                                                                                                      array (4116, 5, 5)
+   flux_bkg_err                                                                                                                      array (4116, 5, 5)
+       flux_err                                                                                                                      array (4116, 5, 5)
+  nan_time_mask                                                                                                                           array (4116,)
+  pipeline_mask                                                                                                                            array (5, 5)
+      pos_corr1                                                                                                                           array (4116,)
+      pos_corr2                                                                                                                           array (4116,)
+        quality                                                                                                                           array (4116,)
+   quality_mask                                                                                                                           array (4397,)
+       campaign                                                                                                                      &lt;class &#39;NoneType&#39;&gt;
+            dec                                                                                                                         &lt;class &#39;float&#39;&gt;
+           meta                                                                                   &lt;class &#39;lightkurve.targetpixelfile.HduToMetaMapping&#39;&gt;
+             ra                                                                                                                         &lt;class &#39;float&#39;&gt;
+          shape                                                                                                                         &lt;class &#39;tuple&#39;&gt;
+           time                                                                                                        &lt;class &#39;astropy.time.core.Time&#39;&gt;
+            wcs                                                                                                                     astropy.wcs.wcs.WCS
 </pre></div></div>
 </div>
 <p>A new piece of metadata not included in the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> objects is the <a class="reference external" href="https://fits.gsfc.nasa.gov/fits_wcs.html">World Coordinate System</a> (WCS). The WCS contains information about how pixel positions map to celestial sky coordinates. This is important when comparing a TPF from a <em>Kepler</em>, <em>K2</em>, or <em>TESS</em> observation to an observation of the same star with a different telescope.</p>

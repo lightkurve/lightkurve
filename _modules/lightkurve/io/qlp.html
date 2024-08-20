@@ -59,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -181,12 +181,15 @@
 <span class="kn">from</span> <span class="nn">.generic</span> <span class="kn">import</span> <span class="n">read_generic_lightcurve</span>
 
 
-<div class="viewcode-block" id="read_qlp_lightcurve"><a class="viewcode-back" href="../../../reference/api/lightkurve.io.qlp.read_qlp_lightcurve.html#lightkurve.io.qlp.read_qlp_lightcurve">[docs]</a><span class="k">def</span> <span class="nf">read_qlp_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">flux_column</span><span class="o">=</span><span class="s2">&quot;sap_flux&quot;</span><span class="p">,</span> <span class="n">flux_err_column</span><span class="o">=</span><span class="s2">&quot;kspsap_flux_err&quot;</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="read_qlp_lightcurve"><a class="viewcode-back" href="../../../reference/api/lightkurve.io.qlp.read_qlp_lightcurve.html#lightkurve.io.qlp.read_qlp_lightcurve">[docs]</a><span class="k">def</span> <span class="nf">read_qlp_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">flux_column</span><span class="o">=</span><span class="s2">&quot;sap_flux&quot;</span><span class="p">,</span> <span class="n">flux_err_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a `~lightkurve.lightcurve.LightCurve` object given a light curve file from the MIT Quicklook Pipeline (QLP).</span>
 
 <span class="sd">    By default, QLP&#39;s `sap_flux` column is used to populate the `flux` values,</span>
-<span class="sd">    and &#39;kspsap_flux_err&#39; is used to populate `flux_err`. For a discussion</span>
+<span class="sd">    and `kspsap_flux_err` / `det_flux_err` is used to populate `flux_err`. For a discussion</span>
 <span class="sd">    related to this choice, see https://github.com/lightkurve/lightkurve/issues/1083</span>
+
+<span class="sd">    For detrended flux, the columns are named with `kspsap_` prefix in sectors 1-55,</span>
+<span class="sd">    and `det_` prefix in sectors 56+. Column `sys_rm_flux` is available in sectors 56+.</span>
 
 <span class="sd">    More information: https://archive.stsci.edu/hlsp/qlp</span>
 
@@ -194,10 +197,10 @@
 <span class="sd">    ----------</span>
 <span class="sd">    filename : str</span>
 <span class="sd">        Local path or remote url of a QLP light curve FITS file.</span>
-<span class="sd">    flux_column : &#39;sap_flux&#39;, &#39;kspsap_flux&#39;, &#39;kspsap_flux_sml&#39;, &#39;kspsap_flux_lag&#39;, or &#39;sap_bkg&#39;</span>
+<span class="sd">    flux_column : &#39;sap_flux&#39;, &#39;kspsap_flux&#39;, &#39;kspsap_flux_sml&#39;, &#39;kspsap_flux_lag&#39;, &#39;det_flux&#39;, &#39;det_flux_sml&#39;, &#39;det_flux_lag&#39;, &#39;sys_rm_flux&#39;, or &#39;sap_bkg&#39;</span>
 <span class="sd">        Which column in the FITS file contains the preferred flux data?</span>
 <span class="sd">        By default the &quot;Simple Aperture Photometry&quot; flux (sap_flux) is used.</span>
-<span class="sd">    flux_err_column: &#39;kspsap_flux_err&#39;, or &#39;sap_bkg_err&#39;</span>
+<span class="sd">    flux_err_column: &#39;kspsap_flux_err&#39;,&#39;det_flux_err&#39;, or &#39;sap_bkg_err&#39;</span>
 <span class="sd">      Which column in the FITS file contains the preferred flux_err data?</span>
 <span class="sd">    quality_bitmask : str or int</span>
 <span class="sd">        Bitmask (integer) which identifies the quality flag bitmask that should</span>
@@ -211,9 +214,17 @@
 <span class="sd">            * &quot;hardest&quot;: removes all data that has been flagged.</span>
 <span class="sd">              This mask is not recommended.</span>
 
+<span class="sd">        QLP-specific &quot;Low precision points&quot; (bit 13 in sectors 1-55, bit 31 in sectors 56+)</span>
+<span class="sd">        is included in &quot;hard&quot; and &quot;hardest&quot; bitmasks.</span>
+
 <span class="sd">        See the `~lightkurve.utils.TessQualityFlags` class for details on the bitmasks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lc</span> <span class="o">=</span> <span class="n">read_generic_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">flux_column</span><span class="o">=</span><span class="n">flux_column</span><span class="p">,</span> <span class="n">flux_err_column</span><span class="o">=</span><span class="n">flux_err_column</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;btjd&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">flux_err_column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SECTOR&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">56</span><span class="p">:</span>
+            <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux_err&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;det_flux_err&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux_err&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;kspsap_flux_err&quot;</span><span class="p">]</span>
 
     <span class="c1"># Filter out poor-quality data</span>
     <span class="c1"># NOTE: Unfortunately Astropy Table masking does not yet work for columns</span>
@@ -222,6 +233,16 @@
     <span class="n">quality_mask</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
         <span class="n">quality_array</span><span class="o">=</span><span class="n">lc</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">],</span> <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span>
     <span class="p">)</span>
+    <span class="c1"># QLP-specific quality_bitmask handling</span>
+    <span class="k">if</span> <span class="n">quality_bitmask</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;hardest&quot;</span><span class="p">,</span> <span class="s2">&quot;hard&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;SECTOR&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">56</span><span class="p">:</span>
+            <span class="n">qlp_low_precision_bitmask</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">30</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># https://archive.stsci.edu/hlsps/qlp/hlsp_qlp_tess_ffi_all_tess_v1_data-prod-desc.pdf</span>
+            <span class="n">qlp_low_precision_bitmask</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">12</span>
+        <span class="n">q_mask2</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
+            <span class="n">quality_array</span><span class="o">=</span><span class="n">lc</span><span class="p">[</span><span class="s2">&quot;quality&quot;</span><span class="p">],</span> <span class="n">bitmask</span><span class="o">=</span><span class="n">qlp_low_precision_bitmask</span><span class="p">)</span>
+        <span class="n">quality_mask</span> <span class="o">=</span> <span class="n">quality_mask</span> <span class="o">&amp;</span> <span class="n">q_mask2</span>
     <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="n">quality_mask</span><span class="p">]</span>
 
     <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;AUTHOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;QLP&quot;</span>

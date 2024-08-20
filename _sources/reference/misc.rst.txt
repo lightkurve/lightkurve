@@ -1,7 +1,7 @@
 .. _api.misc:
 
 =======================
-Miscellaneous utilities 
+Miscellaneous utilities
 =======================
 .. currentmodule:: lightkurve
 
@@ -14,3 +14,4 @@ Working with quality flags
 
   KeplerQualityFlags
   TessQualityFlags
+  utils.plot_image

@@ -59,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -1547,9 +1547,9 @@
         <span class="k">if</span> <span class="n">exptime</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">]:</span>
             <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">products</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">60</span>
         <span class="k">elif</span> <span class="n">exptime</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;short&quot;</span><span class="p">]:</span>
-            <span class="n">mask</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">60</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">200</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">exptime</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;long&quot;</span><span class="p">,</span> <span class="s2">&quot;ffi&quot;</span><span class="p">]:</span>
-            <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">products</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">300</span>
+            <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">products</span><span class="p">[</span><span class="s2">&quot;exptime&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">200</span>
     <span class="k">return</span> <span class="n">mask</span>
 
 

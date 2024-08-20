@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -304,9 +304,9 @@ turbulent motion in the convective outer layers of their atmospheres. This inclu
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-SearchResult containing 12 data products.
+SearchResult containing 13 data products.
 
-<table id="table6426707808">
+<table id="table6031511376">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html'>SPOC</a></td><td>120</td><td>37498433</td><td>0.0</td></tr>
@@ -321,6 +321,7 @@ SearchResult containing 12 data products.
 <tr><td>9</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://archive.stsci.edu/hlsp/tasoc'>TASOC</a></td><td>1800</td><td>37498433</td><td>0.0</td></tr>
 <tr><td>10</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://archive.stsci.edu/hlsp/tasoc'>TASOC</a></td><td>1800</td><td>37498433</td><td>0.0</td></tr>
 <tr><td>11</td><td>TESS Sector 06</td><td>2018</td><td><a href='https://archive.stsci.edu/hlsp/tglc'>TGLC</a></td><td>1800</td><td>37498433</td><td>0.0</td></tr>
+<tr><td>12</td><td>TESS Sector 33</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/cdips'>CDIPS</a></td><td>1800</td><td>37498433</td><td>0.0</td></tr>
 </table></div>
 </div>
 <p>Success! A light curve for the object appears to be available in the data archive. Let’s go ahead and download the data and convert it straight to a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram">periodogram</a> using the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_periodogram.html?highlight=to_periodogram">to_periodogram()</a> function.</p>
@@ -388,7 +389,7 @@ SearchResult containing 12 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 15 data products.
 
-<table id="table6437238240">
+<table id="table6035296144">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr010963065</td><td>0.0</td></tr>
@@ -482,7 +483,7 @@ periodogram are a little broader (usually Lorentzian-like in shape). This may no
 <h2>3. How to Smooth and Detrend a Periodogram<a class="headerlink" href="#3.-How-to-Smooth-and-Detrend-a-Periodogram" title="Permalink to this headline">#</a></h2>
 <section id="3.1.-The-box-kernel-filter">
 <h3>3.1. The box kernel filter<a class="headerlink" href="#3.1.-The-box-kernel-filter" title="Permalink to this headline">#</a></h3>
-<p>To further explore the oscillation modes, we will demonstrate some of Lightkurve’s smoothing tools. There are two types of smoothing functions we can call through the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.smooth.html?highlight=smooth">smooth()</a> function. Let’s start with a basic “moving median,” also known as a 1D box kernel.</p>
+<p>To further explore the oscillation modes, we will demonstrate some of Lightkurve’s smoothing tools. There are two types of smoothing functions we can call through the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.periodogram.Periodogram.smooth.html?highlight=smooth">smooth()</a> function. Let’s start with a basic “moving mean,” also known as a 1D box kernel.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
@@ -500,7 +501,7 @@ periodogram are a little broader (usually Lorentzian-like in shape). This may no
 <img alt="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_29_0.png" src="../../_images/tutorials_3-science-examples_asteroseismology-oscillating-star-periodogram_29_0.png" />
 </div>
 </div>
-<p>In the figure above, the smoothed periodogram is plotted over the top of the original periodogram. In this case we have used the <cite>Astropy ``Box1DKernel`</cite> &lt;<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html">https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html</a>&gt;`__ filter, with a filter width of <span class="math notranslate nohighlight">\(0.5\, \mu \rm{Hz}\)</span>. The filter takes the median value of power in a region <span class="math notranslate nohighlight">\(0.5\, \mu \rm{Hz}\)</span> around a data point, and replaces that point with the median value. It then moves on to the next data point. This creates a
+<p>In the figure above, the smoothed periodogram is plotted over the top of the original periodogram. In this case we have used the <cite>Astropy ``Box1DKernel`</cite> &lt;<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html">https://docs.astropy.org/en/stable/api/astropy.convolution.Box1DKernel.html</a>&gt;`__ filter, with a filter width of <span class="math notranslate nohighlight">\(0.5\, \mu \rm{Hz}\)</span>. The filter takes the mean value of power in a region <span class="math notranslate nohighlight">\(0.5\, \mu \rm{Hz}\)</span> around a data point, and replaces that point with the mean value. It then moves on to the next data point. This creates a
 smoothed periodogram of the same length as the original. Because the power values are now correlated, these smoothed periodograms usually aren’t used for computational analysis, but they can aid visual explorations of the location of the oscillation modes.</p>
 </section>
 <section id="3.2.-The-log-median-filter">

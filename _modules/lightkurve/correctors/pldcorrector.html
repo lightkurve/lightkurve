@@ -59,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -178,7 +178,7 @@
 <span class="sd">against a design matrix composed of the following elements:</span>
 <span class="sd">* A background light curve to capture the dominant scattered light systematics.</span>
 <span class="sd">* Background-corrected pixel time series to capture any residual systematics.</span>
-<span class="sd">* Splines to capture the target&#39;s intrinsic variability.</span>
+<span class="sd">* Splines to capture the target&#39;s intrinsic variability</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -285,7 +285,8 @@
         <span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span>
         <span class="c1"># Remove cadences that have NaN flux (cf. #874). We don&#39;t simply call</span>
         <span class="c1"># `lc.remove_nans()` here because we need to mask both lc &amp; tpf.</span>
-        <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+        <span class="c1"># we also need to remove nans from the flux_err and combine both masks.</span>
+        <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span>
         <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tpf</span> <span class="o">=</span> <span class="n">tpf</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">]</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">lc</span><span class="o">=</span><span class="n">lc</span><span class="p">)</span></div>

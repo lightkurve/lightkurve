@@ -59,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -684,7 +684,7 @@
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
                     <span class="k">continue</span>
 
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">astropy</span><span class="o">.</span><span class="n">units</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">Quantity</span><span class="p">):</span>
@@ -822,7 +822,8 @@
         <span class="n">ls_method</span><span class="o">=</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method in</span>
+<span class="sd">        `astropy`&#39;s `~astropy.timeseries.LombScargle`.</span>
 
 <span class="sd">        By default, the periodogram will be created for a regular grid of</span>
 <span class="sd">        frequencies from one frequency separation to the Nyquist frequency,</span>
@@ -940,9 +941,11 @@
 <span class="sd">            (`&#39;amplitude&#39;`).</span>
 <span class="sd">        ls_method : str</span>
 <span class="sd">            Default: `&#39;fast&#39;`. Passed to the `method` keyword of</span>
-<span class="sd">            `astropy.stats.LombScargle()`.</span>
+<span class="sd">            `astropy.timeseries.LombScargle()`.</span>
 <span class="sd">        kwargs : dict</span>
-<span class="sd">            Keyword arguments passed to `astropy.stats.LombScargle()`</span>
+<span class="sd">            Keyword arguments passed to</span>
+<span class="sd">            `LombScargle() &lt;astropy.timeseries.LombScargle&gt;`</span>
+
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1191,7 +1194,8 @@
 
 <div class="viewcode-block" id="BoxLeastSquaresPeriodogram.from_lightcurve"><a class="viewcode-back" href="../../reference/api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_lightcurve</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Box Least Squares (BLS) method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a `Periodogram` from a LightCurve using the Box Least Squares (BLS) method</span>
+<span class="sd">        in `astropy`&#39;s `~astropy.timeseries.BoxLeastSquares`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

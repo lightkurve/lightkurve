@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -1267,6 +1267,11 @@
      lightkurve.TessQualityFlags
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.utils.plot_image.html">
+     lightkurve.utils.plot_image
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -1321,22 +1326,22 @@ standard deviation of the data.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.TimeDelta.html#astropy.time.TimeDelta" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDelta</span></code></a>, optional</span></dt><dd><p>The time interval for the binned time series - this is either a scalar
+<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.TimeDelta.html#astropy.time.TimeDelta" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDelta</span></code></a>, optional</span></dt><dd><p>The time interval for the binned time series - this is either a scalar
 value (in which case all time bins will be assumed to have the same
 duration) or as an array of values (in which case each time bin can
 have a different duration). If this argument is provided,
 <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> should not be provided.
 (Default: 0.5 days; default unit: days.)</p>
 </dd>
-<dt><strong>time_bin_start</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The start time for the binned time series - this can be either given
-directly as a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that
-initializes the <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can also be a scalar
+<dt><strong>time_bin_start</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The start time for the binned time series - this can be either given
+directly as a <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that
+initializes the <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can also be a scalar
 value if <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code> is provided. Defaults to the first
 time in the sampled time series.</p>
 </dd>
-<dt><strong>time_bin_end</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The times of the end of each bin - this can be either given directly as
-a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that initializes the
-<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can only be given if <code class="docutils literal notranslate"><span class="pre">time_bin_start</span></code>
+<dt><strong>time_bin_end</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The times of the end of each bin - this can be either given directly as
+a <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that initializes the
+<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can only be given if <code class="docutils literal notranslate"><span class="pre">time_bin_start</span></code>
 is an array of values. If <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> is a scalar, time bins are
 assumed to be contiguous, such that the end of each bin is the start
 of the next one, and <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> gives the end time for the last
@@ -1358,7 +1363,7 @@ to accommodate the input time series length.
 If it is an iterable of ints, it specifies the indices of the bin edges.
 If a string, it must be one of  ‘blocks’, ‘knuth’, ‘scott’ or ‘freedman’
 defining a method of automatically determining an optimal bin size.
-See <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.stats.histogram.html#astropy.stats.histogram" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">histogram</span></code></a> for a description of each method.
+See <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.stats.histogram.html#astropy.stats.histogram" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">histogram</span></code></a> for a description of each method.
 Note that ‘blocks’ is not a useful method for regularly sampled data.</p>
 </dd>
 <dt><strong>binsize</strong><span class="classifier">int</span></dt><dd><p>In Lightkurve v1.x, the default behavior of <a class="reference internal" href="#lightkurve.LightCurve.bin" title="lightkurve.LightCurve.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin()</span></code></a> was to create

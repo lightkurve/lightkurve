@@ -65,7 +65,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -565,7 +565,7 @@ short-term events.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x298ecc670&gt;
+&lt;matplotlib.collections.PolyCollection at 0x2803f2e10&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -580,7 +580,7 @@ short-term events.</p>
 <h3>3.2 Argabrightening<a class="headerlink" href="#3.2-Argabrightening" title="Permalink to this headline">#</a></h3>
 <p>Argabrightening (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.8) is a single-cadence quality issue that looks similar to a cosmic ray on the detector. In fact, Argabrightening is thought to be caused by debris hitting the instrument, causing a brief increase in flux. This is distinct from the electronic event caused by a cosmic ray corrupting the pixel readout:
 Argabrightening is the result of physical illumination.</p>
-<p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">KeplerQualityFlags.decode()</span></code> function in <a class="reference internal" href="#1.1-Quality-flags"><span class="std std-ref">Section 1.1</span></a>, we saw that a quality flag of 4160 indicates an Argabrightening event on the charge-coupled device (CCD) and in the optimal aperture used for photometry. Let’s see where that shows up in our data:</p>
+<p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">KeplerQualityFlags.decode()</span></code> function in <a class="reference external" href="#1.1-Quality-flags">Section 1.1</a>, we saw that a quality flag of 4160 indicates an Argabrightening event on the charge-coupled device (CCD) and in the optimal aperture used for photometry. Let’s see where that shows up in our data:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>

@@ -59,7 +59,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -274,14 +274,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;s3://&#39;</span><span class="p">)):</span>
+            <span class="c1"># Filename is an S3 cloud URI</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_fsspec</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fsspec_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;anon&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdulist</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">hdulist</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">targetid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">targetid</span>
 
-        <span class="c1"># For consistency with `LightCurve`, provide a `meta` dictionary</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">HduToMetaMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="c1"># For consistency with `LightCurve`, provide a `meta` dictionary</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">HduToMetaMapping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Cannot instantiate TargetPixelFile, close the HDU to release the file handle</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">e</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements indexing and slicing.</span>
@@ -667,7 +674,7 @@
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">attr</span> <span class="o">!=</span> <span class="s2">&quot;header&quot;</span> <span class="ow">and</span> <span class="n">attr</span> <span class="o">!=</span> <span class="s2">&quot;astropy_time&quot;</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;hdu&quot;</span><span class="p">:</span>
                     <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;res&quot;</span><span class="p">:</span> <span class="n">res</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">}</span>
@@ -832,10 +839,10 @@
                     <span class="c1"># Kepler and TESS pipeline style integer flags</span>
                     <span class="n">aperture_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>                
+                    <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
-                <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>                
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span> 
+                <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span>
         <span class="k">return</span> <span class="n">aperture_mask</span>
 
     <span class="k">def</span> <span class="nf">create_threshold_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">reference_pixel</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">):</span>
@@ -1265,7 +1272,7 @@
 <span class="sd">            matplotlib&#39;s built-in stylesheets (e.g. &#39;ggplot&#39;).</span>
 <span class="sd">            Lightkurve&#39;s custom stylesheet is used by default.</span>
 <span class="sd">        kwargs : dict</span>
-<span class="sd">            Keywords arguments passed to `lightkurve.utils.plot_image`.</span>
+<span class="sd">            Keywords arguments passed to `~lightkurve.utils.plot_image`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1353,23 +1360,18 @@
         <span class="c1"># Overlay the aperture mask if given</span>
         <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">aperture_mask</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]:</span>
-                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;wcs&quot;</span><span class="p">):</span>
-                            <span class="c1"># When using WCS coordinates, do not add col/row to mask coords</span>
-                            <span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
-                        <span class="n">rect</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">(</span>
-                            <span class="n">xy</span><span class="o">=</span><span class="n">xy</span><span class="p">,</span>
-                            <span class="n">width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                            <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                            <span class="n">color</span><span class="o">=</span><span class="n">mask_color</span><span class="p">,</span>
-                            <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                            <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;//&quot;</span><span class="p">,</span>
-                        <span class="p">)</span>
-                        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+            <span class="n">in_aperture</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;wcs&quot;</span><span class="p">):</span>
+                <span class="n">ap_row</span> <span class="o">=</span> <span class="n">in_aperture</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span>
+                <span class="n">ap_col</span> <span class="o">=</span> <span class="n">in_aperture</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ap_row</span> <span class="o">=</span> <span class="n">in_aperture</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">-</span> <span class="mf">0.5</span>
+                <span class="n">ap_col</span> <span class="o">=</span> <span class="n">in_aperture</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">-</span> <span class="mf">0.5</span>    
+            <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ap_row</span><span class="p">)):</span>
+                
+                <span class="n">rect</span><span class="o">=</span><span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="n">ap_col</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span><span class="n">ap_row</span><span class="p">[</span><span class="n">ii</span><span class="p">]),</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">mask_color</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+                
         <span class="k">return</span> <span class="n">ax</span>
 
     <span class="k">def</span> <span class="nf">_to_matplotlib_animation</span><span class="p">(</span>
@@ -1514,8 +1516,8 @@
 <span class="sd">            before saving a fits file.  Default: None (no transform is applied).</span>
 <span class="sd">        ylim_func: function</span>
 <span class="sd">            A function that returns ylimits (low, high) given a LightCurve object.</span>
-<span class="sd">            The default is to return an expanded window around the 10-90th</span>
-<span class="sd">            percentile of lightcurve flux values.</span>
+<span class="sd">            The default is to return a window approximately around 5 sigma-clipped</span>
+<span class="sd">            lightcurve flux values.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -2052,8 +2054,8 @@
 <span class="sd">            Inspired by https://github.com/noraeisner/LATTE</span>
 <span class="sd">        corrector_func : function</span>
 <span class="sd">            Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.</span>
-<span class="sd">            This function is applied to each light curve in the collection</span>
-<span class="sd">            prior to stitching. The default is to normalize each light curve.</span>
+<span class="sd">            This function is applied to each pixel&#39;s light curve.</span>
+<span class="sd">            The default is to return a 5 sigma-clipped light curve.</span>
 <span class="sd">        style : str</span>
 <span class="sd">            Path or URL to a matplotlib style file, or name of one of</span>
 <span class="sd">            matplotlib&#39;s built-in stylesheets (e.g. &#39;ggplot&#39;).</span>
@@ -2062,7 +2064,7 @@
 <span class="sd">            Size of the markers in the lightcurve plot. For periodogram plot, it is used as the line width.</span>
 <span class="sd">            Default: 0.5</span>
 <span class="sd">        kwargs : dict</span>
-<span class="sd">            e.g. extra parameters to be passed to `lc.to_periodogram`.</span>
+<span class="sd">            e.g. extra parameters to be passed to `~lightkurve.LightCurve.to_periodogram`.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -2079,7 +2081,7 @@
 <span class="sd">            &gt;&gt;&gt;</span>
 <span class="sd">            &gt;&gt;&gt; # Variation: Customize the plot&#39;s size so that each pixel is about 1 inch by 1 inch</span>
 <span class="sd">            &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
-<span class="sd">            &gt;&gt;&gt; fig = plt.figure(figsize=(tpf.flux[0].shape[0] * 1.0, tpf.flux[0].shape[1] * 1.0))    # doctest: +SKIP</span>
+<span class="sd">            &gt;&gt;&gt; fig = plt.figure(figsize=(tpf.flux[0].shape[1] * 1.0, tpf.flux[0].shape[0] * 1.0))    # doctest: +SKIP</span>
 <span class="sd">            &gt;&gt;&gt; tpf.plot_pixels(ax=fig.gca(), aperture_mask=&#39;pipeline&#39;)    # doctest: +SKIP</span>
 
 
@@ -2268,28 +2270,33 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">KeplerTargetPixelFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">path</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
-            <span class="n">quality_array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;QUALITY&quot;</span><span class="p">],</span> <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span>
-        <span class="p">)</span>
-
-        <span class="c1"># check to make sure the correct filetype has been provided</span>
-        <span class="n">filetype</span> <span class="o">=</span> <span class="n">detect_filetype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;TessTargetPixelFile&quot;</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;A TESS data product is being opened using the &quot;</span>
-                <span class="s2">&quot;`KeplerTargetPixelFile` class. &quot;</span>
-                <span class="s2">&quot;Please use `TessTargetPixelFile` instead.&quot;</span><span class="p">,</span>
-                <span class="n">LightkurveWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">filetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;File header not recognized as Kepler or TESS &quot;</span> <span class="s2">&quot;observation.&quot;</span><span class="p">,</span>
-                <span class="n">LightkurveWarning</span><span class="p">,</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
+                <span class="n">quality_array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;QUALITY&quot;</span><span class="p">],</span> <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span>
             <span class="p">)</span>
 
-        <span class="c1"># Use the KEPLERID keyword as the default targetid</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;KEPLERID&quot;</span><span class="p">)</span></div>
+            <span class="c1"># check to make sure the correct filetype has been provided</span>
+            <span class="n">filetype</span> <span class="o">=</span> <span class="n">detect_filetype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;TessTargetPixelFile&quot;</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;A TESS data product is being opened using the &quot;</span>
+                    <span class="s2">&quot;`KeplerTargetPixelFile` class. &quot;</span>
+                    <span class="s2">&quot;Please use `TessTargetPixelFile` instead.&quot;</span><span class="p">,</span>
+                    <span class="n">LightkurveWarning</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">filetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;File header not recognized as Kepler or TESS &quot;</span> <span class="s2">&quot;observation.&quot;</span><span class="p">,</span>
+                    <span class="n">LightkurveWarning</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Use the KEPLERID keyword as the default targetid</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;KEPLERID&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Cannot instantiate TargetPixelFile, close the HDU to release the file handle</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">e</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;KeplerTargetPixelFile Object (ID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">)</span>
@@ -2938,33 +2945,38 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TessTargetPixelFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">path</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
-            <span class="n">quality_array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;QUALITY&quot;</span><span class="p">],</span> <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span>
-        <span class="p">)</span>
-        <span class="c1"># Early TESS releases had cadences with time=NaN (i.e. missing data)</span>
-        <span class="c1"># which were not flagged by a QUALITY flag yet; the line below prevents</span>
-        <span class="c1"># these cadences from being used. They would break most methods!</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">quality_bitmask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">quality_bitmask</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">])</span>
-
-        <span class="c1"># check to make sure the correct filetype has been provided</span>
-        <span class="n">filetype</span> <span class="o">=</span> <span class="n">detect_filetype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;KeplerTargetPixelFile&quot;</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;A Kepler data product is being opened using the &quot;</span>
-                <span class="s2">&quot;`TessTargetPixelFile` class. &quot;</span>
-                <span class="s2">&quot;Please use `KeplerTargetPixelFile` instead.&quot;</span><span class="p">,</span>
-                <span class="n">LightkurveWarning</span><span class="p">,</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
+                <span class="n">quality_array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;QUALITY&quot;</span><span class="p">],</span> <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">filetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;File header not recognized as Kepler or TESS &quot;</span> <span class="s2">&quot;observation.&quot;</span><span class="p">,</span>
-                <span class="n">LightkurveWarning</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="c1"># Early TESS releases had cadences with time=NaN (i.e. missing data)</span>
+            <span class="c1"># which were not flagged by a QUALITY flag yet; the line below prevents</span>
+            <span class="c1"># these cadences from being used. They would break most methods!</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">quality_bitmask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">quality_bitmask</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">])</span>
 
-        <span class="c1"># Use the TICID keyword as the default targetid</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TICID&quot;</span><span class="p">)</span></div>
+            <span class="c1"># check to make sure the correct filetype has been provided</span>
+            <span class="n">filetype</span> <span class="o">=</span> <span class="n">detect_filetype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s2">&quot;KeplerTargetPixelFile&quot;</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;A Kepler data product is being opened using the &quot;</span>
+                    <span class="s2">&quot;`TessTargetPixelFile` class. &quot;</span>
+                    <span class="s2">&quot;Please use `KeplerTargetPixelFile` instead.&quot;</span><span class="p">,</span>
+                    <span class="n">LightkurveWarning</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">filetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;File header not recognized as Kepler or TESS &quot;</span> <span class="s2">&quot;observation.&quot;</span><span class="p">,</span>
+                    <span class="n">LightkurveWarning</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Use the TICID keyword as the default targetid</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TICID&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Cannot instantiate TargetPixelFile, close the HDU to release the file handle</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">e</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;TessTargetPixelFile(TICID: </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">)</span>

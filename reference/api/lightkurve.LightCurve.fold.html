@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -1267,6 +1267,11 @@
      lightkurve.TessQualityFlags
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.utils.plot_image.html">
+     lightkurve.utils.plot_image
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -1320,28 +1325,28 @@ convenient plotting methods.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>period</strong><span class="classifier">float <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a></span></dt><dd><p>The period to use for folding.  If a <code class="docutils literal notranslate"><span class="pre">float</span></code> is passed we’ll
+<dt><strong>period</strong><span class="classifier">float <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a></span></dt><dd><p>The period to use for folding.  If a <code class="docutils literal notranslate"><span class="pre">float</span></code> is passed we’ll
 assume it is in units of days.</p>
 </dd>
-<dt><strong>epoch_time</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a></span></dt><dd><p>The time to use as the reference epoch, at which the relative time
+<dt><strong>epoch_time</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a></span></dt><dd><p>The time to use as the reference epoch, at which the relative time
 offset / phase will be <code class="docutils literal notranslate"><span class="pre">epoch_phase</span></code>. Defaults to the first time
 in the time series.</p>
 </dd>
-<dt><strong>epoch_phase</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a></span></dt><dd><p>Phase of <code class="docutils literal notranslate"><span class="pre">epoch_time</span></code>. If <code class="docutils literal notranslate"><span class="pre">normalize_phase</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, this
+<dt><strong>epoch_phase</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a></span></dt><dd><p>Phase of <code class="docutils literal notranslate"><span class="pre">epoch_time</span></code>. If <code class="docutils literal notranslate"><span class="pre">normalize_phase</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, this
 should be a dimensionless value, while if <code class="docutils literal notranslate"><span class="pre">normalize_phase</span></code> is
-<code class="docutils literal notranslate"><span class="pre">False</span></code>, this should be a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> with time
+<code class="docutils literal notranslate"><span class="pre">False</span></code>, this should be a <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> with time
 units. Defaults to 0.</p>
 </dd>
-<dt><strong>wrap_phase</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a></span></dt><dd><p>The value of the phase above which values are wrapped back by one
+<dt><strong>wrap_phase</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a></span></dt><dd><p>The value of the phase above which values are wrapped back by one
 period. If <code class="docutils literal notranslate"><span class="pre">normalize_phase</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, this should be a
 dimensionless value, while if <code class="docutils literal notranslate"><span class="pre">normalize_phase</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>,
-this should be a <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> with time units.
+this should be a <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> with time units.
 Defaults to half the period, so that the resulting time series goes
 from <code class="docutils literal notranslate"><span class="pre">-period</span> <span class="pre">/</span> <span class="pre">2</span></code> to <code class="docutils literal notranslate"><span class="pre">period</span> <span class="pre">/</span> <span class="pre">2</span></code> (if <code class="docutils literal notranslate"><span class="pre">normalize_phase</span></code> is
 <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a>) or -0.5 to 0.5 (if <code class="docutils literal notranslate"><span class="pre">normalize_phase</span></code> is <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>).</p>
 </dd>
-<dt><strong>normalize_phase</strong><span class="classifier">bool</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> phase is returned as <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.time.TimeDelta.html#astropy.time.TimeDelta" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDelta</span></code></a>,
-otherwise as a dimensionless <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>.</p>
+<dt><strong>normalize_phase</strong><span class="classifier">bool</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#False" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">False</span></code></a> phase is returned as <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.TimeDelta.html#astropy.time.TimeDelta" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDelta</span></code></a>,
+otherwise as a dimensionless <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v6.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>.</p>
 </dd>
 </dl>
 </dd>

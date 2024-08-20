@@ -62,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.4</p>
+<p class="title">Lightkurve v2.5</p>
 </a>
 
     
@@ -1267,6 +1267,11 @@
      lightkurve.TessQualityFlags
     </a>
    </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.utils.plot_image.html">
+     lightkurve.utils.plot_image
+    </a>
+   </li>
   </ul>
  </li>
 </ul>
@@ -1363,8 +1368,8 @@ inspection of the transformed lightcurve.  The transform_func is applied
 before saving a fits file.  Default: None (no transform is applied).</p>
 </dd>
 <dt><strong>ylim_func: function</strong></dt><dd><p>A function that returns ylimits (low, high) given a LightCurve object.
-The default is to return an expanded window around the 10-90th
-percentile of lightcurve flux values.</p>
+The default is to return a window approximately around 5 sigma-clipped
+lightcurve flux values.</p>
 </dd>
 </dl>
 </dd>
