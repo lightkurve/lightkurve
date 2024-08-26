@@ -58,7 +58,7 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         which can be one of ``zg``, ``zr``,  ``zi``.
 
     data_release: int, optional
-        The ZTF data release to be used.
+        The ZTF data release to be used. The default is 21.
 
     """
 
@@ -72,7 +72,7 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         # query: ZTF-specific
         ngoodobsrel_min: int = 100,
         filtercode: str = None,
-        data_release: int = 20,
+        data_release: int = 21,
         # for ZTF LC URL
         lc_format: str = "csv",
         scatter_kwargs: dict = None,
