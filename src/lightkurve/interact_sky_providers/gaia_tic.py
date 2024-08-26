@@ -3,7 +3,6 @@ import warnings
 
 import numpy as np
 
-
 import astropy.units as u
 
 from astropy.coordinates import SkyCoord
@@ -39,6 +38,49 @@ def _fill_template(template, var_value, var_name="%s"):
 
 
 class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
+    """
+    Provide Gaia DR3 data to `TargetPixelFile.interact_sky() <lightkurve.TargetPixelFile.interact_sky>`.
+
+    Gaia DR3 data is from Vizier: https://cdsarc.cds.unistra.fr/viz-bin/cat/I/355
+
+    The class is used by ``interact_sky()`` internally. The behavior can
+    be customized by supplying a dictionary of keyword parameters to
+    `catalogs` parameter of ``interact_sky()``. The keyword parameters are
+    then used to customize the parameters passed to the constructor here.
+
+    Parameters
+    ----------
+    coord: `~astropy.coordinates.SkyCoord`
+        the coordinate of the target.
+
+    radius: float or `~astropy.units.Quantity`
+        the cone search radius, in arc seconds if the value is float.
+
+    magnitude_limit: float
+        A value to limit the results in based on Gaia Gmag.
+
+    scatter_kwargs: dict
+        keyword arguments passed to bokeh's ``figure.scatter()``
+        function to plot the stars.
+
+    extra_cols_in_detail_view: dict, optional
+        additional Gaia DR3 parameters to be included in detail view, in the form
+        of (column name in Gaia DR3 Vizier table, display name).
+
+    url_templates: dict, optional
+        The URL templates for the URL shown in detail view. The keys are:
+
+        * ``gaiadr3_main_url`` : Gaia DR3 Main
+        * ``gaiadr3_var_url`` : Gaia DR3 Variable
+        * ``gaiadr3_nss_url`` : Gaia DR3 Non Single Star
+        * ``simbad_url_by_gaia_source`` : SIMBAD by Gaia Source
+        * ``simbad_url_by_coord`` : SIMBAD by coordinate
+
+        For all except ``simbad_url_by_coord``, the string ``%s`` is replaced by
+        Gaia source. For ``simbad_url_by_coord``, the strings ``%ra`` and ``%dec``
+        are replaced by the target's right ascension and declination
+        (in degrees) respectively.
+    """
 
     # Gaia DR3 reference epoch: 2016.0,  time coordinate: barycentric coordinate time (TCB).
     # https://www.cosmos.esa.int/web/gaia/dr3
@@ -233,6 +275,54 @@ def _join_for_empty_right_table(left, right):
 
 
 class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
+    """
+    Provide Gaia DR3 joined with TESS Input Catalog (TIC) data to
+    `TargetPixelFile.interact_sky() <lightkurve.TargetPixelFile.interact_sky>`.
+
+    Gaia DR3 data is from Vizier: https://cdsarc.cds.unistra.fr/viz-bin/cat/I/355
+
+    TIC data is from Vizier: https://cdsarc.cds.unistra.fr/viz-bin/cat/IV/39
+
+    The class is used by ``interact_sky()`` internally. The behavior can
+    be customized by supplying a dictionary of keyword parameters to
+    `catalogs` parameter of ``interact_sky()``. The keyword parameters are
+    then used to customize the parameters passed to the constructor here.
+
+    Parameters
+    ----------
+    coord: `~astropy.coordinates.SkyCoord`
+        the coordinate of the target.
+
+    radius: float or `~astropy.units.Quantity`
+        the cone search radius, in arc seconds if the value is float.
+
+    magnitude_limit: float
+        A value to limit the results in based on Gaia Gmag / TESS Tmag.
+        A star is included if Gmag <= magnitude_limit or Tmag <= magnitude_limit.
+
+    scatter_kwargs: dict
+        keyword arguments passed to bokeh's ``figure.scatter()``
+        function to plot the stars.
+
+    extra_cols_in_detail_view: dict, optional
+        additional Gaia DR3 parameters to be included in detail view, in the form
+        of (column name in Gaia DR3 Vizier table, display name).
+
+    url_templates: dict, optional
+        The URL templates for the URL shown in detail view. The keys are:
+
+        * ``gaiadr3_main_url`` : Gaia DR3 Main
+        * ``gaiadr3_var_url`` : Gaia DR3 Variable
+        * ``gaiadr3_nss_url`` : Gaia DR3 Non Single Star
+        * ``simbad_url_by_gaia_source`` : SIMBAD by Gaia Source
+        * ``simbad_url_by_coord`` : SIMBAD by coordinate
+
+        For all except ``simbad_url_by_coord``, the string ``%s`` is replaced by
+        Gaia source. For ``simbad_url_by_coord``, the strings ``%ra`` and ``%dec``
+        are replaced by the target's right ascension and declination
+        (in degrees) respectively.
+    """
+
     # OPEN: composition (with GaiaDR3InteractSkyCatalogProvider as a member, instead of inheriting it)
     # would be cleaner conceptually
 

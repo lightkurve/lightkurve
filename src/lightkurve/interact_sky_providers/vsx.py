@@ -215,6 +215,33 @@ def _to_mag_text(tab):
 
 
 class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
+    """
+    Provide AAVSO Variable Star Index data to
+    `TargetPixelFile.interact_sky() <lightkurve.TargetPixelFile.interact_sky>`.
+
+    More information: http://aavso.org/vsx/index.php
+
+    The class is used by ``interact_sky()`` internally. The behavior can
+    be customized by supplying a dictionary of keyword parameters to
+    `catalogs` parameter of ``interact_sky()``. The keyword parameters are
+    then used to customize the parameters passed to the constructor here.
+
+    Parameters
+    ----------
+    coord: `~astropy.coordinates.SkyCoord`
+        the coordinate of the target.
+
+    radius: float or `~astropy.units.Quantity`
+        the cone search radius, in arc seconds if the value is float.
+
+    magnitude_limit: float
+        A value to limit the results in based on magnitude in VSX (mean or maximum).
+
+    scatter_kwargs: dict
+        keyword arguments passed to bokeh's ``figure.scatter()``
+        function to plot the stars.
+
+    """
 
     J2000 = Time(2000.0, format="jyear", scale="tt")
 

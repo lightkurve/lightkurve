@@ -22,6 +22,46 @@ def _to_lc_url(oid, data_release, format):
 
 
 class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
+    """
+    Provide Zwicky Transient Facility Archive data to
+    `TargetPixelFile.interact_sky() <lightkurve.TargetPixelFile.interact_sky>`.
+
+    More information: https://irsa.ipac.caltech.edu/Missions/ztf.html
+
+    The class is used by ``interact_sky()`` internally. The behavior can
+    be customized by supplying a dictionary of keyword parameters to
+    `catalogs` parameter of ``interact_sky()``. The keyword parameters are
+    then used to customize the parameters passed to the constructor here.
+
+    Parameters
+    ----------
+    coord: `~astropy.coordinates.SkyCoord`
+        the coordinate of the target.
+
+    radius: float or `~astropy.units.Quantity`
+        the cone search radius, in arc seconds if the value is float.
+
+    magnitude_limit: float
+        A value to limit the results in based on ZTF medianmag.
+
+    scatter_kwargs: dict
+        keyword arguments passed to bokeh's ``figure.scatter()``
+        function to plot the stars.
+
+    ngoodobsrel_min: int, optional
+        minimum number of good observations (``ngoodobsrel``)
+        required for an object to be included in result.
+        Default is 100
+
+    filtercode: str, optional
+        If specified, only include objects of the specified `filtercode`,
+        which can be one of ``zg``, ``zr``,  ``zi``.
+
+    data_release: int, optional
+        The ZTF data release to be used.
+
+    """
+
     # OPEN: support BAD_CATFLAGS_MASK parameter in the ZTF LC URL
 
     def __init__(

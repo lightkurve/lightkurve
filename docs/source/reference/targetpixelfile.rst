@@ -59,3 +59,15 @@ Constructor
    KeplerTargetPixelFile.get_header
    KeplerTargetPixelFile.get_keyword
    KeplerTargetPixelFile.animate
+
+
+Catalog providers for interact_sky()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autosummary::
+  :toctree: api/
+
+  interact_sky_providers.gaia_tic.GaiaDR3InteractSkyCatalogProvider
+  interact_sky_providers.gaia_tic.GaiaDR3TICInteractSkyCatalogProvider
+  interact_sky_providers.vsx.VSXInteractSkyCatalogProvider
+  interact_sky_providers.ztf.ZTFInteractSkyCatalogProvider

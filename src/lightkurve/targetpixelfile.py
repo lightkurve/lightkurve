@@ -1194,12 +1194,12 @@ class TargetPixelFile(object):
                 ap_col = in_aperture[1] - 0.5
             else:
                 ap_row = in_aperture[0] + self.row - 0.5
-                ap_col = in_aperture[1] + self.column - 0.5    
+                ap_col = in_aperture[1] + self.column - 0.5
             for ii in range(len(ap_row)):
-                
+
                 rect=patches.Rectangle((ap_col[ii],ap_row[ii]),1,1, fill=False, hatch="//", color=mask_color)
                 ax.add_patch(rect)
-                
+
         return ax
 
     def _to_matplotlib_animation(
@@ -1381,7 +1381,7 @@ class TargetPixelFile(object):
 
 
     def interact_sky(self, notebook_url=None, aperture_mask="empty", catalogs=None, magnitude_limit=18):
-        """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
+        """Display a Jupyter Notebook widget showing Gaia DR3 positions on top of the pixels.
 
         Parameters
         ----------
@@ -1400,8 +1400,42 @@ class TargetPixelFile(object):
         aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
             Highlight pixels selected by aperture_mask.
             Default is 'empty': no pixel is highlighted.
+        catalogs: array of str, or (str, dict)
+            The list of one or more catalogs to show on top of the pixels. Options are:
+
+                * ``gaiadr3``:  :class:`Gaia DR3 <lightkurve.interact_sky_providers.gaia_tic.GaiaDR3InteractSkyCatalogProvider>`
+                * ``gaiadr3_tic``: :class:`Gaia DR3 + TIC <lightkurve.interact_sky_providers.gaia_tic.GaiaDR3TICInteractSkyCatalogProvider>`
+                * ``vsx``:  :class:`AAVSO Variable Star Index <lightkurve.interact_sky_providers.vsx.VSXInteractSkyCatalogProvider>`
+                * ``ztf``:  :class:`Zwicky Transient Facility Archive <lightkurve.interact_sky_providers.ztf.ZTFInteractSkyCatalogProvider>`
+
+            A catalog can be specified by the above strings. Alternative, if one wants to
+            customize a catalog, it can be specified in the form of (str, dict) tuple.
+            The dictionary of parameters is passed to the correspond provider constructor.
+            See examples below.
+
+            The defualt is ``['gaiadr3`]`` for Kepler, and ``['gaiadr3_tic`]`` for TESS.
         magnitude_limit : float
             A value to limit the results in based on Gaia Gmag. Default, 18.
+
+        Examples
+        --------
+        To show stars from Gaia DR3 + TIC over a target pixel file:
+
+            >>> import lightkurve as lk
+            >>> tpf = lk.search_targetpixelfile("TIC400621146", mission="TESS").download()  # doctest: +SKIP
+            >>> tpf.interact_sky()  # doctest: +SKIP
+
+        To show stars from Gaia DR3 + TIC, ZTF, and VSX
+
+            >>> tpf.interact_sky(catalogs=['gaiadr3_tic', 'ztf', 'vsx'])  # doctest: +SKIP
+
+        To customize the output of Gaia DR3 + TIC by including RUWE:
+
+            >>> tpf.interact_sky(catalogs=[('gaiadr3_tic', dict(extra_cols_in_detail_view={"RUWE": "RUWE"})])  # doctest: +SKIP
+
+        To restrict ZTF search radius to 1 arcminute:
+
+            >>> tpf.interact_sky(catalogs=['gaiadr3_tic', ('ztf', dict(radius=1*u.arcmin))])  # doctest: +SKIP
         """
         from .interact import show_skyview_widget
 
