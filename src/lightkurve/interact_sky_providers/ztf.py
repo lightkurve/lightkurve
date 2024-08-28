@@ -131,7 +131,9 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
         catalog = f"ztf_objects_dr{self.data_release}"
         # OPEN: consider memoize the result, as astroquery v0.47 does not support caching for Irsa
-        rs = Irsa.query_region(coordinates=self.coord, catalog=catalog, spatial="Cone", radius=self.radius)
+        rs = Irsa.query_region(
+            coordinates=self.coord, catalog=catalog, spatial="Cone", radius=self.radius
+        )
 
         if self.magnitude_limit is not None:
             # column medianmag better reflects observed mag, but it could be 0

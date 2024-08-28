@@ -183,7 +183,9 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         # - TICs without Gaia DR3 match: use RA_orig,
         #   the origin of the coordinate is denoted in POSflag (Gaia DR2 / 1, 2MASS, hip, etc.)
         #   need to find the reference epoch of each of the origin catalog, e.g. J2015.5 for Gaia DR2
-        return ProperMotionCorrectionMeta("RAJ2000", "DEJ2000", "pmRA", "pmDE", "icrs", self.J2000)
+        return ProperMotionCorrectionMeta(
+            "RAJ2000", "DEJ2000", "pmRA", "pmDE", "icrs", self.J2000
+        )
 
     def add_to_data_source(self, result: Table, source: dict) -> None:
         super().add_to_data_source(result, source)
@@ -205,10 +207,18 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
     def get_detail_view(self, data: dict) -> Tuple[dict, list]:
         # the vizier URL returns both Gaia DR3 Main and Gaia DR3 Astrophysical parameters table for convenience
-        gaiadr3_main_url = _fill_template(self.url_templates["gaiadr3_main_url"], data['Source'])
-        simbad_url_by_gaia_source = _fill_template(self.url_templates["simbad_url_by_gaia_source"], data['Source'])
-        simbad_url_by_coord = _fill_template(self.url_templates["simbad_url_by_coord"], data['ra'], var_name="%ra")
-        simbad_url_by_coord = _fill_template(simbad_url_by_coord, data['dec'], var_name="%dec")
+        gaiadr3_main_url = _fill_template(
+            self.url_templates["gaiadr3_main_url"], data["Source"]
+        )
+        simbad_url_by_gaia_source = _fill_template(
+            self.url_templates["simbad_url_by_gaia_source"], data["Source"]
+        )
+        simbad_url_by_coord = _fill_template(
+            self.url_templates["simbad_url_by_coord"], data["ra"], var_name="%ra"
+        )
+        simbad_url_by_coord = _fill_template(
+            simbad_url_by_coord, data["dec"], var_name="%dec"
+        )
         if data["Source"] != "":
             source_val_html = f"""{data['Source']} (<a href="{gaiadr3_main_url}" target="_blank">Vizier</a>)"""
             extra_rows = [
@@ -221,13 +231,17 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
 
         var_html = data["VarFlag"]
         if var_html == "VARIABLE":
-            gaiadr3_var_url = _fill_template(self.url_templates["gaiadr3_var_url"], data['Source'])
+            gaiadr3_var_url = _fill_template(
+                self.url_templates["gaiadr3_var_url"], data["Source"]
+            )
             var_html += f' (<a href="{gaiadr3_var_url}" target="_blank">Vizier</a>)'
 
         nss_html = str(data["NSS"])
         if data["NSS"] != 0:
             flags_text = ", ".join(_decode_gaiadr3_nss_flag(data["NSS"]))
-            gaiadr3_nss_url = _fill_template(self.url_templates["gaiadr3_nss_url"], data['Source'])
+            gaiadr3_nss_url = _fill_template(
+                self.url_templates["gaiadr3_nss_url"], data["Source"]
+            )
             nss_html += f' ({flags_text})&emsp;(<a href="{gaiadr3_nss_url}" target="_blank">Vizier</a>)'
 
         key_vals = {
@@ -241,7 +255,7 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             "row": f"{data['y']:.1f}",
             "Variable": var_html,
             "NSS": nss_html,
-            }
+        }
 
         if self.extra_cols_in_detail_view is not None:
             for col, label in self.extra_cols_in_detail_view.items():
@@ -265,12 +279,14 @@ def _join_for_empty_right_table(left, right):
             fill_val, dtype = np.nan, float
         # use MaskedColumn because that's what astroquery returns
         # (some subsequent codes would use MaskedColumn-specific APIs)
-        rs.add_column(MaskedColumn(
-            np.full_like(rs, fill_val, dtype=dtype),
-            name=c,
-            mask=np.full_like(rs, True, dtype=bool),
-            fill_value=fill_val
-        ))
+        rs.add_column(
+            MaskedColumn(
+                np.full_like(rs, fill_val, dtype=dtype),
+                name=c,
+                mask=np.full_like(rs, True, dtype=bool),
+                fill_value=fill_val,
+            )
+        )
     return rs
 
 
@@ -335,7 +351,14 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         extra_cols_in_detail_view: dict = None,
         url_templates: dict = None,
     ) -> None:
-        super().__init__(coord, radius, magnitude_limit, scatter_kwargs, extra_cols_in_detail_view, url_templates)
+        super().__init__(
+            coord,
+            radius,
+            magnitude_limit,
+            scatter_kwargs,
+            extra_cols_in_detail_view,
+            url_templates,
+        )
         # TIC-specific
         self.cols_for_source += ["TIC", "Tmag"]
         self.tic_catalog_name = "IV/39/tic82"
@@ -351,15 +374,29 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         # reducing time needed.
         with warnings.catch_warnings():
             # suppress useless warning to workaround  https://github.com/astropy/astroquery/issues/2352
-            warnings.filterwarnings( # for Gaia
-                "ignore", category=u.UnitsWarning, message="Unit 'e' not supported by the VOUnit standard"
+            warnings.filterwarnings(  # for Gaia
+                "ignore",
+                category=u.UnitsWarning,
+                message="Unit 'e' not supported by the VOUnit standard",
             )
             warnings.filterwarnings(  # for TIC
-                "ignore", category=u.UnitsWarning, message="Unit 'Sun' not supported by the VOUnit standard"
+                "ignore",
+                category=u.UnitsWarning,
+                message="Unit 'Sun' not supported by the VOUnit standard",
             )
 
             gaia_cols = self.columns
-            tic_cols = ["TIC", "GAIA", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "Plx", "Tmag", "Disp"]
+            tic_cols = [
+                "TIC",
+                "GAIA",
+                "RAJ2000",
+                "DEJ2000",
+                "pmRA",
+                "pmDE",
+                "Plx",
+                "Tmag",
+                "Disp",
+            ]
             rs_list = _query_cone_region(
                 self.coord,
                 self.radius,
@@ -387,9 +424,18 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
             cols_to_rename,
             [f"t_{c}" for c in cols_to_rename],
         )
-        tic_rs["GAIA"] = tic_rs["GAIA"].filled(-1)  # avoid table merge error (it requires no missing key)
+        tic_rs["GAIA"] = tic_rs["GAIA"].filled(
+            -1
+        )  # avoid table merge error (it requires no missing key)
         if len(gaia_rs) > 0 and len(tic_rs) > 0:
-            rs = join(gaia_rs, tic_rs, join_type="outer", keys_left="Source", keys_right="GAIA", metadata_conflicts="silent")
+            rs = join(
+                gaia_rs,
+                tic_rs,
+                join_type="outer",
+                keys_left="Source",
+                keys_right="GAIA",
+                metadata_conflicts="silent",
+            )
         elif len(tic_rs) == 0:
             rs = _join_for_empty_right_table(gaia_rs, tic_rs)
         else:
@@ -401,11 +447,16 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
 
         # honor mag limit filter with a more liberal policy: either Gmag or Tmag within the limit is okay.
         if self.magnitude_limit is not None:
-            rs = rs[(rs[self.magnitude_limit_column_name] < self.magnitude_limit) | (rs["Tmag"] < self.magnitude_limit)]
+            rs = rs[
+                (rs[self.magnitude_limit_column_name] < self.magnitude_limit)
+                | (rs["Tmag"] < self.magnitude_limit)
+            ]
 
         # add column magForSize
         rs["magForSize"] = rs[self.magnitude_limit_column_name]  # Gmag
-        rs["magForSize"][rs["Source"].mask] = rs["Tmag"][rs["Source"].mask]  # use Tmag when Gaia data is missing
+        rs["magForSize"][rs["Source"].mask] = rs["Tmag"][
+            rs["Source"].mask
+        ]  # use Tmag when Gaia data is missing
 
         # handle case missing TIC data
         # make missing integer value as empty string
@@ -435,8 +486,12 @@ class GaiaDR3TICInteractSkyCatalogProvider(GaiaDR3InteractSkyCatalogProvider):
         gaia_key_vals, gaia_extra_rows = super().get_detail_view(data)
 
         if data["TIC"] != "":
-            exofop_url = f'https://exofop.ipac.caltech.edu/tess/target.php?id={data["TIC"]}'
-            tic_val_html = f'{data["TIC"]} (<a href="{exofop_url}" target="_blank">ExoFOP</a>)'
+            exofop_url = (
+                f'https://exofop.ipac.caltech.edu/tess/target.php?id={data["TIC"]}'
+            )
+            tic_val_html = (
+                f'{data["TIC"]} (<a href="{exofop_url}" target="_blank">ExoFOP</a>)'
+            )
         else:
             tic_val_html = "No TIC match (new in DR3 or Gaia ID changed from DR2)"
 
