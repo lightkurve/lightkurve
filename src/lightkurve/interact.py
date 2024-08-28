@@ -464,9 +464,9 @@ def _row_to_dict(source, idx):
     return {k: source.data[k][idx] for k in source.data}
 
 
-def add_catalog_figure_elements(provider, tpf, fig, message_selected_target, arrow_4_selected):
+def add_catalog_figure_elements(provider, result, tpf, fig, message_selected_target, arrow_4_selected):
 
-    result = provider.query_catalog()
+    # result: from  provider.query_catalog()
     if result is None:
         # case empty result, return a dummy renderer
         return fig.scatter()
@@ -629,9 +629,8 @@ Selected:<br>
 
 
 def parse_and_add_catalogs_figure_elements(catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected):
+    # 1. create provider instances from catalog specifications
     providers = []
-    catalog_renderers = []
-
     for catalog_spec in catalogs:
         if isinstance(catalog_spec, (tuple, list)):
             if len(catalog_spec) == 2:
@@ -654,8 +653,18 @@ def parse_and_add_catalogs_figure_elements(catalogs, magnitude_limit, tpf, fig_t
 
         # pass all the parameters for query, plotting, etc. to the provider
         provider = create_provider(provider_class, tpf, magnitude_limit, extra_kwargs=extra_kwargs)
-        renderer = add_catalog_figure_elements(provider, tpf, fig_tpf, message_selected_target, arrow_4_selected)
         providers.append(provider)
+
+    # 2. make the remote queries
+    results = []
+    for provider in providers:
+        result = provider.query_catalog()
+        results.append(result)
+
+    # 3. render the query results
+    catalog_renderers = []
+    for provider, result in zip(providers, results):
+        renderer = add_catalog_figure_elements(provider, result, tpf, fig_tpf, message_selected_target, arrow_4_selected)
         catalog_renderers.append(renderer)
     return providers, catalog_renderers
 
