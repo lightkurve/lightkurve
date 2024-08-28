@@ -14,6 +14,7 @@ visualization widget showing the pixel data and a lightcurve::
 Note that this will only work inside a Jupyter notebook at this time.
 """
 from __future__ import division, print_function
+import asyncio
 import os
 import logging
 import warnings
@@ -29,6 +30,8 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from .interact_sky_providers import resolve_catalog_provider_class
 from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
+
+from .asyncio_compat import create_background_task
 
 log = logging.getLogger(__name__)
 
@@ -628,7 +631,13 @@ Selected:<br>
     return r
 
 
-def parse_and_add_catalogs_figure_elements(catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected):
+def parse_and_add_catalogs_figure_elements(*args, **kwargs):
+    return asyncio.run(async_parse_and_add_catalogs_figure_elements(*args, **kwargs))
+
+
+async def async_parse_and_add_catalogs_figure_elements(
+    catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+):
     # 1. create provider instances from catalog specifications
     providers = []
     for catalog_spec in catalogs:
@@ -656,9 +665,13 @@ def parse_and_add_catalogs_figure_elements(catalogs, magnitude_limit, tpf, fig_t
         providers.append(provider)
 
     # 2. make the remote queries
-    results = []
+    result_tasks = []
     for provider in providers:
-        result = provider.query_catalog()
+        a_task = create_background_task(provider.query_catalog)
+        result_tasks.append(a_task)
+    results = []
+    for a_task in result_tasks:
+        result = await a_task
         results.append(result)
 
     # 3. render the query results
