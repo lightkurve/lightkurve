@@ -632,6 +632,8 @@ Selected:<br>
 
 
 def parse_and_add_catalogs_figure_elements(*args, **kwargs):
+    # the synchronous version is used by tests only
+    # Actual usage in show_skyview_widget() uses the async version
     return asyncio.run(async_parse_and_add_catalogs_figure_elements(*args, **kwargs))
 
 
@@ -1318,7 +1320,7 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
 
-    def create_interact_ui(doc):
+    async def async_create_interact_ui(doc):
         tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
         # The data source includes metadata for hover-over tooltips
@@ -1339,7 +1341,7 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
 
         message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
-        providers, catalog_renderers = parse_and_add_catalogs_figure_elements(
+        providers, catalog_renderers = await async_parse_and_add_catalogs_figure_elements(
             catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
             )
 
@@ -1378,6 +1380,12 @@ def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty", catalogs=
                 )
             )
         doc.add_root(widgets_and_figures)
+
+    def create_interact_ui(doc):
+        # bokeh-specific trick to use async codes to create the UI
+        # (the naive asyncio.run() does not work in a bokeh server,
+        #  as it has its own event loop.)
+        doc.add_next_tick_callback(lambda: async_create_interact_ui(doc))
 
     output_notebook(verbose=False, hide_banner=True)
     return show(create_interact_ui, notebook_url=notebook_url)
