@@ -221,6 +221,8 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
     More information: http://aavso.org/vsx/index.php
 
+    https://www.aavso.org/apis-aavso-resources#:~:text=The%20VSX%20API%20is%20not%20%22official%22%20yet
+
     The class is used by ``interact_sky()`` internally. The behavior can
     be customized by supplying a dictionary of keyword parameters to
     `catalogs` parameter of ``interact_sky()``. The keyword parameters are

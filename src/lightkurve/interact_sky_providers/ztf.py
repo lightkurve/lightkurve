@@ -28,6 +28,8 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
     More information: https://irsa.ipac.caltech.edu/Missions/ztf.html
 
+    https://irsa.ipac.caltech.edu/docs/program_interface/ztf_lightcurve_api.html
+
     The class is used by ``interact_sky()`` internally. The behavior can
     be customized by supplying a dictionary of keyword parameters to
     `catalogs` parameter of ``interact_sky()``. The keyword parameters are
