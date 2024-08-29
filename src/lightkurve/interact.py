@@ -17,6 +17,7 @@ from __future__ import division, print_function
 import asyncio
 import os
 import logging
+import traceback
 import warnings
 
 import numpy as np
@@ -666,14 +667,26 @@ async def async_parse_and_add_catalogs_figure_elements(
         provider = create_provider(provider_class, tpf, magnitude_limit, extra_kwargs=extra_kwargs)
         providers.append(provider)
 
-    # 2. make the remote queries
+    # 2. make the remote queries (run in parallel in background)
     result_tasks = []
     for provider in providers:
         a_task = create_background_task(provider.query_catalog)
         result_tasks.append(a_task)
     results = []
-    for a_task in result_tasks:
-        result = await a_task
+    for provider, a_task in zip(providers, result_tasks):
+        try:
+            result = await a_task
+        except Exception as err:
+            # ensure the error from a provider would not stop the whole plot,
+            # e.g., if an user plots with Gaia and ZTF data, if ZTF times out,
+            # the user would still see Gaia data
+            result = None
+            err_str = "".join(traceback.format_exception(err))
+            warnings.warn(
+                (f"Error while getting data from {provider.label}. Its data will not be in the plot. "
+                 f"The error: {type(err).__name__}: {err}\n{err_str}"),
+                LightkurveWarning
+            )
         results.append(result)
 
     # 3. render the query results

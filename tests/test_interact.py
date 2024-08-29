@@ -280,6 +280,20 @@ class StubNoneResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvi
         return "stub_none_result"
 
 
+class StubErrInQueryInteractSkyCatalogProvider(AbstractStubInteractSkyCatalogProvider):
+    """Simulate the case there is some network error during query"""
+
+    @property
+    def label(self):
+        return "stub_err_query"
+
+    def query_catalog(self):
+        raise IOError("simulated network error")
+
+    def get_proper_motion_correction_meta(self):
+        return None
+
+
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 @pytest.mark.filterwarnings("ignore:Proper motion correction cannot be applied to the target")  # for TESSCut
 @pytest.mark.parametrize("tpf_class, tpf_file, aperture_mask", [
@@ -288,7 +302,7 @@ class StubNoneResultInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvi
     (KeplerTargetPixelFile, example_tpf_kepler, "threshold"),
     (TessTargetPixelFile, example_tpf_no_pm, "default"),
     ])
-def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
+def test_interact_sky_functions_basic(tpf_class, tpf_file, aperture_mask):
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh
     from lightkurve.interact import (
@@ -310,7 +324,7 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
         StubNoPMInteractSkyCatalogProvider,
         StubWithPMInteractSkyCatalogProvider,
         StubWithPMnFK5CoordInteractSkyCatalogProvider,  # catalog coordinate in FK5 rather than ICRS
-        # test boundary cases
+        # test boundary cases: no data
         StubEmptyResultInteractSkyCatalogProvider,
         StubNoneResultInteractSkyCatalogProvider,
     ]
@@ -318,6 +332,44 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
     providers, renderers = parse_and_add_catalogs_figure_elements(
         catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
         )
+    for _, _, renderer in zip(catalogs, providers, renderers):  # zip to ensure they are all of the same length
+        assert renderer is not None
+
+
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
+def test_interact_sky_functions_error_handling():
+    """Test how interact_sky() functions handle errors from providers"""
+
+    tpf_class, tpf_file, aperture_mask = TessTargetPixelFile, example_tpf_tess, "pipeline"
+    import bokeh
+    from lightkurve.interact import (
+        prepare_tpf_datasource,
+        make_tpf_figure_elements,
+        add_target_figure_elements,
+        make_interact_sky_selection_elements,
+        parse_and_add_catalogs_figure_elements
+    )
+
+    tpf = tpf_class(tpf_file)
+    mask = tpf._parse_aperture_mask(aperture_mask)
+    tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
+    fig_tpf, slider1 = make_tpf_figure_elements(tpf, tpf_source, tpf_source_selectable=False)
+    add_target_figure_elements(tpf, fig_tpf)
+    message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
+
+    catalogs = [
+        StubNoPMInteractSkyCatalogProvider,
+        # boundary cases: errors in providers
+        StubErrInQueryInteractSkyCatalogProvider,
+        # ensure subsequent providers will be still invoked
+        StubWithPMInteractSkyCatalogProvider,
+    ]
+    magnitude_limit = 18
+
+    with pytest.warns(LightkurveWarning, match="Error while getting data from.*simulated network error"):
+        providers, renderers = parse_and_add_catalogs_figure_elements(
+            catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+            )
     for _, _, renderer in zip(catalogs, providers, renderers):  # zip to ensure they are all of the same length
         assert renderer is not None
 
