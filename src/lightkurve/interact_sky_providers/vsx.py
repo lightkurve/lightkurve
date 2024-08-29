@@ -353,6 +353,7 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
             ("DEC", "@dec{0,0.00000000}"),
             ("column", "@x{0.0}"),
             ("row", "@y{0.0}"),
+            ("Period (d)", "@Period"),
         ]
 
     def get_detail_view(self, data: dict) -> Tuple[dict, list]:
