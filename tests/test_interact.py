@@ -294,6 +294,17 @@ class StubErrInQueryInteractSkyCatalogProvider(AbstractStubInteractSkyCatalogPro
         return None
 
 
+class StubErrInToolTipsInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogProvider):
+    """Simulate the case there is some unexpected error during rendering (tooltips)"""
+
+    @property
+    def label(self):
+        return "stub_err_tooltips"
+
+    def get_tooltips(self):
+        raise ValueError("simulated tooltips error (e.g., due to a bug)")
+
+
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 @pytest.mark.filterwarnings("ignore:Proper motion correction cannot be applied to the target")  # for TESSCut
 @pytest.mark.parametrize("tpf_class, tpf_file, aperture_mask", [
@@ -357,20 +368,34 @@ def test_interact_sky_functions_error_handling():
     add_target_figure_elements(tpf, fig_tpf)
     message_selected_target, arrow_4_selected = make_interact_sky_selection_elements(fig_tpf)
 
-    catalogs = [
+    magnitude_limit = 18
+
+    catalogs1 = [
         StubNoPMInteractSkyCatalogProvider,
         # boundary cases: errors in providers
         StubErrInQueryInteractSkyCatalogProvider,
         # ensure subsequent providers will be still invoked
         StubWithPMInteractSkyCatalogProvider,
     ]
-    magnitude_limit = 18
-
-    with pytest.warns(LightkurveWarning, match="Error while getting data from.*simulated network error"):
+    with pytest.warns(LightkurveWarning, match="Error while getting data from stub_err_query.*simulated network error"):
         providers, renderers = parse_and_add_catalogs_figure_elements(
-            catalogs, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+            catalogs1, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
             )
-    for _, _, renderer in zip(catalogs, providers, renderers):  # zip to ensure they are all of the same length
+    for _, _, renderer in zip(catalogs1, providers, renderers):  # zip to ensure they are all of the same length
+        assert renderer is not None
+
+    catalogs2 = [
+        StubNoPMInteractSkyCatalogProvider,
+        # boundary cases: errors in providers
+        StubErrInToolTipsInteractSkyCatalogProvider,
+        # ensure subsequent providers will be still invoked
+        StubWithPMInteractSkyCatalogProvider,
+    ]
+    with pytest.warns(LightkurveWarning, match="Error while rendering data from stub_err_tooltips.*simulated tooltips error"):
+        providers, renderers = parse_and_add_catalogs_figure_elements(
+            catalogs2, magnitude_limit, tpf, fig_tpf, message_selected_target, arrow_4_selected
+            )
+    for _, _, renderer in zip(catalogs2, providers, renderers):  # zip to ensure they are all of the same length
         assert renderer is not None
 
 

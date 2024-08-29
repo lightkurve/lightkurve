@@ -632,6 +632,11 @@ Selected:<br>
     return r
 
 
+def _get_error_message_with_trace(err):
+    trace_str = "".join(traceback.format_exception(err))
+    return f"{type(err).__name__}: {err}\n{trace_str}"
+
+
 def parse_and_add_catalogs_figure_elements(*args, **kwargs):
     # the synchronous version is used by tests only
     # Actual usage in show_skyview_widget() uses the async version
@@ -681,10 +686,10 @@ async def async_parse_and_add_catalogs_figure_elements(
             # e.g., if an user plots with Gaia and ZTF data, if ZTF times out,
             # the user would still see Gaia data
             result = None
-            err_str = "".join(traceback.format_exception(err))
+            err_str = _get_error_message_with_trace(err)
             warnings.warn(
                 (f"Error while getting data from {provider.label}. Its data will not be in the plot. "
-                 f"The error: {type(err).__name__}: {err}\n{err_str}"),
+                 f"The error: {err_str}"),
                 LightkurveWarning
             )
         results.append(result)
@@ -692,7 +697,17 @@ async def async_parse_and_add_catalogs_figure_elements(
     # 3. render the query results
     catalog_renderers = []
     for provider, result in zip(providers, results):
-        renderer = add_catalog_figure_elements(provider, result, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+        try:
+            renderer = add_catalog_figure_elements(provider, result, tpf, fig_tpf, message_selected_target, arrow_4_selected)
+        except Exception as err:
+            renderer = fig_tpf.scatter()  # a dummy renderer
+            err_str = _get_error_message_with_trace(err)
+            warnings.warn(
+                (f"Error while rendering data from {provider.label}. Its data will not be in the plot. "
+                 f"The error: {err_str}"),
+                LightkurveWarning
+            )
+
         catalog_renderers.append(renderer)
     return providers, catalog_renderers
 
