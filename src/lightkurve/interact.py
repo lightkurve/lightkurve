@@ -632,11 +632,6 @@ Selected:<br>
     return r
 
 
-def _get_error_message_with_trace(err):
-    trace_str = "".join(traceback.format_exception(err))
-    return f"{type(err).__name__}: {err}\n{trace_str}"
-
-
 def parse_and_add_catalogs_figure_elements(*args, **kwargs):
     # the synchronous version is used by tests only
     # Actual usage in show_skyview_widget() uses the async version
@@ -686,7 +681,9 @@ async def async_parse_and_add_catalogs_figure_elements(
             # e.g., if an user plots with Gaia and ZTF data, if ZTF times out,
             # the user would still see Gaia data
             result = None
-            err_str = _get_error_message_with_trace(err)
+            # user format_exc() instead of format_exception(err) to avoid
+            # format_exception() signature change in Python 3.10
+            err_str = f"{type(err).__name__}: {err}\n" + "".join(traceback.format_exc())
             warnings.warn(
                 (f"Error while getting data from {provider.label}. Its data will not be in the plot. "
                  f"The error: {err_str}"),
@@ -701,7 +698,7 @@ async def async_parse_and_add_catalogs_figure_elements(
             renderer = add_catalog_figure_elements(provider, result, tpf, fig_tpf, message_selected_target, arrow_4_selected)
         except Exception as err:
             renderer = fig_tpf.scatter()  # a dummy renderer
-            err_str = _get_error_message_with_trace(err)
+            err_str = f"{type(err).__name__}:  {err}\n" + "".join(traceback.format_exc())
             warnings.warn(
                 (f"Error while rendering data from {provider.label}. Its data will not be in the plot. "
                  f"The error: {err_str}"),
