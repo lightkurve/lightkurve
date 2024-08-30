@@ -43,11 +43,3 @@ async def to_thread(func, *args, **kwargs):
     ctx = contextvars.copy_context()  # TODO: contextvars only available in Python 3.7
     func_call = functools.partial(ctx.run, func, *args, **kwargs)
     return await loop.run_in_executor(None, func_call)
-
-
-def create_background_task(func, *args, **kwargs):
-    """
-    A syntactic sugar for ``create_task(to_thread(...))```.
-    It is not part of ``asyncio`` API.
-    """
-    return create_task(to_thread(func, *args, **kwargs))

@@ -14,7 +14,6 @@ visualization widget showing the pixel data and a lightcurve::
 Note that this will only work inside a Jupyter notebook at this time.
 """
 from __future__ import division, print_function
-import asyncio
 import os
 import logging
 import traceback
@@ -22,7 +21,6 @@ import warnings
 
 import numpy as np
 from astropy.coordinates import SkyCoord, Angle
-from astropy.io import ascii
 from astropy.stats import sigma_clip
 from astropy.table import Table, Column, MaskedColumn
 from astropy.time import Time
@@ -32,7 +30,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 from .interact_sky_providers import resolve_catalog_provider_class
 from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
 
-from .asyncio_compat import create_background_task
+from .asyncio_compat import create_task, to_thread  # to be backward compatible with Python < 3.9
 
 log = logging.getLogger(__name__)
 
@@ -632,10 +630,12 @@ Selected:<br>
     return r
 
 
-def parse_and_add_catalogs_figure_elements(*args, **kwargs):
-    # the synchronous version is used by tests only
-    # Actual usage in show_skyview_widget() uses the async version
-    return asyncio.run(async_parse_and_add_catalogs_figure_elements(*args, **kwargs))
+def _create_background_task(func, *args, **kwargs):
+    """
+    A syntactic sugar for ``create_task(to_thread(...))```.
+    It is not part of ``asyncio`` API.
+    """
+    return create_task(to_thread(func, *args, **kwargs))
 
 
 async def async_parse_and_add_catalogs_figure_elements(
@@ -670,7 +670,7 @@ async def async_parse_and_add_catalogs_figure_elements(
     # 2. make the remote queries (run in parallel in background)
     result_tasks = []
     for provider in providers:
-        a_task = create_background_task(provider.query_catalog)
+        a_task = _create_background_task(provider.query_catalog)
         result_tasks.append(a_task)
     results = []
     for provider, a_task in zip(providers, result_tasks):

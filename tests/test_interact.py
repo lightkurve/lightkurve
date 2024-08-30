@@ -1,4 +1,5 @@
 """Tests the features of the lightkurve.interact module."""
+import asyncio
 import warnings
 
 from astropy.coordinates import SkyCoord
@@ -305,6 +306,15 @@ class StubErrInToolTipsInteractSkyCatalogProvider(StubWithPMInteractSkyCatalogPr
         raise ValueError("simulated tooltips error (e.g., due to a bug)")
 
 
+def parse_and_add_catalogs_figure_elements(*args, **kwargs):
+    """Synchronous version to be used in tests only."""
+    from lightkurve.interact import (
+        async_parse_and_add_catalogs_figure_elements
+    )
+    return asyncio.run(async_parse_and_add_catalogs_figure_elements(*args, **kwargs))
+
+
+
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 @pytest.mark.filterwarnings("ignore:Proper motion correction cannot be applied to the target")  # for TESSCut
 @pytest.mark.parametrize("tpf_class, tpf_file, aperture_mask", [
@@ -320,8 +330,7 @@ def test_interact_sky_functions_basic(tpf_class, tpf_file, aperture_mask):
         prepare_tpf_datasource,
         make_tpf_figure_elements,
         add_target_figure_elements,
-        make_interact_sky_selection_elements,
-        parse_and_add_catalogs_figure_elements
+        make_interact_sky_selection_elements
     )
 
     tpf = tpf_class(tpf_file)
@@ -357,8 +366,7 @@ def test_interact_sky_functions_error_handling():
         prepare_tpf_datasource,
         make_tpf_figure_elements,
         add_target_figure_elements,
-        make_interact_sky_selection_elements,
-        parse_and_add_catalogs_figure_elements
+        make_interact_sky_selection_elements
     )
 
     tpf = tpf_class(tpf_file)
@@ -406,8 +414,7 @@ def test_interact_sky_functions_case_no_target_coordinate():
         prepare_tpf_datasource,
         make_tpf_figure_elements,
         add_target_figure_elements,
-        make_interact_sky_selection_elements,
-        parse_and_add_catalogs_figure_elements
+        make_interact_sky_selection_elements
     )
     tpf_class, tpf_file = TessTargetPixelFile, example_tpf_no_target_position
 
@@ -438,7 +445,6 @@ def test_interact_sky_functions_providers_sanity():
         make_tpf_figure_elements,
         add_target_figure_elements,
         make_interact_sky_selection_elements,
-        parse_and_add_catalogs_figure_elements,
         _row_to_dict
     )
 
@@ -487,7 +493,6 @@ def test_interact_sky_provider_gaiadr3_detail_view():
         make_tpf_figure_elements,
         add_target_figure_elements,
         make_interact_sky_selection_elements,
-        parse_and_add_catalogs_figure_elements,
         _row_to_dict
     )
 
