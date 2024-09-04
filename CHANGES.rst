@@ -1,3 +1,8 @@
+2.6.0 (unreleased)
+==================
+
+- Made oktopus an optional dependency enabling support for Numpy 2.x. [#1452]
+
 2.5.0 (2024-08-29)
 =====================
 
