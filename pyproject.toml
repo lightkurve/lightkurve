@@ -23,8 +23,11 @@ include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
 "Bug Tracker" = "https://github.com/lightkurve/lightkurve/issues"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
-numpy = ">=1.18"
+python = "^3.9"
+numpy = [
+      { version = ">=1.18", python = ">=3.8,<3.12" },
+      { version = ">=1.26", python = ">=3.12" }
+]
 astropy = ">=5.0"
 scipy = { version = ">=1.7", python = ">=3.8,<3.13" }
 matplotlib = ">=3.1"

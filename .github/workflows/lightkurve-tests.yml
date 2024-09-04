@@ -1,14 +1,14 @@
 # GitHub Actions workflow for Lightkurve's continuous integration.
 #
-# This file configures seven different jobs:
-# 1) pytest on Linux, Python 3.8, with -m memtest (i.e. stress memory)
-# 2) pytest on Linux, Python 3.8, with --remote-data enabled (i.e. get data from MAST).
-# 3) pytest on Linux, Python 3.9.
-# 4) pytest on Linux, Python 3.10.
-# 4) pytest on Linux, Python 3.12.
-# 5) pytest on Windows, Python 3.8.
-# 6) pytest on OSX, Python 3.8.
-# 7) flake8 syntax check.
+# This file configures nine different jobs:
+# 1) pytest on Linux, Python 3.9, with -m memtest (i.e. stress memory)
+# 2) pytest on Linux, Python 3.9, with --remote-data enabled (i.e. get data from MAST).
+# 3) pytest on Linux, Python 3.10.
+# 4) pytest on Linux, Python 3.11, with --remote-data enabled (i.e. get data from MAST).
+# 5) pytest on Linux, Python 3.12.
+# 6) pytest on Windows, Python 3.9.
+# 7) pytest on OSX, Python 3.9.
+# 8) flake8 syntax check.
 
 name: Lightkurve-tests
 
@@ -27,22 +27,22 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.8-remote-data, 3.8-memtest, 3.9, '3.10', '3.11']
+        name: ["3.9-remote-data", "3.9-memtest", "3.10", "3.11-remote-data", "3.12"]
         include:
-          - name: 3.8-remote-data
-            python-version: 3.8
+          - name: "3.9-remote-data"
+            python-version: "3.9"
             pytest-command: poetry run pytest --remote-data --doctest-modules
-          - name: 3.8-memtest
-            python-version: 3.8
+          - name: "3.9-memtest"
+            python-version: "3.9"
             pytest-command: poetry run pytest -m memtest --remote-data
-          - name: 3.9
-            python-version: 3.9
+          - name: "3.10"
+            python-version: "3.10"
             pytest-command: poetry run pytest
-          - name: '3.10'
-            python-version: '3.10'
-            pytest-command: poetry run pytest
-          - name: '3.11'
-            python-version: '3.11'
+          - name: "3.11-remote-data"
+            python-version: "3.11"
+            pytest-command: poetry run pytest --remote-data
+          - name: "3.12"
+            python-version: "3.12"
             pytest-command: poetry run pytest
     steps:
     - uses: actions/checkout@v4
@@ -64,8 +64,8 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        name: [3.8]
-        python-version: [3.8]
+        name: [3.9]
+        python-version: [3.9]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -86,7 +86,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: [3.9]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
