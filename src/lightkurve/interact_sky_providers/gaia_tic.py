@@ -106,6 +106,8 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             simbad_url_by_gaia_source=f"https://{simbad_server}/simbad/sim-id?Ident=Gaia DR3 %s",
             # the by_coord template is special with 2 variables, %ra and %dec
             simbad_url_by_coord=f"https://{simbad_server}/simbad/sim-coo?Coord=%ra+%dec&Radius=2&Radius.unit=arcmin",
+            photometry_plot_url="https://cdsarc.cds.unistra.fr/vizier/vizgraph.gml?-s=I/355&-i=.graph_sql_epphot&Pos=%pos&Source=%s",
+            spectrum_plot_url="https://cdsarc.cds.unistra.fr/vizier/vizgraph.gml?-s=I/355&-i=.graph_sql_xpsamp&Pos=%pos&Source=%s",
         )
 
     def __init__(
@@ -141,8 +143,13 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             "Plx",
             "VarFlag",
             "NSS",
+            "EpochPh",  # if epoch photometry available
+            "XPsamp",  # if mean BP/RP spectrum available
+            # RA_ICRS / DE_ICRS used internally to construct URL to photometry / spectrum plot
+            "RA_ICRS",
+            "DE_ICRS",
         ]
-        self.columns = self.cols_for_source + ["RAJ2000", "DEJ2000", "pmRA", "pmDE"]
+        self.columns = self.cols_for_source + ["RAJ2000", "DEJ2000", "pmRA", "pmDE", ]
         # Gaia columns that could have large integers
         self.cols_as_str_for_source = ["Source", "SolID"]
         if extra_cols_in_detail_view is not None:
@@ -171,8 +178,9 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         # so that for rows with missing values, the custom `fill_value` is used
         # for column NSS, without setting fill_value, the astropy default `fill_value`
         # is often 63, confusing  users.
-        if "NSS" in tab.colnames:
-            tab["NSS"].fill_value = 0
+        for col in ["NSS", "EpochPh", "XPsamp"]:
+            if col in tab.colnames:
+                tab[col].fill_value = 0
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:
         # Use RAJ200/ DEJ2000 instead of Gaia DR3's native RA_IRCS in J2016.0 for ease of
@@ -244,6 +252,36 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             )
             nss_html += f' ({flags_text})&emsp;(<a href="{gaiadr3_nss_url}" target="_blank">Vizier</a>)'
 
+        # pos needed for photometry / spectrum URL
+        if data["Source"] != "":
+            # MUST use Gaia native coordinate in RA_ICRS / DE_ICRS
+            pos = str(data["RA_ICRS"])
+            if data["DE_ICRS"] >= 0:
+                pos += "+"
+            pos += str(data["DE_ICRS"])
+        else:
+            pos = ""
+
+        photometry_html = str(data["EpochPh"])
+        if data["EpochPh"] == 1:
+            photometry_plot_url = _fill_template(
+                self.url_templates["photometry_plot_url"], data["Source"], var_name="%s"
+            )
+            photometry_plot_url = _fill_template(
+                photometry_plot_url, pos, var_name="%pos"
+            )
+            photometry_html += f' (<a href="{photometry_plot_url}" target="_blank">plot</a>)'
+
+        spectrum_html = str(data["XPsamp"])
+        if data["XPsamp"] == 1:
+            spectrum_plot_url = _fill_template(
+                self.url_templates["spectrum_plot_url"], data["Source"], var_name="%s"
+            )
+            spectrum_plot_url = _fill_template(
+                spectrum_plot_url, pos, var_name="%pos"
+            )
+            spectrum_html += f' (<a href="{spectrum_plot_url}" target="_blank">plot</a>)'
+
         key_vals = {
             "Source": source_val_html,
             'Separation (")': f"{data['separation']:.2f}",
@@ -255,6 +293,8 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
             "row": f"{data['y']:.1f}",
             "Variable": var_html,
             "NSS": nss_html,
+            "Photometry": photometry_html,
+            "BP/RP Spectrum": spectrum_html,
         }
 
         if self.extra_cols_in_detail_view is not None:
