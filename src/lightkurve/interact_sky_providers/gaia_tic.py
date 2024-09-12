@@ -174,12 +174,18 @@ class GaiaDR3InteractSkyCatalogProvider(VizierInteractSkyCatalogProvider):
         return tab
 
     def _post_process_gaiadr3_result(self, tab):
-        # set custom fill_value for some columns, typically integer columns,
+        # set custom fill_value for integer columns,
         # so that for rows with missing values, the custom `fill_value` is used
         # for column NSS, without setting fill_value, the astropy default `fill_value`
         # is often 63, confusing  users.
-        for col in ["NSS", "EpochPh", "XPsamp"]:
-            if col in tab.colnames:
+        #
+        # In Gaia DR3, integer columns are typically flags or IDs, the value 0
+        # would make more sense (0 is not an ID, and means 0 if it's a flag) than
+        # some large values.
+        # Use a value such as -1 would be more distinctive,
+        # but some columns are unsigned ints. So 0 is used.
+        for col in tab.colnames:
+            if np.issubdtype(tab[col].dtype, np.integer):
                 tab[col].fill_value = 0
 
     def get_proper_motion_correction_meta(self) -> ProperMotionCorrectionMeta:

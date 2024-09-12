@@ -532,7 +532,11 @@ def test_interact_sky_provider_gaiadr3_tic():
     ra, dec = 272.20452, 60.678785
 
     tpf_coord = SkyCoord(ra, dec, frame="icrs", unit="deg")
-    provider = resolve_catalog_provider_class("gaiadr3_tic")(coord=tpf_coord, radius=120*u.arcsec, magnitude_limit=18)
+    provider = resolve_catalog_provider_class("gaiadr3_tic")(
+        coord=tpf_coord, radius=120*u.arcsec, magnitude_limit=18,
+        # extra columns are used in Test 1a (for handling missing integer values)
+        extra_cols_in_detail_view={"IPDfmp": "IPDfmp", "XPcont": "XPcont", "EpochRV": "EpochRV"},
+    )
     rs = provider.query_catalog()
 
     # print(rs)  # for debugging
@@ -548,8 +552,12 @@ def test_interact_sky_provider_gaiadr3_tic():
 
     # Test 1a,for rows with no Gaia data, ensure correct `fill_value` is used for missing values
     # (bokeh data source does not support missing value)
-    nss_filled = rs[(rs["Source"] == "") & (rs["TIC"] != "")]["NSS"].filled()
-    assert_array_equal(nss_filled,  np.full_like(nss_filled, 0))
+    for colname in [
+        "NSS", "EpochPh", "XPsamp",   # some integers columns included by default
+        "IPDfmp", "XPcont", "EpochRV",  # some integer columns can be optionally included
+    ]:
+        col_filled = rs[(rs["Source"] == "") & (rs["TIC"] != "")][colname].filled()
+        assert_array_equal(col_filled,  np.full_like(col_filled, 0), f"Column {colname} should be 0s, with no Gaia DR3 match.")
 
     # Test 1b: ensure it can properly return empty result
     provider = resolve_catalog_provider_class("gaiadr3_tic")(coord=tpf_coord, radius=75*u.arcsec, magnitude_limit=1)
