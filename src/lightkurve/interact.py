@@ -425,7 +425,7 @@ def add_target_figure_elements(tpf, fig):
         fig.scatter(marker="cross", x=target_x, y=target_y, size=20, color="black", line_width=1)
         if not pm_corrected:
             warnings.warn(("Proper motion correction cannot be applied to the target, as none is available. "
-                           "Thus the target (the cross) might be noticeably away from its actual position, "
+                           "Thus the target (the cross) might be noticeably away from its observed position, "
                            "if it has large proper motion."),
                            category=LightkurveWarning)
 
@@ -449,10 +449,18 @@ def create_provider(provider_class, tpf, magnitude_limit, extra_kwargs=None):
     if provider_kwargs.get("radius") is None:
         # use the default search radius, scaled to the TargePixelFile size
 
-        # Use pixel scale for query size
-        pix_scale = 4.0  # arcseconds / pixel for Kepler, default
-        if tpf.mission == "TESS":
+        # Use pixel scale (in arcseconds) for query size
+        if tpf.mission.lower() == "kepler":
+            pix_scale = 4.0
+        elif tpf.mission.lower() == "k2":
+            pix_scale = 4.0
+        elif tpf.mission.lower() == "tess":
             pix_scale = 21.0
+        else:
+            raise ValueError(
+                f"The Target Pixel File is from an unsupported mission {tpf.mission}, "
+                "with unknown pixel scale."
+            )
         # We are querying with a diameter as the radius, overfilling by 2x.
         provider_kwargs["radius"] = Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec")
 
