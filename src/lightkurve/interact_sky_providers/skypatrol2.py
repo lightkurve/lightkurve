@@ -76,12 +76,16 @@ def get_lightcurve(
     lc = lk.LightCurve(
         data=dict(
             time=Time(data.jd, format="jd", scale="utc"),  # assumed to be HJD for now
-            flux=data.mag * u.mag,
-            flux_err=data.mag_err * u.mag,
+            flux=data.mag,
+            flux_err=data.mag_err,
             quality=data.quality,
             phot_filter=data.phot_filter,
         )
     )
+    for c in ["flux", "flux_err"]:
+        # specify the units, somehow doing it in `data` above does not work.
+        lc[c] = lc[c] * u.mag
+
     lc.meta.update(
         {"TARGETID": asas_sn_id, "LABEL": f"ASAS-SN Sky Patrol {asas_sn_id}"}
     )
@@ -190,7 +194,7 @@ class SkyPatrol2InteractSkyCatalogProvider(InteractSkyCatalogProvider):
                 hover_line_color="white",
             )
         super().__init__(coord, radius, magnitude_limit, scatter_kwargs)
-        # ZTF-specific
+        # SkyPatrol-specific
         self.cols_for_source = [  # extra columns to be included in bokeh data source
             "asas_sn_id",
             "gaia_mag",
