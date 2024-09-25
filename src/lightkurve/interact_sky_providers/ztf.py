@@ -74,7 +74,7 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         # query: ZTF-specific
         ngoodobsrel_min: int = 100,
         filtercode: str = None,
-        data_release: int = 21,
+        data_release: int = 22,
         # for ZTF LC URL
         lc_format: str = "csv",
         scatter_kwargs: dict = None,
@@ -148,8 +148,8 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         # RA / DEC : coordinate in degree, proper motion corrected if possible
         rs.rename_column("ra", "RA")
         rs.rename_column("dec", "DEC")
-        # magForSize: the magnitude used for sizing the circles in the plots
-        rs["magForSize"] = rs["medianmag"]
+        # magForSize: use a constant size, to avoid dots too small for dim ones
+        rs["magForSize"] = 15
 
         return rs
 
