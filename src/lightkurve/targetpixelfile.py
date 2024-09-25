@@ -485,7 +485,7 @@ class TargetPixelFile(object):
         ).transpose([1, 2, 0])
 
         # Pass through WCS
-        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)
+        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 0)
         ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
         dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
         ra, dec = ra[self.quality_mask], dec[self.quality_mask]
