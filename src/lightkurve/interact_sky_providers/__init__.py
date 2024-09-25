@@ -6,6 +6,7 @@ from . import (
     gaia_tic,
     vsx,
     ztf,
+    skypatrol2,
 )
 
 
@@ -16,6 +17,8 @@ def resolve_catalog_provider_class(name):
         return gaia_tic.GaiaDR3TICInteractSkyCatalogProvider
     elif name == "ztf":
         return ztf.ZTFInteractSkyCatalogProvider
+    elif name == "skypatrol2":
+        return skypatrol2.SkyPatrol2InteractSkyCatalogProvider
     elif name == "vsx":
         return vsx.VSXInteractSkyCatalogProvider
     else:
