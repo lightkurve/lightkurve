@@ -120,9 +120,9 @@ def _shift_mag(lc):
         lc = lc.append(f_lc)
 
         if f_shift_mag >= 0:
-            f_shift_str = f"{f} +{f_shift_mag:.2f} mag"
+            f_shift_str = f"{f} +{f_shift_mag:.2f}"
         else:
-            f_shift_str = f"{f} {f_shift_mag:.2f} mag"
+            f_shift_str = f"{f} {f_shift_mag:.2f}"
 
         lc.meta[f"SHIFT_{f.upper()}"] = f_shift_mag
         label_suffix += f", {f_shift_str}"
