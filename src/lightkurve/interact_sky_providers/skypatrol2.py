@@ -209,6 +209,9 @@ class SkyPatrol2InteractSkyCatalogProvider(InteractSkyCatalogProvider):
 
         # Tweak result to fit interact_sky() needs
 
+        if self.magnitude_limit is not None:
+            rs = rs[rs["gaia_mag"] < self.magnitude_limit]
+
         # magForSize: use a constant size, to avoid
         # 1. bright targets distracting (usually there'd be a Gaia DR3 counterpart)
         # 2. dots too small for dim ones
