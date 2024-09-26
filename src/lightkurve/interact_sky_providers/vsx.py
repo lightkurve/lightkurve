@@ -334,7 +334,8 @@ class VSXInteractSkyCatalogProvider(InteractSkyCatalogProvider):
             self.magnitude_limit,
         )
         if rs is not None:
-            rs["magForSize"] = 10  # use constant marker size
+            # use constant marker size
+            rs["magForSize"] = np.full(len(rs), 10.0)  # use np.full() for empty rs edge case
             rs["magText"] = _to_mag_text(rs)
         return rs
 

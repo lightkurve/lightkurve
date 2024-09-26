@@ -148,8 +148,9 @@ class ZTFInteractSkyCatalogProvider(InteractSkyCatalogProvider):
         # RA / DEC : coordinate in degree, proper motion corrected if possible
         rs.rename_column("ra", "RA")
         rs.rename_column("dec", "DEC")
+
         # magForSize: use a constant size, to avoid dots too small for dim ones
-        rs["magForSize"] = 15
+        rs["magForSize"] = np.full(len(rs), 15.0)  # use np.full() for empty rs edge case
 
         return rs
 

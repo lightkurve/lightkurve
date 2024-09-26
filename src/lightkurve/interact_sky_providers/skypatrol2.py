@@ -212,7 +212,7 @@ class SkyPatrol2InteractSkyCatalogProvider(InteractSkyCatalogProvider):
         # magForSize: use a constant size, to avoid
         # 1. bright targets distracting (usually there'd be a Gaia DR3 counterpart)
         # 2. dots too small for dim ones
-        rs["magForSize"] = 11
+        rs["magForSize"] = np.full(len(rs), 11.0)  # use np.full() for empty rs edge case
 
         return rs
 
