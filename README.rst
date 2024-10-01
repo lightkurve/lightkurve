@@ -3,7 +3,7 @@ Lightkurve
 
 **A friendly package for Kepler & TESS time series analysis in Python.**
 
-**Documentation: https://docs.lightkurve.org**
+**Documentation: https://https://lightkurve.github.io/lightkurve/**
 
 |test-badge| |conda-badge| |pypi-badge| |pypi-downloads| |doi-badge| |astropy-badge|
 
