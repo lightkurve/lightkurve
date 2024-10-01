@@ -320,8 +320,8 @@ MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;DKHhFHGgDHGgDHGg&#39;   / HDU checksum updated 2024-10-01T14:42:57
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2024-10-01T14:42:57
+CHECKSUM= &#39;EIIiGIHgEIHgEIHg&#39;   / HDU checksum updated 2024-10-01T17:02:17
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2024-10-01T17:02:17
 </pre></div></div>
 </div>
 <p>Looks like it has all the correct information about the target. What about the second extension?</p>
@@ -365,8 +365,8 @@ TFORM6  = &#39;D       &#39;
 TTYPE7  = &#39;MOM_CENTR2&#39;
 TFORM7  = &#39;D       &#39;
 EXTNAME = &#39;LIGHTCURVE&#39;
-CHECKSUM= &#39;W6d5Y3b2W3b2W3b2&#39;   / HDU checksum updated 2024-10-01T14:42:57
-DATASUM = &#39;390244549&#39;          / data unit checksum updated 2024-10-01T14:42:57
+CHECKSUM= &#39;X4e3Z4c3X4c3X4c3&#39;   / HDU checksum updated 2024-10-01T17:02:17
+DATASUM = &#39;390244549&#39;          / data unit checksum updated 2024-10-01T17:02:17
 </pre></div></div>
 </div>
 <p>This extension has 7 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code>, <code class="docutils literal notranslate"><span class="pre">SAP_QUALITY</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>, <code class="docutils literal notranslate"><span class="pre">MOM_CENTR1</span></code>, and <code class="docutils literal notranslate"><span class="pre">MOM_CENTR2</span></code>. What if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
@@ -431,8 +431,8 @@ MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;Z5bAg4b4Z4bAf4b3&#39;   / HDU checksum updated 2024-10-01T14:42:57
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2024-10-01T14:42:57
+CHECKSUM= &#39;a6cAb4c5a4cAa4c3&#39;   / HDU checksum updated 2024-10-01T17:02:17
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2024-10-01T17:02:17
 </pre></div></div>
 </div>
 <p>Now our new keywords are included in the primary header! What about if we want to add more <strong>data columns</strong> to our fits file? We can simply add data columns in the same way. Let’s add the data quality to our fits file.</p>
