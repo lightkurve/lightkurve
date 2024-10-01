@@ -3,7 +3,7 @@ Lightkurve
 
 **A friendly package for Kepler & TESS time series analysis in Python.**
 
-**Documentation: https://https://lightkurve.github.io/lightkurve/**
+**Documentation: https://lightkurve.github.io/lightkurve/**
 
 |test-badge| |conda-badge| |pypi-badge| |pypi-downloads| |doi-badge| |astropy-badge|
 
@@ -42,7 +42,7 @@ Read the documentation at `https://lightkurve.github.io/lightkurve/ <https://lig
 Quickstart and Installation
 ---------------------------
 
-Please visit our quickstart guide at `https://lightkurve.github.io/lightkurve/quickstart.html <https://https://lightkurve.github.io/lightkurve/quickstart.html>`_. 
+Please visit our quickstart guide at `https://lightkurve.github.io/lightkurve/quickstart.html <https://lightkurve.github.io/lightkurve/quickstart.html>`_. 
 
 The easiest way to install *Lightkurve* and all of its dependencies is to use the ``pip`` command,
 which is a standard part of all Python distributions.
@@ -73,7 +73,7 @@ version to immediately reflect changes made in the source tree, you can use:
     $ python -m pip install poetry
     $ poetry install
 
-Please see our guide on `https://https://lightkurve.github.io/lightkurve/development/index.html <https://https://lightkurve.github.io/lightkurve/development/index.html>`_
+Please see our guide on `https://lightkurve.github.io/lightkurve/development/index.html <https://lightkurve.github.io/lightkurve/development/index.html>`_
 for additional instructions.
 
 
@@ -81,14 +81,14 @@ Contributing
 ------------
 
 We welcome community contributions!
-Please read the  guidelines at `https://https://lightkurve.github.io/lightkurve/development/contributing.html <https://https://lightkurve.github.io/lightkurve/development/contributing.html>`_.
+Please read the  guidelines at `https://lightkurve.github.io/lightkurve/development/contributing.html <https://lightkurve.github.io/lightkurve/development/contributing.html>`_.
 
 
 Citing
 ------
 
 If you find Lightkurve useful in your research, please cite it and give us a GitHub star!
-Please read the citation instructions at `https://https://lightkurve.github.io/lightkurve/about/citing.html <https://https://lightkurve.github.io/lightkurve/about/citing.html>`_.
+Please read the citation instructions at `https://lightkurve.github.io/lightkurve/about/citing.html <https://lightkurve.github.io/lightkurve/about/citing.html>`_.
 
 
 Contact
