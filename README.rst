@@ -36,13 +36,13 @@ which enable both hand-tailored data analyses and advanced automated pipelines.
 Documentation
 -------------
 
-Read the documentation at `https://docs.lightkurve.org <https://docs.lightkurve.org>`_.
+Read the documentation at `https://lightkurve.github.io/lightkurve/ <https://lightkurve.github.io/lightkurve/>`_.
 
 
 Quickstart and Installation
 ---------------------------
 
-Please visit our quickstart guide at `https://docs.lightkurve.org/quickstart.html <https://docs.lightkurve.org/quickstart.html>`_. 
+Please visit our quickstart guide at `https://lightkurve.github.io/lightkurve/quickstart.html <https://https://lightkurve.github.io/lightkurve/quickstart.html>`_. 
 
 The easiest way to install *Lightkurve* and all of its dependencies is to use the ``pip`` command,
 which is a standard part of all Python distributions.
@@ -73,7 +73,7 @@ version to immediately reflect changes made in the source tree, you can use:
     $ python -m pip install poetry
     $ poetry install
 
-Please see our guide on `https://docs.lightkurve.org/development/index.html <https://docs.lightkurve.org/development/index.html>`_
+Please see our guide on `https://https://lightkurve.github.io/lightkurve/development/index.html <https://https://lightkurve.github.io/lightkurve/development/index.html>`_
 for additional instructions.
 
 
@@ -81,14 +81,14 @@ Contributing
 ------------
 
 We welcome community contributions!
-Please read the  guidelines at `https://docs.lightkurve.org/development/contributing.html <https://docs.lightkurve.org/development/contributing.html>`_.
+Please read the  guidelines at `https://https://lightkurve.github.io/lightkurve/development/contributing.html <https://https://lightkurve.github.io/lightkurve/development/contributing.html>`_.
 
 
 Citing
 ------
 
 If you find Lightkurve useful in your research, please cite it and give us a GitHub star!
-Please read the citation instructions at `https://docs.lightkurve.org/about/citing.html <https://docs.lightkurve.org/about/citing.html>`_.
+Please read the citation instructions at `https://https://lightkurve.github.io/lightkurve/about/citing.html <https://https://lightkurve.github.io/lightkurve/about/citing.html>`_.
 
 
 Contact
