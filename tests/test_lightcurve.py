@@ -1960,6 +1960,10 @@ def test_select_flux():
     assert all(lc.select_flux("newflux", flux_err_column="newflux").flux_err == lc.newflux)
     # ensure flux_err in the new lc is nan if the origin does not have it
     assert all(np.isnan(lc.select_flux("newflux_n1")["flux_err"]))
+    assert_equal(  # https://github.com/lightkurve/lightkurve/issues/1467
+        lc.select_flux("newflux_n1")["flux_err"].unit, lc.select_flux("newflux_n1")["flux"].unit,
+        "The unit of the all-nan flux_err should be the same as that of flux [#1467]"
+    )
     # Do invalid column names raise a ValueError?
     with pytest.raises(ValueError):
         lc.select_flux("doesnotexist")

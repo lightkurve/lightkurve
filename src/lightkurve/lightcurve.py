@@ -559,7 +559,12 @@ class LightCurve(TimeSeries):
             if flux_err_column in lc.columns:
                 lc["flux_err"] = lc[flux_err_column]
             else:
-                lc["flux_err"][:] = np.nan
+                # fill in a dummy all-nan flux_err column
+                # ensure the unit of new flux_err is consistent with that of flux.
+                flux_err_col_vals = np.full_like(lc["flux"].value, np.nan)
+                if lc["flux"].unit is not None:
+                    flux_err_col_vals = flux_err_col_vals * lc["flux"].unit
+                lc["flux_err"] = flux_err_col_vals
 
         lc.meta['FLUX_ORIGIN'] = flux_column
         normalized_new_flux = lc["flux"].unit is None or lc["flux"].unit is u.dimensionless_unscaled
