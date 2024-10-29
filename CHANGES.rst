@@ -1,8 +1,12 @@
 2.5.1  (unreleased)
 =====================
-- Fixed pixel to world coordinate transformation in ``TargetPixelFile.get_coordinates()`` 
-  in line 488 ("ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)"), where for consistency with 
-  Gaia the origin should be 0 instead of 1.
+
+- Fixed pixel to world coordinate transformation in ``TargetPixelFile.get_coordinates()``
+  in line 488 ("ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)"), where for consistency with
+  Gaia the origin should be 0 instead of 1. [#1465]
+- Fixed ``LightCurve.select_flux()`` in edge cases, where the unit of
+  the new ``flux`` column is different from that of the ``flux_err`` column. [#1467]
+
 
 2.5.0 (2024-08-29)
 =====================
