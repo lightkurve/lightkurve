@@ -1423,9 +1423,11 @@ def _resolve_tic(target):
     # to copy the value from TIC Catalog table to `meta_extras` dict
     def copy_if_exists(src_key, dest_key):
         val = row[src_key]
-        if val is np.ma.masked:
-            return
-        meta_extras[dest_key] = val
+        if val is np.ma.masked or np.isnan(val):
+            # FITS headers does not allow NaN, mimic what SPOC tpfs by setting them to None
+            meta_extras[dest_key] = None
+        else:
+            meta_extras[dest_key] = val
 
     for src_key, dest_key in [
         ("pmRA", "PMRA"),

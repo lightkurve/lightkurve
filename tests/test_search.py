@@ -215,16 +215,19 @@ def test_search_tesscut_download(caplog):
 
 
 @pytest.mark.remote_data
-def test_search_tesscut_meta():
+@pytest.mark.parametrize("tic, sector", [
+    (261136679, 8),  # pi Men
+    (123835353, 6),  # some values are NaN in TIC
+])
+def test_search_tesscut_meta(tic, sector):
     """Ensure TPF from search_tesscut() is close to SPOC-produced TPFs.
     https://github.com/lightkurve/lightkurve/issues/1470
     """
 
-    tic, sector = 261136679, 8  # pi Men
-    tpf = lk.search_targetpixelfile(f"TIC{tic}", sector=sector, mission="TESS", author="SPOC")[-1].download()
+    tpf = lk.search_targetpixelfile(f"TIC{tic}", sector=sector, mission="TESS", author="SPOC")[0].download()
     expected = tpf.meta
 
-    tpf_tc = lk.search_tesscut(f"TIC{tic}", sector=sector)[-1].download()
+    tpf_tc = lk.search_tesscut(f"TIC{tic}", sector=sector)[0].download()
     actual = tpf_tc.meta
 
     for key in ([
@@ -234,7 +237,10 @@ def test_search_tesscut_meta():
         "TESSMAG", "TEFF", "LOGG", "MH", "RADIUS",
     ]):
         # the values from MAST TIC Catalog (basis of the backfill to tpf_tc) often have fewer decimal places.
-        assert_almost_equal(expected[key], actual[key], decimal=3, err_msg=f"header {key} should be almost equal")
+        if expected[key] is None:
+            assert actual[key] is None, f"header {key} should be None"
+        else:
+            assert_almost_equal(expected[key], actual[key], decimal=3, err_msg=f"header {key} should be almost equal")
 
 
 @pytest.mark.remote_data
