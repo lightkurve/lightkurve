@@ -1430,7 +1430,12 @@ def _resolve_tic(target):
     for src_key, dest_key in [
         ("pmRA", "PMRA"),
         ("pmDEC", "PMDEC"),
-        # TODO: add TESSMAG, etc.
+        ("Tmag", "TESSMAG"),
+        ("Teff", "TEFF"),
+        ("logg", "LOGG"),
+        ("MH", "MH"),
+        ("rad", "RADIUS"),
+        # Note: mass is not in SPOC TPFs
     ]:
         copy_if_exists(src_key, dest_key)
 

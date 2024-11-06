@@ -215,6 +215,29 @@ def test_search_tesscut_download(caplog):
 
 
 @pytest.mark.remote_data
+def test_search_tesscut_meta():
+    """Ensure TPF from search_tesscut() is close to SPOC-produced TPFs.
+    https://github.com/lightkurve/lightkurve/issues/1470
+    """
+
+    tic, sector = 261136679, 8  # pi Men
+    tpf = lk.search_targetpixelfile(f"TIC{tic}", sector=sector, mission="TESS", author="SPOC")[-1].download()
+    expected = tpf.meta
+
+    tpf_tc = lk.search_tesscut(f"TIC{tic}", sector=sector)[-1].download()
+    actual = tpf_tc.meta
+
+    for key in ([
+        "RA_OBJ", "DEC_OBJ", "EQUINOX",
+        "PMRA", "PMDEC",
+        "TICID",
+        "TESSMAG", "TEFF", "LOGG", "MH", "RADIUS",
+    ]):
+        # the values from MAST TIC Catalog (basis of the backfill to tpf_tc) often have fewer decimal places.
+        assert_almost_equal(expected[key], actual[key], decimal=3, err_msg=f"header {key} should be almost equal")
+
+
+@pytest.mark.remote_data
 def test_search_with_skycoord():
     """Can we pass both names, SkyCoord objects, and coordinate strings?"""
     sr_name = search_targetpixelfile("KIC 11904151", mission="Kepler", cadence="long")
