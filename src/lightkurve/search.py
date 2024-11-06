@@ -20,7 +20,7 @@ from requests import HTTPError
 from . import PACKAGEDIR, conf, config
 from .collections import LightCurveCollection, TargetPixelFileCollection
 from .io import read
-from .targetpixelfile import TargetPixelFile
+from .targetpixelfile import TargetPixelFile, HduToMetaMapping
 from .utils import (
     LightkurveDeprecationWarning,
     LightkurveError,
@@ -295,7 +295,7 @@ class SearchResult(object):
                     "Started downloading TESSCut for '{}' sector {}."
                     "".format(table[0]["target_name"], table[0]["sequence_number"])
                 )
-                path = self._fetch_tesscut_path(
+                path, meta_extras = self._fetch_tesscut_path(
                     table[0]["target_name"],
                     table[0]["sequence_number"],
                     download_dir,
@@ -318,10 +318,15 @@ class SearchResult(object):
                         "Error: {}".format(exc)
                     )
 
-            return read(
+            tpf = read(
                 path, quality_bitmask=quality_bitmask, targetid=table[0]["targetid"]
             )
-
+            if meta_extras is not None:
+                # extra metadata to be added, to make the TessCut TPF closer to SPOC-produced TPF
+                for key, val in meta_extras.items():
+                    tpf.hdu[0].header[key] = val
+                tpf.meta = HduToMetaMapping(tpf.hdu[0])  # ensure tpf.meta has up-to-date headers
+            return tpf
         else:
             if cutout_size is not None:
                 warnings.warn(
@@ -536,8 +541,6 @@ class SearchResult(object):
         """
         from astroquery.mast import TesscutClass
 
-        coords = _resolve_object(target)
-
         # Set cutout_size defaults
         if cutout_size is None:
             cutout_size = 5
@@ -553,7 +556,7 @@ class SearchResult(object):
                 tesscut_dir = download_dir
 
         # Resolve SkyCoord of given target
-        coords = _resolve_object(target)
+        coords, meta_extras = _resolve_object(target)
 
         # build path string name and check if it exists
         # this is necessary to ensure cutouts are not downloaded multiple times
@@ -587,7 +590,7 @@ class SearchResult(object):
             )
             path = cutout_path[0][0]  # the cutoutpath already contains testcut_dir
             log.debug("Finished downloading.")
-        return path
+        return path, meta_extras
 
 
 @cached
@@ -1385,5 +1388,54 @@ def _resolve_object(target):
     """Ask MAST to resolve an object string to a set of coordinates."""
     from astroquery.mast import MastClass
 
+    # for case target is a TIC, e.g., "TIC 12345678"
+    coords, meta_extras = _resolve_tic(target)
+    if coords is not None:
+        return coords, meta_extras
+
+    # general case: use MAST to resolve to coordinate
     # Note: `_resolve_object` was renamed `resolve_object` in astroquery 0.3.10 (2019)
-    return MastClass().resolve_object(target)
+    return MastClass().resolve_object(target), None
+
+
+def _resolve_tic(target):
+    """Resolve TIC id to coordinates using TIC Catalog, with additional metadata.
+       It is applicable if the target str is in TIC format, e.g., TIC 12345678 .
+    """
+    from astroquery.mast import Catalogs
+
+    tic_id = None
+    if isinstance(target, str):
+        tic_match = re.match(r"^TIC\s*(\d+)$", target, re.IGNORECASE)
+        if tic_match is not None:
+            tic_id = int(tic_match[1])
+
+    if tic_id is None:
+        return None, None
+
+    tab = Catalogs.query_criteria(catalog="Tic", ID=tic_id)
+    if len(tab) < 1:
+        return None, None
+    row = tab[0]
+    coords = SkyCoord(row["ra"], row["dec"], unit=u.deg)  # in J2000
+    meta_extras = {}
+
+    # to copy the value from TIC Catalog table to `meta_extras` dict
+    def copy_if_exists(src_key, dest_key):
+        val = row[src_key]
+        if val is np.ma.masked:
+            return
+        meta_extras[dest_key] = val
+
+    for src_key, dest_key in [
+        ("pmRA", "PMRA"),
+        ("pmDEC", "PMDEC"),
+        # TODO: add TESSMAG, etc.
+    ]:
+        copy_if_exists(src_key, dest_key)
+
+    # TICID is not only for convenience, but needed for PM correction implementation in interact_sky()
+    meta_extras["TICID"] = tic_id
+    meta_extras["OBJECT"] = f"TIC {tic_id}"
+
+    return coords, meta_extras
