@@ -6,6 +6,7 @@
   Gaia the origin should be 0 instead of 1. [#1465]
 - Fixed ``LightCurve.select_flux()`` in edge cases, where the unit of
   the new ``flux`` column is different from that of the ``flux_err`` column. [#1467]
+- Fixed numpy v2 compatibility for ``tpf.interact()``. [#1473]
 
 
 2.5.0 (2024-08-29)
