@@ -1,6 +1,5 @@
 """Reader function for K2SFF community light curve products."""
 from ..lightcurve import KeplerLightCurve
-from ..utils import validate_method
 
 from .generic import read_generic_lightcurve
 

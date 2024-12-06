@@ -6,7 +6,6 @@ Product Description: https://archive.stsci.edu/hlsps/cdips/hlsp_cdips_tess_ffi_a
 import logging
 
 from ..lightcurve import TessLightCurve
-from ..utils import TessQualityFlags
 
 from .generic import read_generic_lightcurve
 
