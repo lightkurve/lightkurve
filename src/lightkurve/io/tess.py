@@ -45,4 +45,48 @@ def read_tess_lightcurve(
     lc.meta["TARGETID"] = lc.meta.get("TICID")
     lc.meta["QUALITY_BITMASK"] = quality_bitmask
     lc.meta["QUALITY_MASK"] = quality_mask
+    lc.meta["EXPTIME"] = lc.meta.get("FRAMETIM") * lc.meta.get("NUM_FRM")
+    lc.meta["CADENCE_TYPE"] = get_tess_cadence_type(lc.meta["EXPTIME"])
     return TessLightCurve(data=lc)
+
+def get_tess_cadence_type(exptime):
+    """ Returns the TESS cadence type as a string based on the exposure time.
+
+    Alternatively, if a string is pass then this function checks for a valid 
+    cadence type and then returns it. It raises an exception if not valid.
+
+    The options are:
+    if   exptime < 60   : "fast"  (i.e. 20-second)
+    elif exptime < 300  : "short" (i.e. 2-minute)
+    else                : "ffi"  (i.e. 30 or 10 minute FFI)
+
+    Parameters
+    ----------
+    exptime : 'ffi', 'short', 'fast', or float
+        Exposure time for cadence in seconds
+        Or a string containing the cadence type
+        'ffi' selects 10-min and 30-min cadence products;
+        'short' selects 2-min products;
+        'fast' selects 20-sec products.
+
+    Returns
+    -------
+    cadence_type : str
+        one of: ('ffi', 'short', 'fast')
+    """
+    valid_str_options = ('ffi', 'short', 'fast')
+
+    if isinstance(exptime, str):
+        if valid_str_options.count(exptime.lower()) != 1:
+            raise Exception('Invalid cadence type')
+        else:
+            return exptime
+
+    if exptime is None:
+        return None
+    elif exptime < 60:
+        return 'fast'
+    elif exptime < 300:
+        return 'short'
+    else:
+        return 'ffi'
