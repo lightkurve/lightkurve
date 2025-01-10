@@ -3,16 +3,12 @@
 
 import pytest
 from numpy.testing import (
-    assert_almost_equal,
-    assert_array_equal,
     assert_allclose,
-    assert_raises,
 )
 
 import warnings
 import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
 import astropy.units as u
 import pandas as pd
 from astropy.table import Table

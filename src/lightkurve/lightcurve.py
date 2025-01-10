@@ -13,13 +13,12 @@ import matplotlib
 from matplotlib import pyplot as plt
 from copy import deepcopy
 
-from astropy.table import Table, Column, MaskedColumn
+from astropy.table import Table
 from astropy.io import fits
 from astropy.time import TimeBase, Time, TimeDelta
 from astropy import units as u
 from astropy.units import Quantity
 from astropy.timeseries import TimeSeries, aggregate_downsample
-from astropy.table import vstack
 from astropy.stats import calculate_bin_edges
 from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 from astropy.utils.exceptions import AstropyUserWarning
