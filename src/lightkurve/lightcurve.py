@@ -1989,6 +1989,9 @@ class LightCurve(TimeSeries):
                     log.warning(f"Column `{column}` has no associated errors.")
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
+            # Default title (none)
+            if title is not None:
+                ax.set_title(title)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
