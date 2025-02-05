@@ -17,13 +17,8 @@ from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
 from astropy.time import Time
 
-# LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
-try:
-    from astropy.timeseries import LombScargle
-    from astropy.timeseries import implementations  # for .main._is_regular
-except ImportError:
-    from astropy.stats import LombScargle
-    from astropy.stats.lombscargle import implementations
+from astropy.timeseries import LombScargle
+from astropy.timeseries.periodograms.lombscargle import implementations  # for .main._is_regular
 
 
 from . import MPLSTYLE
@@ -655,7 +650,8 @@ class LombScarglePeriodogram(Periodogram):
         ls_method="fast",
         **kwargs
     ):
-        """Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method.
+        """Creates a `Periodogram` from a LightCurve using the Lomb-Scargle method in
+        `astropy`'s `~astropy.timeseries.LombScargle`.
 
         By default, the periodogram will be created for a regular grid of
         frequencies from one frequency separation to the Nyquist frequency,
@@ -773,9 +769,11 @@ class LombScarglePeriodogram(Periodogram):
             (`'amplitude'`).
         ls_method : str
             Default: `'fast'`. Passed to the `method` keyword of
-            `astropy.stats.LombScargle()`.
+            `astropy.timeseries.LombScargle()`.
         kwargs : dict
-            Keyword arguments passed to `astropy.stats.LombScargle()`
+            Keyword arguments passed to
+            `LombScargle() <astropy.timeseries.LombScargle>`
+
 
         Returns
         -------
@@ -1024,7 +1022,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
-        """Creates a `Periodogram` from a LightCurve using the Box Least Squares (BLS) method.
+        """Creates a `Periodogram` from a LightCurve using the Box Least Squares (BLS) method
+        in `astropy`'s `~astropy.timeseries.BoxLeastSquares`.
 
         Parameters
         ----------

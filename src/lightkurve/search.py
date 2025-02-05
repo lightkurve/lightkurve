@@ -43,7 +43,7 @@ __all__ = [
 AUTHOR_LINKS = {
     "Kepler": "https://archive.stsci.edu/kepler/data_products.html",
     "K2": "https://archive.stsci.edu/k2/data_products.html",
-    "SPOC": "https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html",
+    "SPOC": "https://heasarc.gsfc.nasa.gov/docs/tess/data-handling.html",
     "TESS-SPOC": "https://archive.stsci.edu/hlsp/tess-spoc",
     "QLP": "https://archive.stsci.edu/hlsp/qlp",
     "TASOC": "https://archive.stsci.edu/hlsp/tasoc",
@@ -54,6 +54,7 @@ AUTHOR_LINKS = {
     "TESScut": "https://mast.stsci.edu/tesscut/",
     "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
     "TGLC": "https://archive.stsci.edu/hlsp/tglc",
+    "KBONUS-BKG":"https://archive.stsci.edu/hlsp/kbonus-bkg",
 }
 
 REPR_COLUMNS_BASE = [
@@ -133,11 +134,11 @@ class SearchResult(object):
         This ordering is not a judgement on the quality of one product vs another,
         because we love all pipelines!
         """
-        sort_priority = {"Kepler": 1, "K2": 1, "SPOC": 1, "TESS-SPOC": 2, "QLP": 3}
+        sort_priority = {"Kepler": 1, "K2": 1, "SPOC": 1, "KBONUS-BKG":2, "TESS-SPOC": 2, "QLP": 3}
         self.table["sort_order"] = [
             sort_priority.get(author, 9) for author in self.table["author"]
         ]
-        self.table.sort(["distance", "year", "mission", "sort_order", "exptime"])
+        self.table.sort(["distance", "project", "sort_order", "year", "exptime"])
 
     def _add_columns(self):
         """Adds a user-friendly index (``#``) column and adds column unit
@@ -160,12 +161,8 @@ class SearchResult(object):
 
     def __repr__(self, html=False):
         def to_tess_gi_url(proposal_id):
-            if re.match("^G0[12].+", proposal_id) is not None:
-                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-primary.html#:~:text={proposal_id}"
-            elif re.match("^G0[34].+", proposal_id) is not None:
-                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-em1.html#:~:text={proposal_id}"
-            else:
-                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs.html#:~:text={proposal_id}"
+            cycle = int(proposal_id[1:3])
+            return f"https://heasarc.gsfc.nasa.gov/docs/tess/data/approved-programs/cycle{cycle}/{proposal_id}.txt"
 
         out = "SearchResult containing {} data products.".format(len(self.table))
         if len(self.table) == 0:
@@ -348,7 +345,7 @@ class SearchResult(object):
             else:
                 from astroquery.mast import Observations
 
-                download_url = table[:1]["dataURL"][0]
+                download_url = table[:1]["dataURI"][0]
                 log.debug("Started downloading {}.".format(download_url))
                 download_response = Observations.download_products(
                     table[:1], mrp_only=False, download_dir=download_dir
@@ -955,11 +952,11 @@ def _search_products(
             )
 
     # Specifying quarter, campaign, or quarter should constrain the mission
-    if quarter:
+    if quarter is not None:
         mission = "Kepler"
-    if campaign:
+    if campaign is not None:
         mission = "K2"
-    if sector:
+    if sector is not None:
         mission = "TESS"
     # Ensure mission is a list
     mission = np.atleast_1d(mission).tolist()
@@ -1158,15 +1155,15 @@ def _query_mast(
     exact_target_name = None
     target_lower = str(target).lower()
     # Was a Kepler target ID passed?
-    kplr_match = re.match("^(kplr|kic) ?(\d+)$", target_lower)
+    kplr_match = re.match(r"^(kplr|kic) ?(\d+)$", target_lower)
     if kplr_match:
         exact_target_name = f"kplr{kplr_match.group(2).zfill(9)}"
     # Was a K2 target ID passed?
-    ktwo_match = re.match("^(ktwo|epic) ?(\d+)$", target_lower)
+    ktwo_match = re.match(r"^(ktwo|epic) ?(\d+)$", target_lower)
     if ktwo_match:
         exact_target_name = f"ktwo{ktwo_match.group(2).zfill(9)}"
     # Was a TESS target ID passed?
-    tess_match = re.match("^(tess|tic) ?(\d+)$", target_lower)
+    tess_match = re.match(r"^(tess|tic) ?(\d+)$", target_lower)
     if tess_match:
         exact_target_name = f"{tess_match.group(2).zfill(9)}"
 
@@ -1374,9 +1371,9 @@ def _mask_by_exptime(products, exptime):
         if exptime in ["fast"]:
             mask &= products["exptime"] < 60
         elif exptime in ["short"]:
-            mask &= (products["exptime"] >= 60) & (products["exptime"] < 300)
+            mask &= (products["exptime"] >= 60) & (products["exptime"] < 200)
         elif exptime in ["long", "ffi"]:
-            mask &= products["exptime"] >= 300
+            mask &= products["exptime"] >= 200
     return mask
 
 

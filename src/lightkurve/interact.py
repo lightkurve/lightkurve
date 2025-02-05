@@ -28,14 +28,16 @@ from astropy.utils.exceptions import AstropyUserWarning
 import pandas as pd
 from pandas import Series
 
-from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError
+
+from .utils import KeplerQualityFlags, LightkurveWarning, LightkurveError, finalize_notebook_url
 
 log = logging.getLogger(__name__)
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
+_BOKEH_IMPORT_ERROR = None
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook, push_notebook
+    from bokeh.io import show, output_notebook
     from bokeh.plotting import figure, ColumnDataSource
     from bokeh.models import (
         LogColorMapper,
@@ -54,9 +56,10 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Div
     from bokeh.models.formatters import PrintfTickFormatter
-except ImportError:
+except Exception as e:
     # We will print a nice error message in the `show_interact_widget` function
-    pass
+    # the error would be raised there in case users need to diagnose problems
+    _BOKEH_IMPORT_ERROR = e
 
 
 def _search_nearby_of_tess_target(tic_id):
@@ -138,8 +141,8 @@ def _get_corrected_coordinate(tpf_or_lc):
     ra_corrected, dec_corrected, pm_corrected = _correct_with_proper_motion(
             ra * u.deg, dec *u.deg,
             pm_ra * pm_unit, pm_dec * pm_unit,
-            # e.g., equinox 2000 is treated as J2000 is set to be noon of 2000-01-01 TT
-            Time(equinox, format="decimalyear", scale="tt") + 0.5,
+            # we assume the data is in J2000 epoch
+            Time('2000', format='byear'),
             new_time)
     return ra_corrected.to(u.deg).value,  dec_corrected.to(u.deg).value, pm_corrected
 
@@ -297,7 +300,19 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
         border_fill_color="whitesmoke",
     )
     fig.title.offset = -10
-    fig.yaxis.axis_label = "Flux (e/s)"
+
+    # ylabel: mimic the logic in lc._create_plot()
+    ylabel = "Flux"
+    if lc.meta.get("NORMALIZED"):
+        ylabel = "Normalized " + ylabel
+    elif (lc["flux"].unit) and (lc["flux"].unit.to_string() != ""):
+        if lc["flux"].unit == (u.electron / u.second):
+            yunit_str = "e/s"  # the common case, use abbreviation
+        else:
+            yunit_str = lc["flux"].unit.to_string()
+        ylabel += f" ({yunit_str})"
+    fig.yaxis.axis_label = ylabel
+
     fig.xaxis.axis_label = "Time (days)"
     try:
         if (lc.mission == "K2") or (lc.mission == "Kepler"):
@@ -323,7 +338,7 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
         nonselection_line_color="gray",
         nonselection_line_alpha=1.0,
     )
-    circ = fig.circle(
+    circ = fig.scatter(
         "time",
         "flux",
         source=lc_source,
@@ -460,7 +475,6 @@ def _add_nearby_tics_if_tess(tpf, magnitude_limit, result):
 
     # nearby TICs from ExoFOP
     tab = _search_nearby_of_tess_target(tic_id)
-
     gaia_ids = result['Source'].array
 
     # merge the TICs with matching Gaia entries
@@ -555,7 +569,6 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
             tpf.time[0])
     result.RA_ICRS = ra_corrected.to(u.deg).value
     result.DE_ICRS = dec_corrected.to(u.deg).value
-
     # Convert to pixel coordinates
     radecs = np.vstack([result["RA_ICRS"], result["DE_ICRS"]]).T
     coords = tpf.wcs.all_world2pix(radecs, 0)
@@ -594,7 +607,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         ]
     tooltips = tooltips_extras + tooltips
 
-    r = fig.circle(
+    r = fig.scatter(
         "x",
         "y",
         source=source,
@@ -626,7 +639,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     if target_ra is not None and target_dec is not None:
         pix_x, pix_y = tpf.wcs.all_world2pix([(target_ra, target_dec)], 0)[0]
         target_x, target_y = tpf.column + pix_x, tpf.row + pix_y
-        fig.cross(x=target_x, y=target_y, size=20, color="black", line_width=1)
+        fig.scatter(marker="cross", x=target_x, y=target_y, size=20, color="black", line_width=1)
         if not pm_corrected:
             warnings.warn(("Proper motion correction cannot be applied to the target, as none is available. "
                            "Thus the target (the cross) might be noticeably away from its actual position, "
@@ -978,7 +991,7 @@ def make_default_export_name(tpf, suffix="custom-lc"):
 
 def show_interact_widget(
     tpf,
-    notebook_url="localhost:8888",
+    notebook_url=None,
     lc=None,
     max_cadences=200000,
     aperture_mask="default",
@@ -1013,6 +1026,9 @@ def show_interact_widget(
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+        to the public hostname of your JupyterHub and notebook_url will
+        be defined appropriately automatically.
     max_cadences: int
         Raise a RuntimeError if the number of cadences shown is larger than
         this value. This limit helps keep browsers from becoming unresponsive.
@@ -1051,19 +1067,14 @@ def show_interact_widget(
     cmap: str
         Colormap to use for tpf plot. Default is 'Viridis256'
     """
-    try:
-        import bokeh
-
-        if bokeh.__version__[0] == "0":
-            warnings.warn(
-                "interact() requires Bokeh version 1.0 or later", LightkurveWarning
-            )
-    except ImportError:
+    if _BOKEH_IMPORT_ERROR is not None:
         log.error(
             "The interact() tool requires the `bokeh` Python package; "
             "you can install bokeh using e.g. `conda install bokeh`."
         )
-        return None
+        raise _BOKEH_IMPORT_ERROR
+
+    notebook_url = finalize_notebook_url(notebook_url)
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
     if ~aperture_mask.any():
@@ -1222,7 +1233,7 @@ def show_interact_widget(
                 vertical_line.update(location=tpf.time.value[frameno])
             else:
                 fig_tpf.select("tpfimg")[0].data_source.data["image"] = [
-                    tpf.flux.value[0, :, :] * np.NaN
+                    tpf.flux.value[0, :, :] * np.nan
                 ]
             lc_source.selected.indices = []
 
@@ -1297,7 +1308,8 @@ def show_interact_widget(
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty",  magnitude_limit=18):
+
+def show_skyview_widget(tpf, notebook_url=None, aperture_mask="empty",  magnitude_limit=18):
     """skyview
 
     Parameters
@@ -1313,25 +1325,23 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+        For use with JupyterHub, set the environment variable LK_JUPYTERHUB_EXTERNAL_URL
+        to the public hostname of your JupyterHub and notebook_url will
+        be defined appropriately automatically.
     aperture_mask : array-like, 'pipeline', 'threshold', 'default', 'background', or 'empty'
         Highlight pixels selected by aperture_mask.
         Default is 'empty': no pixel is highlighted.
     magnitude_limit : float
         A value to limit the results in based on Gaia Gmag. Default, 18.
     """
-    try:
-        import bokeh
-
-        if bokeh.__version__[0] == "0":
-            warnings.warn(
-                "interact_sky() requires Bokeh version 1.0 or later", LightkurveWarning
-            )
-    except ImportError:
+    if _BOKEH_IMPORT_ERROR is not None:
         log.error(
             "The interact_sky() tool requires the `bokeh` Python package; "
             "you can install bokeh using e.g. `conda install bokeh`."
         )
-        return None
+        raise _BOKEH_IMPORT_ERROR
+
+    notebook_url = finalize_notebook_url(notebook_url)
 
     # Try to identify the "fiducial frame", for which the TPF WCS is exact
     zp = (tpf.pos_corr1 == 0) & (tpf.pos_corr2 == 0)
@@ -1343,7 +1353,6 @@ def show_skyview_widget(tpf, notebook_url="localhost:8888", aperture_mask="empty
         fiducial_frame = 0
 
     aperture_mask = tpf._parse_aperture_mask(aperture_mask)
-
     def create_interact_ui(doc):
         tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
