@@ -12,6 +12,7 @@ import numpy as np
 from scipy.interpolate import PchipInterpolator
 from memoization import cached
 from astropy import units as u
+from typing import Union
 
 from .. import LightCurve
 
@@ -129,6 +130,7 @@ def underfit_metric_neighbors(
     max_targets: int = 50,
     interpolate: bool = False,
     extrapolate: bool = False,
+    quality_bitmask: Union[int, str] = "default",
 ):
     """This goodness metric measures the degree of under-fitting of the
     CBVs to the light curve. It does so by measuring the mean residual target to
@@ -187,6 +189,7 @@ def underfit_metric_neighbors(
         interpolate=interpolate,
         extrapolate=extrapolate,
         flux_column="sap_flux",
+        quality_bitmask=quality_bitmask,
     )
 
     # Create fluxMatrix. The last entry is the target under study
@@ -199,9 +202,11 @@ def underfit_metric_neighbors(
     # Add in the trimmed target under study
     fluxMatrix[:, -1] = corrected_lc_flux
 
-    # Ignore NaNs
-    mask = ~np.isnan(corrected_lc_flux)
-    fluxMatrix = fluxMatrix[mask, :]
+    # Remove NaNs from any flux column
+    mask = np.zeros(fluxMatrix.shape[0], dtype=bool)
+    for i in range(fluxMatrix.shape[1]):
+        mask+=np.isnan(fluxMatrix[:,i])
+    fluxMatrix = fluxMatrix[~mask, :]
 
     # Determine the target-target correlation between target and
     # neighborhood
@@ -264,10 +269,11 @@ def _unique_key_for_processing_neighbors(
     extrapolate: bool = False,
     author: tuple = ("Kepler", "K2", "SPOC"),
     flux_column: str = "sap_flux",
+    quality_bitmask: Union[str,int] = "default",
 ):
     """Returns a unique key that will determine whether a cached version of a
     call to `_download_and_preprocess_neighbors` can be re-used."""
-    return f"{corrected_lc.ra}{corrected_lc.dec}{corrected_lc.cadenceno}{radius}{min_targets}{max_targets}{author}{flux_column}{interpolate}"
+    return f"{corrected_lc.ra}{corrected_lc.dec}{corrected_lc.cadenceno}{radius}{min_targets}{max_targets}{author}{flux_column}{interpolate}{quality_bitmask}"
 
 
 @cached(custom_key_maker=_unique_key_for_processing_neighbors)
@@ -280,6 +286,7 @@ def _download_and_preprocess_neighbors(
     extrapolate: bool = False,
     author: tuple = ("Kepler", "K2", "SPOC"),
     flux_column: str = "sap_flux",
+    quality_bitmask: Union[str, int] = "default",
 ):
     """Returns a collection of neighboring light curves.
 
@@ -318,7 +325,7 @@ def _download_and_preprocess_neighbors(
         raise Exception('interpolate must be True if extrapolate is True')
 
     search = corrected_lc.search_neighbors(
-        limit=max_targets, radius=radius, author=author
+        limit=max_targets, radius=radius, author=author,
     )
     if len(search) < min_targets:
         raise MinTargetsError(
@@ -327,7 +334,7 @@ def _download_and_preprocess_neighbors(
     log.info(
         f"Downloading {len(search)} neighboring light curves. This might take a while."
     )
-    lcfCol = search.download_all(flux_column=flux_column)
+    lcfCol = search.download_all(flux_column=flux_column, quality_bitmask=quality_bitmask)
 
     # Pre-process the neighboring light curves
     # Align or interpolate to the corrected light curve
@@ -336,7 +343,7 @@ def _download_and_preprocess_neighbors(
     # Extract SAP light curves
     # We want zero-centered median normalized light curves
     for lc in lcfCol:
-        lcSAP = lc.remove_nans().normalize()
+        lcSAP = lc.remove_nans(column=flux_column).normalize()
         lcSAP.flux -= 1.0
         # Align or interpolate the neighboring target with the target under study
         if interpolate:

@@ -8,7 +8,7 @@
   the new ``flux`` column is different from that of the ``flux_err`` column. [#1467]
 - Fixed numpy v2 compatibility for ``tpf.interact()``. [#1473]
 - Modified RegressionCorrector.correct() to add the model flux error in quadrature. [#1439]
-
+- Updated the default TESS quality mask to include Argabrightening, Impulsive Outlier, and Bad Calibration Exclude flags (see issue #1230). [#1336]
 
 2.5.0 (2024-08-29)
 =====================
