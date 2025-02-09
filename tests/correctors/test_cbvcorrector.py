@@ -227,6 +227,22 @@ def test_cbv_retrieval():
     ax = cbvs.plot("all")
     assert isinstance(ax, matplotlib.axes.Axes)
 
+    # 20-second CBVs
+    cbvs = load_tess_cbvs(sector=41, camera=2, ccd=4, cbv_type='MultiScale', band=2, exptime='fast')
+    assert isinstance(cbvs, TessCotrendingBasisVectors)
+    ax = cbvs.plot("all")
+    assert isinstance(ax, matplotlib.axes.Axes)
+
+    cbvs = load_tess_cbvs(sector=41, camera=2, ccd=4, cbv_type='MultiScale', band=2, exptime=20)
+    assert isinstance(cbvs, TessCotrendingBasisVectors)
+    ax = cbvs.plot("all")
+    assert isinstance(ax, matplotlib.axes.Axes)
+
+    cbvs = load_tess_cbvs(sector=41, camera=2, ccd=4, cbv_type='MultiScale', band=2, exptime=120)
+    assert isinstance(cbvs, TessCotrendingBasisVectors)
+    ax = cbvs.plot("all")
+    assert isinstance(ax, matplotlib.axes.Axes)
+
     # No band specified for MultiScale, this should error
     with pytest.raises(AssertionError):
         cbvs = load_tess_cbvs(sector=10, camera=2, ccd=4, cbv_type="MultiScale")
@@ -334,7 +350,6 @@ def test_cbv_local():
 # *******************************************************************************
 # *******************************************************************************
 # CBVCorrector Unit Tests
-
 
 def test_CBVCorrector():
 
@@ -501,6 +516,10 @@ def test_CBVCorrector_retrieval():
     ).download(flux_column="sap_flux")
     cbvCorrector = CBVCorrector(lc)
     lc = cbvCorrector.correct_gaussian_prior(alpha=1.0)
+    assert isinstance(lc, KeplerLightCurve)
+    assert lc.flux.unit == u.Unit("electron / second")
+
+    lc = cbvCorrector.correct()
     assert isinstance(lc, KeplerLightCurve)
     assert lc.flux.unit == u.Unit("electron / second")
 

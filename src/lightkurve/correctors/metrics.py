@@ -135,9 +135,9 @@ def underfit_metric_neighbors(
     target Pearson correlation between the target under study and a selection of
     neighboring SPOC SAP target light curves.
 
-    This function will search within the given radiu in arceseconds and find the
-    min_targets nearest targets up until max_targets is reached. If less than
-    min_targets is found a MinTargetsError Exception is raised.
+    This function will search within the given radius in arceseconds and find 
+    the min_targets nearest targets up until max_targets is reached. If less 
+    than min_targets is found a MinTargetsError Exception is raised.
 
     The downloaded neighboring targets will normally be "aligned" to the
     corrected_lc, meaning the cadence numbers are used to align the targets
@@ -314,12 +314,17 @@ def _download_and_preprocess_neighbors(
         List containing the flux arrays of the neighboring light curves,
         interpolated or aligned with `corrected_lc` if requested.
     """
+    from .cbvcorrector import _determine_exptime_from_lc
+
     if extrapolate and (extrapolate != interpolate):
         raise Exception('interpolate must be True if extrapolate is True')
 
+    exptime = _determine_exptime_from_lc(corrected_lc)
     search = corrected_lc.search_neighbors(
-        limit=max_targets, radius=radius, author=author
+        limit=max_targets, radius=radius, author=author, 
+        exptime=exptime
     )
+
     if len(search) < min_targets:
         raise MinTargetsError(
             f"Unable to find at least {min_targets} neighbors within {radius} arcseconds radius."
