@@ -1554,7 +1554,7 @@ class TargetPixelFile(object):
                     datacol._dims = datacol.array.shape[1:]
                     datacol._format = fits.column._ColumnFormat(
                         "{}{}".format(
-                            np.product(datacol.array.shape[1:]), datacol._format[-1]
+                            np.prod(datacol.array.shape[1:]), datacol._format[-1]
                         )
                     )
                     data_columns.append(datacol)
