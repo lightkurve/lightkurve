@@ -725,7 +725,7 @@ def test_cutout():
         assert ntpf.flux.shape[2] == 1
         ntpf = tpf.cutout(SkyCoord(tpf.ra, tpf.dec, unit="deg"), size=2)
         ntpf = tpf.cutout(size=2)
-        assert np.product(ntpf.flux.shape[1:]) == 4
+        assert np.prod(ntpf.flux.shape[1:]) == 4
         assert ntpf.targetid == tpf.targetid
 
 
