@@ -205,7 +205,7 @@ def underfit_metric_neighbors(
     # Remove NaNs from any flux column
     mask = np.zeros(fluxMatrix.shape[0], dtype=bool)
     for i in range(fluxMatrix.shape[1]):
-        mask+=np.isnan(fluxMatrix[:,i])
+        mask |= np.isnan(fluxMatrix[:, i])
     fluxMatrix = fluxMatrix[~mask, :]
 
     # Determine the target-target correlation between target and
