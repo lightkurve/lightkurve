@@ -855,8 +855,8 @@ class TargetPixelFile(object):
             col, row = centroid_quadratic(self.flux[idx], mask=aperture_mask)
             col_centr.append(col)
             row_centr.append(row)
-        col_centr = np.asfarray(col_centr) + self.column
-        row_centr = np.asfarray(row_centr) + self.row
+        col_centr = np.asarray(col_centr, dtype=float) + self.column
+        row_centr = np.asarray(row_centr, dtype=float) + self.row
         col_centr = Quantity(col_centr, unit="pixel")
         row_centr = Quantity(row_centr, unit="pixel")
         return col_centr, row_centr
@@ -1554,7 +1554,7 @@ class TargetPixelFile(object):
                     datacol._dims = datacol.array.shape[1:]
                     datacol._format = fits.column._ColumnFormat(
                         "{}{}".format(
-                            np.product(datacol.array.shape[1:]), datacol._format[-1]
+                            np.prod(datacol.array.shape[1:]), datacol._format[-1]
                         )
                     )
                     data_columns.append(datacol)
