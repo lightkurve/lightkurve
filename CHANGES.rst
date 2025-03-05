@@ -9,6 +9,7 @@
 - Fixed numpy v2 compatibility for ``tpf.interact()``. [#1473]
 - Modified RegressionCorrector.correct() to add the model flux error in quadrature. [#1439]
 - Updated the default TESS quality mask to include Argabrightening, Impulsive Outlier, and Bad Calibration Exclude flags (see issue #1230). [#1336]
+- Updated tutorial notebook links [#1484]
 
 2.5.0 (2024-08-29)
 =====================
