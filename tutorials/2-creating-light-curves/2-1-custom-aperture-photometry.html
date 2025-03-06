@@ -1,300 +1,415 @@
 
 <!DOCTYPE html>
 
-<html>
+
+<html lang="en" data-content_root="../../" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Creating your own light curves using custom aperture photometry &#8212; Lightkurve </title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=6d2724f8"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/2-creating-light-curves/2-1-custom-aperture-photometry';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Combining multiple quarters of Kepler data" href="2-1-combining-multiple-quarters.html" />
     <link rel="prev" title="How to open a light curve in Excel?" href="../1-getting-started/how-to-open-a-lightcurve-in-excel.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
-<script async="" src="https://www.google-analytics.com/analytics.js"></script>
-<script>
-                        window.ga = window.ga || function () {
-                            (ga.q = ga.q || []).push(arguments) };
-                        ga.l = +new Date;
-                        ga('create', 'UA-69171-9', 'auto');
-                        ga('set', 'anonymizeIp', true);
-                        ga('send', 'pageview');
-                    </script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.5" />
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
-
-  <div id="navbar-start">
-    
-    
-<a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
-</a>
-
-    
-  </div>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
   
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
-    <div id="navbar-center" class="mr-auto">
-      
-      <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../whats-new-v2.html">
-  What's new?
- </a>
-</li>
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../quickstart.html">
-  Quickstart
- </a>
-</li>
-
-<li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="../index.html">
-  Tutorials
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../reference/index.html">
-  API
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../about/index.html">
-  About Lightkurve
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../development/index.html">
-  Developing for Lightkurve
- </a>
-</li>
-
+  
+  <dialog id="pst-search-dialog">
     
-</ul>
-      </div>
-      
-    </div>
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-    <div id="navbar-end">
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-        <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
-        </li>
-      </ul>
-      </div>
-      
-    </div>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Lightkurve </p>
+  
+</a></div>
+    
   </div>
-</div>
-    </nav>
+  
+  <div class="col-lg-9 navbar-header-items">
     
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
+    What's new?
+  </a>
+</li>
 
-    <div class="container-xl">
-      <div class="row">
-          
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about/index.html">
+    About Lightkurve
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
+    Developing for Lightkurve
+  </a>
+</li>
+
+                </ul>
+            </li>
             
-            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
-            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
           
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-<div class="tocsection onthispage mt-5 pt-1 pb-3">
-    <i class="fas fa-list"></i> On this page
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
-<nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Learning-Goals">
-   Learning Goals
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Introduction">
-   Introduction
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Imports">
-   Imports
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#1.-Background">
-   1. Background
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#1.1-Introduction-to-Kepler-photometry">
-     1.1 Introduction to
-     <em>
-      Kepler
-     </em>
-     photometry
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#1.2-Aperture-photometry">
-     1.2 Aperture photometry
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#1.3-Why-not-just-use-published-light-curves?">
-     1.3 Why not just use published light curves?
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#1.4-Choosing-an-aperture">
-     1.4 Choosing an aperture
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#2.-Getting-Started">
-   2. Getting Started
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#2.1-Doing-photometry-with-the-pipeline-aperture">
-     2.1 Doing photometry with the pipeline aperture
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#2.2-Adjusting-the-aperture">
-     2.2 Adjusting the aperture
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#3.-Manual-Custom-Apertures">
-   3. Manual Custom Apertures
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#3.1-Creating-a-custom-threshold-aperture-with-Lightkurve">
-     3.1 Creating a custom threshold aperture with Lightkurve
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#3.2-Creating-a-custom-aperture-with-NumPy-arrays">
-     3.2 Creating a custom aperture with NumPy arrays
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#3.3-%22Cutting-out%22-a-background-star">
-     3.3 “Cutting out” a background star
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool">
-     3.4 Creating a custom aperture using the
-     <code class="docutils literal notranslate">
-      <span class="pre">
-       tpf.interact
-      </span>
-     </code>
-     tool
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#About-this-Notebook">
-   About this Notebook
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">
-   Citing Lightkurve and Astropy
-  </a>
- </li>
-</ul>
+    </header>
+  
 
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
+    What's new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about/index.html">
+    About Lightkurve
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Developing for Lightkurve
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Creating your own light curves using custom aperture photometry</span></li>
+  </ul>
 </nav>
-              </div>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
               
-              <div class="toc-item">
+              
+              
                 
-              </div>
-              
-            
-          </div>
-          
-
-          
-          
-            
-          
-          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
-              
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-1-custom-aperture-photometry.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-1-custom-aperture-photometry.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Creating-your-own-light-curves-using-custom-aperture-photometry">
-<h1>Creating your own light curves using custom aperture photometry<a class="headerlink" href="#Creating-your-own-light-curves-using-custom-aperture-photometry" title="Permalink to this headline">#</a></h1>
+<h1>Creating your own light curves using custom aperture photometry<a class="headerlink" href="#Creating-your-own-light-curves-using-custom-aperture-photometry" title="Link to this heading">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Understand how to use aperture photometry to turn a series of two-dimensional images into a one-dimensional time series.</p></li>
@@ -303,39 +418,49 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
-<p>This tutorial is part of a series on handling <em>Kepler</em> and <em>K2</em> data with Astropy and Lightkurve. As you have seen earlier in this series, Lightkurve provides utilities that allow you to create your own light curve from a <em>Kepler</em> or <em>K2</em> target pixel file. In this tutorial, we’ll look at the principles behind the process of performing aperture photometry on a target. Then we’ll get into specifics and learn how to customize our apertures to get the most out of our data.</p>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">#</a></h2>
+<p>This tutorial is part of a series on handling <a class="reference external" href="https://archive.stsci.edu/kepler">Kepler</a>, <a class="reference external" href="https://archive.stsci.edu/k2">K2</a>, and <a class="reference external" href="https://archive.stsci.edu/tess">TESS</a> data with Astropy and Lightkurve. As you have seen earlier in this series, Lightkurve provides utilities that allow you to create your own light curve from a <em>Kepler</em>, <em>K2</em>, or <em>TESS</em> target pixel file. In this tutorial, we’ll look at the principles behind the process of performing aperture photometry on a target. Then
+we’ll get into specifics and learn how to customize our apertures to get the most out of our data.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
-<p>We’ll use <a class="reference external" href="https://docs.lightkurve.org/">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to handle arrays for aperture masks.</p>
-<div class="nbinput nblast docutils container">
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">#</a></h2>
+<p>We’ll use <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to handle arrays for aperture masks. Similar procedures can be used for <em>K2</em> or <em>TESS</em> data.</p>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span><span class="w"> </span><span class="nn">lightkurve</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lk</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/nthom/lightkurve/src/lightkurve/config/__init__.py:119: UserWarning: The default Lightkurve cache directory, used by download(), etc., has been moved to /Users/nthom/.lightkurve/cache. Please move all the files in the legacy directory /Users/nthom/.lightkurve-cache to the new location and remove the legacy directory. Refer to https://docs.lightkurve.org/reference/config.html#default-cache-directory-migration for more information.
+  warnings.warn(
+</pre></div></div>
+</div>
 </section>
 <section id="1.-Background">
-<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">#</a></h2>
+<h2>1. Background<a class="headerlink" href="#1.-Background" title="Link to this heading">#</a></h2>
 <section id="1.1-Introduction-to-Kepler-photometry">
-<h3>1.1 Introduction to <em>Kepler</em> photometry<a class="headerlink" href="#1.1-Introduction-to-Kepler-photometry" title="Permalink to this headline">#</a></h3>
+<h3>1.1 Introduction to <em>Kepler</em> photometry<a class="headerlink" href="#1.1-Introduction-to-Kepler-photometry" title="Link to this heading">#</a></h3>
 <p>When you search for <em>Kepler</em> or <em>K2</em> light curves in the data archive, you can either access simple aperture photometry (SAP) light curves (for example, see the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>, Section 6.3.6), or presearch data conditioning simple aperture photometry (PDCSAP) light curves (for example, <a class="reference external" href="https://arxiv.org/pdf/1203.1382.pdf">Stumpe et al., 2012</a>, <a class="reference external" href="https://arxiv.org/pdf/1203.1383.pdf">Smith
-et al., 2012</a>). You can also access the orignal target pixel files (TPFs) from which such light curves were extracted. TPFs are useful for inspecting the calibrated pixels, but when you’re doing science, you usually just want to look at a light curve. This tutorial covers how to use TPFs to <em>create</em> light curves. There are many reasons why you might want to produce your own light curve, which we’ll cover in <a class="reference external" href="#1.3-Why-don't-we-just-use-the-data-from-MAST?">Section
-1.3</a>. But more fundamentally, it’s important to know how the data you’re using is produced. In this tutorial, we’ll walk through the basics of photometry and then learn how to apply it to <em>Kepler</em> TPFs, producing light curves just like the ones produced by the official <em>Kepler</em> pipeline.</p>
-<p>Before we get into it, it’s important to note that we’re only going to be performing photometry on one quarter at a time. Combining <em>Kepler</em> Quarters is not trivial: because the telescope rotated by 90° every quarter, the same star would fall on different pixels every fourth quarter. Different pixels have different sensitivities, so the size of the TPFs downloaded for a single target changes between adjacent quarters. It’s certainly possible to combine multiple quarters of <em>Kepler</em> data, or
-campaigns of <em>K2</em> data, and you can read more about it in a different tutorial. We won’t cover quarter stitching here, however.</p>
+et al., 2012</a>). You can also access the orignal target pixel files (TPFs) from which such light curves were extracted. TPFs are useful for inspecting the calibrated pixels, but when you’re doing science, you usually just want to look at a light curve. This tutorial covers how to use TPFs to <em>create</em> light curves. There are many reasons why you might want to produce your own light curve, which we’ll cover in Section 1.3. But more fundamentally, it’s
+important to know how the data you’re using is produced. In this tutorial, we’ll walk through the basics of photometry and then learn how to apply it to <em>Kepler</em> TPFs, producing light curves like the ones produced by the official <em>Kepler</em> pipeline.</p>
+<p>Before we get into it, it’s important to note that we’re only going to be performing photometry on one quarter at a time. Combining <em>Kepler</em> Quarters is not trivial: because the telescope rotated by 90° every quarter, the same star would fall on different pixels every fourth quarter. Different pixels have different sensitivities, so the size of the TPFs downloaded for a single target changes between adjacent quarters. It’s possible to combine multiple quarters of <em>Kepler</em> data, campaigns of <em>K2</em>
+data, or sectores of <em>TESS</em> data, and you can read more about it in a different tutorial. We won’t cover quarter stitching here, however.</p>
 <p>We also won’t cover systematics correction in this tutorial. Light curves created using custom aperture photometry will still include systematic noise from various sources, such as spacecraft motion. You can read more about noise and noise corrections in other tutorials in this series.</p>
 </section>
 <section id="1.2-Aperture-photometry">
-<h3>1.2 Aperture photometry<a class="headerlink" href="#1.2-Aperture-photometry" title="Permalink to this headline">#</a></h3>
+<h3>1.2 Aperture photometry<a class="headerlink" href="#1.2-Aperture-photometry" title="Link to this heading">#</a></h3>
 <p>In this tutorial, we’re going to explore photometry in a practical context by creating our own time series data. But first, we’ll go through a quick introduction of some of the theory behind it. Photometry is defined as the process of measuring the brightness of an astronomical object. Specifically, we’ll be doing time series photometry: measuring that brightness over time. Telescopes like <em>Kepler</em> use charge-coupled device (CCD) cameras (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument
 Handbook</a>, Section 4) to take images of their targets at regular intervals — this interval is known as the cadence — and we perform photometry to turn each image into a flux measurement.</p>
-<p>In <em>Kepler</em> and <em>K2</em> data, each targeted object has a TPF, which is used to store the raw pixel data from which a light curve can be produced. <em>Kepler</em>’s pixels are 4x4 arcseconds large, and all stars take up less angular space than this as point sources in the sky. So, theoretically, we could track the flux of a single pixel over time, and call that our light curve. But light that falls on a CCD is spread onto surrounding pixels, proportional to its brightness.</p>
+<p>In <em>Kepler</em> data, each targeted object has a TPF, which is used to store the raw pixel data from which a light curve can be produced. <em>Kepler</em>’s pixels are 4x4 arcseconds large, and all stars take up less angular space than this as point sources in the sky. So, theoretically, we could track the flux of a single pixel over time, and call that our light curve. But light that falls on a CCD is spread onto surrounding pixels, proportional to its brightness.</p>
 <p>Let’s have a look at a TPF to see what a star actually looks like in <em>Kepler</em> pixel data. The following line of code downloads the 30-minute long cadence light curve for KIC 7461601 from MAST. You can read more about using Lightkurve to download data in a separate tutorial.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -361,9 +486,9 @@ Handbook</a>, Section 4) to take images of their targets at regular intervals �
 </div>
 </div>
 <p>You can see how the light from this star is spread out across the TPF. The process of choosing which pixels to use for photometry is referred to as defining an aperture. By adding together the flux in multiple pixels, we get a more accurate measurement of the object’s brightness.</p>
-<p>TPFs are designed to be big enough such that the vast majority of a target’s flux is captured within the available pixels. Because light from a star doesn’t spread out like a rectangle (we’ll talk about this more below), each TPF has pixels which we won’t need to use for our photometry. In the example above, the star has a <a class="reference external" href="https://keplerscience.arc.nasa.gov/the-kepler-space-telescope.html#flux-calibration">Kepler magnitude</a> of 13.4; this is analogous to a visual magnitude, and defined based
-on higher resolution photometry taken prior to the <em>Kepler</em> mission. For a star this bright, we can pick out six pixels by eye that almost certainly contain signal. Fainter targets are spread out across fewer pixels, and brighter targets may cover well over 20 pixels. Extremely bright targets will saturate the detector, making it very hard to perform photometry on them. We won’t be covering saturated stars in this tutorial; if you’re interested in working with them, the
-<a class="reference external" href="https://github.com/hvidy/halophot/">Halophot</a> Python package is a good place to start.</p>
+<p>TPFs are designed to be big enough such that the vast majority of a target’s flux is captured within the available pixels. Because light from a star doesn’t spread out like a rectangle (we’ll talk about this more below), each TPF has pixels which we won’t need to use for our photometry. In the example above, the star has a <a class="reference external" href="https://arxiv.org/pdf/1102.0342">Kepler magnitude</a> of 13.4; this is analogous to a visual magnitude, and defined based on higher resolution photometry taken prior to the
+<em>Kepler</em> mission. For a star this bright, we can pick out six pixels by eye that almost certainly contain signal. Fainter targets are spread out across fewer pixels, and brighter targets may cover well over 20 pixels. Extremely bright targets will saturate the detector, making it very hard to perform photometry on them. We won’t be covering saturated stars in this tutorial; if you’re interested in working with them, the <a class="reference external" href="https://github.com/hvidy/halophot/">Halophot</a> Python package is a good
+place to start.</p>
 <p>So what about the pixels we don’t use? Think of a grainy photograph: we observe the same thing in all CCD data, but it’s harder to recognize by eye in photographs from telescopes with large pixels. This grainy noise is called “shot noise,” and arises from fluctuations in the current that powers an electronic photon-collecting device. For aperture photometry, we need to worry about shot noise because it dominates what we see in the “background” of an image, that is, the light we see in pixels
 that don’t have any light from our target. In reality, most pixels will be some kind of combination of “signal” and “background.” When we choose our aperture for photometry, we’re looking to optimize the amount of signal we collect, and minimize the noise contribution from the background.</p>
 <p>This is what the aperture used by the <em>Kepler</em> pipeline looks like for our example star:</p>
@@ -384,12 +509,12 @@ that don’t have any light from our target. In reality, most pixels will be som
 </div>
 <p>You might not expect the star’s aperture to be this shape — stars are point sources, after all. In many cases, stars in <em>Kepler</em> will look circular, as we’d expect. However, at the edge of the focal plane, some targets may appear smeared in one direction. And even for a star with circular spread, the aperture may be a different shape. The way the spread of light interacts with the detector is defined by something called the point spread function (PSF), or pixel response function (PRF).
 <em>Kepler</em>’s PSF/PRF is described in detail in Section 3.5 of the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf">Kepler Instrument Handbook</a>.</p>
-<p>We’ve looked at a basic example in this section, but as we’ll see later in this tutorial, it can be hard to determine the best aperture for a given target by eye. Choosing the best aperture for your target can be something of a balancing act: using a larger aperture will minimize the effects of PSF changes and spacecraft motion, but conversely it increases the presence of shot noise. This is why <em>Kepler</em> and <em>K2</em> data were processed with an “optimal aperture.” Brightness, PSF, shot noise,
-crowding, and many other factors went into predicting the optimal aperture for producing a SAP or PDCSAP light curve with NASA’s <em>Kepler</em> and <em>K2</em> pipelines. You can read more about the process of creating these apertures in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016PASP..128l4501S/abstract">Smith et al., 2016</a>, which is equivalent to Chapter 7 of the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing
+<p>We’ve looked at a basic example in this section, but as we’ll see later in this tutorial, it can be hard to determine the best aperture for a given target by eye. Choosing the best aperture for your target can be something of a balancing act: using a larger aperture will minimize the effects of PSF changes and spacecraft motion, but conversely it increases the presence of shot noise. This is why <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> data were processed with an “optimal aperture.” Brightness, PSF, shot
+noise, crowding, and many other factors went into predicting the optimal aperture for producing a SAP or PDCSAP light curve with NASA’s mission pipelines. You can read more about the process of creating these apertures in <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016PASP..128l4501S/abstract">Smith et al., 2016</a>, which is equivalent to Chapter 7 of the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing
 Handbook</a>.</p>
 </section>
 <section id="1.3-Why-not-just-use-published-light-curves?">
-<h3>1.3 Why not just use published light curves?<a class="headerlink" href="#1.3-Why-not-just-use-published-light-curves?" title="Permalink to this headline">#</a></h3>
+<h3>1.3 Why not just use published light curves?<a class="headerlink" href="#1.3-Why-not-just-use-published-light-curves?" title="Link to this heading">#</a></h3>
 <p>There are several reasons why we might want to create our own light curve from scratch, rather than using the readily available data. One of the main reasons is contamination: particularly in crowded fields, we might find multiple signals in one light curve, meaning there are multiple targets in the TPF. In that case, we would want to make our own light curve using a smaller aperture, to make sure that we’re only picking up the signal from our target star. Alternatively, we might want to use our
 TPF to produce a serendipitous light curve for a contaminating star, especially if it doesn’t have its own SAP/PDCSAP light curve available.</p>
 <p>Another reason we might want to produce our own light curves is to minimize noise. Recall that some pixels might be dominated by shot noise over signal. If we find that some of the pixels in a <em>Kepler</em> pipeline aperture have more noise than signal, we can make our own aperture to see what happens if we exclude those pixels.</p>
@@ -397,20 +522,20 @@ TPF to produce a serendipitous light curve for a contaminating star, especially 
 are hundreds of thousands of stars in the <em>TESS</em> field of view that weren’t targeted and don’t have readily available light curves. Custom aperture photometry is perfectly suited for inspecting individual targets in the <em>TESS</em> FFIs.</p>
 </section>
 <section id="1.4-Choosing-an-aperture">
-<h3>1.4 Choosing an aperture<a class="headerlink" href="#1.4-Choosing-an-aperture" title="Permalink to this headline">#</a></h3>
+<h3>1.4 Choosing an aperture<a class="headerlink" href="#1.4-Choosing-an-aperture" title="Link to this heading">#</a></h3>
 <p>In NASA’s <em>Kepler</em> and <em>K2</em> pipelines, the process of determining apertures is automated (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>, Part II). Here, we’ll manually create our own apertures.</p>
-<p>Without any knowledge of which pixels contain light from our target, the most basic approach is to look at individual pixels and manually determine which pixels to work with. Working offline, we can use Lightkurve’s TPF <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">interact()</a> function, which is a convenient way to inspect one or more pixels at a time. Another recommended way to define an
-aperture is by defining a median flux value and only selecting pixels at a certain sigma above that threshold. In the tutorial, we’ll look at using Lightkurve’s built-in functionality to perform this.</p>
+<p>Without any knowledge of which pixels contain light from our target, the most basic approach is to look at individual pixels and manually determine which pixels to work with. Working offline, we can use Lightkurve’s TPF <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.interact.html">interact()</a> function, which is a convenient way to inspect one or more pixels at a time. Another recommended way to define an aperture is by defining a median flux value and
+only selecting pixels at a certain sigma above that threshold. In the tutorial, we’ll look at using Lightkurve’s built-in functionality to perform this.</p>
 <p>In most situations, a threshold mask will be the best choice for custom aperture photometry, as it doesn’t involve trial and error beyond finding the best sigma value. However, if you’re dealing with multiple bright objects in one TPF, a manual mask may be the better option.</p>
 <p>Both of these methods are most useful when dealing with small amounts of data, such as looking at a handful of individual objects. When working with large datasets, it’s advisable to use the pipeline aperture, as this will be sufficient in the majority of cases with <em>Kepler</em> and <em>K2</em>. However, if you’re processing a large amount of stars which were not targeted during either mission — such as FFI or superstamp data — a good approach would be to experiment with multiple threshold apertures for
 each target and see which one produces the best results.</p>
 </section>
 </section>
 <section id="2.-Getting-Started">
-<h2>2. Getting Started<a class="headerlink" href="#2.-Getting-Started" title="Permalink to this headline">#</a></h2>
+<h2>2. Getting Started<a class="headerlink" href="#2.-Getting-Started" title="Link to this heading">#</a></h2>
 <section id="2.1-Doing-photometry-with-the-pipeline-aperture">
-<h3>2.1 Doing photometry with the pipeline aperture<a class="headerlink" href="#2.1-Doing-photometry-with-the-pipeline-aperture" title="Permalink to this headline">#</a></h3>
-<p>We’re going to use the built-in functions in Lightkurve for aperture photometry. You may have encountered <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> in other tutorials in this series. In this section, we’ll explore a number of ways to use this function for custom aperture photometry — but first, let’s do a quick review of the function at its most basic.</p>
+<h3>2.1 Doing photometry with the pipeline aperture<a class="headerlink" href="#2.1-Doing-photometry-with-the-pipeline-aperture" title="Link to this heading">#</a></h3>
+<p>We’re going to use the built-in functions in Lightkurve for aperture photometry. You may have encountered <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html">to_lightcurve()</a> in other tutorials in this series. In this section, we’ll explore a number of ways to use this function for custom aperture photometry — but first, let’s do a quick review of the function at its most basic.</p>
 <p>We’ll start by downloading a target pixel file. We’re going to use <em>Kepler</em> long cadence data to look at KIC 2437317, a star which shows brightness variations due to rotation (<a class="reference external" href="https://www.aanda.org/articles/aa/pdf/2015/11/aa26216-15.pdf">Reinhold &amp; Gizon, 2015</a>). We’re downloading Quarter 10, as there was minimal data loss during this quarter (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics
 Manual</a>, Section 4.1).</p>
 <div class="nbinput nblast docutils container">
@@ -476,8 +601,8 @@ Manual</a>, Section 4.1).</p>
 only focused on performing photometry, we won’t do any light curve corrections to remove such noise, but you can read more about how to do so in other tutorials.</p>
 </section>
 <section id="2.2-Adjusting-the-aperture">
-<h3>2.2 Adjusting the aperture<a class="headerlink" href="#2.2-Adjusting-the-aperture" title="Permalink to this headline">#</a></h3>
-<p>Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html?highlight=to_lightcurve">to_lightcurve()</a> function has an <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code> keyword, which changes the aperture used to perform photometry. Later we’ll look at creating our own apertures, but first, let’s look at the three standard arguments this keyword takes:</p>
+<h3>2.2 Adjusting the aperture<a class="headerlink" href="#2.2-Adjusting-the-aperture" title="Link to this heading">#</a></h3>
+<p>Lightkurve’s <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.to_lightcurve.html">to_lightcurve()</a> function has an <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code> keyword, which changes the aperture used to perform photometry. Later we’ll look at creating our own apertures, but first, let’s look at the three standard arguments this keyword takes:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">'pipeline'</span></code>: this is the default option, which will return the same as above.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'threshold'</span></code>: select all pixels which have a flux higher than 3 standard deviations above a median brightness.</p></li>
@@ -524,7 +649,7 @@ array([[False, False, False, False, False],
 </pre></div></div>
 </div>
 <p>This is Lightkurve’s default 3 standard deviations threshold mask, and for this TPF there’s only one pixel with flux above that cutoff. Note how Lightkurve apertures work: pixels marked <code class="docutils literal notranslate"><span class="pre">True</span></code> in the aperture mask array are the ones that are used for photometry.</p>
-<p>We’ll make our own Boolean masks like this later. First, let’s play around with the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html?highlight=create_threshold_mask">create_threshold_mask()</a> function and try to reproduce the pipeline mask. Keeping in mind that the TPF we looked at above has many more bright pixels than faint ones, we can expect a bright median, so let’s try using a lower threshold:</p>
+<p>We’ll make our own Boolean masks like this later. First, let’s play around with the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html">create_threshold_mask()</a> function and try to reproduce the pipeline mask. Keeping in mind that the TPF we looked at above has many more bright pixels than faint ones, we can expect a bright median, so let’s try using a lower threshold:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
@@ -568,10 +693,10 @@ array([[False, False, False, False, False],
 </section>
 </section>
 <section id="3.-Manual-Custom-Apertures">
-<h2>3. Manual Custom Apertures<a class="headerlink" href="#3.-Manual-Custom-Apertures" title="Permalink to this headline">#</a></h2>
+<h2>3. Manual Custom Apertures<a class="headerlink" href="#3.-Manual-Custom-Apertures" title="Link to this heading">#</a></h2>
 <section id="3.1-Creating-a-custom-threshold-aperture-with-Lightkurve">
-<h3>3.1 Creating a custom threshold aperture with Lightkurve<a class="headerlink" href="#3.1-Creating-a-custom-threshold-aperture-with-Lightkurve" title="Permalink to this headline">#</a></h3>
-<p>In this section we’ll look at performing aperture photometry with a custom aperture. We’re going to switch to a different star, KIC 2437901. This star is an oscillating red giant (Colman et al., in prep), but we’re interested in it because it was processed using a large TPF, and there’s a second bright star captured in the image.</p>
+<h3>3.1 Creating a custom threshold aperture with Lightkurve<a class="headerlink" href="#3.1-Creating-a-custom-threshold-aperture-with-Lightkurve" title="Link to this heading">#</a></h3>
+<p>In this section we’ll look at performing aperture photometry with a custom aperture. We’re going to switch to a different star, <a class="reference external" href="https://arxiv.org/pdf/2310.06757">KIC 2437901</a>. This star is an oscillating red giant, but we’re interested in it because it was processed using a large TPF, and there’s a second bright star captured in the image.</p>
 <p>Have a look at the TPF:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -636,8 +761,8 @@ array([[False, False, False, False, False, False, False, False],
 <img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_40_0.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_40_0.png" />
 </div>
 </div>
-<p>No luck. Our custom aperture still selects the bright star in the center. When the thresholding method yields multiple contiguous regions, the default behavior of the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html?highlight=create_threshold_mask">create_threshold_mask</a> method is to return the region closest to the center. We can modify this behavior by passing a <code class="docutils literal notranslate"><span class="pre">reference_pixel</span></code> argument to specify the region we are most interested
-in. The argument is defined such that <code class="docutils literal notranslate"><span class="pre">reference_pixel=(0,0)</span></code> refers to the lower left corner. Hence, we can select the region in the upper right corner as follows:</p>
+<p>No luck. Our custom aperture still selects the bright star in the center. When the thresholding method yields multiple contiguous regions, the default behavior of the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.create_threshold_mask.html">create_threshold_mask</a> method is to return the region closest to the center. We can modify this behavior by passing a <code class="docutils literal notranslate"><span class="pre">reference_pixel</span></code> argument to specify the region we are most interested in. The argument is
+defined such that <code class="docutils literal notranslate"><span class="pre">reference_pixel=(0,0)</span></code> refers to the lower left corner. Hence, we can select the region in the upper right corner as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
@@ -675,7 +800,7 @@ in. The argument is defined such that <code class="docutils literal notranslate"
 <p>We could make that signal even clearer by being more selective, and manually assigning <code class="docutils literal notranslate"><span class="pre">True</span></code> to the individual pixels we want to use. The downside to this method is that it takes time and manual work to create a mask by hand. However, when working with small volumes of data, such as one quarter or campaign at a time, or one star, this method can produce good results. In what follows, we will demonstrate three alternative methods to create a mask by hand.</p>
 </section>
 <section id="3.2-Creating-a-custom-aperture-with-NumPy-arrays">
-<h3>3.2 Creating a custom aperture with NumPy arrays<a class="headerlink" href="#3.2-Creating-a-custom-aperture-with-NumPy-arrays" title="Permalink to this headline">#</a></h3>
+<h3>3.2 Creating a custom aperture with NumPy arrays<a class="headerlink" href="#3.2-Creating-a-custom-aperture-with-NumPy-arrays" title="Link to this heading">#</a></h3>
 <p>We can use NumPy to create an aperture mask array by hand. For this star, it would make sense to select a 3x3 zone in the top right of the image. This can be tricky: 2D NumPy arrays index the y-axis first, and are printed with the zeroth y index at the top of the array, whereas a plotted array places zero at the bottom, as with a normal plot.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
@@ -721,8 +846,8 @@ array([[False, False, False, False, False, False, False, False],
 </div>
 </section>
 <section id="3.3-%22Cutting-out%22-a-background-star">
-<h3>3.3 “Cutting out” a background star<a class="headerlink" href="#3.3-%22Cutting-out%22-a-background-star" title="Permalink to this headline">#</a></h3>
-<p>Using Lightkurve’s <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.cutout.html?highlight=cutout">cutout()</a> function, we can emulate the process of creating a threshold mask on only the pixels we’re interested in. This method is only suitable for large TPFs with a clearly separated background star, like the case of KIC 2437901 and KIC 2437948.</p>
+<h3>3.3 “Cutting out” a background star<a class="headerlink" href="#3.3-%22Cutting-out%22-a-background-star" title="Link to this heading">#</a></h3>
+<p>Using Lightkurve’s <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.cutout.html">cutout()</a> function, we can emulate the process of creating a threshold mask on only the pixels we’re interested in. This method is only suitable for large TPFs with a clearly separated background star, like the case of KIC 2437901 and KIC 2437948.</p>
 <p>Let’s start by cutting out those 3x3 pixels we just used as an aperture mask:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
@@ -762,7 +887,7 @@ array([[False, False, False, False, False, False, False, False],
 <img alt="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_53_0.png" src="../../_images/tutorials_2-creating-light-curves_2-1-custom-aperture-photometry_53_0.png" />
 </div>
 </div>
-<p>This is still a <a class="reference external" href="https://docs.lightkurve.org/reference/targetpixelfile.html?highlight=targetpixelfile">TargetPixelFile</a> object, so we can use all of the same functions:</p>
+<p>This is still a <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/targetpixelfile.py#L94">TargetPixelFile</a> object, so we can use all of the same functions:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
@@ -840,18 +965,18 @@ array([[False,  True, False],
 <p>And there’s our signal again, nice and clear!</p>
 </section>
 <section id="3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool">
-<h3>3.4 Creating a custom aperture using the <code class="docutils literal notranslate"><span class="pre">tpf.interact</span></code> tool<a class="headerlink" href="#3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool" title="Permalink to this headline">#</a></h3>
-<p>Finally, it is good to know that there is interactive functionality in Lightkurve to create a mask. We cannot demonstrate it in this static tutorial, but you can try it yourself in a local notebook by running tpf<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.interact.html?highlight=interact#lightkurve.KeplerTargetPixelFile.interact">.interact()</a>. This will bring up an interactive panel which allows you to select the pixels you want using mouse clicks. Next,
-press “Save Lightcurve” in the bottom left of the panel. This will export your custom aperture light curve to a FITS file in your working directory. The file name follows a similar convention to official <em>Kepler</em> data products. For example, the file name for the example above is <code class="docutils literal notranslate"><span class="pre">kplr002437901-2011271113734_lpd-targ-custom-lc.fits</span></code>.</p>
+<h3>3.4 Creating a custom aperture using the <code class="docutils literal notranslate"><span class="pre">tpf.interact</span></code> tool<a class="headerlink" href="#3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool" title="Link to this heading">#</a></h3>
+<p>Finally, it is good to know that there is interactive functionality in Lightkurve to create a mask. We cannot demonstrate it in this static tutorial, but you can try it yourself in a local notebook by running tpf<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.interact.html">.interact()</a>. This will bring up an interactive panel which allows you to select the pixels you want using mouse clicks. Next, press “Save Lightcurve” in the bottom left of the
+panel. This will export your custom aperture light curve to a FITS file in your working directory. The file name follows a similar convention to official <em>Kepler</em> data products. For example, the file name for the example above is <code class="docutils literal notranslate"><span class="pre">kplr002437901-2011271113734_lpd-targ-custom-lc.fits</span></code>.</p>
 </section>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">#</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-15</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
@@ -1002,7 +1127,7 @@ archivePrefix = "arXiv",
       eid = {98},
     pages = {98},
       doi = {10.3847/1538-3881/aafc33},
-   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
+   adsurl = {https://adsabs.harvard.edu/abs/2019AJ....157...98G},
   adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
@@ -1054,51 +1179,143 @@ archivePrefix = "arXiv",
 </section>
 
 
-              </div>
+                </article>
               
               
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../1-getting-started/how-to-open-a-lightcurve-in-excel.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">How to open a light curve in Excel?</p>
-        </div>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../1-getting-started/how-to-open-a-lightcurve-in-excel.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">How to open a light curve in Excel?</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="2-1-combining-multiple-quarters.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="2-1-combining-multiple-quarters.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Combining multiple quarters of <em>Kepler</em> data</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
+                </footer>
               
-          </main>
-          
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-      </div>
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Learning-Goals">Learning Goals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#1.-Background">1. Background</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#1.1-Introduction-to-Kepler-photometry">1.1 Introduction to <em>Kepler</em> photometry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#1.2-Aperture-photometry">1.2 Aperture photometry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#1.3-Why-not-just-use-published-light-curves?">1.3 Why not just use published light curves?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#1.4-Choosing-an-aperture">1.4 Choosing an aperture</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#2.-Getting-Started">2. Getting Started</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#2.1-Doing-photometry-with-the-pipeline-aperture">2.1 Doing photometry with the pipeline aperture</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#2.2-Adjusting-the-aperture">2.2 Adjusting the aperture</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#3.-Manual-Custom-Apertures">3. Manual Custom Apertures</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.1-Creating-a-custom-threshold-aperture-with-Lightkurve">3.1 Creating a custom threshold aperture with Lightkurve</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.2-Creating-a-custom-aperture-with-NumPy-arrays">3.2 Creating a custom aperture with NumPy arrays</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.3-%22Cutting-out%22-a-background-star">3.3 “Cutting out” a background star</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.4-Creating-a-custom-aperture-using-the-tpf.interact-tool">3.4 Creating a custom aperture using the <code class="docutils literal notranslate"><span class="pre">tpf.interact</span></code> tool</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#About-this-Notebook">About this Notebook</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">Citing Lightkurve and Astropy</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorials/2-creating-light-curves/2-1-custom-aperture-photometry.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-<footer class="footer mt-5 mt-md-0">
-  <div class="container">
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
     
-    <div class="footer-item">
-      <p class="copyright">
-    &copy; Copyright Lightkurve developers.<br>
-</p>
+      © Copyright Lightkurve developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
     </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
-</p>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
     </div>
-    
-  </div>
-</footer>
+  
+</div>
+
+  </footer>
   </body>
 </html>

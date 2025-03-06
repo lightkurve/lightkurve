@@ -1,314 +1,461 @@
 
 <!DOCTYPE html>
 
-<html>
+
+<html lang="en" data-content_root="../../" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Removing noise from K2 and TESS light curves using Pixel Level Decorrelation (PLDCorrector) &#8212; Lightkurve </title>
-    
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    
-  <link rel="stylesheet"
-    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
-    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=6d2724f8"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/2-creating-light-curves/2-3-k2-pldcorrector';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Removing noise from K2 light curves using Self Flat Fielding (SFFCorrector)" href="2-3-k2-sffcorrector.html" />
     <link rel="prev" title="Removing scattered light from TESS light curves using linear regression (RegressionCorrector)" href="2-3-removing-scattered-light-using-regressioncorrector.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
-
-    <!-- Google Analytics -->
-    
-<script async="" src="https://www.google-analytics.com/analytics.js"></script>
-<script>
-                        window.ga = window.ga || function () {
-                            (ga.q = ga.q || []).push(arguments) };
-                        ga.l = +new Date;
-                        ga('create', 'UA-69171-9', 'auto');
-                        ga('set', 'anonymizeIp', true);
-                        ga('send', 'pageview');
-                    </script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.5" />
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
-
-  <div id="navbar-start">
-    
-    
-<a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
-</a>
-
-    
-  </div>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
   
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
-    <div id="navbar-center" class="mr-auto">
-      
-      <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../whats-new-v2.html">
-  What's new?
- </a>
-</li>
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../quickstart.html">
-  Quickstart
- </a>
-</li>
-
-<li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="../index.html">
-  Tutorials
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../reference/index.html">
-  API
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../about/index.html">
-  About Lightkurve
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../development/index.html">
-  Developing for Lightkurve
- </a>
-</li>
-
+  
+  <dialog id="pst-search-dialog">
     
-</ul>
-      </div>
-      
-    </div>
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-    <div id="navbar-end">
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-        <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
-        </li>
-      </ul>
-      </div>
-      
-    </div>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Lightkurve </p>
+  
+</a></div>
+    
   </div>
-</div>
-    </nav>
+  
+  <div class="col-lg-9 navbar-header-items">
     
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
+    What's new?
+  </a>
+</li>
 
-    <div class="container-xl">
-      <div class="row">
-          
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about/index.html">
+    About Lightkurve
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
+    Developing for Lightkurve
+  </a>
+</li>
+
+                </ul>
+            </li>
             
-            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
-            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
           
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-<div class="tocsection onthispage mt-5 pt-1 pb-3">
-    <i class="fas fa-list"></i> On this page
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
-<nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Learning-Goals">
-   Learning Goals
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Introduction">
-   Introduction
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Imports">
-   Imports
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#1.-Applying-PLD-to-a-K2-Light-Curve">
-   1. Applying PLD to a
-   <em>
-    K2
-   </em>
-   Light Curve
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#2.-Diagnosing-the-Success-of-the-Correction">
-   2. Diagnosing the Success of the Correction
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#3.-How-to-Avoid-Overfitting-Exoplanet-Transits">
-   3. How to Avoid Overfitting Exoplanet Transits
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#3.1-Overfitting">
-     3.1 Overfitting
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#4.-Applying-PLD-to-a-TESS-Light-Curve">
-   4. Applying PLD to a
-   <em>
-    TESS
-   </em>
-   Light Curve
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#5.-Tuning-PLDCorrector-Using-Optional-Parameters">
-   5. Tuning
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     PLDCorrector
-    </span>
-   </code>
-   Using Optional Parameters
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#5.1-Definitions-of-all-additional-parameters">
-     5.1 Definitions of all additional parameters
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#6.-Frequently-Asked-Questions">
-   6. Frequently Asked Questions
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#About-this-Notebook">
-   About this Notebook
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">
-   Citing Lightkurve and Astropy
-  </a>
- </li>
-</ul>
+    </header>
+  
 
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
+    What's new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about/index.html">
+    About Lightkurve
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Developing for Lightkurve
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)</span></li>
+  </ul>
 </nav>
-              </div>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
               
-              <div class="toc-item">
+              
+              
                 
-              </div>
-              
-            
-          </div>
-          
-
-          
-          
-            
-          
-          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
-              
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Removing-noise-from-K2-and-TESS-light-curves-using-Pixel-Level-Decorrelation-(PLDCorrector)">
-<h1>Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-K2-and-TESS-light-curves-using-Pixel-Level-Decorrelation-(PLDCorrector)" title="Permalink to this headline">#</a></h1>
+<h1>Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-K2-and-TESS-light-curves-using-Pixel-Level-Decorrelation-(PLDCorrector)" title="Link to this heading">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
-<li><p>Understand how to apply the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a> tool to remove instrumental noise from <em>K2</em> and <em>TESS</em> light curves.</p></li>
+<li><p>Understand how to apply the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector</a> tool to remove instrumental noise from <em>K2</em> and <em>TESS</em> light curves.</p></li>
 <li><p>Be able to create an exoplanet transit mask and use it to improve PLD.</p></li>
 <li><p>Be aware of common issues, caveats, and potential biases associated with the use of PLD.</p></li>
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">#</a></h2>
 <p>The <a class="reference external" href="https://archive.stsci.edu/k2">K2</a> and <a class="reference external" href="https://archive.stsci.edu/tess">TESS</a> missions both provide high-precision photometry for thousands of exoplanet candidates. However, observations by both telescopes can be muddled by instrumental systematic trends, making exoplanet detection or stellar characterization difficult.</p>
 <p>Pixel Level Decorrelation (PLD) is a method that has primarily been used to remove systematic trends introduced by small spacecraft motions during observations, and has been shown to be successful at improving the precision of data taken by the <em>Spitzer</em> space telescope (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2015ApJ...805..132D/abstract">Deming et al. 2015</a>) and the <em>K2</em> mission (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016AJ....152..100L/abstract">Luger et al. 2016</a>;
 <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018AJ....156...99L/abstract">2018</a>). PLD works by identifying a set of trends in the pixels surrounding the target star, and performing linear regression to create a combination of these trends that effectively models the systematic noise introduced by spacecraft motion. This noise model is then subtracted from the uncorrected light curve.</p>
-<p>This method has been shown to be very effective at removing the periodic systematic trends in <em>K2</em>, and can also help remove the scattered light background signal in <em>TESS</em> observations. This tutorial will demonstrate how to use the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a> for each mission, and will give advice on how to best implement PLD. The
-<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a> is a special case of the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">RegressionCorrector</a>. For more information on how to use
-<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">RegressionCorrector</a> to choose custom regressors and remove scattered light from <em>TESS</em>, please see the tutorial specifically on removing scattered light from <em>TESS</em> data using the Lightkurve <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">RegressionCorrector</a>.</p>
+<p>This method has been shown to be very effective at removing the periodic systematic trends in <em>K2</em>, and can also help remove the scattered light background signal in <em>TESS</em> observations. This tutorial will demonstrate how to use the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector</a> for each mission, and will give advice on how to
+best implement PLD. The PLDCorrector is a special case of the Lightkurve <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector">RegressionCorrector</a>. For more information on how to use RegressionCorrector to choose custom regressors and remove scattered light from <em>TESS</em>, please see the
+<a class="reference external" href="https://lightkurve.github.io/lightkurve/tutorials/2-creating-light-curves/2-3-removing-scattered-light-using-regressioncorrector.html">tutorial</a> specifically on removing scattered light from <em>TESS</em> data using the Lightkurve RegressionCorrector.</p>
 <p>Before reading this tutorial, it is recommended to first familiarize yourself with using target pixel file (TPF) products and light curve products with Lightkurve.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
-<p>We only need to import the <a class="reference external" href="https://docs.lightkurve.org">Lightkurve</a> package for this tutorial, which in turn uses <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
-<div class="nbinput nblast docutils container">
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">#</a></h2>
+<p>We only need to import the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> package for this tutorial, which in turn uses <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
-<span class="o">%</span><span class="k">matplotlib</span> inline
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span><span class="w"> </span><span class="nn">lightkurve</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lk</span>
 </pre></div>
 </div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/nthom/lightkurve/src/lightkurve/config/__init__.py:119: UserWarning: The default Lightkurve cache directory, used by download(), etc., has been moved to /Users/nthom/.lightkurve/cache. Please move all the files in the legacy directory /Users/nthom/.lightkurve-cache to the new location and remove the legacy directory. Refer to https://docs.lightkurve.org/reference/config.html#default-cache-directory-migration for more information.
+  warnings.warn(
+</pre></div></div>
 </div>
 <hr class="docutils" />
 </section>
 <section id="1.-Applying-PLD-to-a-K2-Light-Curve">
-<h2>1. Applying PLD to a <em>K2</em> Light Curve<a class="headerlink" href="#1.-Applying-PLD-to-a-K2-Light-Curve" title="Permalink to this headline">#</a></h2>
+<h2>1. Applying PLD to a <em>K2</em> Light Curve<a class="headerlink" href="#1.-Applying-PLD-to-a-K2-Light-Curve" title="Link to this heading">#</a></h2>
 <p>The dominant source of noise in <em>K2</em> data is created by the motion of the <em>Kepler</em> spacecraft due to periodic thruster firings. This causes stars to drift across different pixels on the detector, which have varied sensitivity. There are two classes of sensitivity variation on a charge-couped device (CCD) detector — variation between pixels (inter-pixel) and variation within each pixel (intra-pixel). Both inter- and intra-pixel sensitivity variations are present on the <em>Kepler</em> detector, which
 ultimately causes different flux levels to be detected as the target’s Point Spread Function (PSF) drifts across the variations, introducing the systematic trends.</p>
-<p>The <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a> uses information from nearby pixels to create a noise model, so we need to use the <a class="reference external" href="https://docs.lightkurve.org/reference/targetpixelfile.html?highlight=targetpixelfile">TargetPixelFile</a> data product (for more information, see the tutorial on using <em>Kepler</em> target pixel file products). We can use the
-<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> method to identify available observations for the desired target, and the <a class="reference external" href="https://docs.lightkurve.org/reference/search.html?highlight=download">download</a> method to access the data.</p>
+<p>The <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector</a> uses information from nearby pixels to create a noise model, so we need to use the <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/targetpixelfile.py#L94">TargetPixelFile</a> data product (for more information, see the tutorial on using <em>Kepler</em> target pixel file products). We can use the
+<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_targetpixelfile.html#lightkurve.search_targetpixelfile">search_targetpixelfile</a> method to identify available observations for the desired target, and the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.SearchResult.download.html#lightkurve.SearchResult.download">download</a> method to access the data.</p>
 <p>In what follows below, we will demonstrate PLD on the exoplanet system K2-199, which was observed during <em>K2</em> Campaign 6. We can download the pixel data as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -331,7 +478,7 @@ ultimately causes different flux levels to be detected as the target’s Point S
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lightkurve.correctors</span> <span class="kn">import</span> <span class="n">PLDCorrector</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lightkurve.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLDCorrector</span>
 <span class="n">pld</span> <span class="o">=</span> <span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">pld</span><span class="p">)</span>
 </pre></div>
@@ -345,7 +492,7 @@ ultimately causes different flux levels to be detected as the target’s Point S
 PLDCorrector (ID: EPIC 212779596)
 </pre></div></div>
 </div>
-<p>For convenience, you can also use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.LightCurve.to_corrector.html?highlight=to_corrector#lightkurve.LightCurve.to_corrector">to_corrector</a> method of the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object, and pass in the string <code class="docutils literal notranslate"><span class="pre">'pld'</span></code> to specify the desired corrector type.</p>
+<p>For convenience, you can also use the <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/targetpixelfile.py#L1414">to_corrector</a> method of the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object, and pass in the string <code class="docutils literal notranslate"><span class="pre">'pld'</span></code> to specify the desired corrector type.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
@@ -372,7 +519,7 @@ PLDCorrector (ID: EPIC 212779596)
 </pre></div>
 </div>
 </div>
-<p>Now we can compare the output of PLD to an uncorrected light curve. To create the uncorrected light curve, we can use the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method of the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">KeplerTargetPixelFile</a> object, which performs simple aperture photometry (SAP) to create a light curve from the pixel data.</p>
+<p>Now we can compare the output of PLD to an uncorrected light curve. To create the uncorrected light curve, we can use the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method of the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.html#lightkurve.KeplerTargetPixelFile">KeplerTargetPixelFile</a> object, which performs simple aperture photometry (SAP) to create a light curve from the pixel data.</p>
 <p>Below, the uncorrected light curve is shown in red and the PLD-corrected light curve is plotted in black.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -394,7 +541,7 @@ PLDCorrector (ID: EPIC 212779596)
 </div>
 </div>
 <p>The uncorrected light curve is dominated by a short period (about six hours) sawtooth-shaped pattern caused by the <em>Kepler</em> spacecraft thruster firings. PLD captures this trend in the noise model and has subtracted it, leaving the much more accurate light curve in black.</p>
-<p>We can quantify the improvement by comparing the Combined Differential Photometric Precision (CDPP) values for each light curve.</p>
+<p>We can quantify the improvement by comparing the Combined Differential Photometric Precision (<a class="reference external" href="https://arxiv.org/pdf/1208.0595">CDPP</a>) values for each light curve.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -412,16 +559,16 @@ PLDCorrector (ID: EPIC 212779596)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Uncorrected CDPP = 2928 ppm
-Corrected CDPP = 105 ppm
+Corrected CDPP = 106 ppm
 </pre></div></div>
 </div>
 <p>By this metric, the photometric precision improved by more than a factor of 25 after applying PLD.</p>
 <p>Another important trait of PLD is that long-term variability trends in the light curve are preserved. In this example, we can see the stellar rotation of K2-199 as the sinusoidal signal left in the light curve after correction. This is done by fitting a polynomial spline model to the light curve while simultaneously fitting the noise model, because the uncorrected observation is a combination of the signals.</p>
 </section>
 <section id="2.-Diagnosing-the-Success-of-the-Correction">
-<h2>2. Diagnosing the Success of the Correction<a class="headerlink" href="#2.-Diagnosing-the-Success-of-the-Correction" title="Permalink to this headline">#</a></h2>
+<h2>2. Diagnosing the Success of the Correction<a class="headerlink" href="#2.-Diagnosing-the-Success-of-the-Correction" title="Link to this heading">#</a></h2>
 <p>The success of PLD depends on a number of factors including the brightness of the object, the choice of pixels used to create the light curve and the noise model, and whether or not there exists a correlation between the instrumental noise and the astrophysical signals. For these reasons, it is important to carefully review the correct operation of the algorithm each time you use it, and tune the optional parameters of the algorithm if necessary.</p>
-<p>The most convenient way to diagnose the performance of PLD is to use the <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.diagnose.html?highlight=diagnose#lightkurve.correctors.PLDCorrector.diagnose">diagnose()</a> method, which generates a set of diagnostic plots which we will explain below the graph.</p>
+<p>The most convenient way to diagnose the performance of PLD is to use the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.SFFCorrector.diagnose.html#lightkurve.correctors.SFFCorrector.diagnose">diagnose()</a> method, which generates a set of diagnostic plots which we will explain below the graph.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -437,10 +584,14 @@ Corrected CDPP = 105 ppm
 <img alt="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_20_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-k2-pldcorrector_20_0.png" />
 </div>
 </div>
-<p>The diagnostic plot is composed of the following panels: - <strong>Top panel</strong>: The uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) is shown in black, with the Combined Differential Photometric Precision (CDPP), a measurement of the light curve’s scatter, noted in the legend. - <strong>Middle panel</strong>: The PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>) is plotted in gray with the noise model created by the combination of pixel values (<code class="docutils literal notranslate"><span class="pre">pixel_series</span></code>) in blue, the estimated background trend (<code class="docutils literal notranslate"><span class="pre">background</span></code>) in red, and
-the polynomial spline fit to the stellar variability (<code class="docutils literal notranslate"><span class="pre">spline</span></code>) in yellow. For <em>K2</em>, the background signal is minimal compared to the systematic trends due to motion, but it is much more significant for <em>TESS</em> observations. Notice that the corrected light curve closely matches the spline, which is tracing the preserved stellar variability. - <strong>Bottom panel</strong>: A direct comparison between the uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) and the PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>), again noting
-the CDPP of each light curve in the legend. This panel also indicates which cadences were flagged as outliers (<code class="docutils literal notranslate"><span class="pre">outlier_mask</span></code>), which lie greater than five standard deviations above or below the light curve, as well as which cadences are excluded from the spline fit (<code class="docutils literal notranslate"><span class="pre">~cadence_mask</span></code>). As we will see below, <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> is a Boolean array with the same length as the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>’s time array, where <code class="docutils literal notranslate"><span class="pre">True</span></code> is included in the spline fit and <code class="docutils literal notranslate"><span class="pre">False</span></code> is excluded. The tilde (<code class="docutils literal notranslate"><span class="pre">~</span></code>)
-indicates that the inverse of the mask is marked in this plot, that is, the excluded cadences will be crossed out in blue.</p>
+<p>The diagnostic plot is composed of the following panels:</p>
+<ul class="simple">
+<li><p><strong>Top panel</strong>: The uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) is shown in black, with the Combined Differential Photometric Precision (CDPP), a measurement of the light curve’s scatter, noted in the legend.</p></li>
+<li><p><strong>Middle panel</strong>: The PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>) is plotted in gray with the noise model created by the combination of pixel values (<code class="docutils literal notranslate"><span class="pre">pixel_series</span></code>) in blue, the estimated background trend (<code class="docutils literal notranslate"><span class="pre">background</span></code>) in red, and the polynomial spline fit to the stellar variability (<code class="docutils literal notranslate"><span class="pre">spline</span></code>) in yellow. For <em>K2</em>, the background signal is minimal compared to the systematic trends due to motion, but it is much more significant for <em>TESS</em> observations. Notice that the corrected light
+curve closely matches the spline, which is tracing the preserved stellar variability.</p></li>
+<li><p><strong>Bottom panel</strong>: A direct comparison between the uncorrected light curve (<code class="docutils literal notranslate"><span class="pre">original</span></code>) and the PLD-corrected light curve (<code class="docutils literal notranslate"><span class="pre">corrected</span></code>), again noting the CDPP of each light curve in the legend. This panel also indicates which cadences were flagged as outliers (<code class="docutils literal notranslate"><span class="pre">outlier_mask</span></code>), which lie greater than five standard deviations above or below the light curve, as well as which cadences are excluded from the spline fit (<code class="docutils literal notranslate"><span class="pre">~cadence_mask</span></code>). As we will see below, <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> is a Boolean
+array with the same length as the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>’s time array, where <code class="docutils literal notranslate"><span class="pre">True</span></code> is included in the spline fit and <code class="docutils literal notranslate"><span class="pre">False</span></code> is excluded. The tilde (<code class="docutils literal notranslate"><span class="pre">~</span></code>) indicates that the inverse of the mask is marked in this plot, that is, the excluded cadences will be crossed out in blue.</p></li>
+</ul>
 <p>The plot above makes it convenient to review the components of the noise removal algorithm. The performance of the algorithm is strongly affected by the choice of pixels which go into the model components. To diagnose this part of the algorithm, we can use the <code class="docutils literal notranslate"><span class="pre">diagnose_masks</span></code> method:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -466,10 +617,10 @@ indicates that the inverse of the mask is marked in this plot, that is, the excl
 <p>You can alter the <code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code> and <code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code> by passing them as optional arguments to the <code class="docutils literal notranslate"><span class="pre">correct()</span></code> method we used earlier. For more information about these masks, and how to use them effectively, please see the full list of optional parameters and FAQ at the end of this tutorial.</p>
 </section>
 <section id="3.-How-to-Avoid-Overfitting-Exoplanet-Transits">
-<h2>3. How to Avoid Overfitting Exoplanet Transits<a class="headerlink" href="#3.-How-to-Avoid-Overfitting-Exoplanet-Transits" title="Permalink to this headline">#</a></h2>
+<h2>3. How to Avoid Overfitting Exoplanet Transits<a class="headerlink" href="#3.-How-to-Avoid-Overfitting-Exoplanet-Transits" title="Link to this heading">#</a></h2>
 <p>In the example above, it looks like PLD did a great job of removing the instrumental noise introduced by the <em>K2</em> detector drift, but the bottom panel of the diagnostic plot seems to indicate that we’ve falsely labeled in-transit data points as outliers. To alleviate this, we can introduce the <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code>.</p>
 <section id="3.1-Overfitting">
-<h3>3.1 Overfitting<a class="headerlink" href="#3.1-Overfitting" title="Permalink to this headline">#</a></h3>
+<h3>3.1 Overfitting<a class="headerlink" href="#3.1-Overfitting" title="Link to this heading">#</a></h3>
 <p>It’s necessary to mask out transits and flares when fitting the spline. The spline term fits a polynomial to the long-term trend of the light curve, and the highest likelihood solution generally follows the median of the corrected light curve. The presence of transits or flares can pull the median of the light curve down or up, respectively, causing the spline to deviate from the underlying stellar trend.</p>
 <p>In practice, this causes transits to be partially “fit out” by the spline, reducing their depth and giving an incorrect estimate of the planet’s radius.</p>
 <p>You can use a custom <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> by creating a Boolean array with one value per cadence, where <code class="docutils literal notranslate"><span class="pre">True</span></code> indicates a cadence you wish to include and <code class="docutils literal notranslate"><span class="pre">False</span></code> means that the cadence is masked out.</p>
@@ -542,11 +693,11 @@ indicates that the inverse of the mask is marked in this plot, that is, the excl
 </section>
 </section>
 <section id="4.-Applying-PLD-to-a-TESS-Light-Curve">
-<h2>4. Applying PLD to a <em>TESS</em> Light Curve<a class="headerlink" href="#4.-Applying-PLD-to-a-TESS-Light-Curve" title="Permalink to this headline">#</a></h2>
+<h2>4. Applying PLD to a <em>TESS</em> Light Curve<a class="headerlink" href="#4.-Applying-PLD-to-a-TESS-Light-Curve" title="Link to this heading">#</a></h2>
 <p><em>TESS</em> has multiple observing modes. For example, there are two-minute cadence observations, which were retrieved for specific targeted objects, and there are 30-minute cadence Full Frame Images (FFIs), which capture the entire <em>TESS</em> field of view.</p>
 <p>In this example, we will examine a target using the FFI observation. The <em>TESS</em> FFIs are dominated by the scattered light background signal on the <em>TESS</em> detector, which creates high-amplitude, periodic variation. This background can make planet detection difficult, but it can be removed using PLD.</p>
-<p>To access FFI data, we will use the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESScut</a> tool on the Mikulski Archive for Space Telescopes (MAST), developed by <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et al. 2019</a>. Lightkurve has a built-in search method for creating cutouts called <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_tesscut.html?highlight=search_tesscut">search_tesscut</a>, which uses the same syntax as the
-<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.search_targetpixelfile.html?highlight=search_targetpixelfile">search_targetpixelfile</a> method above. We will search for the Wolf-Rayet star WR 40, which was observed by <em>TESS</em> in Sector 10.</p>
+<p>To access FFI data, we will use the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESScut</a> tool on the Mikulski Archive for Space Telescopes (MAST), developed by <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et al. 2019</a>. Lightkurve has a built-in search method for creating cutouts called <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_tesscut.html">search_tesscut</a>, which uses the same syntax as the
+<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_targetpixelfile.html">search_targetpixelfile</a> method above. We will search for the Wolf-Rayet star WR 40, which was observed by <em>TESS</em> in Sector 10.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
@@ -563,13 +714,13 @@ indicates that the inverse of the mask is marked in this plot, that is, the excl
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table13158896144">
+<table id="table4583330960">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 10</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>WR40</td><td>0.0</td></tr>
 </table></div>
 </div>
-<p>We can download the pixel data with the <a class="reference external" href="https://docs.lightkurve.org/reference/search.html?highlight=download">download</a> method. When using TESScut, this method takes the additional parameter <code class="docutils literal notranslate"><span class="pre">cutout_size</span></code>, which determines how many pixels each side length of the cutout target pixel file should have.</p>
+<p>We can download the pixel data with the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.SearchResult.download.html">download</a> method. When using TESScut, this method takes the additional parameter <code class="docutils literal notranslate"><span class="pre">cutout_size</span></code>, which determines how many pixels each side length of the cutout target pixel file should have.</p>
 <p>Here, we use seven pixels on each side, which strikes a good balance between downloading enough pixels to create a good background model, and not downloading too many pixels, which can result in the corrector running slowly or including neighboring stars in the noise model.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
@@ -605,7 +756,7 @@ SearchResult containing 1 data products.
 </div>
 </div>
 <p>The dominant trend in the SAP light curve above is the dramatic ramp up in flux due to the scattered light background on the <em>TESS</em> detector. The pulsation signal of WR 40 can also be seen clearly, with some additional long-period variability.</p>
-<p>We will create a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a> object, and use the default values for <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.correct.html?highlight=pldcorrector%20correct#lightkurve.correctors.PLDCorrector.correct">PLDCorrector.correct</a> to remove this scattered light background.</p>
+<p>We will create a <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector</a> object, and use the default values for <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.correct.html#lightkurve.correctors.PLDCorrector.correct">PLDCorrector.correct</a> to remove this scattered light background.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
@@ -642,55 +793,110 @@ SearchResult containing 1 data products.
 </div>
 </section>
 <section id="5.-Tuning-PLDCorrector-Using-Optional-Parameters">
-<h2>5. Tuning <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> Using Optional Parameters<a class="headerlink" href="#5.-Tuning-PLDCorrector-Using-Optional-Parameters" title="Permalink to this headline">#</a></h2>
+<h2>5. Tuning <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> Using Optional Parameters<a class="headerlink" href="#5.-Tuning-PLDCorrector-Using-Optional-Parameters" title="Link to this heading">#</a></h2>
 <p>In this section, we explore the optional parameters available when using the PLD method.</p>
-<p>These keywords can be used to influence the performance of PLD. The PLD design matrix is constructed from three distinct submatrices, shown below with their corresponding keywords: * <strong>``background_model``</strong> * <code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code> * <strong>``pixel_series``</strong> * <code class="docutils literal notranslate"><span class="pre">pld_order</span></code> * <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> * <code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code> * <strong>``spline``</strong> * <code class="docutils literal notranslate"><span class="pre">spline_n_knots</span></code> * <code class="docutils literal notranslate"><span class="pre">spline_degree</span></code> * <code class="docutils literal notranslate"><span class="pre">restore_trend</span></code></p>
+<p>These keywords can be used to influence the performance of PLD. The PLD design matrix is constructed from three distinct submatrices, shown below with their corresponding keywords:</p>
+<ul class="simple">
+<li><p><strong>``background_model``</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code></p></li>
+</ul>
+</li>
+<li><p><strong>``pixel_series``</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">pld_order</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pca_components</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code></p></li>
+</ul>
+</li>
+<li><p><strong>``spline``</strong></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">spline_n_knots</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">spline_degree</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">restore_trend</span></code></p></li>
+</ul>
+</li>
+</ul>
 <section id="5.1-Definitions-of-all-additional-parameters">
-<h3>5.1 Definitions of all additional parameters<a class="headerlink" href="#5.1-Definitions-of-all-additional-parameters" title="Permalink to this headline">#</a></h3>
+<h3>5.1 Definitions of all additional parameters<a class="headerlink" href="#5.1-Definitions-of-all-additional-parameters" title="Link to this heading">#</a></h3>
 <p>Full descriptions of each of these keywords can be found below.</p>
-<p><strong>``pld_order``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): * The order of Pixel Level Decorrelation to be performed. First order (<code class="docutils literal notranslate"><span class="pre">n=1</span></code>) uses only the pixel fluxes to construct the design matrix. Higher order populates the design matrix with columns constructed from the products of pixel fluxes. Default 3 for <em>K2</em> and 1 for <em>TESS</em>.</p>
-<p><strong>``pca_components``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code> or tuple of <code class="docutils literal notranslate"><span class="pre">int</span></code>): * Number of terms added to the design matrix for each order of PLD pixel fluxes. Increasing this value may provide higher precision at the expense of slower speed and/or overfitting. If performing PLD with <code class="docutils literal notranslate"><span class="pre">pld_order</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> can be a tuple containing the number of terms for each order of PLD. If a single <code class="docutils literal notranslate"><span class="pre">int</span></code> is passed, the same number of terms will be used for each order. If zero is passed, Principle Component Analysis
-(PCA) will not be performed.</p>
-<p><strong>``background_aperture_mask``</strong> (<code class="docutils literal notranslate"><span class="pre">array-like</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>): * A Boolean array flagging the background pixels such that <code class="docutils literal notranslate"><span class="pre">True</span></code> means that the pixel will be used to generate the background systematics model. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all pixels which are fainter than 1-sigma above the median flux will be used.</p>
+<p><strong>``pld_order``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):</p>
+<ul class="simple">
+<li><p>The order of Pixel Level Decorrelation to be performed. First order (<code class="docutils literal notranslate"><span class="pre">n=1</span></code>) uses only the pixel fluxes to construct the design matrix. Higher order populates the design matrix with columns constructed from the products of pixel fluxes. Default 3 for <em>K2</em> and 1 for <em>TESS</em>.</p></li>
+</ul>
+<p><strong>``pca_components``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code> or tuple of <code class="docutils literal notranslate"><span class="pre">int</span></code>):</p>
+<ul class="simple">
+<li><p>Number of terms added to the design matrix for each order of PLD pixel fluxes. Increasing this value may provide higher precision at the expense of slower speed and/or overfitting. If performing PLD with <code class="docutils literal notranslate"><span class="pre">pld_order</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> can be a tuple containing the number of terms for each order of PLD. If a single <code class="docutils literal notranslate"><span class="pre">int</span></code> is passed, the same number of terms will be used for each order. If zero is passed, Principle Component Analysis (PCA) will not be performed.</p></li>
+</ul>
+<p><strong>``background_aperture_mask``</strong> (<code class="docutils literal notranslate"><span class="pre">array-like</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code>):</p>
+<ul class="simple">
+<li><p>A Boolean array flagging the background pixels such that <code class="docutils literal notranslate"><span class="pre">True</span></code> means that the pixel will be used to generate the background systematics model. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all pixels which are fainter than 1-sigma above the median flux will be used.</p></li>
+</ul>
 <p><strong>``pld_aperture_mask``</strong> (<code class="docutils literal notranslate"><span class="pre">array-like</span></code>, <code class="docutils literal notranslate"><span class="pre">'pipeline'</span></code>, <code class="docutils literal notranslate"><span class="pre">'all'</span></code>, <code class="docutils literal notranslate"><span class="pre">'threshold'</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code>):</p>
 <ul class="simple">
 <li><p>A Boolean array describing the aperture such that <code class="docutils literal notranslate"><span class="pre">True</span></code> means that the pixel will be used when selecting the PLD basis vectors. If <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code> are passed in, all pixels will be used. If <code class="docutils literal notranslate"><span class="pre">'pipeline'</span></code> is passed, the mask suggested by the official pipeline will be returned. If <code class="docutils literal notranslate"><span class="pre">'threshold'</span></code> is passed, all pixels brighter than 3-sigma above the median flux will be used.</p></li>
 </ul>
-<p><strong>``spline_n_knots``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): * Number of knots in spline.</p>
-<p><strong>``spline_degree``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>) * Polynomial degree of spline.</p>
-<p><strong>``restore_trend``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>): * Whether to restore the long-term spline trend to the light curve.</p>
-<p><strong>``sparse``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>): * Whether to create <code class="docutils literal notranslate"><span class="pre">SparseDesignMatrix</span></code>.</p>
-<p><strong>``cadence_mask``</strong> (<code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> of <code class="docutils literal notranslate"><span class="pre">bool</span></code>) * (optional) Mask, where <code class="docutils literal notranslate"><span class="pre">True</span></code> indicates a cadence that should be used.</p>
-<p><strong>``sigma``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): * Standard deviation at which to remove outliers from fitting (default 5).</p>
-<p><strong>``niters``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>) * Number of iterations to fit and remove outliers (default 5).</p>
-<p><strong>``propagate_errors``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>): * Whether to propagate the uncertainties from the regression. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Setting to <code class="docutils literal notranslate"><span class="pre">True</span></code> will increase run time, but will sample from multivariate normal distribution of weights.</p>
+<p><strong>``spline_n_knots``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):</p>
+<ul class="simple">
+<li><p>Number of knots in spline.</p></li>
+</ul>
+<p><strong>``spline_degree``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>)</p>
+<ul class="simple">
+<li><p>Polynomial degree of spline.</p></li>
+</ul>
+<p><strong>``restore_trend``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>):</p>
+<ul class="simple">
+<li><p>Whether to restore the long-term spline trend to the light curve.</p></li>
+</ul>
+<p><strong>``sparse``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>):</p>
+<ul class="simple">
+<li><p>Whether to create <code class="docutils literal notranslate"><span class="pre">SparseDesignMatrix</span></code>.</p></li>
+</ul>
+<p><strong>``cadence_mask``</strong> (<code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> of <code class="docutils literal notranslate"><span class="pre">bool</span></code>)</p>
+<ul class="simple">
+<li><p>(optional) Mask, where <code class="docutils literal notranslate"><span class="pre">True</span></code> indicates a cadence that should be used.</p></li>
+</ul>
+<p><strong>``sigma``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):</p>
+<ul class="simple">
+<li><p>Standard deviation at which to remove outliers from fitting (default 5).</p></li>
+</ul>
+<p><strong>``niters``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>)</p>
+<ul class="simple">
+<li><p>Number of iterations to fit and remove outliers (default 5).</p></li>
+</ul>
+<p><strong>``propagate_errors``</strong> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>):</p>
+<ul class="simple">
+<li><p>Whether to propagate the uncertainties from the regression. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Setting to <code class="docutils literal notranslate"><span class="pre">True</span></code> will increase run time, but will sample from multivariate normal distribution of weights.</p></li>
+</ul>
 </section>
 </section>
 <section id="6.-Frequently-Asked-Questions">
-<h2>6. Frequently Asked Questions<a class="headerlink" href="#6.-Frequently-Asked-Questions" title="Permalink to this headline">#</a></h2>
+<h2>6. Frequently Asked Questions<a class="headerlink" href="#6.-Frequently-Asked-Questions" title="Link to this heading">#</a></h2>
 <p><strong>How should I select the pixels to use?</strong></p>
 <p>As shown earlier, there are three aperture masks used in the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>.</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>: Used to create the SAP flux light curve from which the noise model is subtracted. For this aperture, you should select as many pixels as possible that only contain flux from the target star. This is done automatically using a threshold mask, but it is a good idea to examine that mask with the
-<a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.diagnose_masks.html?highlight=diagnose_masks#lightkurve.correctors.PLDCorrector.diagnose_masks">diagnose_masks</a> method to ensure it does not include background targets.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code>: Used to create the SAP flux light curve from which the noise model is subtracted. For this aperture, you should select as many pixels as possible that only contain flux from the target star. This is done automatically using a threshold mask, but it is a good idea to examine that mask with the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.diagnose_masks.html#lightkurve.correctors.PLDCorrector.diagnose_masks">diagnose_masks</a>
+method to ensure it does not include background targets.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code>: Pixels used to create the background model. These pixels should not contain flux from the target star whose light curve you are attempting to correct, nor should it contain flux from background targets.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code>: Pixels used to create the correlated noise model. This aperture mask is more difficult to define, and may change on a case-by-case basis. For <em>K2</em>, this mask should contain as many pixels as possible in order to best capture the persistent motion-generated noise. For <em>TESS</em>, this mask should have less of an impact than the background mask, but should include all pixels in the cutout that do not contain background stars.</p></li>
 </ul>
 <p><strong>How can I speed up the correction?</strong></p>
-<p>The spline <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.DesignMatrix.html?highlight=designmatrix#lightkurve.correctors.DesignMatrix">DesignMatrix</a> used in <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.PLDCorrector.html?highlight=pldcorrector">PLDCorrector</a> can be substituted for a <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.SparseDesignMatrix.html?highlight=sparsedesignmatrix">SparseDesignMatrix</a>. These behave identically to
-traditional <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> objects, but use <code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code> to speed up calculation and reduce memory. This can be done by passing in <code class="docutils literal notranslate"><span class="pre">sparse=True</span></code> to the <code class="docutils literal notranslate"><span class="pre">correct</span></code> method.</p>
+<p>The spline <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix">DesignMatrix</a> used in <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector</a> can be substituted for a
+<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.SparseDesignMatrix.html#lightkurve.correctors.SparseDesignMatrix">SparseDesignMatrix</a>. These behave identically to traditional <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> objects, but use <code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code> to speed up calculation and reduce memory. This can be done by passing in <code class="docutils literal notranslate"><span class="pre">sparse=True</span></code> to the <code class="docutils literal notranslate"><span class="pre">correct</span></code> method.</p>
 <p><strong>What do I do if I get a singular matrix error?</strong></p>
-<p>A singular matrix error occurs when a matrix used in <a class="reference external" href="https://docs.lightkurve.org/reference/api/lightkurve.correctors.RegressionCorrector.html?highlight=regressioncorrector">RegressionCorrector</a> cannot be inverted, a step necessary for optimizing the coefficients. The primary reason this occurs is that the input <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> has low rank relative to the number of column vectors. There are two suggested solutions to this issue: * Limit the number of input column vectors by performing
-Principle Component Analysis (PCA). This is done automatically in <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>, but the number of output PCA vectors can be reduced using the <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> keyword in the <code class="docutils literal notranslate"><span class="pre">correct</span></code> method from its default value of 16. * Ensure you are not masking out too much of your data. For instance, if you are using the <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code>, make sure that the values you want to include in your detrending are labeled as <code class="docutils literal notranslate"><span class="pre">True</span></code>. Using the inverse <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> will often raise a singular matrix
-error.</p>
+<p>A singular matrix error occurs when a matrix used in <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector">RegressionCorrector</a> cannot be inverted, a step necessary for optimizing the coefficients. The primary reason this occurs is that the input <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> has low rank relative to the number of column vectors. There are two suggested solutions to this issue:</p>
+<ul class="simple">
+<li><p>Limit the number of input column vectors by performing Principle Component Analysis (PCA). This is done automatically in <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>, but the number of output PCA vectors can be reduced using the <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> keyword in the <code class="docutils literal notranslate"><span class="pre">correct</span></code> method from its default value of 16.</p></li>
+<li><p>Ensure you are not masking out too much of your data. For instance, if you are using the <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code>, make sure that the values you want to include in your detrending are labeled as <code class="docutils literal notranslate"><span class="pre">True</span></code>. Using the inverse <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> will often raise a singular matrix error.</p></li>
+</ul>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">#</a></h2>
 <p><strong>Authors</strong>: Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>), Geert Barentsen</p>
 <p><strong>Updated</strong>: September 29, 2020</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies in your published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
@@ -841,7 +1047,7 @@ archivePrefix = "arXiv",
       eid = {98},
     pages = {98},
       doi = {10.3847/1538-3881/aafc33},
-   adsurl = {http://adsabs.harvard.edu/abs/2019AJ....157...98G},
+   adsurl = {https://adsabs.harvard.edu/abs/2019AJ....157...98G},
   adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
@@ -893,51 +1099,136 @@ archivePrefix = "arXiv",
 </section>
 
 
-              </div>
+                </article>
               
               
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="2-3-removing-scattered-light-using-regressioncorrector.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)</p>
-        </div>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="2-3-removing-scattered-light-using-regressioncorrector.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="2-3-k2-sffcorrector.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="2-3-k2-sffcorrector.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Removing noise from K2 light curves using Self Flat Fielding (<code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code>)</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
+                </footer>
               
-          </main>
-          
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-      </div>
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Learning-Goals">Learning Goals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#1.-Applying-PLD-to-a-K2-Light-Curve">1. Applying PLD to a <em>K2</em> Light Curve</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#2.-Diagnosing-the-Success-of-the-Correction">2. Diagnosing the Success of the Correction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#3.-How-to-Avoid-Overfitting-Exoplanet-Transits">3. How to Avoid Overfitting Exoplanet Transits</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.1-Overfitting">3.1 Overfitting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#4.-Applying-PLD-to-a-TESS-Light-Curve">4. Applying PLD to a <em>TESS</em> Light Curve</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#5.-Tuning-PLDCorrector-Using-Optional-Parameters">5. Tuning <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> Using Optional Parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#5.1-Definitions-of-all-additional-parameters">5.1 Definitions of all additional parameters</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#6.-Frequently-Asked-Questions">6. Frequently Asked Questions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#About-this-Notebook">About this Notebook</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">Citing Lightkurve and Astropy</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/tutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-<footer class="footer mt-5 mt-md-0">
-  <div class="container">
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
     
-    <div class="footer-item">
-      <p class="copyright">
-    &copy; Copyright Lightkurve developers.<br>
-</p>
+      © Copyright Lightkurve developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
     </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
-</p>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
     </div>
-    
-  </div>
-</footer>
+  
+</div>
+
+  </footer>
   </body>
 </html>
