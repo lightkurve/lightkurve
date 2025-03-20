@@ -2529,7 +2529,20 @@ class LightCurve(TimeSeries):
                         fits.Column(name="CADENCENO", format="J", array=self.cadenceno)
                     )
             for kw in extra_data:
-                if isinstance(extra_data[kw], (np.ndarray, list)):
+                if isinstance(extra_data[kw], TimeBase):
+                    cols.append(
+                        fits.Column(
+                            name="{}".format(kw).upper(),
+                            format="D",
+                            unit=extra_data[kw].format,
+                            array=extra_data[kw].value,
+                        )
+                    )
+                    print("{}".format(kw).upper())
+                    print(extra_data[kw].format)
+                    print(extra_data[kw].value)
+                
+                elif isinstance(extra_data[kw], (np.ndarray, list)):
                     cols.append(
                         fits.Column(
                             name="{}".format(kw).upper(),
@@ -2537,6 +2550,8 @@ class LightCurve(TimeSeries):
                             array=extra_data[kw],
                         )
                     )
+
+
             if "SAP_QUALITY" not in extra_data:
                 cols.append(
                     fits.Column(
