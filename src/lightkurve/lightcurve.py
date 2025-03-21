@@ -2538,9 +2538,7 @@ class LightCurve(TimeSeries):
                             array=extra_data[kw].value,
                         )
                     )
-                    print("{}".format(kw).upper())
-                    print(extra_data[kw].format)
-                    print(extra_data[kw].value)
+
                 
                 elif isinstance(extra_data[kw], (np.ndarray, list)):
                     cols.append(
