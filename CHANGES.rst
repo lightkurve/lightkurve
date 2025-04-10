@@ -1,7 +1,17 @@
-2.6.0 (unreleased)
-==================
+2.5.1  (unreleased)
+=====================
 
+- Fixed pixel to world coordinate transformation in ``TargetPixelFile.get_coordinates()``
+  in line 488 ("ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)"), where for consistency with
+  Gaia the origin should be 0 instead of 1. [#1465]
+- Fixed ``LightCurve.select_flux()`` in edge cases, where the unit of
+  the new ``flux`` column is different from that of the ``flux_err`` column. [#1467]
+- Fixed numpy v2 compatibility for ``tpf.interact()``. [#1473]
+- Modified RegressionCorrector.correct() to add the model flux error in quadrature. [#1439]
+- Updated the default TESS quality mask to include Argabrightening, Impulsive Outlier, and Bad Calibration Exclude flags (see issue #1230). [#1336]
+- Updated tutorial notebook links [#1484]
 - Made oktopus an optional dependency enabling support for Numpy 2.x. [#1452]
+
 
 2.5.0 (2024-08-29)
 =====================
