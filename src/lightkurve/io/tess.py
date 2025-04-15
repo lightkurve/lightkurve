@@ -41,7 +41,10 @@ def read_tess_lightcurve(
     )
     lc = lc[quality_mask]
 
-    lc.meta["AUTHOR"] = "SPOC"
+    if 'tess-spoc' in filename:
+        lc.meta["AUTHOR"] = "TESS-SPOC"
+    else:
+        lc.meta["AUTHOR"] = "SPOC"
     lc.meta["TARGETID"] = lc.meta.get("TICID")
     lc.meta["QUALITY_BITMASK"] = quality_bitmask
     lc.meta["QUALITY_MASK"] = quality_mask
