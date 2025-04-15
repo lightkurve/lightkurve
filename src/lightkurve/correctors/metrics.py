@@ -413,7 +413,7 @@ def _align_to_lc(lc, ref_lc):
 
         # NaN any cadences in ref_lc and not lc
         # This requires us to add rows to the lc table
-        lc_nan_mask = np.logical_not(np.in1d(ref_lc.cadenceno, aligned_lc.cadenceno))
+        lc_nan_mask = np.logical_not(np.isin(ref_lc.cadenceno, aligned_lc.cadenceno))
         lc_nan_indices = np.nonzero(lc_nan_mask)[0]
         if len(lc_nan_indices) > 0:
             row_to_add = LightCurve(aligned_lc[0:len(lc_nan_indices)])
@@ -430,12 +430,12 @@ def _align_to_lc(lc, ref_lc):
         # REALLY slow.
         try:
             # This method is fast but might cause errors
-            keep_indices = np.nonzero(np.in1d(aligned_lc.cadenceno, ref_lc.cadenceno))[0]
+            keep_indices = np.nonzero(np.isin(aligned_lc.cadenceno, ref_lc.cadenceno))[0]
             aligned_lc = aligned_lc[keep_indices]
         except:
             # This method is slow but appears to be more robust
             trim_indices = np.nonzero(np.logical_not(
-                np.in1d(aligned_lc.cadenceno, ref_lc.cadenceno)))[0]
+                np.isin(aligned_lc.cadenceno, ref_lc.cadenceno)))[0]
             aligned_lc.remove_rows(trim_indices)
 
         # Now sort the lc by cadenceno

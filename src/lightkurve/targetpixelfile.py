@@ -855,8 +855,10 @@ class TargetPixelFile(object):
             col, row = centroid_quadratic(self.flux[idx], mask=aperture_mask)
             col_centr.append(col)
             row_centr.append(row)
+
         col_centr = np.asarray(col_centr, dtype=float) + self.column
         row_centr = np.asarray(row_centr, dtype=float) + self.row
+
         col_centr = Quantity(col_centr, unit="pixel")
         row_centr = Quantity(row_centr, unit="pixel")
         return col_centr, row_centr
@@ -1052,7 +1054,7 @@ class TargetPixelFile(object):
             show_progress=show_progress,
         )
         if return_mask:
-            return res, np.in1d(self.time.jd, res.epoch)
+            return res, np.isin(self.time.jd, res.epoch)
         return res
 
     def plot(

@@ -17,7 +17,7 @@ from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
 from astropy.time import Time
 
-from astropy.timeseries import LombScargle
+from astropy.timeseries import BoxLeastSquares, LombScargle
 from astropy.timeseries.periodograms.lombscargle import implementations  # for .main._is_regular
 
 
@@ -1070,16 +1070,6 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         ensuring that any systems with at least 3 transits are within the range of searched periods.
 
         """
-        # BoxLeastSquares was added to `astropy.stats` in AstroPy v3.1 and then
-        # moved to `astropy.timeseries` in v3.2, which makes the import below
-        # somewhat complicated.
-        try:
-            from astropy.timeseries import BoxLeastSquares
-        except ImportError:
-            try:
-                from astropy.stats import BoxLeastSquares
-            except ImportError:
-                raise ImportError("BLS requires AstroPy v3.1 or later")
 
         # Validate user input for `lc`
         # (BoxLeastSquares will not work if flux or flux_err contain NaNs)
