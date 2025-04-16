@@ -1057,27 +1057,34 @@ class LightCurve(TimeSeries):
         # `normalize_phase=True`, so creating a `FoldedLightCurve` object
         # requires the following three-step workaround:
         # 1. Give the folded light curve a valid time column again
+
+        # Having the time replaced by the folded time (as happens time astropy Timeseries.fold)
+        # messes up a lot of lk functions. Let's switch it back, and redefine F
+        # oldedLightCurve to use the PHASE_TIME column
         with ts._delay_required_column_checks():
             folded_time = ts.time.copy()
             ts.remove_column("time")
             ts.add_column(self.time, name="time", index=0)
+            ts.add_column(folded_time, name="PHASE_TIME")
         # 2. Create the folded object
         lc = FoldedLightCurve(data=ts)
         # 3. Restore the folded time
-        with lc._delay_required_column_checks():
-            lc.remove_column("time")
-            lc.add_column(folded_time, name="time", index=0)
+        #with lc._delay_required_column_checks():
+        #    lc.remove_column("time")
+        #    lc.add_column(folded_time, name="time", index=0)
 
         # Add extra column and meta data specific to FoldedLightCurve
         lc.add_column(
             self.time.copy(), name="time_original", index=len(self._required_columns)
         )
         lc.meta["PERIOD"] = period
+        if epoch_time is None:
+            epoch_time = self.time[0]
         lc.meta["EPOCH_TIME"] = epoch_time
         lc.meta["EPOCH_PHASE"] = epoch_phase
         lc.meta["WRAP_PHASE"] = wrap_phase
         lc.meta["NORMALIZE_PHASE"] = normalize_phase
-        lc.sort("time")
+        lc.sort("PHASE_TIME")
 
         return lc
 
@@ -1824,6 +1831,7 @@ class LightCurve(TimeSeries):
         self,
         method="plot",
         column="flux",
+        time_column='time',
         ax=None,
         normalize=False,
         xlabel=None,
@@ -1844,6 +1852,8 @@ class LightCurve(TimeSeries):
             One of 'plot', 'scatter', or 'errorbar'.
         column : str
             Name of data column to plot. Default `flux`.
+        time_column : str
+            Name of time data column. Defauld `time`. 
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
@@ -1878,18 +1888,20 @@ class LightCurve(TimeSeries):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
+        flux = self[column]
+        time = self[time_column]
         # Configure the default style
         if style is None or style == "lightkurve":
             style = MPLSTYLE
         # Default xlabel
         if xlabel is None:
-            if not hasattr(self.time, "format"):
+            if not hasattr(time, "format"):
                 xlabel = "Phase"
-            elif self.time.format == "bkjd":
+            elif time.format == "bkjd":
                 xlabel = "Time - 2454833 [BKJD days]"
-            elif self.time.format == "btjd":
+            elif time.format == "btjd":
                 xlabel = "Time - 2457000 [BTJD days]"
-            elif self.time.format == "jd":
+            elif time.format == "jd":
                 xlabel = "Time [JD]"
             else:
                 xlabel = "Time"
@@ -1953,7 +1965,7 @@ class LightCurve(TimeSeries):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == "scatter":
-                sc = ax.scatter(self.time.value, flux, **kwargs)
+                sc = ax.scatter(time.value, flux, **kwargs)
                 # Colorbars should only be plotted if the user specifies, and there is
                 # a color specified that is not a string (e.g. 'C1') and is iterable.
                 if (
@@ -1969,12 +1981,12 @@ class LightCurve(TimeSeries):
             elif method == "errorbar":
                 if np.any(~np.isnan(flux_err)):
                     ax.errorbar(
-                        x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs
+                        x=time.value, y=flux.value, yerr=flux_err.value, **kwargs
                     )
                 else:
                     log.warning(f"Column `{column}` has no associated errors.")
             else:
-                ax.plot(self.time.value, flux.value, **kwargs)
+                ax.plot(time.value, flux.value, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
@@ -2988,7 +3000,7 @@ class FoldedLightCurve(LightCurve):
     @property
     def phase(self):
         """Alias for `LightCurve.time`."""
-        return self.time
+        return self.PHASE_TIME
 
     @property
     def cycle(self):
@@ -2999,9 +3011,9 @@ class FoldedLightCurve(LightCurve):
         if epoch_time is None:
             # explicit check needed (cannot be the default value in get() function call above)
             # because Lightcurve.fold() will put an explicit None in meta, if epoch_time is not specified.
-            epoch_time = self.time.min()
+            epoch_time = self.PHASE_TIME.min()
         cycle_epoch_start = epoch_time - self.period / 2
-        result = np.asarray(np.floor(((self.time_original - cycle_epoch_start) / self.period).value), dtype=int)
+        result = np.asarray(np.floor(((self.time - cycle_epoch_start) / self.period).value), dtype=int)
         result = result - result.min()
         return result
 
@@ -3041,8 +3053,9 @@ class FoldedLightCurve(LightCurve):
         """
         if "xlabel" not in kwargs:
             kwargs["xlabel"] = "Phase"
-            if isinstance(self.time, TimeDelta):
-                kwargs["xlabel"] += f" [{self.time.format.upper()}]"
+            if isinstance(self.PHASE_TIME, TimeDelta):
+                kwargs["xlabel"] += f" [{self.PHASE_TIME.format.upper()}]"
+            kwargs["time_column"] = "PHASE_TIME"
         return kwargs
 
     def plot(self, **kwargs):
@@ -3131,6 +3144,7 @@ class FoldedLightCurve(LightCurve):
         bins=None,
         binsize=None,
     ):
+        # TODO: The aggregate_downsample has to have the 'time' keyword be the phased time
         """Bins a FoldedLightCurve in equally-spaced bins in time.
 
         If the original light curve contains flux uncertainties (``flux_err``),
@@ -3203,7 +3217,8 @@ class FoldedLightCurve(LightCurve):
         # To work around this, we reset the index to be the regular phase (TimeDelta) when binning
         if (hasattr(self, 'normalize_phase')) & (self.normalize_phase == True):
             with self._delay_required_column_checks():
-                normalized_phase = self.time.copy()
+                normalized_phase = self.PHASE_TIME.copy()
+                original_time = self.time.copy()
                 phase = TimeDelta(normalized_phase * self.period)
                 self.remove_column("time")
                 self.add_column(phase, name="time", index=0)
@@ -3274,6 +3289,8 @@ class FoldedLightCurve(LightCurve):
                 time_bin_size = 0.5 * u.day
         elif not isinstance(time_bin_size, Quantity):
             time_bin_size *= u.day
+
+    
         # Call AstroPy's aggregate_downsample
         with warnings.catch_warnings():
             # ignore uninteresting empty slice warnings
@@ -3331,17 +3348,25 @@ class FoldedLightCurve(LightCurve):
             with self._delay_required_column_checks():
                 phase = self.time.copy()
                 normalized_phase = phase / self.period
-                self.remove_column("time")
-                self.add_column(normalized_phase, name="time", index=0)
-                self.sort("time")
+                self.remove_column("PHASE_TIME")
+                self.add_column(normalized_phase, name="PHASE_TIME")
+                self.remove_column('time')
+                self.add_column(original_time, name='time', index=0)
+                self.sort("PHASE_TIME")
 
             # Reset the 'time' column of the folded and binned object to be the normalized value
             with returned_object._delay_required_column_checks():
                 phase = returned_object.time.copy()
                 normalized_phase = phase / self.period #returned_object.normalized_phase.copy()
-                returned_object.remove_column("time")
-                returned_object.add_column(normalized_phase, name="time", index=0)
-                returned_object.sort("time")
+                returned_object.remove_column("PHASE_TIME")
+                returned_object.add_column(normalized_phase, name="PHASE_TIME")
+                returned_object.sort("PHASE_TIME")
+        else:
+                        # Reset the 'time' column of the folded and binned object to be the normalized value
+            with returned_object._delay_required_column_checks():
+                phase = returned_object.time.copy()
+                returned_object.add_column(phase, name="PHASE_TIME")
+                returned_object.sort("PHASE_TIME")
                          
 
         return returned_object #self.__class__(ts, meta=self.meta)
