@@ -43,7 +43,7 @@ __all__ = [
 AUTHOR_LINKS = {
     "Kepler": "https://archive.stsci.edu/kepler/data_products.html",
     "K2": "https://archive.stsci.edu/k2/data_products.html",
-    "SPOC": "https://heasarc.gsfc.nasa.gov/docs/tess/pipeline.html",
+    "SPOC": "https://heasarc.gsfc.nasa.gov/docs/tess/data-handling.html",
     "TESS-SPOC": "https://archive.stsci.edu/hlsp/tess-spoc",
     "QLP": "https://archive.stsci.edu/hlsp/qlp",
     "TASOC": "https://archive.stsci.edu/hlsp/tasoc",
@@ -161,12 +161,8 @@ class SearchResult(object):
 
     def __repr__(self, html=False):
         def to_tess_gi_url(proposal_id):
-            if re.match("^G0[12].+", proposal_id) is not None:
-                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-primary.html#:~:text={proposal_id}"
-            elif re.match("^G0[34].+", proposal_id) is not None:
-                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs-em1.html#:~:text={proposal_id}"
-            else:
-                return f"https://heasarc.gsfc.nasa.gov/docs/tess/approved-programs.html#:~:text={proposal_id}"
+            cycle = int(proposal_id[1:3])
+            return f"https://heasarc.gsfc.nasa.gov/docs/tess/data/approved-programs/cycle{cycle}/{proposal_id}.txt"
 
         out = "SearchResult containing {} data products.".format(len(self.table))
         if len(self.table) == 0:
@@ -1375,9 +1371,9 @@ def _mask_by_exptime(products, exptime):
         if exptime in ["fast"]:
             mask &= products["exptime"] < 60
         elif exptime in ["short"]:
-            mask &= (products["exptime"] >= 60) & (products["exptime"] < 300)
+            mask &= (products["exptime"] >= 60) & (products["exptime"] < 200)
         elif exptime in ["long", "ffi"]:
-            mask &= products["exptime"] >= 300
+            mask &= products["exptime"] >= 200
     return mask
 
 

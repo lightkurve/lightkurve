@@ -8,6 +8,7 @@ import pytest
 
 from astropy.io import fits
 
+from lightkurve.collections import LightCurveCollection, TargetPixelFileCollection
 from lightkurve.utils import LightkurveDeprecationWarning, LightkurveError
 from lightkurve import (
     PACKAGEDIR,
@@ -15,7 +16,7 @@ from lightkurve import (
     TessTargetPixelFile,
     LightCurve,
 )
-from lightkurve.io import read
+from lightkurve.io import read, read_lc_collection, read_tpf_collection
 from lightkurve.io.generic import read_generic_lightcurve
 
 from .. import TESTDATA
@@ -49,6 +50,13 @@ def test_read_lc_in_hdu():
     assert len(lc.flux) > 0, "LC should be functional even the hdul is closed."
 
 
+def test_read_lc_cloud():
+    """Read a lightcurve file from AWS S3 cloud"""
+    cloud_uri = 's3://stpubdata/tess/public/tid/s0015/0000/0003/7542/2201/tess2019226182529-s0015-0000000375422201-0151-s_lc.fits'
+    lc = read(cloud_uri)
+    assert isinstance(lc, LightCurve)
+
+
 # tpf.hdu has open file handle, so they are not tested for unclosed file handles
 def test_read_tpf():
     # define paths to k2 and tess data
@@ -69,6 +77,44 @@ def test_read_tpf():
     assert isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile)
     # Can open take a quality_bitmask argument?
     assert read(k2_path, quality_bitmask="hard").quality_bitmask == "hard"
+
+
+def test_read_tpf_cloud():
+    """Read a TPF file from AWS S3 cloud"""
+    cloud_uri = 's3://stpubdata/kepler/public/target_pixel_files/0082/008264588/kplr008264588-2009131105131_lpd-targ.fits.gz'
+    tpf = read(cloud_uri)
+    assert isinstance(tpf, KeplerTargetPixelFile)
+
+
+def test_read_lc_collection():
+    """Read multiple light curve files into a collection"""
+    path_list = ['s3://stpubdata/kepler/public/lightcurves/0082/008264588/kplr008264588-2009131105131_llc.fits',
+                 's3://stpubdata/kepler/public/lightcurves/0082/008264588/kplr008264588-2009166043257_llc.fits',
+                 's3://stpubdata/kepler/public/lightcurves/0082/008264588/kplr008264588-2009259160929_llc.fits']
+    collection = read_lc_collection(path_list)
+    assert isinstance(collection, LightCurveCollection)
+
+    # Check that stitching produces a single light curve
+    stitched = read_lc_collection(path_list, stitch=True)
+    assert isinstance(stitched, LightCurve)
+
+    # Checking edge cases - path to a TPF file and an invalid path
+    # Neither path should produce a light curve, and resulting collection should be empty
+    path_empty = ['s3://stpubdata/kepler/public/target_pixel_files/0082/008264588/kplr008264588-2009131105131_lpd-targ.fits.gz',
+                  's3://invalid']
+    empty_collection = read_lc_collection(path_empty)
+    assert isinstance(empty_collection, LightCurveCollection)
+    assert not empty_collection.data
+
+
+def test_read_tpf_collection():
+    """Read multiple TPF files into a collection"""
+    path_list = ['s3://stpubdata/tess/public/tid/s0015/0000/0003/7542/2201/tess2019226182529-s0015-0000000375422201-0151-s_tp.fits',
+                 's3://stpubdata/tess/public/tid/s0016/0000/0003/7542/2201/tess2019253231442-s0016-0000000375422201-0152-s_tp.fits',
+                 's3://stpubdata/tess/public/tid/s0017/0000/0003/7542/2201/tess2019279210107-s0017-0000000375422201-0161-s_tp.fits']
+
+    collection = read_tpf_collection(path_list)
+    assert isinstance(collection, TargetPixelFileCollection)
 
 
 def test_open():

@@ -3,7 +3,7 @@ import pytest
 from astropy.io import fits
 from astropy.utils.data import get_pkg_data_filename
 import numpy as np
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_equal
 
 from lightkurve import search_lightcurve
 from lightkurve.io.eleanor import read_eleanor_lightcurve
@@ -31,6 +31,10 @@ def test_gsfc_eleanor_lite():
         lc = read_eleanor_lightcurve(url, quality_bitmask='hardest')
         assert not (lc["quality"] & (2**17 | 2**18)).any()
         assert np.issubdtype(lc["cadenceno"].dtype, np.integer)
+
+        # https://github.com/lightkurve/lightkurve/issues/1467
+        lc = lc.select_flux("flux_bkg")
+        assert_equal(lc["flux_err"].unit, lc["flux"].unit)
 
 
 @pytest.mark.parametrize(

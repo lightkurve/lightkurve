@@ -17,7 +17,8 @@ developer, please open an issue!
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Daniel Hey <https://github.com/danielhey>`_
 - `Oliver Hall <https://github.com/ojhall94>`_
-
+- `Nicole Schance <https://github.com/Nschanche>`_
+- `Tyler Pritchard <https://github.com/tylerapritchard>`_
 
 
 Contributors
@@ -59,6 +60,7 @@ The following GitHub members directly contributed code and bugfixes:
 - `DeepekshGupta <https://github.com/DeepekshGupta>`_
 - `vvilhelmus <https://github.com/vvilhelmus>`_
 - `vbkostov <https://github.com/vbkostov>`_
+- `Sam Bianco <https://github.com/snbianco>`_
 
 
 Community

@@ -559,7 +559,21 @@ class LightCurve(TimeSeries):
             if flux_err_column in lc.columns:
                 lc["flux_err"] = lc[flux_err_column]
             else:
-                lc["flux_err"][:] = np.nan
+                # fill in a dummy all-nan flux_err column
+                # ensure the unit of new flux_err is consistent with that of flux.
+                flux_err_col_vals = np.full(lc["flux"].shape, np.nan)
+                if lc["flux"].unit is not None:
+                    flux_err_col_vals = flux_err_col_vals * lc["flux"].unit
+                lc["flux_err"] = flux_err_col_vals
+
+        # Ensure resulting flux / flux_err have the same
+        # Do the check here after the columns are selected so as to uniformly handle
+        # different cases.
+        if lc["flux"].unit != lc["flux_err"].unit:
+            raise ValueError(
+                f"Columns '{flux_column}' and '{flux_err_column}' have different units: "
+                f"{lc.flux.unit} and {lc.flux_err.unit} respectively."
+            )
 
         lc.meta['FLUX_ORIGIN'] = flux_column
         normalized_new_flux = lc["flux"].unit is None or lc["flux"].unit is u.dimensionless_unscaled
@@ -1987,6 +2001,10 @@ class LightCurve(TimeSeries):
                     log.warning(f"Column `{column}` has no associated errors.")
             else:
                 ax.plot(time.value, flux.value, **kwargs)
+
+            # Default title (none)
+            if title is not None:
+                ax.set_title(title)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
@@ -2508,7 +2526,10 @@ class LightCurve(TimeSeries):
             ).any():
                 cols.append(
                     fits.Column(
-                        name=flux_column_name, format="E", unit="e-/s", array=self.flux
+                        name=flux_column_name,
+                        format="E",
+                        unit=self.flux.unit.to_string(),
+                        array=self.flux,
                     )
                 )
             if hasattr(self,'flux_err'):
@@ -2517,7 +2538,7 @@ class LightCurve(TimeSeries):
                         fits.Column(
                             name=flux_column_name.upper() + "_ERR",
                             format="E",
-                            unit="e-/s",
+                            unit=self.flux_err.unit.to_string(),
                             array=self.flux_err,
                         )
                     )

@@ -932,6 +932,25 @@ def test_to_fits():
         )
 
 
+def test_to_fits_flux_units_in_header():
+    # Test the units
+    hdu = LightCurve(
+        time=[0, 1, 2, 3, 4] * u.s,
+        flux=[1, 1, 1, 1, 1] * u.dimensionless_unscaled,
+        flux_err=[0.1, 0.1, 0.1, 0.1, 0.1] * u.dimensionless_unscaled,
+    ).to_fits()
+    assert "TUNIT2" not in hdu[1].header
+    assert "TUNIT3" not in hdu[1].header
+
+    hdu = LightCurve(
+        time=[0, 1, 2, 3, 4] * u.s,
+        flux=[1, 1, 1, 1, 1] * u.Jy,
+        flux_err=[0.1, 0.1, 0.1, 0.1, 0.1] * u.Jy,
+    ).to_fits()
+    assert hdu[1].header["TUNIT2"] == "Jy"
+    assert hdu[1].header["TUNIT3"] == "Jy"
+
+
 def test_astropy_time_bkjd():
     """Does `KeplerLightCurve` support bkjd?"""
     bkjd = np.array([100, 200])
@@ -1928,6 +1947,10 @@ def test_select_flux():
                           'newflux_err': [7, 8, 9] * u_e_s,
                           'newflux_n1': [0.9, 1, 1.1] * u.dimensionless_unscaled,  # normalized, unitless
                           'newflux_n2': [0.9, 1, 1.1],  # normalized, no unit
+                          'newflux_n3': [4, 5, 6] * u_e_s,  # case flux and _err have different units
+                          'newflux_n3_err': [1, 2, 3] * u.percent,
+                          'newflux_n4': [4, 5, 6] * u_e_s,  # case flux and _err have different units
+                          'newflux_n4_err': [.01, .02, .03],  # normalized, no unit
                           },
                           )
     # Can we set flux to newflux?
@@ -1941,6 +1964,15 @@ def test_select_flux():
     assert all(lc.select_flux("newflux", flux_err_column="newflux").flux_err == lc.newflux)
     # ensure flux_err in the new lc is nan if the origin does not have it
     assert all(np.isnan(lc.select_flux("newflux_n1")["flux_err"]))
+    assert_equal(  # https://github.com/lightkurve/lightkurve/issues/1467
+        lc.select_flux("newflux_n1")["flux_err"].unit, lc.select_flux("newflux_n1")["flux"].unit,
+        "The unit of the all-nan flux_err should be the same as that of flux [#1467]"
+    )
+    # Do inconsistent units in the selected columns raise a ValueError? [issue 1467]
+    with pytest.raises(ValueError, match="different units"):
+        lc.select_flux("newflux_n3")
+    with pytest.raises(ValueError, match="different units"):
+        lc.select_flux("newflux_n4")
     # Do invalid column names raise a ValueError?
     with pytest.raises(ValueError):
         lc.select_flux("doesnotexist")

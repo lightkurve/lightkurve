@@ -1,4 +1,18 @@
-2.5.0 (unreleased)
+2.5.1  (unreleased)
+=====================
+
+- Fixed pixel to world coordinate transformation in ``TargetPixelFile.get_coordinates()``
+  in line 488 ("ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)"), where for consistency with
+  Gaia the origin should be 0 instead of 1. [#1465]
+- Fixed ``LightCurve.select_flux()`` in edge cases, where the unit of
+  the new ``flux`` column is different from that of the ``flux_err`` column. [#1467]
+- Fixed numpy v2 compatibility for ``tpf.interact()``. [#1473]
+- Modified RegressionCorrector.correct() to add the model flux error in quadrature. [#1439]
+- Updated the default TESS quality mask to include Argabrightening, Impulsive Outlier, and Bad Calibration Exclude flags (see issue #1230). [#1336]
+- Updated tutorial notebook links [#1484]
+- Author keyword now specifies between SPOC and TESS-SPOC [#1487]
+
+2.5.0 (2024-08-29)
 =====================
 
 - Fixed memory leak in reading Lightcurve / TargetPixel FITS files in v2.4.2 [#1390]
@@ -12,11 +26,16 @@
 - Various improvements to the online documentation. [#1400, #1425]
 - Fixed a bug in ``tpf.interact()`` so that proper y label is displayed when
   lightcurve is normalized with ``transform_func``. [#1387]
+- Changed 'short' cadence in search.py to be <200s so the new TESS FFI cadence is excluded [#1394]
 - Fixed ``lightkurve.utils.centroid_quadratic()`` in edge cases, e.g., fluxes are
   all negative with mask specified, NaN in the identified brightest 3X3 patch. [#1426]
 - Fixed interact features, e.g. ``tpf.interact()``, to be compliant
   with Bokeh v3.4.0. The minimum Bokeh version is raised to v2.3.2 accordingly. [#1428]
-
+- Updated aperture plotting to speed it up in the case of large (bleed column) apertures. [#1434]
+- Fixed time format for KEPSEISMIC light curves from bjkd to mjd. [#1443]
+- Fixed flux unit bug in to_fits [#1454]
+- Added support to read data products hosted on public AWS S3 buckets. [#1451]
+- Added functions to read in collections of light curves or target pixel files. [#1451]
 
 2.4.2 (2023-11-03)
 =====================

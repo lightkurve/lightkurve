@@ -9,7 +9,6 @@ from astropy.table import vstack
 from astropy.utils.decorators import deprecated
 
 from . import MPLSTYLE
-from .targetpixelfile import TargetPixelFile
 from .utils import LightkurveWarning, LightkurveDeprecationWarning
 
 
