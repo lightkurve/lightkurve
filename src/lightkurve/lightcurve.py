@@ -2484,14 +2484,6 @@ class LightCurve(TimeSeries):
                 "DATE": datetime.datetime.now().strftime("%Y-%m-%d"),
                 "CREATOR": "lightkurve.LightCurve.to_fits()",
                 "PROCVER": str(__version__),
-                "TELESCOP": self.telescop,
-                "INSTRUME": self.instrume,
-                "OBJECT": self.object,
-                "MISSION": self.mission,
-                "RA_OBJ": self.ra,
-                "DEC_OBJ": self.dec,
-                "MOM_CENTR1": self.centroid_col,
-                "MOM_CENTR2": self.centroid_row,
             }
 
             for kw in default:
@@ -3473,24 +3465,25 @@ class KeplerLightCurve(LightCurve):
             Returns an astropy.io.fits object if path is None
         """
         kepler_specific_data = {
-            #"TELESCOP": "KEPLER",
+            "TELESCOP": "KEPLER",
             "INSTRUME": "Kepler Photometer",
-            #"OBJECT": "{}".format(self.targetid),
+            "OBJECT": "{}".format(self.targetid),
             "KEPLERID": self.targetid,
             "CHANNEL": self.channel,
-            #"MISSION": self.mission,
-            #"RA_OBJ": self.ra,
-            #"DEC_OBJ": self.dec,
+            "MISSION": self.mission,
+            "RA_OBJ": self.ra,
+            "DEC_OBJ": self.dec,
             "EQUINOX": 2000,
             "DATE-OBS": Time(self.time[0] + 2454833.0, format=("jd")).isot,
             "SAP_QUALITY": self.quality,
-            #"MOM_CENTR1": self.centroid_col,
-            #"MOM_CENTR2": self.centroid_row,
+            "MOM_CENTR1": self.centroid_col,
+            "MOM_CENTR2": self.centroid_row,
         }
 
         for kw in kepler_specific_data:
-            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
-                extra_data[kw] = kepler_specific_data[kw]
+            if hasattr(self, kw):
+                if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                    extra_data[kw] = kepler_specific_data[kw]
         hdu = super(KeplerLightCurve, self).to_fits(
             path=None, overwrite=overwrite, **extra_data
         )
@@ -3593,17 +3586,17 @@ class TessLightCurve(LightCurve):
             Returns an astropy.io.fits object if path is None
         """
         tess_specific_data = {
-            #"OBJECT": "{}".format(self.targetid),
-            #"MISSION": self.meta.get("MISSION"),
-            #"RA_OBJ": self.meta.get("RA"),
-            #"TELESCOP": self.meta.get("MISSION"),
+            "OBJECT": "{}".format(self.targetid),
+            "MISSION": self.meta.get("MISSION"),
+            "RA_OBJ": self.meta.get("RA"),
+            "TELESCOP": self.meta.get("MISSION"),
             "CAMERA": self.meta.get("CAMERA"),
             "CCD": self.meta.get("CCD"),
             "SECTOR": self.meta.get("SECTOR"),
             "TARGETID": self.meta.get("TARGETID"),
-            #"DEC_OBJ": self.meta.get("DEC"),
-            #"MOM_CENTR1": self.centroid_col,
-            #"MOM_CENTR2": self.centroid_row,
+            "DEC_OBJ": self.meta.get("DEC"),
+            "MOM_CENTR1": self.centroid_col,
+            "MOM_CENTR2": self.centroid_row,
         }
 
         for kw in tess_specific_data:
