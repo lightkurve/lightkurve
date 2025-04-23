@@ -102,6 +102,9 @@ class TargetPixelFile(object):
         self.path = path
         if isinstance(path, fits.HDUList):
             self.hdu = path
+        elif (isinstance(path, str) and path.startswith('s3://')):
+            # Filename is an S3 cloud URI
+            self.hdu = fits.open(path, use_fsspec=True, fsspec_kwargs={"anon": True}, **kwargs)
         else:
             self.hdu = fits.open(self.path, **kwargs)
         try:
@@ -482,7 +485,7 @@ class TargetPixelFile(object):
         ).transpose([1, 2, 0])
 
         # Pass through WCS
-        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)
+        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 0)
         ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
         dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
         ra, dec = ra[self.quality_mask], dec[self.quality_mask]
@@ -852,8 +855,8 @@ class TargetPixelFile(object):
             col, row = centroid_quadratic(self.flux[idx], mask=aperture_mask)
             col_centr.append(col)
             row_centr.append(row)
-        col_centr = np.asfarray(col_centr) + self.column
-        row_centr = np.asfarray(row_centr) + self.row
+        col_centr = np.asarray(col_centr, dtype=float) + self.column
+        row_centr = np.asarray(row_centr, dtype=float) + self.row
         col_centr = Quantity(col_centr, unit="pixel")
         row_centr = Quantity(row_centr, unit="pixel")
         return col_centr, row_centr
@@ -1185,23 +1188,18 @@ class TargetPixelFile(object):
         # Overlay the aperture mask if given
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
-            for i in range(self.shape[1]):
-                for j in range(self.shape[2]):
-                    if aperture_mask[i, j]:
-                        if hasattr(ax, "wcs"):
-                            # When using WCS coordinates, do not add col/row to mask coords
-                            xy = (j - 0.5, i - 0.5)
-                        else:
-                            xy = (j + self.column - 0.5, i + self.row - 0.5)
-                        rect = patches.Rectangle(
-                            xy=xy,
-                            width=1,
-                            height=1,
-                            color=mask_color,
-                            fill=False,
-                            hatch="//",
-                        )
-                        ax.add_patch(rect)
+            in_aperture = np.where(aperture_mask)
+            if hasattr(ax, "wcs"):
+                ap_row = in_aperture[0] - 0.5
+                ap_col = in_aperture[1] - 0.5
+            else:
+                ap_row = in_aperture[0] + self.row - 0.5
+                ap_col = in_aperture[1] + self.column - 0.5    
+            for ii in range(len(ap_row)):
+                
+                rect=patches.Rectangle((ap_col[ii],ap_row[ii]),1,1, fill=False, hatch="//", color=mask_color)
+                ax.add_patch(rect)
+                
         return ax
 
     def _to_matplotlib_animation(
@@ -1556,7 +1554,7 @@ class TargetPixelFile(object):
                     datacol._dims = datacol.array.shape[1:]
                     datacol._format = fits.column._ColumnFormat(
                         "{}{}".format(
-                            np.product(datacol.array.shape[1:]), datacol._format[-1]
+                            np.prod(datacol.array.shape[1:]), datacol._format[-1]
                         )
                     )
                     data_columns.append(datacol)
