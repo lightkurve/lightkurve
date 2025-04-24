@@ -257,7 +257,7 @@ def test_lightcurve_fold():
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
     fold = lc.fold(period=1, epoch_time=-0.1)
-    assert_almost_equal(fold.PHASE_TIME[0], -0.5, 2)
+    assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
     assert np.min(fold.cycle) == 0
@@ -266,7 +266,7 @@ def test_lightcurve_fold():
         # `transit_midpoint` is deprecated and its use will emit a warning
         warnings.simplefilter("ignore", LightkurveWarning)
         fold = lc.fold(period=1, transit_midpoint=-0.1)
-    assert_almost_equal(fold.PHASE_TIME[0], -0.5, 2)
+    assert_almost_equal(fold.phase[0], -0.5, 2)
     ax = fold.plot()
     assert "Phase" in ax.get_xlabel()
     ax = fold.scatter()
@@ -1390,13 +1390,13 @@ def test_fold_v2():
     fld = lc.fold(period=1)
     fld2 = lc.fold(period=1 * u.day)
     assert_array_equal(fld.phase, fld2.phase)
-    assert isinstance(fld.PHASE_TIME, TimeDelta)
+    assert isinstance(fld.phase, TimeDelta)
     fld.plot_river()
     plt.close()
 
     # Does phase normalization work?
     fld = lc.fold(period=1, normalize_phase=True)
-    assert isinstance(fld.PHASE_TIME, u.Quantity)
+    assert isinstance(fld.phase, u.Quantity)
     fld.plot_river()
     plt.close()
 

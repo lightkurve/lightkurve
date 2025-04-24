@@ -1078,12 +1078,12 @@ class LightCurve(TimeSeries):
 
         # Having the time replaced by the folded time (as happens time astropy Timeseries.fold)
         # messes up a lot of lk functions. Let's switch it back, and redefine F
-        # oldedLightCurve to use the PHASE_TIME column
+        # oldedLightCurve to use the phase column
         with ts._delay_required_column_checks():
             folded_time = ts.time.copy()
             ts.remove_column("time")
             ts.add_column(self.time, name="time", index=0)
-            ts.add_column(folded_time, name="PHASE_TIME")
+            ts.add_column(folded_time, name="phase")
         # 2. Create the folded object
         lc = FoldedLightCurve(data=ts)
         # 3. Restore the folded time
@@ -1102,7 +1102,7 @@ class LightCurve(TimeSeries):
         lc.meta["EPOCH_PHASE"] = epoch_phase
         lc.meta["WRAP_PHASE"] = wrap_phase
         lc.meta["NORMALIZE_PHASE"] = normalize_phase
-        lc.sort("PHASE_TIME")
+        lc.sort("phase")
 
         return lc
 
@@ -3025,7 +3025,7 @@ class FoldedLightCurve(LightCurve):
     @property
     def phase(self):
         """Alias for `LightCurve.time`."""
-        return self.PHASE_TIME
+        return self.phase
 
     @property
     def cycle(self):
@@ -3036,7 +3036,7 @@ class FoldedLightCurve(LightCurve):
         if epoch_time is None:
             # explicit check needed (cannot be the default value in get() function call above)
             # because Lightcurve.fold() will put an explicit None in meta, if epoch_time is not specified.
-            epoch_time = self.PHASE_TIME.min()
+            epoch_time = self.phase.min()
         cycle_epoch_start = epoch_time - self.period / 2
         result = np.asarray(np.floor(((self.time - cycle_epoch_start) / self.period).value), dtype=int)
         result = result - result.min()
@@ -3078,9 +3078,9 @@ class FoldedLightCurve(LightCurve):
         """
         if "xlabel" not in kwargs:
             kwargs["xlabel"] = "Phase"
-            if isinstance(self.PHASE_TIME, TimeDelta):
-                kwargs["xlabel"] += f" [{self.PHASE_TIME.format.upper()}]"
-            kwargs["time_column"] = "PHASE_TIME"
+            if isinstance(self.phase, TimeDelta):
+                kwargs["xlabel"] += f" [{self.phase.format.upper()}]"
+            kwargs["time_column"] = "phase"
         return kwargs
 
     def plot(self, **kwargs):
@@ -3217,7 +3217,7 @@ class FoldedLightCurve(LightCurve):
         # To work around this, we reset the index to be the regular phase (TimeDelta) when binning
         if hasattr(self, 'normalize_phase'):
             with self._delay_required_column_checks():
-                phase = self.PHASE_TIME.copy()
+                phase = self.phase.copy()
                 original_time = self.time.copy()
                 if self.normalize_phase == True:
                     phase = TimeDelta(phase * self.period)
@@ -3344,37 +3344,37 @@ class FoldedLightCurve(LightCurve):
         if hasattr(self, 'normalize_phase'):
             
             # Reset the 'time' column of the folded object to be the JD time
-            # If the phase was normalized, set PHASE_TIME to the normalized value
+            # If the phase was normalized, set 'phase' to the normalized value
             with self._delay_required_column_checks():
                 phase = self.time.copy()
-                self.remove_column("PHASE_TIME")
+                self.remove_column("phase")
                 if self.normalize_phase == True:
                     normalized_phase = phase / self.period
-                    self.add_column(normalized_phase, name="PHASE_TIME")
+                    self.add_column(normalized_phase, name="phase")
                 else:
-                    self.add_column(phase, name="PHASE_TIME")
+                    self.add_column(phase, name="phase")
                 self.remove_column('time')
                 self.add_column(original_time, name='time', index=0)
-                self.sort("PHASE_TIME")
+                self.sort("phase")
 
             # Reset the 'time' column of the folded and binned object to be the phase 
             #       The time in JD is no longer relavant when binning a phase curve    
             with returned_object._delay_required_column_checks():
                 phase = returned_object.time.copy()
                 if self.normalize_phase == True:
-                    returned_object.remove_column("PHASE_TIME")
+                    returned_object.remove_column("phase")
                     normalized_phase = phase / self.period #returned_object.normalized_phase.copy()
-                    returned_object.add_column(normalized_phase, name="PHASE_TIME")
+                    returned_object.add_column(normalized_phase, name="phase")
                 else:
-                    returned_object.add_column(phase, name="PHASE_TIME")
+                    returned_object.add_column(phase, name="phase")
 
                 returned_object.sort("time")
         else:
             # Reset the 'time' column of the folded and binned object to be the normalized value
             with returned_object._delay_required_column_checks():
                 phase = returned_object.time.copy()
-                returned_object.add_column(phase, name="PHASE_TIME")
-                returned_object.sort("PHASE_TIME")
+                returned_object.add_column(phase, name="phase")
+                returned_object.sort("phase")
                          
 
         return returned_object #self.__class__(ts, meta=self.meta)
