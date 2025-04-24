@@ -3025,7 +3025,7 @@ class FoldedLightCurve(LightCurve):
     @property
     def phase(self):
         """Alias for `LightCurve.time`."""
-        return self.phase
+        return self["phase"]
 
     @property
     def cycle(self):
