@@ -1040,7 +1040,11 @@ class LightCurve(TimeSeries):
         ):
             epoch_phase *= u.day
         if wrap_phase is not None and not isinstance(wrap_phase, Quantity):
-            wrap_phase *= u.day
+            if normalize_phase:
+                wrap_phase *= u.dimensionless_unscaled
+            else:
+                wrap_phase *= u.day
+                
 
         # Warn if `epoch_time` appears to use the wrong format
         if epoch_time is not None and epoch_time.value > 2450000:
@@ -3188,7 +3192,7 @@ class FoldedLightCurve(LightCurve):
         n_bins : int, optional
             The number of bins to use. Defaults to the number needed to fit all
             the original points. Note that this will create this number of bins
-            of length ``time_bin_size`` independent of the lightkurve length.
+            of length ``phase_bin_size`` independent of the lightkurve length.
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
