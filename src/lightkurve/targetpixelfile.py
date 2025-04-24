@@ -108,14 +108,21 @@ class TargetPixelFile(object):
         self.path = path
         if isinstance(path, fits.HDUList):
             self.hdu = path
+        elif (isinstance(path, str) and path.startswith('s3://')):
+            # Filename is an S3 cloud URI
+            self.hdu = fits.open(path, use_fsspec=True, fsspec_kwargs={"anon": True}, **kwargs)
         else:
-            with fits.open(self.path, **kwargs) as hdulist:
-                self.hdu = deepcopy(hdulist)
-        self.quality_bitmask = quality_bitmask
-        self.targetid = targetid
+            self.hdu = fits.open(self.path, **kwargs)
+        try:
+            self.quality_bitmask = quality_bitmask
+            self.targetid = targetid
 
-        # For consistency with `LightCurve`, provide a `meta` dictionary
-        self.meta = HduToMetaMapping(self.hdu[0])
+            # For consistency with `LightCurve`, provide a `meta` dictionary
+            self.meta = HduToMetaMapping(self.hdu[0])
+        except Exception as e:
+            # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
+            self.hdu.close()
+            raise e
 
     def __getitem__(self, key):
         """Implements indexing and slicing.
@@ -484,7 +491,7 @@ class TargetPixelFile(object):
         ).transpose([1, 2, 0])
 
         # Pass through WCS
-        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)
+        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 0)
         ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
         dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
         ra, dec = ra[self.quality_mask], dec[self.quality_mask]
@@ -666,10 +673,10 @@ class TargetPixelFile(object):
                     # Kepler and TESS pipeline style integer flags
                     aperture_mask = (aperture_mask & 2) == 2
                 else:
-                    aperture_mask = aperture_mask.astype(bool)                
+                    aperture_mask = aperture_mask.astype(bool)
             elif np.issubdtype(aperture_mask.dtype, float):
-                aperture_mask = aperture_mask.astype(bool)                
-        self._last_aperture_mask = aperture_mask 
+                aperture_mask = aperture_mask.astype(bool)
+        self._last_aperture_mask = aperture_mask
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3, reference_pixel="center"):
@@ -854,8 +861,8 @@ class TargetPixelFile(object):
             col, row = centroid_quadratic(self.flux[idx], mask=aperture_mask)
             col_centr.append(col)
             row_centr.append(row)
-        col_centr = np.asfarray(col_centr) + self.column
-        row_centr = np.asfarray(row_centr) + self.row
+        col_centr = np.asarray(col_centr, dtype=float) + self.column
+        row_centr = np.asarray(row_centr, dtype=float) + self.row
         col_centr = Quantity(col_centr, unit="pixel")
         row_centr = Quantity(row_centr, unit="pixel")
         return col_centr, row_centr
@@ -1099,7 +1106,7 @@ class TargetPixelFile(object):
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
         kwargs : dict
-            Keywords arguments passed to `lightkurve.utils.plot_image`.
+            Keywords arguments passed to `~lightkurve.utils.plot_image`.
 
         Returns
         -------
@@ -1187,23 +1194,18 @@ class TargetPixelFile(object):
         # Overlay the aperture mask if given
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
-            for i in range(self.shape[1]):
-                for j in range(self.shape[2]):
-                    if aperture_mask[i, j]:
-                        if hasattr(ax, "wcs"):
-                            # When using WCS coordinates, do not add col/row to mask coords
-                            xy = (j - 0.5, i - 0.5)
-                        else:
-                            xy = (j + self.column - 0.5, i + self.row - 0.5)
-                        rect = patches.Rectangle(
-                            xy=xy,
-                            width=1,
-                            height=1,
-                            color=mask_color,
-                            fill=False,
-                            hatch="//",
-                        )
-                        ax.add_patch(rect)
+            in_aperture = np.where(aperture_mask)
+            if hasattr(ax, "wcs"):
+                ap_row = in_aperture[0] - 0.5
+                ap_col = in_aperture[1] - 0.5
+            else:
+                ap_row = in_aperture[0] + self.row - 0.5
+                ap_col = in_aperture[1] + self.column - 0.5    
+            for ii in range(len(ap_row)):
+                
+                rect=patches.Rectangle((ap_col[ii],ap_row[ii]),1,1, fill=False, hatch="//", color=mask_color)
+                ax.add_patch(rect)
+                
         return ax
 
     def _to_matplotlib_animation(
@@ -1348,8 +1350,8 @@ class TargetPixelFile(object):
             before saving a fits file.  Default: None (no transform is applied).
         ylim_func: function
             A function that returns ylimits (low, high) given a LightCurve object.
-            The default is to return an expanded window around the 10-90th
-            percentile of lightcurve flux values.
+            The default is to return a window approximately around 5 sigma-clipped
+            lightcurve flux values.
 
         Examples
         --------
@@ -1558,7 +1560,7 @@ class TargetPixelFile(object):
                     datacol._dims = datacol.array.shape[1:]
                     datacol._format = fits.column._ColumnFormat(
                         "{}{}".format(
-                            np.product(datacol.array.shape[1:]), datacol._format[-1]
+                            np.prod(datacol.array.shape[1:]), datacol._format[-1]
                         )
                     )
                     data_columns.append(datacol)
@@ -1886,8 +1888,8 @@ class TargetPixelFile(object):
             Inspired by https://github.com/noraeisner/LATTE
         corrector_func : function
             Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
-            This function is applied to each light curve in the collection
-            prior to stitching. The default is to normalize each light curve.
+            This function is applied to each pixel's light curve.
+            The default is to return a 5 sigma-clipped light curve.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -1896,7 +1898,7 @@ class TargetPixelFile(object):
             Size of the markers in the lightcurve plot. For periodogram plot, it is used as the line width.
             Default: 0.5
         kwargs : dict
-            e.g. extra parameters to be passed to `lc.to_periodogram`.
+            e.g. extra parameters to be passed to `~lightkurve.LightCurve.to_periodogram`.
 
         Examples
         --------
@@ -1913,7 +1915,7 @@ class TargetPixelFile(object):
             >>>
             >>> # Variation: Customize the plot's size so that each pixel is about 1 inch by 1 inch
             >>> import matplotlib.pyplot as plt
-            >>> fig = plt.figure(figsize=(tpf.flux[0].shape[0] * 1.0, tpf.flux[0].shape[1] * 1.0))    # doctest: +SKIP
+            >>> fig = plt.figure(figsize=(tpf.flux[0].shape[1] * 1.0, tpf.flux[0].shape[0] * 1.0))    # doctest: +SKIP
             >>> tpf.plot_pixels(ax=fig.gca(), aperture_mask='pipeline')    # doctest: +SKIP
 
 
@@ -2168,28 +2170,33 @@ class KeplerTargetPixelFile(TargetPixelFile):
         super(KeplerTargetPixelFile, self).__init__(
             path, quality_bitmask=quality_bitmask, **kwargs
         )
-        self.quality_mask = KeplerQualityFlags.create_quality_mask(
-            quality_array=self.hdu[1].data["QUALITY"], bitmask=quality_bitmask
-        )
-
-        # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.hdu)
-        if filetype == "TessTargetPixelFile":
-            warnings.warn(
-                "A TESS data product is being opened using the "
-                "`KeplerTargetPixelFile` class. "
-                "Please use `TessTargetPixelFile` instead.",
-                LightkurveWarning,
-            )
-        elif filetype is None:
-            warnings.warn(
-                "File header not recognized as Kepler or TESS " "observation.",
-                LightkurveWarning,
+        try:
+            self.quality_mask = KeplerQualityFlags.create_quality_mask(
+                quality_array=self.hdu[1].data["QUALITY"], bitmask=quality_bitmask
             )
 
-        # Use the KEPLERID keyword as the default targetid
-        if self.targetid is None:
-            self.targetid = self.get_header().get("KEPLERID")
+            # check to make sure the correct filetype has been provided
+            filetype = detect_filetype(self.hdu)
+            if filetype == "TessTargetPixelFile":
+                warnings.warn(
+                    "A TESS data product is being opened using the "
+                    "`KeplerTargetPixelFile` class. "
+                    "Please use `TessTargetPixelFile` instead.",
+                    LightkurveWarning,
+                )
+            elif filetype is None:
+                warnings.warn(
+                    "File header not recognized as Kepler or TESS " "observation.",
+                    LightkurveWarning,
+                )
+
+            # Use the KEPLERID keyword as the default targetid
+            if self.targetid is None:
+                self.targetid = self.get_header().get("KEPLERID")
+        except Exception as e:
+            # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
+            self.hdu.close()
+            raise e
 
     def __repr__(self):
         return "KeplerTargetPixelFile Object (ID: {})".format(self.targetid)
@@ -2839,33 +2846,38 @@ class TessTargetPixelFile(TargetPixelFile):
         super(TessTargetPixelFile, self).__init__(
             path, quality_bitmask=quality_bitmask, **kwargs
         )
-        self.quality_mask = TessQualityFlags.create_quality_mask(
-            quality_array=self.hdu[1].data["QUALITY"], bitmask=quality_bitmask
-        )
-        # Early TESS releases had cadences with time=NaN (i.e. missing data)
-        # which were not flagged by a QUALITY flag yet; the line below prevents
-        # these cadences from being used. They would break most methods!
-        if (quality_bitmask != 0) and (quality_bitmask != "none"):
-            self.quality_mask &= np.isfinite(self.hdu[1].data["TIME"])
-
-        # check to make sure the correct filetype has been provided
-        filetype = detect_filetype(self.hdu)
-        if filetype == "KeplerTargetPixelFile":
-            warnings.warn(
-                "A Kepler data product is being opened using the "
-                "`TessTargetPixelFile` class. "
-                "Please use `KeplerTargetPixelFile` instead.",
-                LightkurveWarning,
+        try:
+            self.quality_mask = TessQualityFlags.create_quality_mask(
+                quality_array=self.hdu[1].data["QUALITY"], bitmask=quality_bitmask
             )
-        elif filetype is None:
-            warnings.warn(
-                "File header not recognized as Kepler or TESS " "observation.",
-                LightkurveWarning,
-            )
+            # Early TESS releases had cadences with time=NaN (i.e. missing data)
+            # which were not flagged by a QUALITY flag yet; the line below prevents
+            # these cadences from being used. They would break most methods!
+            if (quality_bitmask != 0) and (quality_bitmask != "none"):
+                self.quality_mask &= np.isfinite(self.hdu[1].data["TIME"])
 
-        # Use the TICID keyword as the default targetid
-        if self.targetid is None:
-            self.targetid = self.get_header().get("TICID")
+            # check to make sure the correct filetype has been provided
+            filetype = detect_filetype(self.hdu)
+            if filetype == "KeplerTargetPixelFile":
+                warnings.warn(
+                    "A Kepler data product is being opened using the "
+                    "`TessTargetPixelFile` class. "
+                    "Please use `KeplerTargetPixelFile` instead.",
+                    LightkurveWarning,
+                )
+            elif filetype is None:
+                warnings.warn(
+                    "File header not recognized as Kepler or TESS " "observation.",
+                    LightkurveWarning,
+                )
+
+            # Use the TICID keyword as the default targetid
+            if self.targetid is None:
+                self.targetid = self.get_header().get("TICID")
+        except Exception as e:
+            # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
+            self.hdu.close()
+            raise e
 
     def __repr__(self):
         return "TessTargetPixelFile(TICID: {})".format(self.targetid)

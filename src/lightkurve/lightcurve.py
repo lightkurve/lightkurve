@@ -559,7 +559,21 @@ class LightCurve(TimeSeries):
             if flux_err_column in lc.columns:
                 lc["flux_err"] = lc[flux_err_column]
             else:
-                lc["flux_err"][:] = np.nan
+                # fill in a dummy all-nan flux_err column
+                # ensure the unit of new flux_err is consistent with that of flux.
+                flux_err_col_vals = np.full(lc["flux"].shape, np.nan)
+                if lc["flux"].unit is not None:
+                    flux_err_col_vals = flux_err_col_vals * lc["flux"].unit
+                lc["flux_err"] = flux_err_col_vals
+
+        # Ensure resulting flux / flux_err have the same
+        # Do the check here after the columns are selected so as to uniformly handle
+        # different cases.
+        if lc["flux"].unit != lc["flux_err"].unit:
+            raise ValueError(
+                f"Columns '{flux_column}' and '{flux_err_column}' have different units: "
+                f"{lc.flux.unit} and {lc.flux_err.unit} respectively."
+            )
 
         lc.meta['FLUX_ORIGIN'] = flux_column
         normalized_new_flux = lc["flux"].unit is None or lc["flux"].unit is u.dimensionless_unscaled
@@ -615,9 +629,7 @@ class LightCurve(TimeSeries):
         warning_type=LightkurveDeprecationWarning,
     )
     def hdu(self):
-        with fits.open(self.filename) as hdulist:
-            hdulist = hdulist.copy()
-        return hdulist
+        return fits.open(self.filename)
 
     @property
     @deprecated("2.0", warning_type=LightkurveDeprecationWarning)
@@ -1977,6 +1989,9 @@ class LightCurve(TimeSeries):
                     log.warning(f"Column `{column}` has no associated errors.")
             else:
                 ax.plot(self.time.value, flux.value, **kwargs)
+            # Default title (none)
+            if title is not None:
+                ax.set_title(title)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
@@ -2270,7 +2285,8 @@ class LightCurve(TimeSeries):
         path_or_buf : string or file handle
             File path or object. By default, the result is returned as a string.
         **kwargs : dict
-            Dictionary of arguments to be passed to `TimeSeries.write()`.
+            Dictionary of arguments to be passed to
+            `astropy`'s `~astropy.timeseries.TimeSeries.write`.
 
         Returns
         -------
@@ -2294,8 +2310,8 @@ class LightCurve(TimeSeries):
 
         The data frame will be indexed by `time` using values corresponding
         to the light curve's time format.  This is different from the
-        default behavior of `Table.to_pandas()` in AstroPy, which converts
-        time values into ISO timestamps.
+        default behavior of `astropy`'s `~astropy.timeseries.TimeSeries.to_pandas`,
+        which converts time values into ISO timestamps.
 
         Returns
         -------
@@ -2489,7 +2505,10 @@ class LightCurve(TimeSeries):
             ).any():
                 cols.append(
                     fits.Column(
-                        name=flux_column_name, format="E", unit="e-/s", array=self.flux
+                        name=flux_column_name,
+                        format="E",
+                        unit=self.flux.unit.to_string(),
+                        array=self.flux,
                     )
                 )
             if hasattr(self,'flux_err'):
@@ -2498,7 +2517,7 @@ class LightCurve(TimeSeries):
                         fits.Column(
                             name=flux_column_name.upper() + "_ERR",
                             format="E",
-                            unit="e-/s",
+                            unit=self.flux_err.unit.to_string(),
                             array=self.flux_err,
                         )
                     )
@@ -2996,7 +3015,12 @@ class FoldedLightCurve(LightCurve):
         """The cycle of the correspond `time_original`.
         The first cycle is cycle 0, irrespective of whether it is a complete one or not.
         """
-        cycle_epoch_start = self.epoch_time - self.period / 2
+        epoch_time = self.meta.get("EPOCH_TIME")
+        if epoch_time is None:
+            # explicit check needed (cannot be the default value in get() function call above)
+            # because Lightcurve.fold() will put an explicit None in meta, if epoch_time is not specified.
+            epoch_time = self.time.min()
+        cycle_epoch_start = epoch_time - self.period / 2
         result = np.asarray(np.floor(((self.time_original - cycle_epoch_start) / self.period).value), dtype=int)
         result = result - result.min()
         return result

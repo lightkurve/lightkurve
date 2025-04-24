@@ -177,7 +177,6 @@ class RegressionCorrector(Corrector):
 
         if prior_sigma is not None:
             sigma_w_inv = sigma_w_inv + np.diag(1.0 / prior_sigma ** 2)
-        if prior_sigma is not None:
             B = B + (prior_mu / prior_sigma ** 2)
 
         # Solve for weights w
@@ -305,7 +304,7 @@ class RegressionCorrector(Corrector):
         )
         self.corrected_lc = self.lc.copy()
         self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
-        self.corrected_lc.flux_err = (self.lc.flux_err ** 2 + model_err ** 2) ** 0.5
+        self.corrected_lc.flux_err = (self.lc.flux_err ** 2 + self.model_lc.flux_err ** 2) ** 0.5
         self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
         return self.corrected_lc
 

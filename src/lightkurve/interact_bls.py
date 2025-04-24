@@ -14,6 +14,7 @@ log = logging.getLogger(__name__)
 
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
+_BOKEH_IMPORT_ERROR = None
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
     from bokeh.io import show, output_notebook
@@ -24,8 +25,10 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Paragraph
     from bokeh.events import PanEnd, Reset
-except ImportError:
-    pass  # we will print an error message in `show_interact_widget` instead
+except Exception as e:
+    # We will print a nice error message in the `show_interact_widget` function
+    # the error would be raised there in case users need to diagnose problems
+    _BOKEH_IMPORT_ERROR = e
 
 from .interact import prepare_lightcurve_datasource
 from .lightcurve import LightCurve
@@ -312,7 +315,7 @@ def make_lightcurve_figure_elements(
     fig.y_range = Range1d(start=float(ylims[0]), end=float(ylims[1]))
 
     # Add light curve
-    fig.circle(
+    fig.scatter(
         "time",
         "flux",
         line_width=1,
@@ -346,7 +349,7 @@ def make_lightcurve_figure_elements(
         text_alpha=0.6,
     )
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle(
+    help = fig.scatter(
         "time",
         "flux",
         alpha=0.0,
@@ -407,7 +410,7 @@ def make_folded_figure_elements(
     fig.xaxis.axis_label = f"Phase [{f.time.format.upper()}]"
 
     # Scatter point for data
-    fig.circle(
+    fig.scatter(
         "phase",
         "flux",
         line_width=1,
@@ -442,7 +445,7 @@ def make_folded_figure_elements(
         text_alpha=0.6,
     )
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle(
+    help = fig.scatter(
         "phase",
         "flux",
         alpha=0.0,
@@ -507,7 +510,7 @@ def make_bls_figure_elements(result, bls_source, help_source):
     )
 
     # Add circles for the selection of new period. These are always hidden
-    fig.circle(
+    fig.scatter(
         "period",
         "power",
         source=bls_source,
@@ -559,7 +562,7 @@ def make_bls_figure_elements(result, bls_source, help_source):
         text_alpha=0.6,
     )
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle(
+    help = fig.scatter(
         "period",
         "power",
         alpha=0.0,
@@ -630,19 +633,12 @@ def show_interact_widget(
         but less accurate compute time. You can also vary this value using the
         Resolution Slider.
     """
-    try:
-        import bokeh
-
-        if bokeh.__version__[0] == "0":
-            warnings.warn(
-                "interact_bls() requires Bokeh version 1.0 or later", LightkurveWarning
-            )
-    except ImportError:
+    if _BOKEH_IMPORT_ERROR is not None:
         log.error(
             "The interact_bls() tool requires the `bokeh` package; "
             "you can install bokeh using e.g. `conda install bokeh`."
         )
-        return None
+        raise _BOKEH_IMPORT_ERROR
 
     def _round_strip_unit(val, decimals):
         return np.round(getattr(val, "value", val), decimals)

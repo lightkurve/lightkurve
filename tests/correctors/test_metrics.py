@@ -39,14 +39,13 @@ def test_underfit_metric_neighbors():
     """Sanity checks for `underfit_metric_neighbors`."""
     # PDCSAP_FLUX has a very good score (>0.99) because it has been corrected
     lc_pdcsap = search_lightcurve("Proxima Cen", sector=11, author="SPOC").download(
-        flux_column="pdcsap_flux"
+        flux_column="pdcsap_flux", 
     )
     assert underfit_metric_neighbors(lc_pdcsap, min_targets=3, max_targets=3) > 0.99
-
     # SAP_FLUX has a worse score (<0.95) because it hasn't been corrected
-    lc_sap = lc_pdcsap.copy()
-    lc_sap.flux = lc_pdcsap.sap_flux
-    lc_sap.flux_err = lc_pdcsap.sap_flux_err
+    lc_sap = search_lightcurve("Proxima Cen", sector=11, author="SPOC").download(
+        flux_column="sap_flux", 
+    )
     assert underfit_metric_neighbors(lc_sap, min_targets=3, max_targets=3) < 0.95
 
     # A flat light curve should have a perfect score (1)

@@ -6,7 +6,7 @@ target's own Target Pixel File.
 against a design matrix composed of the following elements:
 * A background light curve to capture the dominant scattered light systematics.
 * Background-corrected pixel time series to capture any residual systematics.
-* Splines to capture the target's intrinsic variability.
+* Splines to capture the target's intrinsic variability
 """
 import logging
 import warnings
@@ -113,7 +113,8 @@ class PLDCorrector(RegressionCorrector):
         lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
         # Remove cadences that have NaN flux (cf. #874). We don't simply call
         # `lc.remove_nans()` here because we need to mask both lc & tpf.
-        nan_mask = np.isnan(lc.flux)
+        # we also need to remove nans from the flux_err and combine both masks.
+        nan_mask = np.isnan(lc.flux) | np.isnan(lc.flux_err)
         lc = lc[~nan_mask]
         self.tpf = tpf[~nan_mask]
         super().__init__(lc=lc)
@@ -249,7 +250,7 @@ class PLDCorrector(RegressionCorrector):
             # Create a DesignMatrix for each PLD order
             all_pld = []
             for order in range(1, pld_order + 1):
-                reg_n = np.product(list(multichoose(regressors_pld.T, order)), axis=1).T
+                reg_n = np.prod(list(multichoose(regressors_pld.T, order)), axis=1).T
                 pld_n = DesignMatrix(
                     reg_n,
                     prior_sigma=np.ones(reg_n.shape[1]) * prior_sigma / reg_n.shape[1],
