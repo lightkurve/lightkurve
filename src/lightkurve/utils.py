@@ -1084,7 +1084,7 @@ def query_skycatalog(
     result["Separation"] = sep_pm_correct
 
     # Calculate the relative flux
-    result["Relative_Flux"] = np.exp(
+    result["Relative_Flux"] = 10 ** (
         (
             [value for key, value in result.items() if "_Mag" in key][0]
             - [value for key, value in result.items() if "_Mag" in key][0][ref_index]
