@@ -1036,9 +1036,12 @@ class LightCurve(TimeSeries):
         if (
             epoch_phase is not None
             and not isinstance(epoch_phase, Quantity)
-            and not normalize_phase
+            
         ):
-            epoch_phase *= u.day
+            if not normalize_phase:
+                epoch_phase *= u.day
+            else:
+                epoch_phase *= u.dimensionless_unscaled
         if wrap_phase is not None and not isinstance(wrap_phase, Quantity):
             if normalize_phase:
                 wrap_phase *= u.dimensionless_unscaled

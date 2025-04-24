@@ -280,6 +280,14 @@ def test_lightcurve_fold():
     with pytest.warns(LightkurveWarning, match="appears to be given in JD"):
         lc.fold(10, 2456600)
 
+    # Make sure normalizing and binning work for folded lightcurves
+    fold = lc.fold(period=1.5, normalize_phase=False)
+    assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1.5, 2)
+    assert len(fold.bin(bins=10)) == 10
+    fold = lc.fold(period=1.5, normalize_phase=True)
+    assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1, 2)
+    assert len(fold.bin(bins=10)) == 10
+
 
 @pytest.mark.parametrize(
     "normalize_phase", [False, True]
@@ -309,6 +317,7 @@ def test_lightcurve_fold_odd_even_masks(normalize_phase):
     #Check wrap_phase keyword works as expected for normalized folded lightcurves (see #1423)
     wrapped_fold = lc.fold(period=period, epoch_time=epoch_time, epoch_phase=0.5, normalize_phase=normalize_phase, wrap_phase=0.25)
     assert_almost_equal(wrapped_fold.phase[-1].value, 0.25, decimal = 1)
+
 
 
     # cycle 0: time [0, 1)
