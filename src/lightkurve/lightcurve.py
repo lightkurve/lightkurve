@@ -3076,7 +3076,7 @@ class FoldedLightCurve(LightCurve):
     def _replace_normalized_phase(self):
         # Some astropy functions, such as aggregate_downsample, require Time or TimeDelta
         # As normalized phase-folded lightcurves are unitless, this breaks
-        # This will create a copy of self replacing normalized phase with phase in TimeDelta
+        # This will replace the normalized phase with phase in TimeDelta
         if not hasattr(self, 'normalize_phase'):
             warnings.warn("Not a phase-folded lightcurve, no phase available")
 
@@ -3098,8 +3098,6 @@ class FoldedLightCurve(LightCurve):
         # Some astropy functions, such as aggregate_downsample, require Time or TimeDelta
         # As normalized phase-folded lightcurves are unitless, this breaks
         # This will re-normalized the phase
-        #temp_fold = self.copy()
-        # If the phase folded lightcurve is normalized, unnormalize it
         with self._delay_required_column_checks():
             phase = self.time
             normalized_phase = phase / self.period
