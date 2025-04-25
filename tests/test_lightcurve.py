@@ -635,7 +635,7 @@ def test_bin_folded():
     lc = LightCurve(
         time=np.arange(2000), flux=np.random.normal(loc=42, scale=0.01, size=2000)
     )
-    binned_folded_lc = lc.fold(period=100).bin(phase_bin_size=100)
+    binned_folded_lc = lc.fold(period=100).bin(time_bin_size=100)
     assert np.round(binned_folded_lc.flux_err[0], 2) == 0.01
 
 
