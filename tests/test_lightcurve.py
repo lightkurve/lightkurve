@@ -282,10 +282,10 @@ def test_lightcurve_fold():
 
     # Make sure normalizing and binning work for folded lightcurves
     fold = lc.fold(period=1.5, normalize_phase=False)
-    assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1.5, 2)
+    assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1.5, 1)
     assert len(fold.bin(bins=10)) == 10
     fold = lc.fold(period=1.5, normalize_phase=True)
-    assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1, 2)
+    assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1, 1)
     assert len(fold.bin(bins=10)) == 10
 
 

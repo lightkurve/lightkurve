@@ -65,6 +65,7 @@ def _is_np_structured_array(data1):
     return isinstance(data1, np.ndarray) and data1.dtype.names is not None
 
 
+
 class LightCurve(TimeSeries):
     """
     Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
@@ -1079,33 +1080,30 @@ class LightCurve(TimeSeries):
         # requires the following three-step workaround:
         # 1. Give the folded light curve a valid time column again
 
-        # Having the time replaced by the folded time (as happens time astropy Timeseries.fold)
-        # messes up a lot of lk functions. Let's switch it back, and redefine F
-        # oldedLightCurve to use the phase column
         with ts._delay_required_column_checks():
             folded_time = ts.time.copy()
             ts.remove_column("time")
             ts.add_column(self.time, name="time", index=0)
-            ts.add_column(folded_time, name="phase")
+
         # 2. Create the folded object
         lc = FoldedLightCurve(data=ts)
+
         # 3. Restore the folded time
-        #with lc._delay_required_column_checks():
-        #    lc.remove_column("time")
-        #    lc.add_column(folded_time, name="time", index=0)
+        with lc._delay_required_column_checks():
+            lc.remove_column("time")
+            lc.add_column(folded_time, name="time", index=0)
+
 
         # Add extra column and meta data specific to FoldedLightCurve
         lc.add_column(
             self.time.copy(), name="time_original", index=len(self._required_columns)
         )
         lc.meta["PERIOD"] = period
-        if epoch_time is None:
-            epoch_time = self.time[0]
         lc.meta["EPOCH_TIME"] = epoch_time
         lc.meta["EPOCH_PHASE"] = epoch_phase
         lc.meta["WRAP_PHASE"] = wrap_phase
         lc.meta["NORMALIZE_PHASE"] = normalize_phase
-        lc.sort("phase")
+        lc.sort("time")
 
         return lc
 
@@ -3028,7 +3026,7 @@ class FoldedLightCurve(LightCurve):
     @property
     def phase(self):
         """Alias for `LightCurve.time`."""
-        return self["phase"]
+        return self.time
 
     @property
     def cycle(self):
@@ -3039,9 +3037,9 @@ class FoldedLightCurve(LightCurve):
         if epoch_time is None:
             # explicit check needed (cannot be the default value in get() function call above)
             # because Lightcurve.fold() will put an explicit None in meta, if epoch_time is not specified.
-            epoch_time = self.phase.min()
+            epoch_time = self.time.min()
         cycle_epoch_start = epoch_time - self.period / 2
-        result = np.asarray(np.floor(((self.time - cycle_epoch_start) / self.period).value), dtype=int)
+        result = np.asarray(np.floor(((self.time_original - cycle_epoch_start) / self.period).value), dtype=int)
         result = result - result.min()
         return result
 
@@ -3074,6 +3072,41 @@ class FoldedLightCurve(LightCurve):
         See the documentation of `odd_mask` for examples.
         """
         return ~self.odd_mask
+    
+    def _replace_normalized_phase(self):
+        # Some astropy functions, such as aggregate_downsample, require Time or TimeDelta
+        # As normalized phase-folded lightcurves are unitless, this breaks
+        # This will create a copy of self replacing normalized phase with phase in TimeDelta
+        if not hasattr(self, 'normalize_phase'):
+            warnings.warn("Not a phase-folded lightcurve, no phase available")
+
+        # If the lightcurve is phase folded but not normalized, just return self
+        if self.normalize_phase == False:
+            return self
+
+        # If the phase folded lightcurve is normalized, unnormalize it
+        with self._delay_required_column_checks():
+            normalized_phase = self.time
+            #print(normalized_phase * self.period)
+            phase = TimeDelta(normalized_phase * self.period)
+            self.remove_column("time")
+            self.add_column(phase, name="time", index=0)
+        #return self
+
+
+    def _normalize_the_phase(self):
+        # Some astropy functions, such as aggregate_downsample, require Time or TimeDelta
+        # As normalized phase-folded lightcurves are unitless, this breaks
+        # This will re-normalized the phase
+        #temp_fold = self.copy()
+        # If the phase folded lightcurve is normalized, unnormalize it
+        with self._delay_required_column_checks():
+            phase = self.time
+            normalized_phase = phase / self.period
+            self.remove_column("time")
+            self.add_column(normalized_phase, name="time", index=0)
+
+            
 
     def _set_xlabel(self, kwargs):
         """Helper function for plot, scatter, and errorbar.
@@ -3081,9 +3114,12 @@ class FoldedLightCurve(LightCurve):
         """
         if "xlabel" not in kwargs:
             kwargs["xlabel"] = "Phase"
-            if isinstance(self.phase, TimeDelta):
-                kwargs["xlabel"] += f" [{self.phase.format.upper()}]"
-            kwargs["time_column"] = "phase"
+            if isinstance(self.time, TimeDelta):
+                kwargs["xlabel"] += f" [{self.time.format.upper()}]"
+            if self.normalize_phase == True:
+                kwargs["xlabel"] += f" (Normalized)"
+
+                    
         return kwargs
 
     def plot(self, **kwargs):
@@ -3162,15 +3198,14 @@ class FoldedLightCurve(LightCurve):
         )
         return ax
     
+
     def bin(
         self,
-        phase_bin_size=None,
-        phase_bin_start=None,
-        #phase_bin_end=None,
-        n_bins=None,
+        time_bin_size=None,
+        time_bin_start=None,
         aggregate_func=None,
         bins=None,
-        binsize=None,
+
     ):
         """Bins a FoldedLightCurve in equally-spaced bins in phase.
 
@@ -3181,21 +3216,17 @@ class FoldedLightCurve(LightCurve):
 
         Parameters
         ----------
-        phase_bin_size : `~astropy.units.Quantity` or `~astropy.time.TimeDelta`, optional
+        time_bin_size : `~astropy.units.Quantity` or `~astropy.time.TimeDelta`, optional
             The time interval for the binned time series - this is either a scalar
             value (in which case all time bins will be assumed to have the same
-            duration) or as an array of values (in which case each time bin can
+            duration) or as an array of values (in which case each phase bin can
             have a different duration). If this argument is provided,
             ``time_bin_end`` should not be provided.
             (Default: 0.5 days; default unit: days.)
-        phase_bin_start : `~astropy.time.Time` or iterable, optional
+        time_bin_start : `~astropy.time.Time` or iterable, optional
             The start phase for the binned time series. This can also be a scalar
             value if ``time_bin_size`` is provided. Defaults to the first
             time in the sampled time series.
-        n_bins : int, optional
-            The number of bins to use. Defaults to the number needed to fit all
-            the original points. Note that this will create this number of bins
-            of length ``phase_bin_size`` independent of the lightkurve length.
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
@@ -3214,173 +3245,68 @@ class FoldedLightCurve(LightCurve):
         binned_lc : `FoldedLightCurve`
             A new folded light curve which has been binned, with the 'time' column phase in days 
         """
-
         # astropy's aggregate_downsample function only works when 'time' is type Time or TimeDelta
         # Since the normalized phase is a unitless quantity, this breaks.
         # To work around this, we reset the index to be the regular phase (TimeDelta) when binning
-        if hasattr(self, 'normalize_phase'):
-            with self._delay_required_column_checks():
-                phase = self.phase.copy()
-                original_time = self.time.copy()
-                if self.normalize_phase == True:
-                    phase = TimeDelta(phase * self.period)
-                self.remove_column("time")
-                self.add_column(phase, name="time", index=0)
+        if self.normalize_phase == True:
+            self._replace_normalized_phase()
+        
+        if isinstance(time_bin_size, Quantity):
+            if time_bin_size.unit == u.dimensionless_unscaled:
+                raise TypeError("time_bin_size must be scaler (will default to hours) or in time units")
+ 
+        if (bins != None) & (time_bin_size != None):
+            raise ValueError("Can not specify both 'bins' and 'time_bin_size'")
+        if bins != None:
+            # astropy's aggregate_downsample doesn't work for phase data
+            # AttributeError: 'TimeDelta' object has no attribute 'mjd'
+            # This is a workaround
+            time_span = max(self.time.value) - min(self.time.value)
+            time_bin_size = time_span / bins
+            
 
 
+        result = super().bin(
+                        time_bin_size=time_bin_size,
+                        time_bin_start=time_bin_start,
+                        aggregate_func=aggregate_func,
 
-        kwargs = dict()
-        if binsize is not None and bins is not None:
-            raise ValueError("Only one of ``bins`` and ``binsize`` can be specified.")
-        elif (binsize is not None or bins is not None) and (
-            phase_bin_size is not None or n_bins is not None
-        ):
-            raise ValueError(
-                "``bins`` or ``binsize`` conflicts with "
-                "``n_bins`` or ``phase_bin_size``."
-            )
-        elif bins is not None:
-            if (bins not in ('blocks', 'knuth', 'scott', 'freedman') and
-                    np.array(bins).dtype != np.int_):
-                raise TypeError("``bins`` must have integer type.")
-            elif (isinstance(bins, str) or np.size(bins) != 1) and not _HAS_VAR_BINS:
-                raise ValueError("Sequence or method for ``bins`` requires Astropy 5.0.")
+                    )
+        
+        if self.normalize_phase == True:
+            self._normalize_the_phase()
 
-        if phase_bin_start is None:
-            phase_bin_start = self.time[0]
-        if not isinstance(phase_bin_start, (Time, TimeDelta)):
-            if isinstance(self.time, TimeDelta):
-                phase_bin_start = TimeDelta(
-                    phase_bin_start, format=self.time.format, scale=self.time.scale
-                )
-            else:
-                phase_bin_start = Time(
-                    phase_bin_start, format=self.time.format, scale=self.time.scale
-                )
+            with result._delay_required_column_checks():
+                phase = result.time
+                normalized_phase = phase / self.period
+                result.remove_column("time")
+                result.add_column(normalized_phase, name="time", index=0)
+                         
+        return result 
+    
 
-        # Backwards compatibility with Lightkurve v1.x
-        if phase_bin_size is None:
-            if bins is not None:
-                if np.size(bins) == 1:
-                    warnings.warn(
-                        '"classic" `bins` require Astropy 5.0; will use constant lengths in time.',
-                        LightkurveWarning)
-                    # Odd memory error in np.searchsorted with pytest-memtest?
-                    if self.time[0] >= phase_bin_start:
-                        i = len(self.time)
-                    else:
-                        i = len(self.time) - np.searchsorted(self.time, phase_bin_start)
-                    phase_bin_size = ((self.time[-1] - phase_bin_start) * i /
-                                     ((i - 1) * bins)).to(u.day)
-                else:
-                    phase_bin_start = self.time[bins[:-1]]
-                    kwargs['time_bin_end'] = self.time[bins[1:]]
-            elif binsize is not None:
-                if _HAS_VAR_BINS:
-                    phase_bin_start = self.time[::binsize]
-                else:
-                    warnings.warn(
-                        '`binsize` requires Astropy 5.0 to guarantee equal number of points; '
-                        'will use estimated time lengths for bins.', LightkurveWarning)
-                    if self.time[0] >= phase_bin_start:
-                        i = 0
-                    else:
-                        i = np.searchsorted(self.time, phase_bin_start)
-                    phase_bin_size = (self.time[i + binsize] - self.time[i]).to(u.day)
-            else:
-                phase_bin_size = 0.5 * u.day
-        elif not isinstance(phase_bin_size, Quantity):
-            phase_bin_size *= u.day
+    def copy(self):
 
     
-        # Call AstroPy's aggregate_downsample
-        with warnings.catch_warnings():
-            # ignore uninteresting empty slice warnings
-            warnings.simplefilter("ignore", (RuntimeWarning, AstropyUserWarning))
-            ts = aggregate_downsample(
-                self,
-                time_bin_size=phase_bin_size,
-                n_bins=n_bins,
-                time_bin_start=phase_bin_start,
-                aggregate_func=aggregate_func,
-                **kwargs
-            )
-
-            # If `flux_err` is populated, assume the errors combine as the root-mean-square
-            if np.any(np.isfinite(self.flux_err)):
-                rmse_func = (
-                    lambda x: np.sqrt(np.nansum(x ** 2)) / len(np.atleast_1d(x))
-                    if np.any(np.isfinite(x))
-                    else np.nan
-                )
-                ts_err = aggregate_downsample(
-                    self,
-                    time_bin_size=phase_bin_size,
-                    n_bins=n_bins,
-                    time_bin_start=phase_bin_start,
-                    aggregate_func=rmse_func,
-                )
-                ts["flux_err"] = ts_err["flux_err"]
-            # If `flux_err` is unavailable, populate `flux_err` as nanstd(flux)
-            else:
-                ts_err = aggregate_downsample(
-                    self,
-                    time_bin_size=phase_bin_size,
-                    n_bins=n_bins,
-                    time_bin_start=phase_bin_start,
-                    aggregate_func=np.nanstd,
-                )
-                ts["flux_err"] = ts_err["flux"]
-        # Prepare a LightCurve object by ensuring there is a time column
-        ts._required_columns = []
-        ts.add_column(ts.time_bin_start + ts.time_bin_size / 2.0, name="time")
-
-        # Ensure the required columns appear in the correct order
-        for idx, colname in enumerate(self.__class__._required_columns):
-            tmpcol = ts[colname]
-            ts.remove_column(colname)
-            ts.add_column(tmpcol, name=colname, index=idx)
+        if self.normalize_phase == True:
+            self._replace_normalized_phase()
         
-        # Create the binned object
-        returned_object = self.__class__(ts, meta=self.meta)
-        
-        if hasattr(self, 'normalize_phase'):
-            
-            # Reset the 'time' column of the folded object to be the JD time
-            # If the phase was normalized, set 'phase' to the normalized value
-            with self._delay_required_column_checks():
-                phase = self.time.copy()
-                self.remove_column("phase")
-                if self.normalize_phase == True:
-                    normalized_phase = phase / self.period
-                    self.add_column(normalized_phase, name="phase")
-                else:
-                    self.add_column(phase, name="phase")
-                self.remove_column('time')
-                self.add_column(original_time, name='time', index=0)
-                self.sort("phase")
+        result = super().copy()
 
-            # Reset the 'time' column of the folded and binned object to be the phase 
-            #       The time in JD is no longer relavant when binning a phase curve    
-            with returned_object._delay_required_column_checks():
-                phase = returned_object.time.copy()
-                if self.normalize_phase == True:
-                    returned_object.remove_column("phase")
-                    normalized_phase = phase / self.period #returned_object.normalized_phase.copy()
-                    returned_object.add_column(normalized_phase, name="phase")
-                else:
-                    returned_object.add_column(phase, name="phase")
+        if self.normalize_phase == True:
+            self._normalize_the_phase()
 
-                returned_object.sort("time")
-        else:
-            # Reset the 'time' column of the folded and binned object to be the normalized value
-            with returned_object._delay_required_column_checks():
-                phase = returned_object.time.copy()
-                returned_object.add_column(phase, name="phase")
-                returned_object.sort("phase")
-                         
+            with result._delay_required_column_checks():
+                phase = result.time
+                normalized_phase = phase / self.period
+                result.remove_column("time")
+                result.add_column(normalized_phase, name="time", index=0)
+        return result
+    
 
-        return returned_object #self.__class__(ts, meta=self.meta)
+    
+
+
     
 
 class KeplerLightCurve(LightCurve):
