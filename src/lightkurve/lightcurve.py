@@ -3259,10 +3259,7 @@ class FoldedLightCurve(LightCurve):
             # astropy's aggregate_downsample doesn't work for phase data
             # AttributeError: 'TimeDelta' object has no attribute 'mjd'
             # This is a workaround
-            time_span = max(self.time.value) - min(self.time.value)
-            time_bin_size = time_span / bins
-            
-
+            time_bin_size = self.period / bins
 
         result = super().bin(
                         time_bin_size=time_bin_size,
