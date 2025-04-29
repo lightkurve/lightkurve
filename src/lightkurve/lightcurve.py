@@ -3206,6 +3206,7 @@ class FoldedLightCurve(LightCurve):
 
     ):
         """Bins a FoldedLightCurve in equally-spaced bins in phase.
+        Binning always occurs in time units (not normalized phase units)
 
         If the original light curve contains flux uncertainties (``flux_err``),
         the binned lightcurve will report the root-mean-square error.
@@ -3218,8 +3219,9 @@ class FoldedLightCurve(LightCurve):
             The time interval for the binned time series - this is either a scalar
             value (in which case all time bins will be assumed to have the same
             duration) or as an array of values (in which case each phase bin can
-            have a different duration). If this argument is provided,
-            ``time_bin_end`` should not be provided.
+            have a different duration). If the phase is normalized, the phase will first
+            be converted back into TimeDelta units. If this argument is provided,
+            ``time_bin_end`` should not be provided. 
             (Default: 0.5 days; default unit: days.)
         time_bin_start : `~astropy.time.Time` or iterable, optional
             The start phase for the binned time series. This can also be a scalar
@@ -3228,15 +3230,10 @@ class FoldedLightCurve(LightCurve):
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
-        bins : int, iterable or str, optional
-            If an int, this gives the number of bins to divide the lightkurve into.
+        bins : int
+            Gives the number of bins to divide the lightkurve into.
             In contrast to ``n_bins`` this adjusts the length of ``phase_bin_size``
             to accommodate the input time series length.
-            If it is an iterable of ints, it specifies the indices of the bin edges.
-            If a string, it must be one of  'blocks', 'knuth', 'scott' or 'freedman'
-            defining a method of automatically determining an optimal bin size.
-            See `~astropy.stats.histogram` for a description of each method.
-            Note that 'blocks' is not a useful method for regularly sampled data.
 
         Returns
         -------
@@ -3248,17 +3245,19 @@ class FoldedLightCurve(LightCurve):
         # To work around this, we reset the index to be the regular phase (TimeDelta) when binning
         if self.normalize_phase == True:
             self._replace_normalized_phase()
-        
-        if isinstance(time_bin_size, Quantity):
-            if time_bin_size.unit == u.dimensionless_unscaled:
-                raise TypeError("time_bin_size must be scaler (will default to hours) or in time units")
+
+        if time_bin_size != None:
+            if isinstance(time_bin_size, Quantity):
+                if time_bin_size.unit == u.dimensionless_unscaled:
+                    raise TypeError("time_bin_size must be scaler (default hours) or in time units")
+
  
         if (bins != None) & (time_bin_size != None):
             raise ValueError("Can not specify both 'bins' and 'time_bin_size'")
         if bins != None:
-            # astropy's aggregate_downsample doesn't work for phase data
+            # astropy's aggregate_downsample doesn't work for phase data:
             # AttributeError: 'TimeDelta' object has no attribute 'mjd'
-            # This is a workaround
+            # So we directly compute the time_bin_size if the number of bins is provided
             time_bin_size = self.period / bins
 
         result = super().bin(
