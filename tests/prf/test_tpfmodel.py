@@ -1,4 +1,5 @@
 """Test the features of the lightkurve.prf.tpfmodels module."""
+
 import os
 import pytest
 
@@ -9,11 +10,14 @@ from scipy.stats import mode
 
 from lightkurve.prf import SimpleKeplerPRF, KeplerPRF
 
+# oktopus package is required for TPFModel
+# however, oktopus is not compliant with numpy v2.x
 try:
     from oktopus import PoissonPosterior
     from lightkurve.prf import FixedValuePrior, GaussianPrior, UniformPrior
     from lightkurve.prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior
     from lightkurve.prf import TPFModel, PRFPhotometry
+
     NO_OKTOPUS = False
 except ModuleNotFoundError:
     NO_OKTOPUS = True
@@ -75,8 +79,8 @@ def test_tpf_model():
     model = TPFModel(
         star_priors=[
             StarPrior(
-                col=GaussianPrior(mean=col, var=2 ** 2),
-                row=GaussianPrior(mean=row, var=2 ** 2),
+                col=GaussianPrior(mean=col, var=2**2),
+                row=GaussianPrior(mean=row, var=2**2),
                 flux=UniformPrior(lb=flux - 0.5, ub=flux + 0.5),
                 targetid="TESTSTAR",
             )
