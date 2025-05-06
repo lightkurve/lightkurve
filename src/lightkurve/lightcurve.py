@@ -3411,9 +3411,8 @@ class KeplerLightCurve(LightCurve):
         }
 
         for kw in kepler_specific_data:
-            if hasattr(self, kw):
-                if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
-                    extra_data[kw] = kepler_specific_data[kw]
+            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                extra_data[kw] = kepler_specific_data[kw]
         hdu = super(KeplerLightCurve, self).to_fits(
             path=None, overwrite=overwrite, **extra_data
         )
