@@ -258,6 +258,7 @@ def test_lightcurve_fold():
     assert len(fold.time_original) == len(lc.time)
     fold = lc.fold(period=1, epoch_time=-0.1)
     assert_almost_equal(fold.phase[0], -0.5, 2)
+    assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
     assert np.min(fold.cycle) == 0
@@ -280,13 +281,18 @@ def test_lightcurve_fold():
     with pytest.warns(LightkurveWarning, match="appears to be given in JD"):
         lc.fold(10, 2456600)
 
-    # Make sure normalizing and binning work for folded lightcurves
+    # Make sure binning a phase-normalized folded lightcurve works (#1422)
     fold = lc.fold(period=1.5, normalize_phase=False)
+    assert isinstance(fold.time, TimeDelta)
     assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1.5, 1)
     assert len(fold.bin(bins=10)) == 10
     fold = lc.fold(period=1.5, normalize_phase=True)
+    assert isinstance(fold.time, u.Quantity)
     assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1, 1)
-    assert len(fold.bin(bins=10)) == 10
+    binned = fold.bin(bins=10)
+    assert len(binned) == 10
+    # ensure fold was not changed
+    assert len(fold) == 100
 
 
 @pytest.mark.parametrize(

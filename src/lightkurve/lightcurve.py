@@ -1037,7 +1037,6 @@ class LightCurve(TimeSeries):
         if (
             epoch_phase is not None
             and not isinstance(epoch_phase, Quantity)
-            
         ):
             if not normalize_phase:
                 epoch_phase *= u.day
@@ -3081,8 +3080,10 @@ class FoldedLightCurve(LightCurve):
             warnings.warn("Not a phase-folded lightcurve, no phase available")
 
         # If the lightcurve is phase folded but not normalized, just return self
-        if self.normalize_phase == False:
-            return self
+        if not self.meta.get("NORMALIZE_PHASE"):
+            # it should never happen, likely that there is some bug.
+            warnings.warn("The function should be invoked on a folded lightcurve with normalized phase. No-Op.")
+            return
 
         # If the phase folded lightcurve is normalized, unnormalize it
         with self._delay_required_column_checks():
@@ -3094,10 +3095,17 @@ class FoldedLightCurve(LightCurve):
         #return self
 
 
-    def _normalize_the_phase(self):
+    def _restore_normalized_phase(self):
         # Some astropy functions, such as aggregate_downsample, require Time or TimeDelta
         # As normalized phase-folded lightcurves are unitless, this breaks
         # This will re-normalized the phase
+
+        # Checki if the lightcurve is already normalized
+        if isinstance(self.time, Quantity):
+            # should not happen, likely there is some bug
+            warnings.warn("Attempt to restore normalized phase while the phase has already been normalized. No-op.")
+            return 
+        
         with self._delay_required_column_checks():
             phase = self.time
             normalized_phase = phase / self.period
@@ -3201,6 +3209,7 @@ class FoldedLightCurve(LightCurve):
         self,
         time_bin_size=None,
         time_bin_start=None,
+        time_bin_end=None,
         aggregate_func=None,
         bins=None,
 
@@ -3263,24 +3272,23 @@ class FoldedLightCurve(LightCurve):
         result = super().bin(
                         time_bin_size=time_bin_size,
                         time_bin_start=time_bin_start,
+                        time_bin_end=time_bin_end,
                         aggregate_func=aggregate_func,
 
                     )
         
         if self.normalize_phase == True:
-            self._normalize_the_phase()
-
-            with result._delay_required_column_checks():
-                phase = result.time
-                normalized_phase = phase / self.period
-                result.remove_column("time")
-                result.add_column(normalized_phase, name="time", index=0)
+            self._restore_normalized_phase()
+            result._restore_normalized_phase()
                          
         return result 
     
 
     def copy(self):
-
+        # the default copy() in astropy fails if the lightcurve
+        # has normalized phase (time column is `Quantity` instead of `Time` like)
+        # workaround it by temporarily changing time column to 
+        # non-normalized `TimeDelta`
     
         if self.normalize_phase == True:
             self._replace_normalized_phase()
@@ -3288,13 +3296,8 @@ class FoldedLightCurve(LightCurve):
         result = super().copy()
 
         if self.normalize_phase == True:
-            self._normalize_the_phase()
-
-            with result._delay_required_column_checks():
-                phase = result.time
-                normalized_phase = phase / self.period
-                result.remove_column("time")
-                result.add_column(normalized_phase, name="time", index=0)
+            self._restore_normalized_phase()
+            result._restore_normalized_phase()
         return result
     
 
@@ -3556,7 +3559,7 @@ def _boolean_mask_to_bitmask(aperture_mask):
     aperture_mask : array-like
         2D aperture mask. The mask can be either a boolean mask or an integer
         mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
-        are converted to then Kepler/TESS conventions.  Kepler bitmasks are
+        are converted to Kepler/TESS conventions.  Kepler bitmasks are
         returned unchanged except for possible datatype conversion.
 
     Returns
