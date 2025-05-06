@@ -1593,6 +1593,7 @@ class LightCurve(TimeSeries):
                 time_bin_size=time_bin_size,
                 n_bins=n_bins,
                 time_bin_start=time_bin_start,
+                time_bin_end=time_bin_end,
                 aggregate_func=aggregate_func,
                 **kwargs
             )
@@ -1609,6 +1610,7 @@ class LightCurve(TimeSeries):
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
+                    time_bin_end=time_bin_end,
                     aggregate_func=rmse_func,
                 )
                 ts["flux_err"] = ts_err["flux_err"]
@@ -1619,6 +1621,7 @@ class LightCurve(TimeSeries):
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
+                    time_bin_end=time_bin_end,
                     aggregate_func=np.nanstd,
                 )
                 ts["flux_err"] = ts_err["flux"]
@@ -3212,6 +3215,7 @@ class FoldedLightCurve(LightCurve):
         time_bin_end=None,
         aggregate_func=None,
         bins=None,
+        n_bins=None,
 
     ):
         """Bins a FoldedLightCurve in equally-spaced bins in phase.
@@ -3236,13 +3240,29 @@ class FoldedLightCurve(LightCurve):
             The start phase for the binned time series. This can also be a scalar
             value if ``time_bin_size`` is provided. Defaults to the first
             time in the sampled time series.
+        time_bin_end : `~astropy.time.Time` or iterable, optional
+            The times of the end of each bin - this can be either given directly as
+            a `~astropy.time.Time` array or as any iterable that initializes the
+            `~astropy.time.Time` class. This can only be given if ``time_bin_start``
+            is an array of values. If ``time_bin_end`` is a scalar, time bins are
+            assumed to be contiguous, such that the end of each bin is the start
+            of the next one, and ``time_bin_end`` gives the end time for the last
+            bin. If ``time_bin_end`` is an array, the time bins do not need to be
+            contiguous. If this argument is provided, ``time_bin_size`` should not
+            be provided. This option, like the iterable form of ``time_bin_start``,
+            requires Astropy 5.0.
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
-        bins : int
-            Gives the number of bins to divide the lightkurve into.
-            In contrast to ``n_bins`` this adjusts the length of ``phase_bin_size``
+        bins : int, iterable or str, optional
+            If an int, this gives the number of bins to divide the lightkurve into.
+            This adjusts the length of ``time_bin_size``
             to accommodate the input time series length.
+            If it is an iterable of ints, it specifies the indices of the bin edges.
+            If a string, it must be one of  'blocks', 'knuth', 'scott' or 'freedman'
+            defining a method of automatically determining an optimal bin size.
+            See `~astropy.stats.histogram` for a description of each method.
+            Note that 'blocks' is not a useful method for regularly sampled data.
 
         Returns
         -------
@@ -3252,14 +3272,26 @@ class FoldedLightCurve(LightCurve):
         # astropy's aggregate_downsample function only works when 'time' is type Time or TimeDelta
         # Since the normalized phase is a unitless quantity, this breaks.
         # To work around this, we reset the index to be the regular phase (TimeDelta) when binning
+        if n_bins != None:
+            raise ValueError("n_bins is no longer accepted for FoldedLightCurve objects. Please specify 'bins' instead")
+
         if self.normalize_phase == True:
             self._replace_normalized_phase()
+
+        if time_bin_start is None:
+            time_bin_start = self.time[0]
+        if not isinstance(time_bin_start, TimeDelta):
+            if isinstance(self.time, TimeDelta):
+                time_bin_start = TimeDelta(
+                    time_bin_start, format=self.time.format, scale=self.time.scale
+                )
+            else:
+                warnings.warn("The function should be invoked on a folded lightcurve with normalized phase.")
 
         if time_bin_size != None:
             if isinstance(time_bin_size, Quantity):
                 if time_bin_size.unit == u.dimensionless_unscaled:
                     raise TypeError("time_bin_size must be scaler (default hours) or in time units")
-
  
         if (bins != None) & (time_bin_size != None):
             raise ValueError("Can not specify both 'bins' and 'time_bin_size'")
@@ -3267,14 +3299,18 @@ class FoldedLightCurve(LightCurve):
             # astropy's aggregate_downsample doesn't work for phase data:
             # AttributeError: 'TimeDelta' object has no attribute 'mjd'
             # So we directly compute the time_bin_size if the number of bins is provided
-            time_bin_size = self.period / bins
+            if time_bin_start != self.time[0]:
+                time_bin_size = (np.nanmax(self.time) - time_bin_start).to('day') / bins
+            elif time_bin_end != None:
+                time_bin_size = (np.nanmax(self.time) - time_bin_end).to('day') / bins
+            else:
+                time_bin_size = self.period / bins
 
         result = super().bin(
                         time_bin_size=time_bin_size,
                         time_bin_start=time_bin_start,
                         time_bin_end=time_bin_end,
                         aggregate_func=aggregate_func,
-
                     )
         
         if self.normalize_phase == True:
