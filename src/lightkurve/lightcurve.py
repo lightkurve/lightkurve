@@ -3212,7 +3212,6 @@ class FoldedLightCurve(LightCurve):
         self,
         time_bin_size=None,
         time_bin_start=None,
-        time_bin_end=None,
         aggregate_func=None,
         bins=None,
         n_bins=None,
@@ -3236,21 +3235,10 @@ class FoldedLightCurve(LightCurve):
             be converted back into TimeDelta units. If this argument is provided,
             ``time_bin_end`` should not be provided. 
             (Default: 0.5 days; default unit: days.)
-        time_bin_start : `~astropy.time.Time` or iterable, optional
+        time_bin_start : Time like value, optional
             The start phase for the binned time series. This can also be a scalar
             value if ``time_bin_size`` is provided. Defaults to the first
             time in the sampled time series.
-        time_bin_end : `~astropy.time.Time` or iterable, optional
-            The times of the end of each bin - this can be either given directly as
-            a `~astropy.time.Time` array or as any iterable that initializes the
-            `~astropy.time.Time` class. This can only be given if ``time_bin_start``
-            is an array of values. If ``time_bin_end`` is a scalar, time bins are
-            assumed to be contiguous, such that the end of each bin is the start
-            of the next one, and ``time_bin_end`` gives the end time for the last
-            bin. If ``time_bin_end`` is an array, the time bins do not need to be
-            contiguous. If this argument is provided, ``time_bin_size`` should not
-            be provided. This option, like the iterable form of ``time_bin_start``,
-            requires Astropy 5.0.
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
@@ -3280,13 +3268,13 @@ class FoldedLightCurve(LightCurve):
 
         if time_bin_start is None:
             time_bin_start = self.time[0]
-        if not isinstance(time_bin_start, TimeDelta):
+        if np.isscalar(time_bin_size):
             if isinstance(self.time, TimeDelta):
                 time_bin_start = TimeDelta(
                     time_bin_start, format=self.time.format, scale=self.time.scale
                 )
             else:
-                warnings.warn("The function should be invoked on a folded lightcurve with normalized phase.")
+                warnings.warn("The function cannot be run on a lightcurve with normalized phase.")
 
         if time_bin_size != None:
             if isinstance(time_bin_size, Quantity):
@@ -3301,15 +3289,12 @@ class FoldedLightCurve(LightCurve):
             # So we directly compute the time_bin_size if the number of bins is provided
             if time_bin_start != self.time[0]:
                 time_bin_size = (np.nanmax(self.time) - time_bin_start).to('day') / bins
-            elif time_bin_end != None:
-                time_bin_size = (np.nanmax(self.time) - time_bin_end).to('day') / bins
             else:
                 time_bin_size = self.period / bins
 
         result = super().bin(
                         time_bin_size=time_bin_size,
                         time_bin_start=time_bin_start,
-                        time_bin_end=time_bin_end,
                         aggregate_func=aggregate_func,
                     )
         
