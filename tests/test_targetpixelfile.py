@@ -472,7 +472,9 @@ def test_tpf_from_images():
     w.wcs.cdelt = np.array([-0.066667, 0.066667])
     w.wcs.crval = [0, -90]
     w.wcs.ctype = ["RA---AIR", "DEC--AIR"]
+
     w.wcs.set_pv([(2, 1, 45.0)])
+
     pixcrd = np.asarray([[0, 0], [24, 38], [45, 98]], dtype=float)
     header = w.to_header()
     header["CRVAL1P"] = 10
