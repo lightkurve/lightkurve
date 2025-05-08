@@ -3242,15 +3242,10 @@ class FoldedLightCurve(LightCurve):
         aggregate_func : callable, optional
             The function to use for combining points in the same bin. Defaults
             to np.nanmean.
-        bins : int, iterable or str, optional
-            If an int, this gives the number of bins to divide the lightkurve into.
+        bins : int, optional
+            int which gives the number of bins to divide the lightkurve into.
             This adjusts the length of ``time_bin_size``
             to accommodate the input time series length.
-            If it is an iterable of ints, it specifies the indices of the bin edges.
-            If a string, it must be one of  'blocks', 'knuth', 'scott' or 'freedman'
-            defining a method of automatically determining an optimal bin size.
-            See `~astropy.stats.histogram` for a description of each method.
-            Note that 'blocks' is not a useful method for regularly sampled data.
 
         Returns
         -------
@@ -3262,6 +3257,11 @@ class FoldedLightCurve(LightCurve):
         # To work around this, we reset the index to be the regular phase (TimeDelta) when binning
         if n_bins != None:
             raise ValueError("n_bins is no longer accepted for FoldedLightCurve objects. Please specify 'bins' instead")
+            bins = n_bins
+        if bins != None:
+            if not isinstance(bins, int):
+                ValueError('bins must be an integer describing the total number of bins.')
+
 
         if self.normalize_phase == True:
             self._replace_normalized_phase()
