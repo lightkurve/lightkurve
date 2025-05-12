@@ -12,7 +12,10 @@
 - Updated tutorial notebook links [#1484]
 - Author keyword now specifies between SPOC and TESS-SPOC [#1487]
 - Changed calls of `np.in1d` to `np.isin` for numpy v2 compatibility [#1492]
-- Made oktopus an optional dependency to facilitate Numpy v2 support. [#1452]
+- Loosen dependency on oktopus (and autograd) to facilitate Numpy v2 support,
+  along with updates of some deprecated numpy calls.
+  They will still be pulled in with a default ``pip install``, but this allows
+  Lightkurve to be run without oktopus with only ``tpfmodel`` disabled [#1452]
 
 2.5.0 (2024-08-29)
 =====================

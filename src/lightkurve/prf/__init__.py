@@ -5,5 +5,6 @@ try:
     from .tpfmodel import *
 except ModuleNotFoundError:
     warnings.warn(
-        "Warning: the tpfmodel module is not available without oktopus. See lightkurve PR #1452 for details."
+        "Warning: the tpfmodel submodule is not available without oktopus installed, "
+        "which requires a current version of autograd. See #1452 for details."
     )

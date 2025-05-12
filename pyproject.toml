@@ -29,10 +29,9 @@ numpy = [
       { version = ">=1.26", python = ">=3.12" }
 ]
 astropy = ">=5.0"
-scipy = { version = ">=1.7", python = ">=3.8,<3.13" }
+scipy = { version = ">=1.7", python = ">=3.8,<3.14" }
 matplotlib = ">=3.1"
 astroquery = ">=0.3.10"
-oktopus = { version = ">=0.1.2", python = ">=3.8,<3.10" }
 beautifulsoup4 = ">=4.6.0"
 requests = ">=2.22.0"
 urllib3 = { version = ">=1.23", python = ">=3.8,<4.0" }  # necessary to make requests work on py310
@@ -56,6 +55,8 @@ black = ">=21.12b0"
 flake8 = ">=3.8.4"
 mypy = ">=0.930"
 isort = { version = ">=5.6.4", python = ">=3.6,<4.0" }
+oktopus = ">=0.1.2"
+autograd = { version = ">=1.8.0", python = ">=3.11" }    # minimum version to support numpy>=2
 pytest = ">=6.1.2"
 pytest-cov = ">=2.10.1"
 pytest-remotedata = ">=0.3.2"
