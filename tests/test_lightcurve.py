@@ -287,12 +287,22 @@ def test_lightcurve_fold():
     assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1.5, 1)
     assert len(fold.bin(bins=10)) == 10
     fold = lc.fold(period=1.5, normalize_phase=True)
+    assert isinstance(lc.time, Time)
     assert isinstance(fold.time, u.Quantity)
+    assert fold.time.unit == u.dimensionless_unscaled
     assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1, 1)
     binned = fold.bin(bins=10)
     assert len(binned) == 10
     # ensure fold was not changed
     assert len(fold) == 100
+    assert isinstance(fold.time, u.Quantity)
+
+    # Make sure 'copy()' works as expected
+    fold_copy = fold.copy()
+    assert_array_equal(fold.time, fold_copy.time)
+    assert_array_equal(fold.flux, fold_copy.flux)
+
+
 
 
 @pytest.mark.parametrize(
@@ -320,7 +330,7 @@ def test_lightcurve_fold_odd_even_masks(normalize_phase):
     assert len(odd) == len(fold.time)
     assert np.all(odd == ~even)
 
-    #Check wrap_phase keyword works as expected for normalized folded lightcurves (see #1423)
+    # Check wrap_phase keyword works as expected for normalized folded lightcurves (see #1423)
     wrapped_fold = lc.fold(period=period, epoch_time=epoch_time, epoch_phase=0.5, normalize_phase=normalize_phase, wrap_phase=0.25)
     assert_almost_equal(wrapped_fold.phase[-1].value, 0.25, decimal = 1)
 

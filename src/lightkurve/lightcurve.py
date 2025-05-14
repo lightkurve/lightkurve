@@ -3079,8 +3079,6 @@ class FoldedLightCurve(LightCurve):
         # Some astropy functions, such as aggregate_downsample, require Time or TimeDelta
         # As normalized phase-folded lightcurves are unitless, this breaks
         # This will replace the normalized phase with phase in TimeDelta
-        if not hasattr(self, 'normalize_phase'):
-            warnings.warn("Not a phase-folded lightcurve, no phase available")
 
         # If the lightcurve is phase folded but not normalized, just return self
         if not self.meta.get("NORMALIZE_PHASE"):
@@ -3212,6 +3210,7 @@ class FoldedLightCurve(LightCurve):
         self,
         time_bin_size=None,
         time_bin_start=None,
+        time_bin_end=None,
         aggregate_func=None,
         bins=None,
         n_bins=None,
@@ -3246,6 +3245,9 @@ class FoldedLightCurve(LightCurve):
             int which gives the number of bins to divide the lightkurve into.
             This adjusts the length of ``time_bin_size``
             to accommodate the input time series length.
+        n_bins: 
+            This functionality is deprecated for FoldedLightCurves. If provided, asserts
+            bins=n_bins
 
         Returns
         -------
@@ -3255,41 +3257,55 @@ class FoldedLightCurve(LightCurve):
         # astropy's aggregate_downsample function only works when 'time' is type Time or TimeDelta
         # Since the normalized phase is a unitless quantity, this breaks.
         # To work around this, we reset the index to be the regular phase (TimeDelta) when binning
+        
         if n_bins != None:
-            raise ValueError("n_bins is no longer accepted for FoldedLightCurve objects. Please specify 'bins' instead")
+            warnings.warn("n_bins is no longer accepted for FoldedLightCurve objects. Please specify 'bins' instead")
+            bins = n_bins
         if bins != None:
             if not isinstance(bins, int):
-                ValueError('bins must be an integer describing the total number of bins.')
-
+                raise ValueError('bins must be an integer describing the total number of bins.')
+            if time_bin_size != None:
+                raise ValueError("Can not specify both 'bins' and 'time_bin_size'")
+            
 
         if self.normalize_phase == True:
             self._replace_normalized_phase()
 
         if time_bin_start is None:
             time_bin_start = self.time[0]
-        if np.isscalar(time_bin_size):
-            if isinstance(self.time, TimeDelta):
-                time_bin_start = TimeDelta(
-                    time_bin_start, format=self.time.format, scale=self.time.scale
-                )
-            else:
-                warnings.warn("The function cannot be run on a lightcurve with normalized phase.")
+        if isinstance(time_bin_start, list):
+            time_bin_start = time_bin_start[0]
+            warnings.warn("FoldedLightCurve does not support lists for time_bin_start. Using the first value.")
+        if isinstance(time_bin_start, Quantity):
+            if time_bin_start.unit == u.dimensionless_unscaled:
+                    time_bin_start = time_bin_start.value * self.period      
+        if np.isscalar(time_bin_start):
+            time_bin_start = time_bin_start * u.day
+
+
 
         if time_bin_size != None:
+            if np.isscalar(time_bin_size):
+                if self.normalize_phase == True:
+                    time_bin_size = time_bin_size * u.dimensionless_unscaled
+                else:
+                    time_bin_size = time_bin_size * u.day
             if isinstance(time_bin_size, Quantity):
                 if time_bin_size.unit == u.dimensionless_unscaled:
-                    raise TypeError("time_bin_size must be scaler (default hours) or in time units")
+                    time_bin_size = time_bin_size.value * self.period
  
-        if (bins != None) & (time_bin_size != None):
-            raise ValueError("Can not specify both 'bins' and 'time_bin_size'")
+
         if bins != None:
             # astropy's aggregate_downsample doesn't work for phase data:
             # AttributeError: 'TimeDelta' object has no attribute 'mjd'
             # So we directly compute the time_bin_size if the number of bins is provided
+            if time_bin_size != None:
+                raise ValueError("Can not specify both 'bins' and 'time_bin_size'")
             if time_bin_start != self.time[0]:
                 time_bin_size = (np.nanmax(self.time) - time_bin_start).to('day') / bins
             else:
                 time_bin_size = self.period / bins
+
 
         result = super().bin(
                         time_bin_size=time_bin_size,
@@ -3300,7 +3316,7 @@ class FoldedLightCurve(LightCurve):
         if self.normalize_phase == True:
             self._restore_normalized_phase()
             result._restore_normalized_phase()
-                         
+        
         return result 
     
 
