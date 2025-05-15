@@ -1935,7 +1935,7 @@ class LightCurve(TimeSeries):
             flux_err = np.full(len(flux), np.nan)
 
         # Second workaround for AstroPy v5.0.0 issue #12481:
-        # matplotlib does not work well with `MaskedANDArray` arrays.
+        # matplotlib does not work well with `MaskedNDArray` arrays.
         if hasattr(flux, 'mask'):
             flux = flux.filled(np.nan)
         if hasattr(flux_err, 'mask'):
