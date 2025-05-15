@@ -3210,7 +3210,6 @@ class FoldedLightCurve(LightCurve):
         self,
         time_bin_size=None,
         time_bin_start=None,
-        time_bin_end=None,
         aggregate_func=None,
         bins=None,
         n_bins=None,
@@ -3226,13 +3225,12 @@ class FoldedLightCurve(LightCurve):
 
         Parameters
         ----------
-        time_bin_size : `~astropy.units.Quantity` or `~astropy.time.TimeDelta`, optional
+        time_bin_size : `~astropy.units.Quantity`,`~astropy.time.TimeDelta`, or scalar (optional)
             The time interval for the binned time series - this is either a scalar
             value (in which case all time bins will be assumed to have the same
             duration) or as an array of values (in which case each phase bin can
-            have a different duration). If the phase is normalized, the phase will first
-            be converted back into TimeDelta units. If this argument is provided,
-            ``time_bin_end`` should not be provided. 
+            have a different duration). In cases where the lightcurve is phase-normalized, a scalar
+            input will be assumed to be in normalized phase units (u.dimensionless_unscaled) 
             (Default: 0.5 days; default unit: days.)
         time_bin_start : Time like value, optional
             The start phase for the binned time series. This can also be a scalar

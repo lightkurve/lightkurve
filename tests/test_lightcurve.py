@@ -301,6 +301,10 @@ def test_lightcurve_fold():
     fold_copy = fold.copy()
     assert_array_equal(fold.time, fold_copy.time)
     assert_array_equal(fold.flux, fold_copy.flux)
+    # ensure the it is a deep copy
+    assert fold is not fold_copy
+    assert fold.time is not fold_copy.time
+    assert fold.flux is not fold_copy.flux
 
 
 
