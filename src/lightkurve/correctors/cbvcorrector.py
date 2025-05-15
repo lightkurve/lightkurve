@@ -133,7 +133,7 @@ class CBVCorrector(RegressionCorrector):
         # We do not want any NaNs
         lc = lc.remove_nans()
 
-        # Call the RegresssionCorrector Constructor
+        # Call the RegressionCorrector Constructor
         super(CBVCorrector, self).__init__(lc)
 
         #***
@@ -236,7 +236,7 @@ class CBVCorrector(RegressionCorrector):
             List of CBV vectors to use in each passed cbv_type. {'ALL' => Use all}
             NOTE: 1-Based indexing!
         alpha : float
-            L2-norm regularization penatly term. Default = 1e-20
+            L2-norm regularization penalty term. Default = 1e-20
             {0 => no regularization}
         ext_dm  :  `.DesignMatrix` or `.DesignMatrixCollection`
             Optionally pass an extra design matrix to also be used in the fit
@@ -255,7 +255,7 @@ class CBVCorrector(RegressionCorrector):
         --------
         The following example will perform the correction using the
         SingleScale and Spike basis vectors with a weak regularization alpha
-        term of 0.1. It also adds in an external design matrix to perfomr a
+        term of 0.1. It also adds in an external design matrix to perform a
         joint fit.
             >>> cbv_type = ['SingleScale', 'Spike']
             >>> cbv_indices = [np.arange(1,9), 'ALL']
@@ -394,7 +394,7 @@ class CBVCorrector(RegressionCorrector):
         """ Optimizes the correction by adjusting the L2-Norm (Ridge Regression)
         regularization penalty term, alpha, based on the introduced noise
         (over-fitting) and residual correlation (under-fitting) goodness
-        metrics. The numercial optimization is performed using the
+        metrics. The numerical optimization is performed using the
         scipy.optimize.minimize_scalar Brent's method.
 
         The optimizer attempts to maximize the over- and under-fitting goodness
@@ -422,7 +422,7 @@ class CBVCorrector(RegressionCorrector):
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
         alpha_bounds : float list(len=2)
-            upper anbd lowe bounds for alpha
+            upper and lower bounds for alpha
         target_over_score : float
             Target Over-fitting metric score
         target_under_score : float
@@ -513,7 +513,7 @@ class CBVCorrector(RegressionCorrector):
         ----------
         n_samples : int
             The number of times to compute and average the metric
-            This can stabalize the value, defaut = 10
+            This can stabilize the value, default = 10
 
         Returns
         -------
@@ -707,7 +707,7 @@ class CBVCorrector(RegressionCorrector):
                         cbv_idx_loop = cbvs.cbv_indices
                     # Trim to nCBVs in cbvs
                     cbv_idx_loop = np.array([idx for idx in cbv_idx_loop if
-                        bool(np.in1d(idx, cbvs.cbv_indices))])
+                        bool(np.isin(idx, cbvs.cbv_indices))])
             
                     if cbv_type[idx].find('MultiScale') >= 0:
                         # Find the correct band if this is a multi-scale CBV set
@@ -780,7 +780,7 @@ class CBVCorrector(RegressionCorrector):
         under-fitting goodness metrics to return a scalar penalty term to
         minimize.
 
-        Uses the paramaters in self.optimization_params.
+        Uses the parameters in self.optimization_params.
 
         Parameters (in self.optimization_params)
         ----------
@@ -1006,7 +1006,7 @@ class CotrendingBasisVectors(TimeSeries):
     ----------
     cadenceno       : int array-like
         Cadence indices
-    time            : flaot array-like
+    time            : float array-like
         CBV cadence times
     gap_indicators  : bool array-like
         True => cadence is gapped
@@ -1021,7 +1021,7 @@ class CotrendingBasisVectors(TimeSeries):
     #***
     def __init__(self, data=None, time=None, **kwargs):
 
-        # Add some columns if not existant
+        # Add some columns if not existent
         if data is not None:
             if not 'GAP' in data.colnames:
                 data['GAP'] = np.full(data[data.colnames[0]].size, False)
@@ -1243,7 +1243,7 @@ class CotrendingBasisVectors(TimeSeries):
 
             # NaN any CBV cadences that are in the light curve and not in CBVs
             # This requires us to add rows to the CBV table
-            lc_nan_mask = np.logical_not(np.in1d(lc.cadenceno, cbvs.cadenceno))
+            lc_nan_mask = np.logical_not(np.isin(lc.cadenceno, cbvs.cadenceno))
             # Determine if the CBVs are poorly aligned to the light curve
             if ((np.count_nonzero(lc_nan_mask) / len(lc_nan_mask)) >
                             poorly_aligned_threshold):
@@ -1271,7 +1271,7 @@ class CotrendingBasisVectors(TimeSeries):
             # REALLY slow.
             try:
                 # This method is fast but might cause errors
-                keep_indices = np.nonzero(np.in1d(cbvs.cadenceno, lc.cadenceno))[0]
+                keep_indices = np.nonzero(np.isin(cbvs.cadenceno, lc.cadenceno))[0]
                 # Determine if the CBVs are poorly aligned to the light curve
                 if (len(keep_indices) / len(cbvs)) < poorly_aligned_threshold:
                     poorly_aligned_flag = True
@@ -1279,7 +1279,7 @@ class CotrendingBasisVectors(TimeSeries):
             except:
                 # This method is slow but appears to be more robust
                 trim_indices = np.nonzero(np.logical_not(
-                    np.in1d(cbvs.cadenceno, lc.cadenceno)))[0]
+                    np.isin(cbvs.cadenceno, lc.cadenceno)))[0]
                 # Determine if the CBVs are poorly aligned to the light curve
                 if (len(trim_indices) / len(cbvs)) > poorly_aligned_threshold:
                     poorly_aligned_flag = True
@@ -1290,7 +1290,7 @@ class CotrendingBasisVectors(TimeSeries):
 
         else:
             raise Exception('align requires cadence numbers for the ' + \
-                    'light curve. NO SYNCHRONIZATION OCCURED')
+                    'light curve. NO SYNCHRONIZATION OCCURRED')
 
         # Only issue this warning once
         if poorly_aligned_flag:
@@ -1569,7 +1569,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
         """Initiates a TessCotrendingBasisVectors object.
 
         Normally one would use TessCotrendingBasisVectors.from_hdu to
-        automatically set up the object. However, for certain functionaility
+        automatically set up the object. However, for certain functionality
         one must instantiate the object directly.
         """
 
@@ -1612,7 +1612,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             raise ValueError('Invalid band')
 
         # Get the requested cbv_type
-        # Curiosly, camera and CCD are not in the primary header!
+        # Curiously, camera and CCD are not in the primary header!
         camera = hdu[1].header['CAMERA']
         ccd = hdu[1].header['CCD']
         switcher = {
@@ -1624,7 +1624,7 @@ class TessCotrendingBasisVectors(CotrendingBasisVectors):
             }
         extName = switcher.get(cbv_type, switcher['unknown'])
         if (extName == 'error'):
-            raise Exception('Invalide cbv_type')
+            raise Exception('Invalid cbv_type')
 
         try:
 
