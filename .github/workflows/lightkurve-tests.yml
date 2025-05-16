@@ -5,7 +5,7 @@
 # 2) pytest on Linux, Python 3.9, with --remote-data enabled (i.e. get data from MAST).
 # 3) pytest on Linux, Python 3.10.
 # 4) pytest on Linux, Python 3.11.
-# 5) pytest on Linux, Python 3.12, with --remote-data enabled (i.e. get data from MAST).
+# 5) pytest on Linux, Python 3.12.
 # 6) pytest on Linux, Python 3.13.
 # 7) pytest on Windows, Python 3.9.
 # 8) pytest on OSX, Python 3.9.
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: ["3.9-remote-data", "3.9-memtest", "3.10", "3.11", "3.12-remote-data", "3.13"]
+        name: ["3.9-remote-data", "3.9-memtest", "3.10", "3.11", "3.12", "3.13"]
         include:
           - name: "3.9-remote-data"
             python-version: "3.9"
@@ -44,7 +44,7 @@ jobs:
             pytest-command: poetry run pytest
           - name: "3.12-remote-data"
             python-version: "3.12"
-            pytest-command: poetry run pytest --remote-data
+            pytest-command: poetry run pytest
           - name: "3.13"
             python-version: "3.13"
             pytest-command: poetry run pytest
