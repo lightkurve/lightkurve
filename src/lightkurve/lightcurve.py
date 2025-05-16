@@ -819,7 +819,7 @@ class LightCurve(TimeSeries):
         Returns
         -------
         new_lc : `LightCurve`
-            Light curve which has the other light curves appened to it.
+            Light curve which has the other light curves append to it.
         """
         if inplace:
             raise ValueError(
@@ -1247,7 +1247,7 @@ class LightCurve(TimeSeries):
         if hasattr(lc, "cadenceno"):
             dt = lc.time.value - np.median(np.diff(lc.time.value)) * lc.cadenceno.value
             ncad = np.arange(lc.cadenceno.value[0], lc.cadenceno.value[-1] + 1, 1)
-            in_original = np.in1d(ncad, lc.cadenceno.value)
+            in_original = np.isin(ncad, lc.cadenceno.value)
             ncad = ncad[~in_original]
             ndt = np.interp(ncad, lc.cadenceno.value, dt)
 
@@ -1267,7 +1267,7 @@ class LightCurve(TimeSeries):
                     prevtime = ntime[-1]
                 ntime.append(t)
             ntime = np.asarray(ntime, float)
-            in_original = np.in1d(ntime, lc.time.value)
+            in_original = np.isin(ntime, lc.time.value)
 
         # Fill in time points
         newdata["time"] = Time(ntime, format=lc.time.format, scale=lc.time.scale)
@@ -1728,7 +1728,7 @@ class LightCurve(TimeSeries):
         in the brightness of the target.  They can also cause dips by moving
         through a local background aperture mask (if any is used).
 
-        The artifical spikes and dips introduced by asteroids are frequently
+        The artificial spikes and dips introduced by asteroids are frequently
         confused with stellar flares, planet transits, etc.  This method helps
         to identify false signals injects by asteroids by providing a list of
         the solar system objects (name, brightness, time) that passed in the
@@ -1845,7 +1845,7 @@ class LightCurve(TimeSeries):
             show_progress=show_progress,
         )
         if return_mask:
-            return res, np.in1d(self.time.jd, res.epoch)
+            return res, np.isin(self.time.jd, res.epoch)
         return res
 
     def _create_plot(
@@ -1963,7 +1963,7 @@ class LightCurve(TimeSeries):
         # Normalize the data if requested
         if normalize:
             # ignore "light curve is already normalized" message because
-            # the user explicitely asked for normalization here
+            # the user explicitly asked for normalization here
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore", message=".*already.*")
                 if column == "flux":
@@ -2374,7 +2374,7 @@ class LightCurve(TimeSeries):
         which in turn wrap `astropy`'s `~astropy.timeseries.LombScargle` and `~astropy.timeseries.BoxLeastSquares`.
 
         Optional keywords accepted if ``method='lombscargle'`` are:
-        ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
+        ``minimum_frequency``, ``maximum_frequency``, ``minimum_period``,
         ``maximum_period``, ``frequency``, ``period``, ``nterms``,
         ``nyquist_factor``, ``oversample_factor``, ``freq_unit``,
         ``normalization``, ``ls_method``.
@@ -2711,7 +2711,7 @@ class LightCurve(TimeSeries):
         y /= med
 
         # Here `ph` is the phase of each time point x
-        # cyc is the number of cycles that have occured at each time point x
+        # cyc is the number of cycles that have occurred at each time point x
         # since the phase 0 before x[0]
         n = int(
             period.value
@@ -3049,7 +3049,7 @@ class FoldedLightCurve(LightCurve):
     def odd_mask(self):
         """Boolean mask which flags the odd-numbered cycles (1, 3, 5, etc).
 
-        This is useful for studying every second occurence of a signal.
+        This is useful for studying every second occurrence of a signal.
         For example, in exoplanet searches, comparisons of odd and even transits
         can help confirm the planetary nature of a signal. Differences in the
         depth, duration, or shape of the odd- and even-numbered transits would

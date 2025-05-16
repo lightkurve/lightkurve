@@ -147,7 +147,7 @@ def underfit_metric_neighbors(
     interpolated to the corrected_lc cadence times. extrapolate=True will 
     further extrapolate the targets to the corrected_lc cadence times.
 
-    The returned under-fitting goodness metric is callibrated such that a
+    The returned under-fitting goodness metric is calibrated such that a
     value of 0.95 means the residual correlations in the target is
     equivalent to chance correlations of White Gaussian Noise.
 
@@ -214,7 +214,7 @@ def underfit_metric_neighbors(
 
     # The selection basis for targets used for the PDC-MAP SVD  uses median
     # absolute correlation per star.  However, here we wish to overemphasize
-    # any residual correlation between a handfull of targets and not the
+    # any residual correlation between a handful of targets and not the
     # overall correlation (which should almost always be low).
 
     # We want a residual correlation larger than random correlations of WGN
@@ -384,7 +384,7 @@ def _align_to_lc(lc, ref_lc):
     cadence numbers that exist in ref_lc but not in lc will
     have NaNs returned for those cadences.
 
-    Any cadences in the lc not in ref_lc will be removed from the returnd lc.
+    Any cadences in the lc not in ref_lc will be removed from the returned lc.
 
     The returned lc is sorted by cadenceno.
 
@@ -413,7 +413,7 @@ def _align_to_lc(lc, ref_lc):
 
         # NaN any cadences in ref_lc and not lc
         # This requires us to add rows to the lc table
-        lc_nan_mask = np.logical_not(np.in1d(ref_lc.cadenceno, aligned_lc.cadenceno))
+        lc_nan_mask = np.logical_not(np.isin(ref_lc.cadenceno, aligned_lc.cadenceno))
         lc_nan_indices = np.nonzero(lc_nan_mask)[0]
         if len(lc_nan_indices) > 0:
             row_to_add = LightCurve(aligned_lc[0:len(lc_nan_indices)])
@@ -430,12 +430,12 @@ def _align_to_lc(lc, ref_lc):
         # REALLY slow.
         try:
             # This method is fast but might cause errors
-            keep_indices = np.nonzero(np.in1d(aligned_lc.cadenceno, ref_lc.cadenceno))[0]
+            keep_indices = np.nonzero(np.isin(aligned_lc.cadenceno, ref_lc.cadenceno))[0]
             aligned_lc = aligned_lc[keep_indices]
         except:
             # This method is slow but appears to be more robust
             trim_indices = np.nonzero(np.logical_not(
-                np.in1d(aligned_lc.cadenceno, ref_lc.cadenceno)))[0]
+                np.isin(aligned_lc.cadenceno, ref_lc.cadenceno)))[0]
             aligned_lc.remove_rows(trim_indices)
 
         # Now sort the lc by cadenceno
@@ -443,7 +443,7 @@ def _align_to_lc(lc, ref_lc):
 
     else:
         raise Exception('align requires cadence numbers for the ' + \
-                'light curve. NO ALIGNMENT OCCURED')
+                'light curve. NO ALIGNMENT OCCURRED')
 
     return aligned_lc
 
