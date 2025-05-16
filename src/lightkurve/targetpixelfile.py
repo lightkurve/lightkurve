@@ -684,7 +684,7 @@ class TargetPixelFile(object):
 
         If the thresholding method yields multiple contiguous regions, then
         only the region closest to the (col, row) coordinate specified by
-        `reference_pixel` is returned.  For exmaple, `reference_pixel=(0, 0)`
+        `reference_pixel` is returned.  For example, `reference_pixel=(0, 0)`
         will pick the region closest to the bottom left corner.
         By default, the region closest to the center of the mask will be
         returned. If `reference_pixel=None` then all regions will be returned.
@@ -714,7 +714,7 @@ class TargetPixelFile(object):
             warnings.simplefilter("ignore")
             median_image = np.nanmedian(self.flux, axis=0)
         vals = median_image[np.isfinite(median_image)].flatten()
-        # Calculate the theshold value in flux units
+        # Calculate the threshold value in flux units
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
         threshold_mask = np.nan_to_num(median_image) >= mad_cut
@@ -945,7 +945,7 @@ class TargetPixelFile(object):
         in the brightness of the target.  They can also cause dips by moving
         through a local background aperture mask (if any is used).
 
-        The artifical spikes and dips introduced by asteroids are frequently
+        The artificial spikes and dips introduced by asteroids are frequently
         confused with stellar flares, planet transits, etc.  This method helps
         to identify false signals injects by asteroids by providing a list of
         the solar system objects (name, brightness, time) that passed in the
@@ -1052,7 +1052,7 @@ class TargetPixelFile(object):
             show_progress=show_progress,
         )
         if return_mask:
-            return res, np.in1d(self.time.jd, res.epoch)
+            return res, np.isin(self.time.jd, res.epoch)
         return res
 
     def plot(
@@ -1785,7 +1785,7 @@ class TargetPixelFile(object):
                 hdu_idx["POS_CORR1"] = column_current - column_ref
                 hdu_idx["POS_CORR2"] = row_current - row_ref
 
-            # Cutout (if neccessary) and get data
+            # Cutout (if necessary) and get data
             cutout_list = [
                 _cutout_image(hdu, position, wcs_ref, size) for hdu in hdu_list
             ]

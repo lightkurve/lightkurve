@@ -14,7 +14,7 @@
 - Fixed the bug in ``bin()`` function with ``bin`` parameter for ``FoldedLightCurve`` objects. [#1491]
 - Modified ``copy()`` and ``bin()`` functions for ``FoldedLightCurve`` objects to fix issues with normalized phase [#1491]
 - Removed ``binsize`` and ``time_bin_end`` as input options for ``FoldedLightCurve`` objects [#1491]
-
+- Changed calls of `np.in1d` to `np.isin` for numpy v2 compatibility [#1492]
 
 2.5.0 (2024-08-29)
 =====================

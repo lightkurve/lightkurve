@@ -644,7 +644,7 @@ class SparseDesignMatrix(DesignMatrix):
 
         # You can't split on the first or last index
         row_indices = list(
-            np.asarray(row_indices)[~np.in1d(row_indices, [0, self.shape[0]])]
+            np.asarray(row_indices)[~np.isin(row_indices, [0, self.shape[0]])]
         )
         if len(row_indices) == 0:
             return self
@@ -659,7 +659,7 @@ class SparseDesignMatrix(DesignMatrix):
         )
         dm._X = hstack(
             [
-                dm.X.multiply(lil_matrix(np.in1d(x, idx).astype(int)).T)
+                dm.X.multiply(lil_matrix(np.isin(x, idx).astype(int)).T)
                 for idx in np.array_split(x, row_indices)
             ],
             format="lil",

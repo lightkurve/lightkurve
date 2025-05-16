@@ -309,8 +309,8 @@ def test_bls(caplog):
     # Model is LC
     assert isinstance(model, LightCurve)
     # Model is otherwise identical to LC
-    assert np.in1d(model.time, lc.time).all()
-    assert np.in1d(lc.time, model.time).all()
+    assert np.isin(model.time, lc.time).all()
+    assert np.isin(lc.time, model.time).all()
 
     mask = p.get_transit_mask(1, 0.1, 0)
     assert isinstance(mask, np.ndarray)
