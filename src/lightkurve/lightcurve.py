@@ -3294,7 +3294,7 @@ class FoldedLightCurve(LightCurve):
  
 
         if bins != None:
-            # astropy's aggregate_downsample doesn't work for phase data:
+            # parent bin(bins=###) assumes time has format 'mjd', so does not work for phase data
             # AttributeError: 'TimeDelta' object has no attribute 'mjd'
             # So we directly compute the time_bin_size if the number of bins is provided
             if time_bin_size != None:
