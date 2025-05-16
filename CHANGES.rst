@@ -11,8 +11,9 @@
 - Updated the default TESS quality mask to include Argabrightening, Impulsive Outlier, and Bad Calibration Exclude flags (see issue #1230). [#1336]
 - Updated tutorial notebook links [#1484]
 - Author keyword now specifies between SPOC and TESS-SPOC [#1487]
-- Modified copy() and bin() functions for FoldedLightCurve objects to fix issues with normalized phase [#1491]
-- Removed binsize and time_bin_end as input options for FoldedLightCurve objects [#1491]
+- Fixed the bug in ``bin()`` function with ``bin`` parameter for ``FoldedLightCurve`` objects. [#1491]
+- Modified ``copy()`` and ``bin()`` functions for ``FoldedLightCurve`` objects to fix issues with normalized phase [#1491]
+- Removed ``binsize`` and ``time_bin_end`` as input options for ``FoldedLightCurve`` objects [#1491]
 
 
 2.5.0 (2024-08-29)
