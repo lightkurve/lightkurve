@@ -65,6 +65,7 @@ def _is_np_structured_array(data1):
     return isinstance(data1, np.ndarray) and data1.dtype.names is not None
 
 
+
 class LightCurve(TimeSeries):
     """
     Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
@@ -1036,11 +1037,17 @@ class LightCurve(TimeSeries):
         if (
             epoch_phase is not None
             and not isinstance(epoch_phase, Quantity)
-            and not normalize_phase
         ):
-            epoch_phase *= u.day
+            if not normalize_phase:
+                epoch_phase *= u.day
+            else:
+                epoch_phase *= u.dimensionless_unscaled
         if wrap_phase is not None and not isinstance(wrap_phase, Quantity):
-            wrap_phase *= u.day
+            if normalize_phase:
+                wrap_phase *= u.dimensionless_unscaled
+            else:
+                wrap_phase *= u.day
+                
 
         # Warn if `epoch_time` appears to use the wrong format
         if epoch_time is not None and epoch_time.value > 2450000:
@@ -1071,16 +1078,20 @@ class LightCurve(TimeSeries):
         # `normalize_phase=True`, so creating a `FoldedLightCurve` object
         # requires the following three-step workaround:
         # 1. Give the folded light curve a valid time column again
+
         with ts._delay_required_column_checks():
             folded_time = ts.time.copy()
             ts.remove_column("time")
             ts.add_column(self.time, name="time", index=0)
+
         # 2. Create the folded object
         lc = FoldedLightCurve(data=ts)
+
         # 3. Restore the folded time
         with lc._delay_required_column_checks():
             lc.remove_column("time")
             lc.add_column(folded_time, name="time", index=0)
+
 
         # Add extra column and meta data specific to FoldedLightCurve
         lc.add_column(
@@ -1582,6 +1593,7 @@ class LightCurve(TimeSeries):
                 time_bin_size=time_bin_size,
                 n_bins=n_bins,
                 time_bin_start=time_bin_start,
+                time_bin_end=time_bin_end,
                 aggregate_func=aggregate_func,
                 **kwargs
             )
@@ -1598,6 +1610,7 @@ class LightCurve(TimeSeries):
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
+                    time_bin_end=time_bin_end,
                     aggregate_func=rmse_func,
                 )
                 ts["flux_err"] = ts_err["flux_err"]
@@ -1608,6 +1621,7 @@ class LightCurve(TimeSeries):
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
+                    time_bin_end=time_bin_end,
                     aggregate_func=np.nanstd,
                 )
                 ts["flux_err"] = ts_err["flux"]
@@ -1838,6 +1852,7 @@ class LightCurve(TimeSeries):
         self,
         method="plot",
         column="flux",
+        time_column='time',
         ax=None,
         normalize=False,
         xlabel=None,
@@ -1858,6 +1873,8 @@ class LightCurve(TimeSeries):
             One of 'plot', 'scatter', or 'errorbar'.
         column : str
             Name of data column to plot. Default `flux`.
+        time_column : str
+            Name of time data column. Defauld `time`. 
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
@@ -1892,18 +1909,20 @@ class LightCurve(TimeSeries):
         ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
+        flux = self[column]
+        time = self[time_column]
         # Configure the default style
         if style is None or style == "lightkurve":
             style = MPLSTYLE
         # Default xlabel
         if xlabel is None:
-            if not hasattr(self.time, "format"):
+            if not hasattr(time, "format"):
                 xlabel = "Phase"
-            elif self.time.format == "bkjd":
+            elif time.format == "bkjd":
                 xlabel = "Time - 2454833 [BKJD days]"
-            elif self.time.format == "btjd":
+            elif time.format == "btjd":
                 xlabel = "Time - 2457000 [BTJD days]"
-            elif self.time.format == "jd":
+            elif time.format == "jd":
                 xlabel = "Time [JD]"
             else:
                 xlabel = "Time"
@@ -1967,7 +1986,7 @@ class LightCurve(TimeSeries):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == "scatter":
-                sc = ax.scatter(self.time.value, flux, **kwargs)
+                sc = ax.scatter(time.value, flux, **kwargs)
                 # Colorbars should only be plotted if the user specifies, and there is
                 # a color specified that is not a string (e.g. 'C1') and is iterable.
                 if (
@@ -1983,12 +2002,13 @@ class LightCurve(TimeSeries):
             elif method == "errorbar":
                 if np.any(~np.isnan(flux_err)):
                     ax.errorbar(
-                        x=self.time.value, y=flux.value, yerr=flux_err.value, **kwargs
+                        x=time.value, y=flux.value, yerr=flux_err.value, **kwargs
                     )
                 else:
                     log.warning(f"Column `{column}` has no associated errors.")
             else:
-                ax.plot(self.time.value, flux.value, **kwargs)
+                ax.plot(time.value, flux.value, **kwargs)
+
             # Default title (none)
             if title is not None:
                 ax.set_title(title)
@@ -3054,6 +3074,46 @@ class FoldedLightCurve(LightCurve):
         See the documentation of `odd_mask` for examples.
         """
         return ~self.odd_mask
+    
+    def _replace_normalized_phase(self):
+        # Some astropy functions, such as aggregate_downsample, require Time or TimeDelta
+        # As normalized phase-folded lightcurves are unitless, this breaks
+        # This will replace the normalized phase with phase in TimeDelta
+
+        # If the lightcurve is phase folded but not normalized, just return self
+        if not self.meta.get("NORMALIZE_PHASE"):
+            # it should never happen, likely that there is some bug.
+            warnings.warn("The function should be invoked on a folded lightcurve with normalized phase. No-Op.")
+            return
+
+        # If the phase folded lightcurve is normalized, unnormalize it
+        with self._delay_required_column_checks():
+            normalized_phase = self.time
+            #print(normalized_phase * self.period)
+            phase = TimeDelta(normalized_phase * self.period)
+            self.remove_column("time")
+            self.add_column(phase, name="time", index=0)
+        #return self
+
+
+    def _restore_normalized_phase(self):
+        # Some astropy functions, such as aggregate_downsample, require Time or TimeDelta
+        # As normalized phase-folded lightcurves are unitless, this breaks
+        # This will re-normalized the phase
+
+        # Checki if the lightcurve is already normalized
+        if isinstance(self.time, Quantity):
+            # should not happen, likely there is some bug
+            warnings.warn("Attempt to restore normalized phase while the phase has already been normalized. No-op.")
+            return 
+        
+        with self._delay_required_column_checks():
+            phase = self.time
+            normalized_phase = phase / self.period
+            self.remove_column("time")
+            self.add_column(normalized_phase, name="time", index=0)
+
+            
 
     def _set_xlabel(self, kwargs):
         """Helper function for plot, scatter, and errorbar.
@@ -3063,6 +3123,10 @@ class FoldedLightCurve(LightCurve):
             kwargs["xlabel"] = "Phase"
             if isinstance(self.time, TimeDelta):
                 kwargs["xlabel"] += f" [{self.time.format.upper()}]"
+            if self.normalize_phase == True:
+                kwargs["xlabel"] += f" (Normalized)"
+
+                    
         return kwargs
 
     def plot(self, **kwargs):
@@ -3140,7 +3204,141 @@ class FoldedLightCurve(LightCurve):
             period=self.period, epoch_time=self.epoch_time, **kwargs
         )
         return ax
+    
 
+    def bin(
+        self,
+        time_bin_size=None,
+        time_bin_start=None,
+        aggregate_func=None,
+        bins=None,
+        n_bins=None,
+
+    ):
+        """Bins a FoldedLightCurve in equally-spaced bins in phase.
+        Binning always occurs in time units (not normalized phase units)
+
+        If the original light curve contains flux uncertainties (``flux_err``),
+        the binned lightcurve will report the root-mean-square error.
+        If no uncertainties are included, the binned curve will return the
+        standard deviation of the data.
+
+        Parameters
+        ----------
+        time_bin_size : `~astropy.units.Quantity`,`~astropy.time.TimeDelta`, or scalar (optional)
+            The time interval for the binned time series - this is either a scalar
+            value (in which case all time bins will be assumed to have the same
+            duration) or as an array of values (in which case each phase bin can
+            have a different duration). In cases where the lightcurve is phase-normalized, a scalar
+            input will be assumed to be in normalized phase units (u.dimensionless_unscaled) 
+            (Default: 0.5 days; default unit: days.)
+        time_bin_start : Time like value, optional
+            The start phase for the binned time series. This can also be a scalar
+            value if ``time_bin_size`` is provided. Defaults to the first
+            time in the sampled time series.
+        aggregate_func : callable, optional
+            The function to use for combining points in the same bin. Defaults
+            to np.nanmean.
+        bins : int, optional
+            int which gives the number of bins to divide the lightkurve into.
+            This adjusts the length of ``time_bin_size``
+            to accommodate the input time series length.
+        n_bins: 
+            This functionality is deprecated for FoldedLightCurves. If provided, asserts
+            bins=n_bins
+
+        Returns
+        -------
+        binned_lc : `FoldedLightCurve`
+            A new folded light curve which has been binned, with the 'time' column phase in days 
+        """
+        # astropy's aggregate_downsample function only works when 'time' is type Time or TimeDelta
+        # Since the normalized phase is a unitless quantity, this breaks.
+        # To work around this, we reset the index to be the regular phase (TimeDelta) when binning
+        
+        if n_bins != None:
+            warnings.warn("n_bins is no longer accepted for FoldedLightCurve objects. Please specify 'bins' instead")
+            bins = n_bins
+        if bins != None:
+            if not isinstance(bins, int):
+                raise ValueError('bins must be an integer describing the total number of bins.')
+            if time_bin_size != None:
+                raise ValueError("Can not specify both 'bins' and 'time_bin_size'")
+            
+
+        if self.normalize_phase == True:
+            self._replace_normalized_phase()
+
+        if time_bin_start is None:
+            time_bin_start = self.time[0]
+        if isinstance(time_bin_start, list):
+            time_bin_start = time_bin_start[0]
+            warnings.warn("FoldedLightCurve does not support lists for time_bin_start. Using the first value.")
+        if isinstance(time_bin_start, Quantity):
+            if time_bin_start.unit == u.dimensionless_unscaled:
+                    time_bin_start = time_bin_start.value * self.period      
+        if np.isscalar(time_bin_start):
+            time_bin_start = time_bin_start * u.day
+
+
+
+        if time_bin_size != None:
+            if np.isscalar(time_bin_size):
+                if self.normalize_phase == True:
+                    time_bin_size = time_bin_size * u.dimensionless_unscaled
+                else:
+                    time_bin_size = time_bin_size * u.day
+            if isinstance(time_bin_size, Quantity):
+                if time_bin_size.unit == u.dimensionless_unscaled:
+                    time_bin_size = time_bin_size.value * self.period
+ 
+
+        if bins != None:
+            # parent bin(bins=###) assumes time has format 'mjd', so does not work for phase data
+            # AttributeError: 'TimeDelta' object has no attribute 'mjd'
+            # So we directly compute the time_bin_size if the number of bins is provided
+            if time_bin_size != None:
+                raise ValueError("Can not specify both 'bins' and 'time_bin_size'")
+            if time_bin_start != self.time[0]:
+                time_bin_size = (np.nanmax(self.time) - time_bin_start).to('day') / bins
+            else:
+                time_bin_size = self.period / bins
+
+
+        result = super().bin(
+                        time_bin_size=time_bin_size,
+                        time_bin_start=time_bin_start,
+                        aggregate_func=aggregate_func,
+                    )
+        
+        if self.normalize_phase == True:
+            self._restore_normalized_phase()
+            result._restore_normalized_phase()
+        
+        return result 
+    
+
+    def copy(self):
+        # the default copy() in astropy fails if the lightcurve
+        # has normalized phase (time column is `Quantity` instead of `Time` like)
+        # workaround it by temporarily changing time column to 
+        # non-normalized `TimeDelta`
+    
+        if self.normalize_phase == True:
+            self._replace_normalized_phase()
+        
+        result = super().copy()
+
+        if self.normalize_phase == True:
+            self._restore_normalized_phase()
+            result._restore_normalized_phase()
+        return result
+    
+
+    
+
+
+    
 
 class KeplerLightCurve(LightCurve):
     """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
@@ -3323,7 +3521,7 @@ class TessLightCurve(LightCurve):
         aperture_mask=None,
         **extra_data,
     ):
-        """Writes the KeplerLightCurve to a FITS file.
+        """Writes the TessLightCurve to a FITS file.
 
         Parameters
         ----------
@@ -3394,7 +3592,7 @@ def _boolean_mask_to_bitmask(aperture_mask):
     aperture_mask : array-like
         2D aperture mask. The mask can be either a boolean mask or an integer
         mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
-        are converted to the Kepler/TESS conventions.  Kepler bitmasks are
+        are converted to Kepler/TESS conventions.  Kepler bitmasks are
         returned unchanged except for possible datatype conversion.
 
     Returns
