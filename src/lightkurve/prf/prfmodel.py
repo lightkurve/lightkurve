@@ -108,8 +108,8 @@ class KeplerPRF(object):
             Two dimensional array representing the PRF values parametrized
             by flux, centroids, widths, and rotation.
         """
-        cosa = math.cos(rotation_angle)
-        sina = math.sin(rotation_angle)
+        cosa = np.cos(rotation_angle)
+        sina = np.sin(rotation_angle)
 
         delta_col = self.col_coord - center_col
         delta_row = self.row_coord - center_row

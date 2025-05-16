@@ -11,6 +11,11 @@
 - Updated the default TESS quality mask to include Argabrightening, Impulsive Outlier, and Bad Calibration Exclude flags (see issue #1230). [#1336]
 - Updated tutorial notebook links [#1484]
 - Author keyword now specifies between SPOC and TESS-SPOC [#1487]
+- Changed calls of `np.in1d` to `np.isin` for numpy v2 compatibility [#1492]
+- Loosen dependency on oktopus (and autograd) to facilitate Numpy v2 support,
+  along with updates of some deprecated numpy calls.
+  They will still be pulled in with a default ``pip install``, but this allows
+  Lightkurve to be run without oktopus with only ``tpfmodel`` disabled [#1452]
 - Fixed the bug in ``bin()`` function with ``bin`` parameter for ``FoldedLightCurve`` objects. [#1491]
 - Modified ``copy()`` and ``bin()`` functions for ``FoldedLightCurve`` objects to fix issues with normalized phase [#1491]
 - Removed ``binsize`` and ``time_bin_end`` as input options for ``FoldedLightCurve`` objects [#1491]
