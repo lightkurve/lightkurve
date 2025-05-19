@@ -2,6 +2,9 @@ import pytest
 import warnings
 
 import numpy as np
+from astropy.coordinates import SkyCoord
+from astropy.time import Time
+from astropy.table import Table
 from numpy.testing import assert_almost_equal, assert_array_equal
 
 from lightkurve.utils import KeplerQualityFlags, TessQualityFlags
@@ -12,7 +15,10 @@ from lightkurve.utils import bkjd_to_astropy_time, btjd_to_astropy_time
 from lightkurve.utils import centroid_quadratic
 from lightkurve.utils import show_citation_instructions
 from lightkurve.lightcurve import LightCurve
+from lightkurve import search_targetpixelfile
 
+
+from lightkurve.utils import query_skycatalog
 
 def test_channel_to_module_output():
     assert channel_to_module_output(1) == (2, 1)
@@ -228,3 +234,108 @@ def test_centroid_quadratic_robustness(data_dtype, mask):
 
 def test_show_citation_instructions():
     show_citation_instructions()
+
+@pytest.mark.remote_data
+def test_query_skycatalog():
+    # Tests the region around TIC 228760807 which should return a catalog containing 4 objects.
+    c = SkyCoord(194.10141041659, -27.3905828803397, unit="deg")
+    epoch = Time(1569.4424277786259, scale="tdb", format="btjd")
+
+    catalog = query_skycatalog(c, epoch, "tic", 80, 18)
+    assert len(catalog["ID"]) == 4
+
+    # Checks that an astropy Table is returned
+    assert isinstance(catalog, Table)
+
+    # Test that the proper motion works
+    correct_ra = 194.10075230969787
+    correct_dec = -27.390340343480744
+
+    assert np.isclose(catalog["RA"][0], correct_ra, atol=1e-6)
+    assert np.isclose(catalog["DEC"][0], correct_dec, atol=1e-6)
+
+    # Test different epochs
+    catalog_new = query_skycatalog(
+        c, Time(2461041.500, scale="tt", format="jd"), "tic", 80, 18
+    )
+
+    correct_ra_new = 194.10052070792756
+    correct_dec_new = -27.390254988629433
+
+    assert np.isclose(catalog["RA"][0], correct_ra_new, atol=1e-6)
+    assert np.isclose(catalog["DEC"][0], correct_dec_new, atol=1e-6)
+
+    # test the catalog type i.e., simbad is not included in our catalog list.
+    # Look at other tests to see if this is correct syntax
+    with pytest.raises(ValueError, match="Can not parse catalog name 'simbad'"):
+        query_skycatalog(c, epoch, "simbad", 80, 18)
+
+    # Test each other catalog
+    # Gaia
+    catalog_gaia = query_skycatalog(
+        c, Time(1569.4424277786259, scale="tdb", format="btjd"), "gaiadr3", 80, 18
+    )
+
+    assert len(catalog_gaia["ID"]) == 2
+
+    # Kepler
+    catalog_kepler = query_skycatalog(
+        SkyCoord(285.679391, 50.2413, unit="deg"),
+        Time(120.5391465105713, scale="tdb", format="bkjd"),
+        "kic",
+        20,
+        18,
+    )
+
+    assert len(catalog_kepler["ID"]) == 5
+
+    # K2
+    catalog_k2 = query_skycatalog(
+        SkyCoord(172.560465, 7.588391, unit="deg"),
+        Time(1975.1781333280233, scale="tdb", format="bkjd"),
+        "epic",
+        20,
+        18,
+    )
+
+    assert len(catalog_k2["ID"]) == 1
+
+
+@pytest.mark.remote_data
+def test_query_skycatalog_tpf():
+    # Test that you get an answer for each TPF type
+    TESS_tpf = search_targetpixelfile("TIC 228760807")[0].download()
+    catalog_tess = TESS_tpf.skycatalog
+    assert isinstance(catalog_tess, Table)
+
+    Kepler_tpf = search_targetpixelfile("Kepler-10")[0].download()
+    catalog_kepler = Kepler_tpf.skycatalog
+    assert isinstance(catalog_kepler, Table)
+
+    K2_tpf = search_targetpixelfile("K2-18")[0].download()
+    catalog_k2 = K2_tpf.skycatalog
+    assert isinstance(catalog_k2, Table)
+
+    # assert that the target is inside the TPF
+    target_ra = TESS_tpf.ra
+    target_dec = TESS_tpf.dec
+
+    index = np.where(catalog_tess["ID"] == 228760807)
+    cat_ra = catalog_tess["RA"][index]
+    cat_dec = catalog_tess["DEC"][index]
+
+    c1 = SkyCoord(target_ra, target_dec, unit="deg")
+    c2 = SkyCoord(cat_ra, cat_dec, unit="deg")
+    sep = c1.separation(c2)
+    assert sep.arcsecond < 10
+
+    # Check that it has pixel positions and that they are within reason
+    correct_row = 1806.0942842433474
+    correct_col = 825.0328770805637
+
+    assert np.isclose(catalog_tess["Row"][index], correct_row, atol=1e-6)
+    assert np.isclose(catalog_tess["Column"][index], correct_col, atol=1e-6)
+
+    # Check that there are magnitudes
+    correct_mag = 9.459
+    assert np.isclose(catalog_tess["TESS_Mag"][index], correct_mag, atol=1e-3)
