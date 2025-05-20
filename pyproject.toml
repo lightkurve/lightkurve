@@ -5,7 +5,7 @@ description = "A friendly package for Kepler & TESS time series analysis in Pyth
 license = "MIT"
 authors = ["Geert Barentsen <hello@geert.io>", "TESS Science Support Center <tesshelp@bigbang.gsfc.nasa.gov>"]
 readme = "README.rst"
-homepage = "https://docs.lightkurve.org"
+homepage = "https://lightkurve.github.io/lightkurve/"
 repository = "https://github.com/lightkurve/lightkurve"
 keywords = ["NASA", "Kepler", "TESS", "Astronomy"]
 classifiers = [
@@ -19,7 +19,7 @@ classifiers = [
 include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
 
 [tool.poetry.urls]
-"Documentation" = "https://docs.lightkurve.org"
+"Documentation" = "https://lightkurve.github.io/lightkurve/"
 "Bug Tracker" = "https://github.com/lightkurve/lightkurve/issues"
 
 [tool.poetry.dependencies]

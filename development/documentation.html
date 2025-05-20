@@ -1,342 +1,401 @@
-
 <!DOCTYPE html>
 
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Building the documentation &#8212; Lightkurve </title>
-    
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <title>Building the documentation &#8212; Lightkurve </title>
+
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
-    
-  <link rel="stylesheet"
-    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+
+  <link rel="stylesheet" href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
-    
+  <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+  <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Releasing a new version" href="release-procedure.html" />
-    <link rel="prev" title="Running the unit tests" href="testing.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
-    
+  <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+  <script src="../_static/jquery.js"></script>
+  <script src="../_static/underscore.js"></script>
+  <script src="../_static/doctools.js"></script>
+  <link rel="index" title="Index" href="../genindex.html" />
+  <link rel="search" title="Search" href="../search.html" />
+  <link rel="next" title="Releasing a new version" href="release-procedure.html" />
+  <link rel="prev" title="Running the unit tests" href="testing.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="None">
 
-    <!-- Google Analytics -->
-    
-<script async="" src="https://www.google-analytics.com/analytics.js"></script>
-<script>
-                        window.ga = window.ga || function () {
-                            (ga.q = ga.q || []).push(arguments) };
-                        ga.l = +new Date;
-                        ga('create', 'UA-69171-9', 'auto');
-                        ga('set', 'anonymizeIp', true);
-                        ga('send', 'pageview');
-                    </script>
 
-  </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-    
-    <div class="container-fluid" id="banner"></div>
+  <!-- Google Analytics -->
 
-    
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+  <script async="" src="https://www.google-analytics.com/analytics.js"></script>
+  <script>
+    window.ga = window.ga || function () {
+      (ga.q = ga.q || []).push(arguments)
+    };
+    ga.l = +new Date;
+    ga('create', 'UA-69171-9', 'auto');
+    ga('set', 'anonymizeIp', true);
+    ga('send', 'pageview');
+  </script>
 
-  <div id="navbar-start">
-    
-    
-<a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.5</p>
-</a>
+</head>
 
-    
-  </div>
+<body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
 
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+  <div class="container-fluid" id="banner"></div>
 
-  
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
-    <div id="navbar-center" class="mr-auto">
-      
-      <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../whats-new-v2.html">
-  What's new?
- </a>
-</li>
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../quickstart.html">
-  Quickstart
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../tutorials/index.html">
-  Tutorials
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../reference/index.html">
-  API
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../about/index.html">
-  About Lightkurve
- </a>
-</li>
-
-<li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="index.html">
-  Developing for Lightkurve
- </a>
-</li>
-
-    
-</ul>
-      </div>
-      
-    </div>
-
-    <div id="navbar-end">
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-        <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
-        </li>
-      </ul>
-      </div>
-      
-    </div>
-  </div>
-</div>
-    </nav>
-    
-
+  <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main">
     <div class="container-xl">
-      <div class="row">
-          
-            
-            <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar">
-              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-  <div class="bd-toc-item active">
-    <ul class="current nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="vision.html">
-   Vision of the Lightkurve project
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="contributing.html">
-   Reporting issues and proposing changes
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="testing.html">
-   Running the unit tests
-  </a>
- </li>
- <li class="toctree-l1 current active">
-  <a class="current reference internal" href="#">
-   Building the documentation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="release-procedure.html">
-   Releasing a new version
-  </a>
- </li>
-</ul>
 
-  </div>
-</nav>
-              </div>
-              <div class="sidebar-end-items">
-              </div>
-            </div>
-            
-          
-
-          
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-<div class="tocsection onthispage mt-5 pt-1 pb-3">
-    <i class="fas fa-list"></i> On this page
-</div>
-
-<nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#coding-and-documentation-standards">
-   Coding and documentation standards
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#building-documentation">
-   Building documentation
-  </a>
- </li>
-</ul>
-
-</nav>
-              </div>
-              
-              <div class="toc-item">
-                
-              </div>
-              
-            
-          </div>
-          
-
-          
-          
-            
-          
-          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
-              
-              <div>
-                
-  <section id="building-the-documentation">
-<span id="docs"></span><h1>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this headline">#</a></h1>
-<section id="coding-and-documentation-standards">
-<h2>Coding and documentation standards<a class="headerlink" href="#coding-and-documentation-standards" title="Permalink to this headline">#</a></h2>
-<p>Lightkurve adopts AstroPy’s coding guidelines and standards,
-as documented in <a class="reference external" href="http://docs.astropy.org/en/stable/index.html#developer-documentation">AstroPy’s Development Documentation</a>.</p>
-</section>
-<section id="building-documentation">
-<h2>Building documentation<a class="headerlink" href="#building-documentation" title="Permalink to this headline">#</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Building the documentation is not necessary unless you are
-writing new documentation or do not have internet access, because the
-latest version of the documentation is available online at
-<a class="reference external" href="https://docs.lightkurve.org/">docs.lightkurve.org</a> .</p>
-</div>
-<p>Building the <em>lightkurve</em> documentation requires <code class="xref py py-obj docutils literal notranslate"><span class="pre">sphinx</span></code> and a few extra packages. We recommend using <code class="xref py py-obj docutils literal notranslate"><span class="pre">poetry</span></code> to install the development dependencies:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ poetry install
-</pre></div>
-</div>
-<p>To make a clean directory for the docs use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
-$ make clean
-</pre></div>
-</div>
-<p>To build the documentation in HTML format, execute:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
-$ make html
-</pre></div>
-</div>
-<p>Note if you build the documentation after cleaning the directory this will compile the notebooks, which can take a significant amount of time (over 30 minutes). This will save the documentation website in the <code class="docutils literal notranslate"><span class="pre">../../lightkurve-docs</span></code> directory
-on your system.  If you re-run the <code class="xref py py-obj docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> command the notebook-based tutorials will not be recompiled by default
-because they take some time to build.  To recompile the just the notebooks, type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make notebooks
-</pre></div>
-</div>
-<p>Finally, if you have write permission to <em>lightkurve</em>’s GitHub repository,
-you can upload the documentation to the web server using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make upload
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you encounter the error <code class="docutils literal notranslate"><span class="pre">Pandoc</span> <span class="pre">wasn't</span> <span class="pre">found</span></code>, you will have to install <code class="docutils literal notranslate"><span class="pre">pandoc</span></code> separately as well following its <a class="reference external" href="https://pandoc.org/installing.html">installation instruction</a>  .
-For example, on Mac OS you can install <code class="docutils literal notranslate"><span class="pre">pandoc</span></code> using <code class="docutils literal notranslate"><span class="pre">homebrew</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ brew install pandoc
-</pre></div>
-</div>
-<p>An alternative method is to install pandoc using <code class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install --channel=conda-forge pandoc
-</pre></div>
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>To build the docs on a Mac you may have to install the Xcode Command Line Tools, which you can do using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ xcode-select --install
-</pre></div>
-</div>
-</div>
-</section>
-</section>
+      <div id="navbar-start">
 
 
-              </div>
-              
-              
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="testing.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Running the unit tests</p>
-        </div>
-    </a>
-    <a class='right-next' id="next-link" href="release-procedure.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Releasing a new version</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
-    </a>
-</div>
-              
-          </main>
-          
+        <a class="navbar-brand" href="../index.html">
+          <p class="title">Lightkurve v2.5</p>
+        </a>
+
 
       </div>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible"
+        aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+
+      <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+        <div id="navbar-center" class="mr-auto">
+
+          <div class="navbar-center-item">
+            <ul id="navbar-main-elements" class="navbar-nav">
+              <li class="toctree-l1 nav-item">
+                <a class="reference internal nav-link" href="../whats-new-v2.html">
+                  What's new?
+                </a>
+              </li>
+
+              <li class="toctree-l1 nav-item">
+                <a class="reference internal nav-link" href="../quickstart.html">
+                  Quickstart
+                </a>
+              </li>
+
+              <li class="toctree-l1 nav-item">
+                <a class="reference internal nav-link" href="../tutorials/index.html">
+                  Tutorials
+                </a>
+              </li>
+
+              <li class="toctree-l1 nav-item">
+                <a class="reference internal nav-link" href="../reference/index.html">
+                  API
+                </a>
+              </li>
+
+              <li class="toctree-l1 nav-item">
+                <a class="reference internal nav-link" href="../about/index.html">
+                  About Lightkurve
+                </a>
+              </li>
+
+              <li class="toctree-l1 current active nav-item">
+                <a class="reference internal nav-link" href="index.html">
+                  Developing for Lightkurve
+                </a>
+              </li>
+
+
+            </ul>
+          </div>
+
+        </div>
+
+        <div id="navbar-end">
+
+          <div class="navbar-end-item">
+            <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+              <li class="nav-item">
+                <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank"
+                  title="GitHub"><span><i class="fab fa-github-square"></i></span>
+                  <label class="sr-only">GitHub</label></a>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
     </div>
-  
+  </nav>
+
+
+  <div class="container-xl">
+    <div class="row">
+
+
+      <!-- Only show if we have sidebars configured, else just a small margin  -->
+      <div class="col-12 col-md-3 bd-sidebar">
+        <div class="sidebar-start-items">
+          <form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+            <i class="icon fas fa-search"></i>
+            <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..."
+              aria-label="Search the docs ..." autocomplete="off">
+          </form>
+          <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+            <div class="bd-toc-item active">
+              <ul class="current nav bd-sidenav">
+                <li class="toctree-l1">
+                  <a class="reference internal" href="vision.html">
+                    Vision of the Lightkurve project
+                  </a>
+                </li>
+                <li class="toctree-l1">
+                  <a class="reference internal" href="contributing.html">
+                    Reporting issues and proposing changes
+                  </a>
+                </li>
+                <li class="toctree-l1">
+                  <a class="reference internal" href="testing.html">
+                    Running the unit tests
+                  </a>
+                </li>
+                <li class="toctree-l1 current active">
+                  <a class="current reference internal" href="#">
+                    Building the documentation
+                  </a>
+                </li>
+                <li class="toctree-l1">
+                  <a class="reference internal" href="release-procedure.html">
+                    Releasing a new version
+                  </a>
+                </li>
+              </ul>
+
+            </div>
+          </nav>
+        </div>
+        <div class="sidebar-end-items">
+        </div>
+      </div>
+
+
+
+
+      <div class="d-none d-xl-block col-xl-2 bd-toc">
+
+
+        <div class="toc-item">
+
+          <div class="tocsection onthispage mt-5 pt-1 pb-3">
+            <i class="fas fa-list"></i> On this page
+          </div>
+
+          <nav id="bd-toc-nav">
+            <ul class="visible nav section-nav flex-column">
+              <li class="toc-h2 nav-item toc-entry">
+                <a class="reference internal nav-link" href="#coding-and-documentation-standards">
+                  Coding and documentation standards
+                </a>
+              </li>
+              <li class="toc-h2 nav-item toc-entry">
+                <a class="reference internal nav-link" href="#building-documentation">
+                  Building documentation
+                </a>
+              </li>
+            </ul>
+
+          </nav>
+        </div>
+
+        <div class="toc-item">
+
+        </div>
+
+
+      </div>
+
+
+
+
+
+
+      <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+
+        <div>
+
+          <section id="building-the-documentation">
+            <span id="docs"></span>
+            <h1>Building the documentation<a class="headerlink" href="#building-the-documentation"
+                title="Permalink to this headline">#</a></h1>
+            <section id="coding-and-documentation-standards">
+              <h2>Coding and documentation standards<a class="headerlink" href="#coding-and-documentation-standards"
+                  title="Permalink to this headline">#</a></h2>
+              <p>Lightkurve adopts AstroPy’s coding guidelines and standards,
+                as documented in <a class="reference external"
+                  href="http://docs.astropy.org/en/stable/index.html#developer-documentation">AstroPy’s Development
+                  Documentation</a>.</p>
+            </section>
+            <section id="building-documentation">
+              <h2>Building documentation<a class="headerlink" href="#building-documentation"
+                  title="Permalink to this headline">#</a></h2>
+              <div class="admonition note">
+                <p class="admonition-title">Note</p>
+                <p>Building the documentation is not necessary unless you are
+                  writing new documentation or do not have internet access, because the
+                  latest version of the documentation is available online at
+                  <a class="reference external"
+                    href="https://lightkurve.github.io/lightkurve/">lightkurve.github.io/lightkurve/</a> .
+                </p>
+              </div>
+              <p>Building the <em>lightkurve</em> documentation requires <code
+                  class="xref py py-obj docutils literal notranslate"><span class="pre">sphinx</span></code> and a few
+                extra packages. We recommend using <code
+                  class="xref py py-obj docutils literal notranslate"><span class="pre">poetry</span></code> to install
+                the development dependencies:</p>
+              <div class="highlight-default notranslate">
+                <div class="highlight">
+                  <pre><span></span>$ poetry install
+</pre>
+                </div>
+              </div>
+              <p>To make a clean directory for the docs use:</p>
+              <div class="highlight-default notranslate">
+                <div class="highlight">
+                  <pre><span></span>$ cd docs
+$ make clean
+</pre>
+                </div>
+              </div>
+              <p>To build the documentation in HTML format, execute:</p>
+              <div class="highlight-default notranslate">
+                <div class="highlight">
+                  <pre><span></span>$ cd docs
+$ make html
+</pre>
+                </div>
+              </div>
+              <p>Note if you build the documentation after cleaning the directory this will compile the notebooks, which
+                can take a significant amount of time (over 30 minutes). This will save the documentation website in the
+                <code class="docutils literal notranslate"><span class="pre">../../lightkurve-docs</span></code>
+                directory
+                on your system. If you re-run the <code
+                  class="xref py py-obj docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code>
+                command the notebook-based tutorials will not be recompiled by default
+                because they take some time to build. To recompile the just the notebooks, type:</p>
+              <div class="highlight-default notranslate">
+                <div class="highlight">
+                  <pre><span></span>$ make notebooks
+</pre>
+                </div>
+              </div>
+              <p>Finally, if you have write permission to <em>lightkurve</em>’s GitHub repository,
+                you can upload the documentation to the web server using:</p>
+              <div class="highlight-default notranslate">
+                <div class="highlight">
+                  <pre><span></span>$ make upload
+</pre>
+                </div>
+              </div>
+              <div class="admonition note">
+                <p class="admonition-title">Note</p>
+                <p>If you encounter the error <code
+                    class="docutils literal notranslate"><span class="pre">Pandoc</span> <span class="pre">wasn't</span> <span class="pre">found</span></code>,
+                  you will have to install <code
+                    class="docutils literal notranslate"><span class="pre">pandoc</span></code> separately as well
+                  following its <a class="reference external" href="https://pandoc.org/installing.html">installation
+                    instruction</a> .
+                  For example, on Mac OS you can install <code
+                    class="docutils literal notranslate"><span class="pre">pandoc</span></code> using <code
+                    class="docutils literal notranslate"><span class="pre">homebrew</span></code>:</p>
+                <div class="highlight-default notranslate">
+                  <div class="highlight">
+                    <pre><span></span>$ brew install pandoc
+</pre>
+                  </div>
+                </div>
+                <p>An alternative method is to install pandoc using <code
+                    class="docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+                <div class="highlight-default notranslate">
+                  <div class="highlight">
+                    <pre><span></span>$ conda install --channel=conda-forge pandoc
+</pre>
+                  </div>
+                </div>
+              </div>
+              <div class="admonition note">
+                <p class="admonition-title">Note</p>
+                <p>To build the docs on a Mac you may have to install the Xcode Command Line Tools, which you can do
+                  using:</p>
+                <div class="highlight-default notranslate">
+                  <div class="highlight">
+                    <pre><span></span>$ xcode-select --install
+</pre>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </section>
+
+
+        </div>
+
+
+        <!-- Previous / next buttons -->
+        <div class='prev-next-area'>
+          <a class='left-prev' id="prev-link" href="testing.html" title="previous page">
+            <i class="fas fa-angle-left"></i>
+            <div class="prev-next-info">
+              <p class="prev-next-subtitle">previous</p>
+              <p class="prev-next-title">Running the unit tests</p>
+            </div>
+          </a>
+          <a class='right-next' id="next-link" href="release-procedure.html" title="next page">
+            <div class="prev-next-info">
+              <p class="prev-next-subtitle">next</p>
+              <p class="prev-next-title">Releasing a new version</p>
+            </div>
+            <i class="fas fa-angle-right"></i>
+          </a>
+        </div>
+
+      </main>
+
+
+    </div>
+  </div>
+
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
   <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-<footer class="footer mt-5 mt-md-0">
-  <div class="container">
-    
-    <div class="footer-item">
-      <p class="copyright">
-    &copy; Copyright Lightkurve developers.<br>
-</p>
+  <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+
+      <div class="footer-item">
+        <p class="copyright">
+          &copy; Copyright Lightkurve developers.<br>
+        </p>
+      </div>
+
+      <div class="footer-item">
+        <p class="sphinx-version">
+          Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+        </p>
+      </div>
+
     </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
-</p>
-    </div>
-    
-  </div>
-</footer>
-  </body>
+  </footer>
+</body>
+
 </html>

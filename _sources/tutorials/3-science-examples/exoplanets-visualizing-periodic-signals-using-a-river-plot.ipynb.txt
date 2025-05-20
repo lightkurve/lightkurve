@@ -34,7 +34,7 @@
     "\n",
     "A \"river plot\" is a method to visualize periodic signals that vary over time. It is created by breaking a light curve into segments of equal length, such as the period of a planet orbiting a star, and displaying the segments side by side to allow the flux values to be compared. This allows you to examine how an entire light curve varies relative to a fixed period. It is similar to a \"[waterfall plot](https://en.wikipedia.org/wiki/Waterfall_plot)\" which is used to similarly analyze time variation in spectra. \n",
     "\n",
-    "This tutorial demonstrates how to create a river plot using [Lightkurve](https://docs.lightkurve.org)."
+    "This tutorial demonstrates how to create a river plot using [Lightkurve](https://lightkurve.github.io/lightkurve)."
    ]
   },
   {
