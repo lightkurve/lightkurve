@@ -77,6 +77,7 @@ mistune = "<2.0.0"  # Workaround for #1162 (not a true dependency)
 # docutils 0.21 cannot be installed with poetry
 # See https://github.com/python-poetry/poetry/issues/9293
 docutils = "!=0.21"
+lxml-html-clean = "^0.4.2"
 
 [build-system]
 requires = ["poetry-core"]
