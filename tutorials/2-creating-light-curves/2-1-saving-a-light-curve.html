@@ -316,13 +316,13 @@ RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinate
 RA_OBJ  =            291.03872 / [deg] right ascension
 DEC_OBJ =             36.59813 / [deg] declination
 EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.5.1   &#39;
+PROCVER = &#39;2.5.2dev&#39;
 MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;DaYBGUX9DaXADUX9&#39;   / HDU checksum updated 2025-05-20T10:54:10
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2025-05-20T10:54:10
+CHECKSUM= &#39;CIFfFFFdCFFdCFFd&#39;   / HDU checksum updated 2025-05-20T14:56:29
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2025-05-20T14:56:29
 </pre></div></div>
 </div>
 <p>Looks like it has all the correct information about the target. What about the second extension?</p>
@@ -366,8 +366,8 @@ TFORM6  = &#39;D       &#39;
 TTYPE7  = &#39;MOM_CENTR2&#39;
 TFORM7  = &#39;D       &#39;
 EXTNAME = &#39;LIGHTCURVE&#39;
-CHECKSUM= &#39;X6d5Y4c3X4c3X4c3&#39;   / HDU checksum updated 2025-05-20T10:54:10
-DATASUM = &#39;390244549&#39;          / data unit checksum updated 2025-05-20T10:54:10
+CHECKSUM= &#39;W2d1Y1b0W1b0W1b0&#39;   / HDU checksum updated 2025-05-20T14:56:29
+DATASUM = &#39;390244549&#39;          / data unit checksum updated 2025-05-20T14:56:29
 </pre></div></div>
 </div>
 <p>This extension has 7 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code>, <code class="docutils literal notranslate"><span class="pre">SAP_QUALITY</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>, <code class="docutils literal notranslate"><span class="pre">MOM_CENTR1</span></code>, and <code class="docutils literal notranslate"><span class="pre">MOM_CENTR2</span></code>. What if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
@@ -424,7 +424,7 @@ RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinate
 RA_OBJ  =            291.03872 / [deg] right ascension
 DEC_OBJ =             36.59813 / [deg] declination
 EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.5.1   &#39;
+PROCVER = &#39;2.5.2dev&#39;
 HLSPLEAD= &#39;Kepler/K2 GO office&#39;
 HLSPNAME= &#39;TUTORIAL&#39;
 CITATION= &#39;HEDGES2018&#39;
@@ -432,8 +432,8 @@ MISSION = &#39;Kepler  &#39;
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;ZI5QhF2PZF2PfF2P&#39;   / HDU checksum updated 2025-05-20T10:54:10
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2025-05-20T10:54:10
+CHECKSUM= &#39;Z3i9f2Z7Z2f7d2Z7&#39;   / HDU checksum updated 2025-05-20T14:56:29
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2025-05-20T14:56:29
 </pre></div></div>
 </div>
 <p>Now our new keywords are included in the primary header! What about if we want to add more <strong>data columns</strong> to our fits file? We can simply add data columns in the same way. Let’s add the data quality to our fits file.</p>

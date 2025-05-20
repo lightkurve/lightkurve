@@ -622,23 +622,23 @@ RegressionCorrector (ID: KIC 8462852)
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=1190</i>
-<table id="table13421204528" class="table-striped table-bordered table-condensed">
+<table id="table13487099968" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th></tr></thead>
-<tr><td>1711.3882446289062</td><td>-341.18816068925025</td><td>0.0</td></tr>
-<tr><td>1711.4090576171875</td><td>-341.21407886438647</td><td>0.0</td></tr>
-<tr><td>1711.4298706054688</td><td>-341.9634439702595</td><td>0.0</td></tr>
-<tr><td>1711.4507446289062</td><td>-341.83822804039573</td><td>0.0</td></tr>
-<tr><td>1711.4715576171875</td><td>-342.1986575923138</td><td>0.0</td></tr>
-<tr><td>1711.4923706054688</td><td>-342.10919463036316</td><td>0.0</td></tr>
+<tr><td>1711.3882446289062</td><td>-341.18816068929846</td><td>0.0</td></tr>
+<tr><td>1711.4090576171875</td><td>-341.2140788644174</td><td>0.0</td></tr>
+<tr><td>1711.4298706054688</td><td>-341.963443970305</td><td>0.0</td></tr>
+<tr><td>1711.4507446289062</td><td>-341.8382280404312</td><td>0.0</td></tr>
+<tr><td>1711.4715576171875</td><td>-342.1986575923511</td><td>0.0</td></tr>
+<tr><td>1711.4923706054688</td><td>-342.1091946304059</td><td>0.0</td></tr>
 <tr><td>...</td><td>...</td><td>...</td></tr>
-<tr><td>1737.2837524414062</td><td>218.3548225328277</td><td>0.0</td></tr>
-<tr><td>1737.3045654296875</td><td>109.60592441127756</td><td>0.0</td></tr>
-<tr><td>1737.3253784179688</td><td>2.4883698938256202</td><td>0.0</td></tr>
-<tr><td>1737.3462524414062</td><td>-92.9196504669053</td><td>0.0</td></tr>
-<tr><td>1737.3670654296875</td><td>-179.75423736150515</td><td>0.0</td></tr>
-<tr><td>1737.3878784179688</td><td>-238.60812425258882</td><td>0.0</td></tr>
+<tr><td>1737.2837524414062</td><td>218.3548225328832</td><td>0.0</td></tr>
+<tr><td>1737.3045654296875</td><td>109.60592441131939</td><td>0.0</td></tr>
+<tr><td>1737.3253784179688</td><td>2.488369893871095</td><td>0.0</td></tr>
+<tr><td>1737.3462524414062</td><td>-92.91965046688256</td><td>0.0</td></tr>
+<tr><td>1737.3670654296875</td><td>-179.75423736149605</td><td>0.0</td></tr>
+<tr><td>1737.3878784179688</td><td>-238.60812425258155</td><td>0.0</td></tr>
 </table></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -878,7 +878,7 @@ $880.81385 \; \mathrm{ppm}$</div></div>
 </div>
 <div class="output_area docutils container">
 <div class="math notranslate nohighlight">
-$825.55526 \; \mathrm{ppm}$</div></div>
+$825.56685 \; \mathrm{ppm}$</div></div>
 </div>
 </section>
 <section id="6.-Should-I-use-RegressionCorrector-or-PLDCorrector?">
@@ -965,32 +965,41 @@ $825.55526 \; \mathrm{ppm}$</div></div>
 </div>
 <div class="output_area rendered_html docutils container">
 <head>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
-<style>
-    button {
-        border: 1px solid;
-        padding: 0.2em;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 0.8em;
-        margin: 0.2em;
-        cursor: pointer;
-    }
+    <style>
+        button {
+            border: 1px solid;
+            padding: 0.2em;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.8em;
+            margin: 0.2em;
+            cursor: pointer;
+        }
 
-    .citation-button-1 {background-color: #4CAF50;} /* Green */
-    .citation-button-2 {background-color: #008CBA;} /* Blue */
-</style>
+        .citation-button-1 {
+            background-color: #4CAF50;
+        }
 
-<script type="text/javascript">
-    function copyBibtex(package) {
-        var copyText = document.getElementById(package + "Text");
-        copyText.select();
-        document.execCommand("copy");
-        alert("BibTex has been copied to your clipboard")
-    }
-</script>
+        /* Green */
+        .citation-button-2 {
+            background-color: #008CBA;
+        }
+
+        /* Blue */
+    </style>
+
+    <script type="text/javascript">
+        function copyBibtex(package) {
+            var copyText = document.getElementById(package + "Text");
+            copyText.select();
+            document.execCommand("copy");
+            alert("BibTex has been copied to your clipboard")
+        }
+    </script>
 </head>
 
 <body>
@@ -1124,26 +1133,26 @@ archivePrefix = "arXiv",
 
     <p>
         When using Lightkurve, we kindly request that you cite the following packages:
-        <ul>
-            <li>
-                <a href="https://lightkurve.github.io/lightkurve">lightkurve</a>
-                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astropy.org">astropy</a>
-                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astroquery.readthedocs.io">astroquery</a>
-                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
-            </li>
-            <li>
-                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
-                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                — if you are using <i>search_tesscut()</i>.
-            </li>
-        </ul>
+    <ul>
+        <li>
+            <a href="https://lightkurve.github.io/lightkurve/">lightkurve</a>
+            <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+        </li>
+        <li>
+            <a href="https://astropy.org">astropy</a>
+            <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+        </li>
+        <li>
+            <a href="https://astroquery.readthedocs.io">astroquery</a>
+            <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            — if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
+        </li>
+        <li>
+            <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
+            <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            — if you are using <i>search_tesscut()</i>.
+        </li>
+    </ul>
     </p>
 </body></div>
 </div>

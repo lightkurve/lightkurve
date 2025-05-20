@@ -39,7 +39,7 @@
     "3. The noise removal tools now allow users to perform custom corrections in a way that is very similar to the official TESS pipeline. \n",
     "\n",
     "The remainder of this page briefly demonstrates these new features.\n",
-    "They are explained in more detail in a new set of entry-level tutorials which are avaiable in the online documentation at [lightkurve.github.io/lightkurve/tutorials](https://lightkurve.github.io/lightkurve/tutorials).\n",
+    "They are explained in more detail in a new set of entry-level tutorials which are avaiable in the online documentation at [https://lightkurve.github.io/lightkurve/tutorials](https://lightkurve.github.io/lightkurve/tutorials).\n",
     "\n",
     "\n",
     "## 1. LightCurve objects are now specialized kinds of AstroPy Tables\n",
@@ -374,7 +374,7 @@
     "* Modified `TargetPixelFile.plot()` to use a more clear hatched style when visualizing the aperture mask on top of pixel data. \n",
     "* Added `SparseDesignMatrix` and modified `RegressionCorrector` to enable systematics removal methods to benefit from scipy.sparse speed-ups. \n",
     "\n",
-    "In addition, Lightkurve 2 contains numerous smaller improvements and bugfixes. To see a detailed list of all changes, please see the [Full Changelog](http://lightkurve.github.io/lightkurve/about/changelog.html)."
+    "In addition, Lightkurve 2 contains numerous smaller improvements and bugfixes. To see a detailed list of all changes, please see the [Full Changelog](https://lightkurve.github.io/lightkurve/about/changelog.html)."
    ]
   },
   {

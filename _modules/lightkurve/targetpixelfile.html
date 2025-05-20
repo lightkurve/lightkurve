@@ -215,7 +215,7 @@
     <span class="n">validate_method</span><span class="p">,</span>
     <span class="n">centroid_quadratic</span><span class="p">,</span>
     <span class="n">_query_solar_system_objects</span><span class="p">,</span>
-    <span class="n">finalize_notebook_url</span>
+    <span class="n">finalize_notebook_url</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">detect_filetype</span>
 
@@ -274,9 +274,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">path</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;s3://&#39;</span><span class="p">)):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;s3://&quot;</span><span class="p">):</span>
             <span class="c1"># Filename is an S3 cloud URI</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">use_fsspec</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fsspec_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;anon&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">use_fsspec</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fsspec_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;anon&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -747,7 +749,9 @@
 <span class="sd">        lc : LightCurve object</span>
 <span class="sd">            Object containing the resulting lightcurve.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">method</span> <span class="o">=</span> <span class="n">validate_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;aperture&quot;</span><span class="p">,</span> <span class="s2">&quot;prf&quot;</span><span class="p">,</span> <span class="s2">&quot;sap&quot;</span><span class="p">,</span> <span class="s2">&quot;sff&quot;</span><span class="p">,</span> <span class="s2">&quot;cbv&quot;</span><span class="p">,</span> <span class="s2">&quot;pld&quot;</span><span class="p">])</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">validate_method</span><span class="p">(</span>
+            <span class="n">method</span><span class="p">,</span> <span class="n">supported_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;aperture&quot;</span><span class="p">,</span> <span class="s2">&quot;prf&quot;</span><span class="p">,</span> <span class="s2">&quot;sap&quot;</span><span class="p">,</span> <span class="s2">&quot;sff&quot;</span><span class="p">,</span> <span class="s2">&quot;cbv&quot;</span><span class="p">,</span> <span class="s2">&quot;pld&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;aperture&quot;</span><span class="p">,</span> <span class="s2">&quot;sap&quot;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_aperture_photometry</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;prf&quot;</span><span class="p">:</span>
@@ -760,7 +764,7 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_default_aperture_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">aperture_mask</span> <span class="o">==</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span>
                 <span class="c1"># returns &#39;pipeline&#39;, unless it is missing. Falls back to &#39;threshold&#39;</span>
                 <span class="k">return</span> <span class="s2">&quot;pipeline&quot;</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;threshold&quot;</span>
             <span class="k">else</span><span class="p">:</span>
@@ -808,7 +812,7 @@
 
         <span class="c1"># Input validation</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">if</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;`aperture_mask` has shape </span><span class="si">{}</span><span class="s2">, &quot;</span>
                     <span class="s2">&quot;but the flux data has shape </span><span class="si">{}</span><span class="s2">&quot;</span>
@@ -832,7 +836,7 @@
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="c1"># Kepler and TESS pipeline style integer flags</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;&gt;i4&quot;</span><span class="p">)):</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
             <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">((</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
@@ -1106,7 +1110,7 @@
         <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">return_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of asteroids or comets which affected the target pixel files.</span>
 
@@ -1211,7 +1215,7 @@
 
         <span class="k">if</span> <span class="n">radius</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">radius</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="mi">2</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">pixel_scale</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="mi">5</span><span class="p">))</span>
+                <span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">pixel_scale</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="mi">5</span><span class="p">))</span>
             <span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">arcsecond</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="n">_query_solar_system_objects</span><span class="p">(</span>
@@ -1286,8 +1290,7 @@
                 <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">cadenceno</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;cadenceno </span><span class="si">{}</span><span class="s2"> is out of bounds, &quot;</span>
-                    <span class="s2">&quot;must be in the range </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;cadenceno </span><span class="si">{}</span><span class="s2"> is out of bounds, must be in the range </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                         <span class="n">cadenceno</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
@@ -1306,8 +1309,9 @@
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;frame </span><span class="si">{}</span><span class="s2"> is out of bounds, must be in the range &quot;</span>
-                <span class="s2">&quot;0-</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="s2">&quot;frame </span><span class="si">{}</span><span class="s2"> is out of bounds, must be in the range 0-</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">frame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">)</span>
             <span class="p">)</span>
 
         <span class="c1"># Make list of preset colour labels</span>
@@ -1343,8 +1347,6 @@
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="s2">&quot;wcs&quot;</span><span class="p">):</span>
                     <span class="n">img_extent</span> <span class="o">=</span> <span class="kc">None</span>
 
-
-
             <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_image</span><span class="p">(</span>
                 <span class="n">data_to_plot</span><span class="p">,</span>
                 <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
@@ -1356,7 +1358,6 @@
             <span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
-
         <span class="c1"># Overlay the aperture mask if given</span>
         <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
@@ -1366,12 +1367,18 @@
                 <span class="n">ap_col</span> <span class="o">=</span> <span class="n">in_aperture</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ap_row</span> <span class="o">=</span> <span class="n">in_aperture</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">-</span> <span class="mf">0.5</span>
-                <span class="n">ap_col</span> <span class="o">=</span> <span class="n">in_aperture</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">-</span> <span class="mf">0.5</span>    
+                <span class="n">ap_col</span> <span class="o">=</span> <span class="n">in_aperture</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">-</span> <span class="mf">0.5</span>
             <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ap_row</span><span class="p">)):</span>
-                
-                <span class="n">rect</span><span class="o">=</span><span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="n">ap_col</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span><span class="n">ap_row</span><span class="p">[</span><span class="n">ii</span><span class="p">]),</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;//&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">mask_color</span><span class="p">)</span>
+                <span class="n">rect</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">ap_col</span><span class="p">[</span><span class="n">ii</span><span class="p">],</span> <span class="n">ap_row</span><span class="p">[</span><span class="n">ii</span><span class="p">]),</span>
+                    <span class="mi">1</span><span class="p">,</span>
+                    <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;//&quot;</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">mask_color</span><span class="p">,</span>
+                <span class="p">)</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
-                
+
         <span class="k">return</span> <span class="n">ax</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_to_matplotlib_animation</span><span class="p">(</span>
@@ -1443,9 +1450,16 @@
             <span class="c1"># To make installing Lightkurve easier, ipython is an optional dependency,</span>
             <span class="c1"># because we can assume it is installed when notebook-specific features are called</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
-            <span class="k">return</span> <span class="n">HTML</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_to_matplotlib_animation</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_args</span><span class="p">)</span><span class="o">.</span><span class="n">to_jshtml</span><span class="p">())</span>
+
+            <span class="k">return</span> <span class="n">HTML</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_to_matplotlib_animation</span><span class="p">(</span>
+                    <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_args</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">to_jshtml</span><span class="p">()</span>
+            <span class="p">)</span>
         <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ipython needs to be installed for animate() to work (e.g., `pip install ipython`)&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s2">&quot;ipython needs to be installed for animate() to work (e.g., `pip install ipython`)&quot;</span>
+            <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes the TPF to a FITS file on disk.&quot;&quot;&quot;</span>
@@ -1551,8 +1565,9 @@
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">interact_sky</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;empty&quot;</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="mi">18</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">interact_sky</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s2">&quot;empty&quot;</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="mi">18</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</span>
 
 <span class="sd">        Parameters</span>
@@ -1580,7 +1595,10 @@
         <span class="n">notebook_url</span> <span class="o">=</span> <span class="n">finalize_notebook_url</span><span class="p">(</span><span class="n">notebook_url</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">show_skyview_widget</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">,</span> <span class="n">magnitude_limit</span><span class="o">=</span><span class="n">magnitude_limit</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">,</span>
+            <span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">,</span>
+            <span class="n">magnitude_limit</span><span class="o">=</span><span class="n">magnitude_limit</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_corrector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;pld&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1609,7 +1627,7 @@
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_methods</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="p">(</span><span class="s2">&quot;Unrecognized method &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="s2">&quot;allowed methods are: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="p">(</span><span class="s2">&quot;Unrecognized method &#39;</span><span class="si">{0}</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">allowed methods are: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">method</span><span class="p">,</span> <span class="n">allowed_methods</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -2286,7 +2304,7 @@
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">filetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;File header not recognized as Kepler or TESS &quot;</span> <span class="s2">&quot;observation.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;File header not recognized as Kepler or TESS observation.&quot;</span><span class="p">,</span>
                     <span class="n">LightkurveWarning</span><span class="p">,</span>
                 <span class="p">)</span>
 
@@ -2654,8 +2672,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the data before writing to a TPF for any obvious errors.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)):</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;The factory-created TPF contains cadences with &quot;</span>
-                <span class="s2">&quot;identical TIME values.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The factory-created TPF contains cadences with identical TIME values.&quot;</span><span class="p">,</span>
                 <span class="n">LightkurveWarning</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)):</span>
@@ -2966,7 +2983,7 @@
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">filetype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;File header not recognized as Kepler or TESS &quot;</span> <span class="s2">&quot;observation.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;File header not recognized as Kepler or TESS observation.&quot;</span><span class="p">,</span>
                     <span class="n">LightkurveWarning</span><span class="p">,</span>
                 <span class="p">)</span>
 

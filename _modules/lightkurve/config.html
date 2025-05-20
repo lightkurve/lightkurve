@@ -176,7 +176,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">astropy.config</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">astropyconfig</span>
 
 
-<span class="n">ROOTNAME</span> <span class="o">=</span> <span class="s1">&#39;lightkurve&#39;</span>
+<span class="n">ROOTNAME</span> <span class="o">=</span> <span class="s2">&quot;lightkurve&quot;</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">ConfigNamespace</span><span class="p">(</span><span class="n">astropyconfig</span><span class="o">.</span><span class="n">ConfigNamespace</span><span class="p">):</span>
@@ -276,7 +276,7 @@
         <span class="k">return</span>
 
     <span class="n">cache_dir</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">cache_dir</span>
-    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">cache_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cache_dir</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">cache_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cache_dir</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="c1"># If an user has specified a custom cache dir, the check won&#39;t be performed.</span>
         <span class="c1"># Not only is the check somewhat irrelevant, the behavior is also required</span>
         <span class="c1"># to support the case that the user configures the legacy `~/.lightkurve-cache`</span>

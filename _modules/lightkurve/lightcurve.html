@@ -171,6 +171,7 @@
                 
   <h1>Source code for lightkurve.lightcurve</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Defines LightCurve, KeplerLightCurve, and TessLightCurve.&quot;&quot;&quot;</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -204,7 +205,7 @@
     <span class="n">btjd_to_astropy_time</span><span class="p">,</span>
     <span class="n">validate_method</span><span class="p">,</span>
     <span class="n">_query_solar_system_objects</span><span class="p">,</span>
-    <span class="n">finalize_notebook_url</span>
+    <span class="n">finalize_notebook_url</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">LightkurveWarning</span><span class="p">,</span> <span class="n">LightkurveDeprecationWarning</span>
 
@@ -213,7 +214,8 @@
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="n">_HAS_VAR_BINS</span> <span class="o">=</span> <span class="s1">&#39;time_bin_end&#39;</span> <span class="ow">in</span> <span class="n">aggregate_downsample</span><span class="o">.</span><span class="vm">__kwdefaults__</span>
+<span class="n">_HAS_VAR_BINS</span> <span class="o">=</span> <span class="s2">&quot;time_bin_end&quot;</span> <span class="ow">in</span> <span class="n">aggregate_downsample</span><span class="o">.</span><span class="vm">__kwdefaults__</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_to_unitless_day</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
@@ -235,7 +237,6 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_is_np_structured_array</span><span class="p">(</span><span class="n">data1</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">data1</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-
 
 
 <div class="viewcode-block" id="LightCurve"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.html#lightkurve.LightCurve">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LightCurve</span><span class="p">(</span><span class="n">TimeSeries</span><span class="p">):</span>
@@ -340,7 +341,6 @@
     <span class="n">__array_priority__</span> <span class="o">=</span> <span class="mi">100_000</span>
 
 <div class="viewcode-block" id="LightCurve.__init__"><a class="viewcode-back" href="../../reference/api/lightkurve.LightCurve.html#lightkurve.LightCurve.__init__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
         <span class="c1"># the ` {has,get,set}_time_in_data()`: helpers to handle `data` of different types</span>
         <span class="c1"># in some cases, they also need to access kwargs[&quot;names&quot;] as well</span>
 
@@ -438,7 +438,9 @@
             <span class="k">elif</span> <span class="n">_is_np_structured_array</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
                 <span class="c1"># astropy Time cannot be assigned to a column in np structured array</span>
                 <span class="c1"># we have special codepath handling it outside this function</span>
-                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Setting Time instances to np structured array is not supported&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                    <span class="s2">&quot;Setting Time instances to np structured array is not supported&quot;</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># should never reach here. It&#39;d have been caught by `has_time_in()``</span>
                 <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Unsupported type for time in data&quot;</span><span class="p">)</span>
@@ -614,7 +616,7 @@
                 <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span>
                 <span class="ow">and</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
                 <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_attributes_relax</span>
-                <span class="ow">and</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;meta&#39;</span>
+                <span class="ow">and</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;meta&quot;</span>
             <span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                     <span class="p">(</span>
@@ -634,7 +636,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;LABEL&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; LABEL=</span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LABEL&#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+            <span class="n">result</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; LABEL=&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LABEL&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
         <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;QUARTER&quot;</span><span class="p">,</span> <span class="s2">&quot;CAMPAIGN&quot;</span><span class="p">,</span> <span class="s2">&quot;SECTOR&quot;</span><span class="p">,</span> <span class="s2">&quot;AUTHOR&quot;</span><span class="p">,</span> <span class="s2">&quot;FLUX_ORIGIN&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
                 <span class="n">result</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -649,7 +651,7 @@
                 <span class="n">descr_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;masked=True&quot;</span><span class="p">)</span>
             <span class="n">descr_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;length=</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
             <span class="k">if</span> <span class="s2">&quot;LABEL&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
-                <span class="n">descr_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LABEL=</span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LABEL&#39;</span><span class="p">)</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">descr_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;LABEL=&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;LABEL&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;QUARTER&quot;</span><span class="p">,</span> <span class="s2">&quot;CAMPAIGN&quot;</span><span class="p">,</span> <span class="s2">&quot;SECTOR&quot;</span><span class="p">,</span> <span class="s2">&quot;AUTHOR&quot;</span><span class="p">,</span> <span class="s2">&quot;FLUX_ORIGIN&quot;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
                     <span class="n">descr_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -748,8 +750,10 @@
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="o">.</span><span class="n">unit</span><span class="si">}</span><span class="s2"> respectively.&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;FLUX_ORIGIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flux_column</span>
-        <span class="n">normalized_new_flux</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
+        <span class="n">lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;FLUX_ORIGIN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flux_column</span>
+        <span class="n">normalized_new_flux</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;flux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
+        <span class="p">)</span>
         <span class="c1"># Note: here we assume unitless flux means it&#39;s normalized</span>
         <span class="c1"># it&#39;s not exactly true in many constructed lightcurves in unit test</span>
         <span class="c1"># but the assumption should hold for any real world use cases, e.g. TESS QLP</span>
@@ -914,7 +918,7 @@
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">newlc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">other</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span>
-            <span class="n">newlc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">((</span><span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">newlc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">((</span><span class="n">other</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">newlc</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__div__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -995,8 +999,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;the `inplace` parameter is no longer supported &quot;</span>
-                <span class="s2">&quot;as of Lightkurve v2.0&quot;</span>
+                <span class="s2">&quot;the `inplace` parameter is no longer supported as of Lightkurve v2.0&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">others</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
             <span class="n">others</span> <span class="o">=</span> <span class="p">(</span><span class="n">others</span><span class="p">,)</span>
@@ -1070,7 +1073,7 @@
             <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma</span>
         <span class="p">)</span>
         <span class="c1"># In astropy&gt;=5.0, extra_mask is a masked array</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">extra_mask</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">extra_mask</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
             <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">extra_mask</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># support astropy&lt;5.0</span>
             <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">extra_mask</span>
@@ -1123,7 +1126,7 @@
             <span class="p">)</span>
             <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
             <span class="c1"># In astropy&gt;=5.0, mask1 is a masked array</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mask1</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">mask1</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># support astropy&lt;5.0</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">mask1</span>
@@ -1206,10 +1209,7 @@
             <span class="n">epoch_time</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span>
                 <span class="n">epoch_time</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">scale</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">epoch_phase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epoch_phase</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">)</span>
-        <span class="p">):</span>
+        <span class="k">if</span> <span class="n">epoch_phase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">epoch_phase</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">normalize_phase</span><span class="p">:</span>
                 <span class="n">epoch_phase</span> <span class="o">*=</span> <span class="n">u</span><span class="o">.</span><span class="n">day</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1219,7 +1219,6 @@
                 <span class="n">wrap_phase</span> <span class="o">*=</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">wrap_phase</span> <span class="o">*=</span> <span class="n">u</span><span class="o">.</span><span class="n">day</span>
-                
 
         <span class="c1"># Warn if `epoch_time` appears to use the wrong format</span>
         <span class="k">if</span> <span class="n">epoch_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">epoch_time</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">2450000</span><span class="p">:</span>
@@ -1263,7 +1262,6 @@
         <span class="k">with</span> <span class="n">lc</span><span class="o">.</span><span class="n">_delay_required_column_checks</span><span class="p">():</span>
             <span class="n">lc</span><span class="o">.</span><span class="n">remove_column</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
             <span class="n">lc</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">folded_time</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
 
         <span class="c1"># Add extra column and meta data specific to FoldedLightCurve</span>
         <span class="n">lc</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span>
@@ -1450,10 +1448,14 @@
 
         <span class="c1"># Temporary workaround for issue #1172.  TODO: remove the `if`` statement</span>
         <span class="c1"># below once we adopt AstroPy &gt;=5.0.3 as a minimum dependency.</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
-            <span class="n">fe</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ntime</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">],</span> <span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="o">.</span><span class="n">unmasked</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
+            <span class="n">fe</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                <span class="n">ntime</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">],</span> <span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="o">.</span><span class="n">unmasked</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">fe</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">ntime</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">],</span> <span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span>
+            <span class="n">fe</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                <span class="n">ntime</span><span class="p">[</span><span class="o">~</span><span class="n">in_original</span><span class="p">],</span> <span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux_err</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;gaussian_noise&quot;</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -1698,11 +1700,15 @@
                 <span class="s2">&quot;``n_bins`` or ``time_bin_size``.&quot;</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="n">bins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">bins</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;blocks&#39;</span><span class="p">,</span> <span class="s1">&#39;knuth&#39;</span><span class="p">,</span> <span class="s1">&#39;scott&#39;</span><span class="p">,</span> <span class="s1">&#39;freedman&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">bins</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;blocks&quot;</span><span class="p">,</span> <span class="s2">&quot;knuth&quot;</span><span class="p">,</span> <span class="s2">&quot;scott&quot;</span><span class="p">,</span> <span class="s2">&quot;freedman&quot;</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span>
+            <span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;``bins`` must have integer type.&quot;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_HAS_VAR_BINS</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sequence or method for ``bins`` requires Astropy 5.0.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Sequence or method for ``bins`` requires Astropy 5.0.&quot;</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">time_bin_start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">time_bin_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1724,28 +1730,34 @@
                     <span class="c1"># should it instead set equal-number bins with binsize=int(len(self) / bins)?</span>
                     <span class="c1"># Get start times in mjd and convert back to original format</span>
                     <span class="n">bin_starts</span> <span class="o">=</span> <span class="n">calculate_bin_edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">mjd</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="n">time_bin_start</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="n">Time</span><span class="p">(</span><span class="n">bin_starts</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;mjd&#39;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+                    <span class="n">time_bin_start</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span>
+                        <span class="n">Time</span><span class="p">(</span><span class="n">bin_starts</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;mjd&quot;</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span>
+                    <span class="p">)</span>
                 <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                         <span class="s1">&#39;&quot;classic&quot; `bins` require Astropy 5.0; will use constant lengths in time.&#39;</span><span class="p">,</span>
-                        <span class="n">LightkurveWarning</span><span class="p">)</span>
+                        <span class="n">LightkurveWarning</span><span class="p">,</span>
+                    <span class="p">)</span>
                     <span class="c1"># Odd memory error in np.searchsorted with pytest-memtest?</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">time_bin_start</span><span class="p">:</span>
                         <span class="n">i</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">i</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">time_bin_start</span><span class="p">)</span>
-                    <span class="n">time_bin_size</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_bin_start</span><span class="p">)</span> <span class="o">*</span> <span class="n">i</span> <span class="o">/</span>
-                                     <span class="p">((</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">bins</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+                    <span class="n">time_bin_size</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time_bin_start</span><span class="p">)</span> <span class="o">*</span> <span class="n">i</span> <span class="o">/</span> <span class="p">((</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">bins</span><span class="p">)</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">time_bin_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;time_bin_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;time_bin_end&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
             <span class="k">elif</span> <span class="n">binsize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">_HAS_VAR_BINS</span><span class="p">:</span>
                     <span class="n">time_bin_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[::</span><span class="n">binsize</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="s1">&#39;`binsize` requires Astropy 5.0 to guarantee equal number of points; &#39;</span>
-                        <span class="s1">&#39;will use estimated time lengths for bins.&#39;</span><span class="p">,</span> <span class="n">LightkurveWarning</span><span class="p">)</span>
+                        <span class="s2">&quot;`binsize` requires Astropy 5.0 to guarantee equal number of points; &quot;</span>
+                        <span class="s2">&quot;will use estimated time lengths for bins.&quot;</span><span class="p">,</span>
+                        <span class="n">LightkurveWarning</span><span class="p">,</span>
+                    <span class="p">)</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">time_bin_start</span><span class="p">:</span>
                         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -1767,13 +1779,13 @@
                 <span class="n">time_bin_start</span><span class="o">=</span><span class="n">time_bin_start</span><span class="p">,</span>
                 <span class="n">time_bin_end</span><span class="o">=</span><span class="n">time_bin_end</span><span class="p">,</span>
                 <span class="n">aggregate_func</span><span class="o">=</span><span class="n">aggregate_func</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span>
 
             <span class="c1"># If `flux_err` is populated, assume the errors combine as the root-mean-square</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)):</span>
                 <span class="n">rmse_func</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
                     <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                 <span class="p">)</span>
@@ -1982,7 +1994,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;the `cadence_mask` argument is missing or invalid&quot;</span><span class="p">)</span>
         <span class="c1"># Avoid searching times with NaN flux; this is necessary because e.g.</span>
         <span class="c1"># `remove_outliers` includes NaNs in its mask.</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
             <span class="c1"># Temporary workaround for issue #1172. TODO: remove this `if`` statement</span>
             <span class="c1"># once we adopt AstroPy &gt;=5.0.3 as a minimum dependency</span>
             <span class="n">cadence_mask</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unmasked</span><span class="p">)</span>
@@ -2024,7 +2036,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">method</span><span class="o">=</span><span class="s2">&quot;plot&quot;</span><span class="p">,</span>
         <span class="n">column</span><span class="o">=</span><span class="s2">&quot;flux&quot;</span><span class="p">,</span>
-        <span class="n">time_column</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span>
+        <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span>
         <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">xlabel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2046,7 +2058,7 @@
 <span class="sd">        column : str</span>
 <span class="sd">            Name of data column to plot. Default `flux`.</span>
 <span class="sd">        time_column : str</span>
-<span class="sd">            Name of time data column. Defauld `time`. </span>
+<span class="sd">            Name of time data column. Defauld `time`.</span>
 <span class="sd">        ax : `~matplotlib.axes.Axes`</span>
 <span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
 <span class="sd">            a new one will be generated.</span>
@@ -2116,7 +2128,7 @@
 
         <span class="c1"># Workaround for AstroPy v5.0.0 issue #12481: the &#39;c&#39; argument</span>
         <span class="c1"># in matplotlib&#39;s scatter does not work with masked quantities.</span>
-        <span class="k">if</span> <span class="s2">&quot;c&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;c&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;c&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unmasked</span>
 
         <span class="n">flux</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
@@ -2127,9 +2139,9 @@
 
         <span class="c1"># Second workaround for AstroPy v5.0.0 issue #12481:</span>
         <span class="c1"># matplotlib does not work well with `MaskedNDArray` arrays.</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
             <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">flux_err</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">flux_err</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
             <span class="n">flux_err</span> <span class="o">=</span> <span class="n">flux_err</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
 
         <span class="c1"># Normalize the data if requested</span>
@@ -2703,7 +2715,7 @@
                         <span class="n">array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;flux_err&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;flux_err&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="o">~</span><span class="p">(</span><span class="n">flux_column_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;_ERR&quot;</span> <span class="ow">in</span> <span class="n">extra_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
                     <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span>
@@ -2713,7 +2725,7 @@
                             <span class="n">array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">,</span>
                         <span class="p">)</span>
                     <span class="p">)</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;cadenceno&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;cadenceno&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
                     <span class="p">[</span><span class="s2">&quot;CADENCENO&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">extra_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
@@ -2867,12 +2879,12 @@
         <span class="k">elif</span> <span class="p">(</span><span class="n">bin_points</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;sigma&quot;</span><span class="p">]):</span>
             <span class="n">bin_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="p">((</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
-            <span class="n">bin_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">e</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="n">bin_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">e</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;median&quot;</span><span class="p">:</span>
-            <span class="n">bin_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">e</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="n">bin_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">e</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;sigma&quot;</span><span class="p">:</span>
             <span class="n">bin_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">e</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span>
+                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">e</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -2936,7 +2948,7 @@
         <span class="c1"># If the method is average we need to denormalize the plot</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">]:</span>
             <span class="n">median</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">median</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">median</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
                 <span class="n">median</span> <span class="o">=</span> <span class="n">median</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="n">ar</span> <span class="o">*=</span> <span class="n">median</span>
 
@@ -3032,7 +3044,9 @@
 
         <span class="c1"># If ``transit_time`` is a ``Quantity```, attempt converting it to a ``Time`` object</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transit_time</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
-            <span class="n">transit_time</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="n">transit_time</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">scale</span><span class="p">)</span>
+            <span class="n">transit_time</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span>
+                <span class="n">transit_time</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">scale</span>
+            <span class="p">)</span>
 
         <span class="c1"># Ensure all parameters are 1D-arrays</span>
         <span class="n">period</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
@@ -3176,6 +3190,7 @@
 <span class="sd">        truncated_lc : LightCurve</span>
 <span class="sd">            The truncated light curve.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span><span class="w"> </span><span class="nf">_to_unitless</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
 
@@ -3213,7 +3228,10 @@
             <span class="c1"># because Lightcurve.fold() will put an explicit None in meta, if epoch_time is not specified.</span>
             <span class="n">epoch_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
         <span class="n">cycle_epoch_start</span> <span class="o">=</span> <span class="n">epoch_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">time_original</span> <span class="o">-</span> <span class="n">cycle_epoch_start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">time_original</span> <span class="o">-</span> <span class="n">cycle_epoch_start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">-</span> <span class="n">result</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">result</span>
 
@@ -3246,7 +3264,7 @@
 <span class="sd">        See the documentation of `odd_mask` for examples.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">odd_mask</span>
-    
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_replace_normalized_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Some astropy functions, such as aggregate_downsample, require Time or TimeDelta</span>
         <span class="c1"># As normalized phase-folded lightcurves are unitless, this breaks</span>
@@ -3255,18 +3273,19 @@
         <span class="c1"># If the lightcurve is phase folded but not normalized, just return self</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NORMALIZE_PHASE&quot;</span><span class="p">):</span>
             <span class="c1"># it should never happen, likely that there is some bug.</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The function should be invoked on a folded lightcurve with normalized phase. No-Op.&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The function should be invoked on a folded lightcurve with normalized phase. No-Op.&quot;</span>
+            <span class="p">)</span>
             <span class="k">return</span>
 
         <span class="c1"># If the phase folded lightcurve is normalized, unnormalize it</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delay_required_column_checks</span><span class="p">():</span>
             <span class="n">normalized_phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
-            <span class="c1">#print(normalized_phase * self.period)</span>
+            <span class="c1"># print(normalized_phase * self.period)</span>
             <span class="n">phase</span> <span class="o">=</span> <span class="n">TimeDelta</span><span class="p">(</span><span class="n">normalized_phase</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">remove_column</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="c1">#return self</span>
-
+        <span class="c1"># return self</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_restore_normalized_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Some astropy functions, such as aggregate_downsample, require Time or TimeDelta</span>
@@ -3276,16 +3295,16 @@
         <span class="c1"># Checki if the lightcurve is already normalized</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
             <span class="c1"># should not happen, likely there is some bug</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Attempt to restore normalized phase while the phase has already been normalized. No-op.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> 
-        
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Attempt to restore normalized phase while the phase has already been normalized. No-op.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
+
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delay_required_column_checks</span><span class="p">():</span>
             <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
             <span class="n">normalized_phase</span> <span class="o">=</span> <span class="n">phase</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">remove_column</span><span class="p">(</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">normalized_phase</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-            
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_set_xlabel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for plot, scatter, and errorbar.</span>
@@ -3298,7 +3317,6 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_phase</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;xlabel&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; (Normalized)&quot;</span>
 
-                    
         <span class="k">return</span> <span class="n">kwargs</span>
 
 <div class="viewcode-block" id="FoldedLightCurve.plot"><a class="viewcode-back" href="../../reference/api/lightkurve.FoldedLightCurve.plot.html#lightkurve.FoldedLightCurve.plot">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -3376,7 +3394,6 @@
             <span class="n">period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">epoch_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_time</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">ax</span></div>
-    
 
     <span class="k">def</span><span class="w"> </span><span class="nf">bin</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -3385,7 +3402,6 @@
         <span class="n">aggregate_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">n_bins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Bins a FoldedLightCurve in equally-spaced bins in phase.</span>
 <span class="sd">        Binning always occurs in time units (not normalized phase units)</span>
@@ -3402,7 +3418,7 @@
 <span class="sd">            value (in which case all time bins will be assumed to have the same</span>
 <span class="sd">            duration) or as an array of values (in which case each phase bin can</span>
 <span class="sd">            have a different duration). In cases where the lightcurve is phase-normalized, a scalar</span>
-<span class="sd">            input will be assumed to be in normalized phase units (u.dimensionless_unscaled) </span>
+<span class="sd">            input will be assumed to be in normalized phase units (u.dimensionless_unscaled)</span>
 <span class="sd">            (Default: 0.5 days; default unit: days.)</span>
 <span class="sd">        time_bin_start : Time like value, optional</span>
 <span class="sd">            The start phase for the binned time series. This can also be a scalar</span>
@@ -3415,28 +3431,31 @@
 <span class="sd">            int which gives the number of bins to divide the lightkurve into.</span>
 <span class="sd">            This adjusts the length of ``time_bin_size``</span>
 <span class="sd">            to accommodate the input time series length.</span>
-<span class="sd">        n_bins: </span>
+<span class="sd">        n_bins:</span>
 <span class="sd">            This functionality is deprecated for FoldedLightCurves. If provided, asserts</span>
 <span class="sd">            bins=n_bins</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        binned_lc : `FoldedLightCurve`</span>
-<span class="sd">            A new folded light curve which has been binned, with the &#39;time&#39; column phase in days </span>
+<span class="sd">            A new folded light curve which has been binned, with the &#39;time&#39; column phase in days</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># astropy&#39;s aggregate_downsample function only works when &#39;time&#39; is type Time or TimeDelta</span>
         <span class="c1"># Since the normalized phase is a unitless quantity, this breaks.</span>
         <span class="c1"># To work around this, we reset the index to be the regular phase (TimeDelta) when binning</span>
-        
+
         <span class="k">if</span> <span class="n">n_bins</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;n_bins is no longer accepted for FoldedLightCurve objects. Please specify &#39;bins&#39; instead&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;n_bins is no longer accepted for FoldedLightCurve objects. Please specify &#39;bins&#39; instead&quot;</span>
+            <span class="p">)</span>
             <span class="n">bins</span> <span class="o">=</span> <span class="n">n_bins</span>
         <span class="k">if</span> <span class="n">bins</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;bins must be an integer describing the total number of bins.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;bins must be an integer describing the total number of bins.&quot;</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="n">time_bin_size</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not specify both &#39;bins&#39; and &#39;time_bin_size&#39;&quot;</span><span class="p">)</span>
-            
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_phase</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_replace_normalized_phase</span><span class="p">()</span>
@@ -3445,14 +3464,14 @@
             <span class="n">time_bin_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_bin_start</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">time_bin_start</span> <span class="o">=</span> <span class="n">time_bin_start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;FoldedLightCurve does not support lists for time_bin_start. Using the first value.&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;FoldedLightCurve does not support lists for time_bin_start. Using the first value.&quot;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_bin_start</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">time_bin_start</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">:</span>
-                    <span class="n">time_bin_start</span> <span class="o">=</span> <span class="n">time_bin_start</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span>      
+                <span class="n">time_bin_start</span> <span class="o">=</span> <span class="n">time_bin_start</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">time_bin_start</span><span class="p">):</span>
             <span class="n">time_bin_start</span> <span class="o">=</span> <span class="n">time_bin_start</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">day</span>
-
-
 
         <span class="k">if</span> <span class="n">time_bin_size</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">time_bin_size</span><span class="p">):</span>
@@ -3463,7 +3482,6 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_bin_size</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">time_bin_size</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="n">u</span><span class="o">.</span><span class="n">dimensionless_unscaled</span><span class="p">:</span>
                     <span class="n">time_bin_size</span> <span class="o">=</span> <span class="n">time_bin_size</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span>
- 
 
         <span class="k">if</span> <span class="n">bins</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># parent bin(bins=###) assumes time has format &#39;mjd&#39;, so does not work for phase data</span>
@@ -3472,45 +3490,38 @@
             <span class="k">if</span> <span class="n">time_bin_size</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can not specify both &#39;bins&#39; and &#39;time_bin_size&#39;&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">time_bin_start</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-                <span class="n">time_bin_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">-</span> <span class="n">time_bin_start</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;day&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">bins</span>
+                <span class="n">time_bin_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="o">-</span> <span class="n">time_bin_start</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;day&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">bins</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">time_bin_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">/</span> <span class="n">bins</span>
 
-
         <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span>
-                        <span class="n">time_bin_size</span><span class="o">=</span><span class="n">time_bin_size</span><span class="p">,</span>
-                        <span class="n">time_bin_start</span><span class="o">=</span><span class="n">time_bin_start</span><span class="p">,</span>
-                        <span class="n">aggregate_func</span><span class="o">=</span><span class="n">aggregate_func</span><span class="p">,</span>
-                    <span class="p">)</span>
-        
+            <span class="n">time_bin_size</span><span class="o">=</span><span class="n">time_bin_size</span><span class="p">,</span>
+            <span class="n">time_bin_start</span><span class="o">=</span><span class="n">time_bin_start</span><span class="p">,</span>
+            <span class="n">aggregate_func</span><span class="o">=</span><span class="n">aggregate_func</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_phase</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_restore_normalized_phase</span><span class="p">()</span>
             <span class="n">result</span><span class="o">.</span><span class="n">_restore_normalized_phase</span><span class="p">()</span>
-        
-        <span class="k">return</span> <span class="n">result</span> 
-    
+
+        <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># the default copy() in astropy fails if the lightcurve</span>
         <span class="c1"># has normalized phase (time column is `Quantity` instead of `Time` like)</span>
-        <span class="c1"># workaround it by temporarily changing time column to </span>
+        <span class="c1"># workaround it by temporarily changing time column to</span>
         <span class="c1"># non-normalized `TimeDelta`</span>
-    
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_phase</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_replace_normalized_phase</span><span class="p">()</span>
-        
+
         <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_phase</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_restore_normalized_phase</span><span class="p">()</span>
             <span class="n">result</span><span class="o">.</span><span class="n">_restore_normalized_phase</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">result</span></div>
-    
 
-    
-
-
-    
 
 <span class="k">class</span><span class="w"> </span><span class="nc">KeplerLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`</span>

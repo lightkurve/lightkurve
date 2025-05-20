@@ -383,32 +383,41 @@ kwarg, or slicing of your input TPF like so:</p>
 </div>
 <div class="output_area rendered_html docutils container">
 <head>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
-<style>
-    button {
-        border: 1px solid;
-        padding: 0.2em;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 0.8em;
-        margin: 0.2em;
-        cursor: pointer;
-    }
+    <style>
+        button {
+            border: 1px solid;
+            padding: 0.2em;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.8em;
+            margin: 0.2em;
+            cursor: pointer;
+        }
 
-    .citation-button-1 {background-color: #4CAF50;} /* Green */
-    .citation-button-2 {background-color: #008CBA;} /* Blue */
-</style>
+        .citation-button-1 {
+            background-color: #4CAF50;
+        }
 
-<script type="text/javascript">
-    function copyBibtex(package) {
-        var copyText = document.getElementById(package + "Text");
-        copyText.select();
-        document.execCommand("copy");
-        alert("BibTex has been copied to your clipboard")
-    }
-</script>
+        /* Green */
+        .citation-button-2 {
+            background-color: #008CBA;
+        }
+
+        /* Blue */
+    </style>
+
+    <script type="text/javascript">
+        function copyBibtex(package) {
+            var copyText = document.getElementById(package + "Text");
+            copyText.select();
+            document.execCommand("copy");
+            alert("BibTex has been copied to your clipboard")
+        }
+    </script>
 </head>
 
 <body>
@@ -542,26 +551,26 @@ archivePrefix = "arXiv",
 
     <p>
         When using Lightkurve, we kindly request that you cite the following packages:
-        <ul>
-            <li>
-                <a href="https://lightkurve.github.io/lightkurve">lightkurve</a>
-                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astropy.org">astropy</a>
-                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astroquery.readthedocs.io">astroquery</a>
-                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
-            </li>
-            <li>
-                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
-                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                — if you are using <i>search_tesscut()</i>.
-            </li>
-        </ul>
+    <ul>
+        <li>
+            <a href="https://lightkurve.github.io/lightkurve/">lightkurve</a>
+            <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+        </li>
+        <li>
+            <a href="https://astropy.org">astropy</a>
+            <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+        </li>
+        <li>
+            <a href="https://astroquery.readthedocs.io">astroquery</a>
+            <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            — if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
+        </li>
+        <li>
+            <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
+            <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            — if you are using <i>search_tesscut()</i>.
+        </li>
+    </ul>
     </p>
 </body></div>
 </div>

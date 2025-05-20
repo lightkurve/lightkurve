@@ -298,7 +298,7 @@ Section 4.2 for more information.)</p>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table12964043984">
+<table id="table6076088720">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 00</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -335,7 +335,7 @@ Length = 18 rows</div>
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table4383848912">
+<table id="table4423286112">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 04</td><td>2010</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr006922244</td><td>0.0</td></tr>
@@ -732,8 +732,8 @@ array([[          nan, 5.6079335e+00, 5.1491142e+01, 8.4241745e+01,
 <p>All four of these data arrays are in units of electrons per second.</p>
 <p><strong>Note</strong>: for <em>Kepler</em>, the flux background isn’t a measurement made using the local TPF data. Instead, at each cadence, the <em>Kepler</em> pipeline fits a model to thousands of empty pixels across each CCD in order to estimate a continuum background across the the CCD. For more details read the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 2.6.2.4. In the case of <em>TESS</em>, local
 background pixels contained within a TPF are used instead.</p>
-<p><strong>Note</strong>: The <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> values seen above have been quality-masked. This means that cadences of observations that violated the <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> parameter are removed, and so <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> represents the data that you probably want to use to do your science. The <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> can also be accessed as a property of a <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile</a>&gt;`__. For specific details on the
-<code class="docutils literal notranslate"><span class="pre">quality</span></code> flags, read the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">Kepler Archive Manual</a>, Section 2.3.1.1.</p>
+<p><strong>Note</strong>: The <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> values seen above have been quality-masked. This means that cadences of observations that violated the <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> parameter are removed, and so <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> represents the data that you probably want to use to do your science. The <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> can also be accessed as a property of a <code class="docutils literal notranslate"><span class="pre">`KeplerTargetPixelFile</span></code> &lt;<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile">https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.html?highlight=keplertargetpixelfile</a>&gt;`__. For specific
+details on the <code class="docutils literal notranslate"><span class="pre">quality</span></code> flags, read the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">Kepler Archive Manual</a>, Section 2.3.1.1.</p>
 <p>If you want to access flux and background flux measurements that <em>have not</em> been quality masked, you can pass a custom <code class="docutils literal notranslate"><span class="pre">quality_bitmask</span></code> parameter to the <code class="docutils literal notranslate"><span class="pre">download()</span></code> or <code class="docutils literal notranslate"><span class="pre">read()</span></code> method as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
@@ -803,32 +803,41 @@ background pixels contained within a TPF are used instead.</p>
 </div>
 <div class="output_area rendered_html docutils container">
 <head>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
-<style>
-    button {
-        border: 1px solid;
-        padding: 0.2em;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 0.8em;
-        margin: 0.2em;
-        cursor: pointer;
-    }
+    <style>
+        button {
+            border: 1px solid;
+            padding: 0.2em;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.8em;
+            margin: 0.2em;
+            cursor: pointer;
+        }
 
-    .citation-button-1 {background-color: #4CAF50;} /* Green */
-    .citation-button-2 {background-color: #008CBA;} /* Blue */
-</style>
+        .citation-button-1 {
+            background-color: #4CAF50;
+        }
 
-<script type="text/javascript">
-    function copyBibtex(package) {
-        var copyText = document.getElementById(package + "Text");
-        copyText.select();
-        document.execCommand("copy");
-        alert("BibTex has been copied to your clipboard")
-    }
-</script>
+        /* Green */
+        .citation-button-2 {
+            background-color: #008CBA;
+        }
+
+        /* Blue */
+    </style>
+
+    <script type="text/javascript">
+        function copyBibtex(package) {
+            var copyText = document.getElementById(package + "Text");
+            copyText.select();
+            document.execCommand("copy");
+            alert("BibTex has been copied to your clipboard")
+        }
+    </script>
 </head>
 
 <body>
@@ -962,26 +971,26 @@ archivePrefix = "arXiv",
 
     <p>
         When using Lightkurve, we kindly request that you cite the following packages:
-        <ul>
-            <li>
-                <a href="https://lightkurve.github.io/lightkurve">lightkurve</a>
-                <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astropy.org">astropy</a>
-                <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-            </li>
-            <li>
-                <a href="https://astroquery.readthedocs.io">astroquery</a>
-                <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                —  if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
-            </li>
-            <li>
-                <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
-                <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
-                — if you are using <i>search_tesscut()</i>.
-            </li>
-        </ul>
+    <ul>
+        <li>
+            <a href="https://lightkurve.github.io/lightkurve/">lightkurve</a>
+            <button onclick="copyBibtex('lightkurve')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+        </li>
+        <li>
+            <a href="https://astropy.org">astropy</a>
+            <button onclick="copyBibtex('astropy')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+        </li>
+        <li>
+            <a href="https://astroquery.readthedocs.io">astroquery</a>
+            <button onclick="copyBibtex('astroquery')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            — if you are using <i>search_lightcurve()</i> or <i>search_targetpixelfile()</i>.
+        </li>
+        <li>
+            <a href="https://mast.stsci.edu/tesscut/">tesscut</a>
+            <button onclick="copyBibtex('tesscut')"><i class="fas fa-clipboard"></i> Copy BibTeX</button>
+            — if you are using <i>search_tesscut()</i>.
+        </li>
+    </ul>
     </p>
 </body></div>
 </div>
