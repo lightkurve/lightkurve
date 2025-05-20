@@ -1,423 +1,553 @@
 
 <!DOCTYPE html>
 
-
-<html lang="en" data-content_root="../" >
-
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Full changelog &#8212; Lightkurve </title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
+    
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=05a62d9f" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script src="../_static/documentation_options.js?v=6d2724f8"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'about/changelog';</script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Other software" href="other_software.html" />
     <link rel="prev" title="Citing Lightkurve &amp; its dependencies" href="citing.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
-  
-  <dialog id="pst-search-dialog">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-<form class="bd-search d-flex align-items-center"
-      action="../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
+    <div class="container-fluid" id="banner"></div>
 
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../index.html">
+<p class="title">Lightkurve v2.5</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
   </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
 
   
-    
-  
-
-<a class="navbar-brand logo" href="../index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">Lightkurve </p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Developing for Lightkurve
+ </a>
+</li>
+
     
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../tutorials/index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
-    About Lightkurve
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
-          
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-        </div>
-      
-      
-        <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../tutorials/index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
-    About Lightkurve
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="install.html">Installing Lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing Lightkurve &amp; its dependencies</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Full changelog</a></li>
-<li class="toctree-l1"><a class="reference internal" href="other_software.html">Other software</a></li>
 </ul>
-</div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
-  </div>
-
-
       </div>
       
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
+    </div>
 
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">About Lightkurve</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Full changelog</span></li>
-  </ul>
-</nav>
-</div>
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
       
     </div>
-  
-  
+  </div>
 </div>
-</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="install.html">
+   Installing Lightkurve
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="citing.html">
+   Citing Lightkurve &amp; its dependencies
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Full changelog
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="other_software.html">
+   Other software
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
-              
-              
+              <div class="toc-item">
                 
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#unreleased">
+   2.5.1  (unreleased)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   2.5.0 (2024-08-29)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id2">
+   2.4.2 (2023-11-03)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id3">
+   2.4.1 (2023-09-06)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id4">
+   2.4.0 (2023-02-14)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id5">
+   2.3.0 (2022-07-07)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id6">
+   2.2.1 (2022-05-26)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id7">
+   2.2.0 (2022-04-12)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id8">
+   2.1.1 (2022-03-24)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id9">
+   2.1.0 (2022-02-10)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id10">
+   2.0.11 (2021-09-22)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id11">
+   2.0.10 (2021-06-04)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id12">
+   2.0.9 (2021-03-31)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id13">
+   2.0.8 (2021-03-30)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id14">
+   2.0.7 (2021-03-24)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id15">
+   2.0.6 (2021-03-15)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id16">
+   2.0.5 (2021-03-13)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id17">
+   2.0.4 (2021-03-11)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id18">
+   2.0.3 (2021-02-23)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id19">
+   2.0.2 (2021-02-19)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id20">
+   2.0.1 (2021-02-16)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id21">
+   2.0.0 (2021-02-15)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#major-changes">
+     Major changes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#other-changes">
+     Other changes
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#lightkurve-lightcurve">
+       lightkurve.lightcurve
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#lightkurve-targetpixelfile">
+       lightkurve.targetpixelfile
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#lightkurve-collections">
+       lightkurve.collections
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#lightkurve-search">
+       lightkurve.search
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#lightkurve-correctors">
+       lightkurve.correctors
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#lightkurve-seismology">
+       lightkurve.seismology
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#lightkurve-periodogram">
+       lightkurve.periodogram
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id22">
+   1.11.3 (2020-10-06)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id23">
+   1.11.2 (2020-08-28)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id24">
+   1.11.1 (2020-06-18)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id25">
+   1.11.0 (2020-05-20)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id26">
+   1.10.0 (2020-05-14)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id27">
+   1.9.1 (2020-03-25)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id28">
+   1.9.0 (2020-02-25)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id29">
+   1.8.0 (2020-02-09)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id30">
+   1.7.0 (2020-01-29)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id31">
+   1.6.0 (2019-12-16)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id32">
+   1.5.2 (2019-12-05)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id33">
+   1.5.1 (2019-11-22)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id34">
+   1.5.0 (2019-11-20)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id35">
+   1.4.1 (2019-11-18)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id36">
+   1.4.0 (2019-11-12)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id37">
+   1.3.0 (2019-10-21)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id38">
+   1.2.0 (2019-10-01)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id39">
+   1.1.1 (2019-08-19)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id40">
+   1.1.0 (2019-07-19)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id41">
+   1.0.1 (2019-05-20)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id42">
+   1.0.0 (2019-04-08)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b30-2019-03-27">
+   1.0b30 (2019-03-27)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b29-2019-02-14">
+   1.0b29 (2019-02-14)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b28-2019-02-09">
+   1.0b28 (2019-02-09)
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#changes">
+     Changes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#bugfixes">
+     Bugfixes
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b26-2019-02-04">
+   1.0b26 (2019-02-04)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b25-2018-12-14">
+   1.0b25 (2018-12-14)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b24-2018-12-10">
+   1.0b24 (2018-12-10)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b23-2018-11-30">
+   1.0b23 (2018-11-30)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b22-2018-11-17">
+   1.0b22 (2018-11-17)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b21-2018-10-29">
+   1.0b21 (2018-10-29)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b20-2018-10-16">
+   1.0b20 (2018-10-16)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#b19-2018-10-10">
+   1.0b19 (2018-10-10)
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <section id="full-changelog">
-<span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Link to this heading">#</a></h1>
+<span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">#</a></h1>
 <section id="unreleased">
-<h2>2.5.1  (unreleased)<a class="headerlink" href="#unreleased" title="Link to this heading">#</a></h2>
+<h2>2.5.1  (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed pixel to world coordinate transformation in <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.get_coordinates()</span></code>
 in line 488 (“ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)”), where for consistency with
@@ -428,10 +558,20 @@ the new <code class="docutils literal notranslate"><span class="pre">flux</span>
 <li><p>Modified RegressionCorrector.correct() to add the model flux error in quadrature. [#1439]</p></li>
 <li><p>Updated the default TESS quality mask to include Argabrightening, Impulsive Outlier, and Bad Calibration Exclude flags (see issue #1230). [#1336]</p></li>
 <li><p>Updated tutorial notebook links [#1484]</p></li>
+<li><p>Author keyword now specifies between SPOC and TESS-SPOC [#1487]</p></li>
+<li><p>Changed calls of <code class="xref py py-obj docutils literal notranslate"><span class="pre">np.in1d</span></code> to <code class="xref py py-obj docutils literal notranslate"><span class="pre">np.isin</span></code> for numpy v2 compatibility [#1492]</p></li>
+<li><p>Loosen dependency on oktopus (and autograd) to facilitate Numpy v2 support,
+along with updates of some deprecated numpy calls.
+They will still be pulled in with a default <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>, but this allows
+Lightkurve to be run without oktopus with only <code class="docutils literal notranslate"><span class="pre">tpfmodel</span></code> disabled [#1452]</p></li>
+<li><p>Fixed the bug in <code class="docutils literal notranslate"><span class="pre">bin()</span></code> function with <code class="docutils literal notranslate"><span class="pre">bin</span></code> parameter for <code class="docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> objects. [#1491]</p></li>
+<li><p>Modified <code class="docutils literal notranslate"><span class="pre">copy()</span></code> and <code class="docutils literal notranslate"><span class="pre">bin()</span></code> functions for <code class="docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> objects to fix issues with normalized phase [#1491]</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">binsize</span></code> and <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> as input options for <code class="docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> objects [#1491]</p></li>
+<li><p>Changed calls of <code class="docutils literal notranslate"><span class="pre">`np.in1d`</span></code> to <code class="docutils literal notranslate"><span class="pre">np.isin</span></code> for numpy v2 compatibility [#1492]</p></li>
 </ul>
 </section>
 <section id="id1">
-<h2>2.5.0 (2024-08-29)<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<h2>2.5.0 (2024-08-29)<a class="headerlink" href="#id1" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed memory leak in reading Lightcurve / TargetPixel FITS files in v2.4.2 [#1390]</p></li>
 <li><p>Added support for changes in QLP High Level Science Product
@@ -457,13 +597,13 @@ with Bokeh v3.4.0. The minimum Bokeh version is raised to v2.3.2 accordingly. [#
 </ul>
 </section>
 <section id="id2">
-<h2>2.4.2 (2023-11-03)<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<h2>2.4.2 (2023-11-03)<a class="headerlink" href="#id2" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed download issue due to MAST API change [#1380]</p></li>
 </ul>
 </section>
 <section id="id3">
-<h2>2.4.1 (2023-09-06)<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<h2>2.4.1 (2023-09-06)<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Updated interact features to work with JupyterHub (e.g. TiKE) [#1349]</p></li>
 <li><p>Exposed niters parameter in the PCA function of design matrix</p></li>
@@ -475,7 +615,7 @@ with Bokeh v3.4.0. The minimum Bokeh version is raised to v2.3.2 accordingly. [#
 </ul>
 </section>
 <section id="id4">
-<h2>2.4.0 (2023-02-14)<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<h2>2.4.0 (2023-02-14)<a class="headerlink" href="#id4" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added the ability to configure the default cache directory used by
 <code class="docutils literal notranslate"><span class="pre">SearchResult.download()</span></code> / <code class="docutils literal notranslate"><span class="pre">SearchResult.download_all()</span></code>. [#1214]</p></li>
@@ -487,7 +627,7 @@ to <code class="docutils literal notranslate"><span class="pre">$HOME/.lightkurv
 </ul>
 </section>
 <section id="id5">
-<h2>2.3.0 (2022-07-07)<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<h2>2.3.0 (2022-07-07)<a class="headerlink" href="#id5" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added support for reading light curves created using the <code class="docutils literal notranslate"><span class="pre">eleanor</span></code> package
 or provided by the GSFC-ELEANOR-LITE High Level Science Product. [#1217, #1236]</p></li>
@@ -505,7 +645,7 @@ reading light curve files and CBV files with AstroPy v5.1 installed. [#1226, #12
 </ul>
 </section>
 <section id="id6">
-<h2>2.2.1 (2022-05-26)<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<h2>2.2.1 (2022-05-26)<a class="headerlink" href="#id6" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">LightCurve.flatten()</span></code> which caused the flux unit of
 flattened light curves to be non-dimensionless. [#1195]</p></li>
@@ -525,7 +665,7 @@ excessive search radius to be used for TESS light curves. [#1208]</p></li>
 </ul>
 </section>
 <section id="id7">
-<h2>2.2.0 (2022-04-12)<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<h2>2.2.0 (2022-04-12)<a class="headerlink" href="#id7" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> which prevented custom pixels
 from being selected with Bokeh v2.3.x and later. [#1177]</p></li>
@@ -544,7 +684,7 @@ be executed using the <code class="docutils literal notranslate"><span class="pr
 </ul>
 </section>
 <section id="id8">
-<h2>2.1.1 (2022-03-24)<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<h2>2.1.1 (2022-03-24)<a class="headerlink" href="#id8" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">LightCurve.plot_river()</span></code> which triggered a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">TypeError:</span> <span class="pre">cannot</span> <span class="pre">write</span> <span class="pre">to</span> <span class="pre">unmasked</span> <span class="pre">output</span></code>. [#1175]</p></li>
@@ -555,7 +695,7 @@ results in the presence of masked data. [#1172]</p></li>
 </ul>
 </section>
 <section id="id9">
-<h2>2.1.0 (2022-02-10)<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<h2>2.1.0 (2022-02-10)<a class="headerlink" href="#id9" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Made Lightkurve compatible with AstroPy v5.0, which introduced masked quantities.
 Lightkurve v2.1 now requires AstroPy v5.0 and Python v3.8 or later. [#1162]</p></li>
@@ -569,7 +709,7 @@ for custom bin sizes. [#1042]</p></li>
 </ul>
 </section>
 <section id="id10">
-<h2>2.0.11 (2021-09-22)<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<h2>2.0.11 (2021-09-22)<a class="headerlink" href="#id10" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Modified <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact_sky()</span></code> to enable it to work with
 pixel files which lack proper motion or coordinate information. [#1088]</p></li>
@@ -597,7 +737,7 @@ to be raised when using older versions of matplotlib. [#1139]</p></li>
 </ul>
 </section>
 <section id="id11">
-<h2>2.0.10 (2021-06-04)<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<h2>2.0.10 (2021-06-04)<a class="headerlink" href="#id11" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Modified the search functions to ensure the two parts of K2 Campaigns
 9, 10, and 11 are more clearly marked. [#1018]</p></li>
@@ -622,7 +762,7 @@ column as the default flux column. [#1083]</p></li>
 </ul>
 </section>
 <section id="id12">
-<h2>2.0.9 (2021-03-31)<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<h2>2.0.9 (2021-03-31)<a class="headerlink" href="#id12" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">head()</span></code>, <code class="docutils literal notranslate"><span class="pre">tail()</span></code>, and <code class="docutils literal notranslate"><span class="pre">truncate()</span></code> convenience methods
 to the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> class. [#1017]</p></li>
@@ -633,7 +773,7 @@ if the light curves contained incompatible column types. [#1015]</p></li>
 </ul>
 </section>
 <section id="id13">
-<h2>2.0.8 (2021-03-30)<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<h2>2.0.8 (2021-03-30)<a class="headerlink" href="#id13" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug which caused the <code class="docutils literal notranslate"><span class="pre">step</span></code> and <code class="docutils literal notranslate"><span class="pre">interval</span></code> parameters
 to be ignored in <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.animate()</span></code>.</p></li>
@@ -642,7 +782,7 @@ if the aperture extension is missing from the file.</p></li>
 </ul>
 </section>
 <section id="id14">
-<h2>2.0.7 (2021-03-24)<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<h2>2.0.7 (2021-03-24)<a class="headerlink" href="#id14" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added support for reading CDIPS light curves. [#980]</p></li>
 <li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object instantiation to fail if
@@ -656,7 +796,7 @@ when the collection contained normalized and non-normalized light curves. [#1002
 </ul>
 </section>
 <section id="id15">
-<h2>2.0.6 (2021-03-15)<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
+<h2>2.0.6 (2021-03-15)<a class="headerlink" href="#id15" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Removed <code class="docutils literal notranslate"><span class="pre">ipython</span></code> from the installation requirements. [#999]</p></li>
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">LightCurve.to_excel()</span></code> convenience method. [#1000]</p></li>
@@ -665,7 +805,7 @@ into Excel.</p></li>
 </ul>
 </section>
 <section id="id16">
-<h2>2.0.5 (2021-03-13)<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<h2>2.0.5 (2021-03-13)<a class="headerlink" href="#id16" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Removed <code class="docutils literal notranslate"><span class="pre">numba</span></code> from the installation requirements and modified
 <code class="docutils literal notranslate"><span class="pre">SparseDesignMatrix</span></code> to no longer use <code class="docutils literal notranslate"><span class="pre">numba.jit</span></code>. [#997]</p></li>
@@ -676,7 +816,7 @@ instead of having them raise a <code class="docutils literal notranslate"><span 
 </ul>
 </section>
 <section id="id17">
-<h2>2.0.4 (2021-03-11)<a class="headerlink" href="#id17" title="Link to this heading">#</a></h2>
+<h2>2.0.4 (2021-03-11)<a class="headerlink" href="#id17" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.animate()</span></code> feature to display Target Pixel Files
 as HTML animations inside Jupyter notebook environments. [#991]</p></li>
@@ -685,7 +825,7 @@ to be Quantity objects rather than arrays. [#982]</p></li>
 </ul>
 </section>
 <section id="id18">
-<h2>2.0.3 (2021-02-23)<a class="headerlink" href="#id18" title="Link to this heading">#</a></h2>
+<h2>2.0.3 (2021-02-23)<a class="headerlink" href="#id18" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added support for reading KEPSEISMIC light curves. [#972]</p></li>
 <li><p>Modified the top-level namespace of lightkurve to include the contents of
@@ -695,7 +835,7 @@ to be Quantity objects rather than arrays. [#982]</p></li>
 </ul>
 </section>
 <section id="id19">
-<h2>2.0.2 (2021-02-19)<a class="headerlink" href="#id19" title="Link to this heading">#</a></h2>
+<h2>2.0.2 (2021-02-19)<a class="headerlink" href="#id19" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">lightkurve.units</span></code> module to ensure “ppt” and “ppm” are enabled
 AstroPy units when Lightkurve is imported. [#959]</p></li>
@@ -705,16 +845,16 @@ a light curve’s flux by N. [#961]</p></li>
 </ul>
 </section>
 <section id="id20">
-<h2>2.0.1 (2021-02-16)<a class="headerlink" href="#id20" title="Link to this heading">#</a></h2>
+<h2>2.0.1 (2021-02-16)<a class="headerlink" href="#id20" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed an issue which caused the installation of Lightkurve 2.0 to fail
 under Python 3.9. [#951]</p></li>
 </ul>
 </section>
 <section id="id21">
-<h2>2.0.0 (2021-02-15)<a class="headerlink" href="#id21" title="Link to this heading">#</a></h2>
+<h2>2.0.0 (2021-02-15)<a class="headerlink" href="#id21" title="Permalink to this headline">#</a></h2>
 <section id="major-changes">
-<h3>Major changes<a class="headerlink" href="#major-changes" title="Link to this heading">#</a></h3>
+<h3>Major changes<a class="headerlink" href="#major-changes" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p>Removed support for Python 2. [#733]</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> is now a sub-class of <code class="docutils literal notranslate"><span class="pre">astropy.time.TimeSeries</span></code>. This enables
@@ -733,9 +873,9 @@ source files (<code class="docutils literal notranslate"><span class="pre">src/<
 </ul>
 </section>
 <section id="other-changes">
-<h3>Other changes<a class="headerlink" href="#other-changes" title="Link to this heading">#</a></h3>
+<h3>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this headline">#</a></h3>
 <section id="lightkurve-lightcurve">
-<h4>lightkurve.lightcurve<a class="headerlink" href="#lightkurve-lightcurve" title="Link to this heading">#</a></h4>
+<h4>lightkurve.lightcurve<a class="headerlink" href="#lightkurve-lightcurve" title="Permalink to this headline">#</a></h4>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">LightCurve.search_neighbors()</span></code> convenience method to search for
 light curves around an existing one. [#907]</p></li>
@@ -753,7 +893,7 @@ incorrectly. [#902]</p></li>
 </ul>
 </section>
 <section id="lightkurve-targetpixelfile">
-<h4>lightkurve.targetpixelfile<a class="headerlink" href="#lightkurve-targetpixelfile" title="Link to this heading">#</a></h4>
+<h4>lightkurve.targetpixelfile<a class="headerlink" href="#lightkurve-targetpixelfile" title="Permalink to this headline">#</a></h4>
 <ul class="simple">
 <li><p>Added the ability to perform math with <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> objects, e.g.,
 <code class="docutils literal notranslate"><span class="pre">tpf</span> <span class="pre">=</span> <span class="pre">tpf</span> <span class="pre">-</span> <span class="pre">100</span></code> will subtract 100 from the <code class="docutils literal notranslate"><span class="pre">tpf.flux</span></code> values. [#665]</p></li>
@@ -782,13 +922,13 @@ the tpf does not contain all expected WCS keywords. [#892]</p></li>
 </ul>
 </section>
 <section id="lightkurve-collections">
-<h4>lightkurve.collections<a class="headerlink" href="#lightkurve-collections" title="Link to this heading">#</a></h4>
+<h4>lightkurve.collections<a class="headerlink" href="#lightkurve-collections" title="Permalink to this headline">#</a></h4>
 <ul class="simple">
 <li><p>Added the ability to filter a collection by <code class="docutils literal notranslate"><span class="pre">quarter</span></code>, <code class="docutils literal notranslate"><span class="pre">campaign</span></code> or <code class="docutils literal notranslate"><span class="pre">sector</span></code>. [#815]</p></li>
 </ul>
 </section>
 <section id="lightkurve-search">
-<h4>lightkurve.search<a class="headerlink" href="#lightkurve-search" title="Link to this heading">#</a></h4>
+<h4>lightkurve.search<a class="headerlink" href="#lightkurve-search" title="Permalink to this headline">#</a></h4>
 <ul class="simple">
 <li><p>Added support for the new 20-second and 10-minute TESS cadence modes in the
 search functions by allowing the exact exposure time to be specified via the
@@ -809,7 +949,7 @@ exists in local cache prior to contacting MAST. [#915]</p></li>
 </ul>
 </section>
 <section id="lightkurve-correctors">
-<h4>lightkurve.correctors<a class="headerlink" href="#lightkurve-correctors" title="Link to this heading">#</a></h4>
+<h4>lightkurve.correctors<a class="headerlink" href="#lightkurve-correctors" title="Permalink to this headline">#</a></h4>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">CotrendingBasisVectors</span></code> class to provide a convenient interface
 to work with TESS and Kepler basis vector data products. [#826]</p></li>
@@ -828,7 +968,7 @@ over- and under-fitting of a corrected light curve. [#907]</p></li>
 </ul>
 </section>
 <section id="lightkurve-seismology">
-<h4>lightkurve.seismology<a class="headerlink" href="#lightkurve-seismology" title="Link to this heading">#</a></h4>
+<h4>lightkurve.seismology<a class="headerlink" href="#lightkurve-seismology" title="Permalink to this headline">#</a></h4>
 <ul class="simple">
 <li><p>Modified the <code class="docutils literal notranslate"><span class="pre">estimate_radius</span></code>, <code class="docutils literal notranslate"><span class="pre">estimate_mass</span></code>, and <code class="docutils literal notranslate"><span class="pre">estimate_logg</span></code>
 methods to default to the <code class="docutils literal notranslate"><span class="pre">teff</span></code> value in the meta data. [#766]</p></li>
@@ -837,7 +977,7 @@ the underlying periodogram does not have uniformly-spaced frequencies. [#780]</p
 </ul>
 </section>
 <section id="lightkurve-periodogram">
-<h4>lightkurve.periodogram<a class="headerlink" href="#lightkurve-periodogram" title="Link to this heading">#</a></h4>
+<h4>lightkurve.periodogram<a class="headerlink" href="#lightkurve-periodogram" title="Permalink to this headline">#</a></h4>
 <ul class="simple">
 <li><p>Modified <code class="docutils literal notranslate"><span class="pre">create_transit_mask</span></code> method to return <code class="docutils literal notranslate"><span class="pre">True</span></code> during transits and
 <code class="docutils literal notranslate"><span class="pre">False</span></code> elsewhere for consistent mask syntax. [#808]</p></li>
@@ -848,20 +988,20 @@ by default, which yields more accurate results (albeit slower). [#859, #860]</p>
 </section>
 </section>
 <section id="id22">
-<h2>1.11.3 (2020-10-06)<a class="headerlink" href="#id22" title="Link to this heading">#</a></h2>
+<h2>1.11.3 (2020-10-06)<a class="headerlink" href="#id22" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed inline plots not appearing in Jupyter Notebooks and Google Colab. [#865]</p></li>
 </ul>
 </section>
 <section id="id23">
-<h2>1.11.2 (2020-08-28)<a class="headerlink" href="#id23" title="Link to this heading">#</a></h2>
+<h2>1.11.2 (2020-08-28)<a class="headerlink" href="#id23" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a warning being issued (<code class="docutils literal notranslate"><span class="pre">&quot;LightCurveFile.header</span> <span class="pre">is</span> <span class="pre">deprecated&quot;</span></code>)
 when downloading light curve files from MAST. [#819]</p></li>
 </ul>
 </section>
 <section id="id24">
-<h2>1.11.1 (2020-06-18)<a class="headerlink" href="#id24" title="Link to this heading">#</a></h2>
+<h2>1.11.1 (2020-06-18)<a class="headerlink" href="#id24" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.cutout()</span></code> which prevented image edges from
 being included in cut-outs. [#749]</p></li>
@@ -873,7 +1013,7 @@ TESS pixel coordinates refer to pixel centers. [#755]</p></li>
 </ul>
 </section>
 <section id="id25">
-<h2>1.11.0 (2020-05-20)<a class="headerlink" href="#id25" title="Link to this heading">#</a></h2>
+<h2>1.11.0 (2020-05-20)<a class="headerlink" href="#id25" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Deprecated the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.header</span></code> property and <code class="docutils literal notranslate"><span class="pre">LightCurveFile.header()</span></code>
 method in favor of a consistent <code class="docutils literal notranslate"><span class="pre">get_header()</span></code> method. [#736]</p></li>
@@ -882,7 +1022,7 @@ by half a pixel. [#734]</p></li>
 </ul>
 </section>
 <section id="id26">
-<h2>1.10.0 (2020-05-14)<a class="headerlink" href="#id26" title="Link to this heading">#</a></h2>
+<h2>1.10.0 (2020-05-14)<a class="headerlink" href="#id26" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">query_solar_system_objects()</span></code> method to search for solar system
 objects in <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> and <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects. [#714]</p></li>
@@ -894,7 +1034,7 @@ motion stars to be shown at incorrect locations. [#730]</p></li>
 </ul>
 </section>
 <section id="id27">
-<h2>1.9.1 (2020-03-25)<a class="headerlink" href="#id27" title="Link to this heading">#</a></h2>
+<h2>1.9.1 (2020-03-25)<a class="headerlink" href="#id27" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Increased the speed of <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> and
 <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> by a factor ~10x. [#715]</p></li>
@@ -905,7 +1045,7 @@ incompatible with Bokeh v2.0.0. [#716]</p></li>
 </ul>
 </section>
 <section id="id28">
-<h2>1.9.0 (2020-02-25)<a class="headerlink" href="#id28" title="Link to this heading">#</a></h2>
+<h2>1.9.0 (2020-02-25)<a class="headerlink" href="#id28" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added an experimental <code class="docutils literal notranslate"><span class="pre">TessPLDCorrector</span></code> class designed to correct TESS FFI
 light curves by detrending against local pixel time series. [#687]</p></li>
@@ -916,7 +1056,7 @@ more than once. [#481]</p></li>
 </ul>
 </section>
 <section id="id29">
-<h2>1.8.0 (2020-02-09)<a class="headerlink" href="#id29" title="Link to this heading">#</a></h2>
+<h2>1.8.0 (2020-02-09)<a class="headerlink" href="#id29" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">Seismology.interact_echelle()</span></code> method for creating interactive
 asteroseismic echelle diagrams. [#625]</p></li>
@@ -928,7 +1068,7 @@ make it easy to plot odd- and even-numbered transits. [#425]</p></li>
 </ul>
 </section>
 <section id="id30">
-<h2>1.7.0 (2020-01-29)<a class="headerlink" href="#id30" title="Link to this heading">#</a></h2>
+<h2>1.7.0 (2020-01-29)<a class="headerlink" href="#id30" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added a <code class="docutils literal notranslate"><span class="pre">scale='linear'</span></code> option to <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> to show
 pixels using a linear stretch. The default is <code class="docutils literal notranslate"><span class="pre">scale='log'</span></code>. [#664]</p></li>
@@ -943,7 +1083,7 @@ input light curve contained flux uncertainties &lt;= 0. [#668]</p></li>
 </ul>
 </section>
 <section id="id31">
-<h2>1.6.0 (2019-12-16)<a class="headerlink" href="#id31" title="Link to this heading">#</a></h2>
+<h2>1.6.0 (2019-12-16)<a class="headerlink" href="#id31" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">tpf.to_lightcurve()</span></code> which caused <code class="docutils literal notranslate"><span class="pre">flux</span></code> and <code class="docutils literal notranslate"><span class="pre">flux_err</span></code>
 to be <code class="docutils literal notranslate"><span class="pre">0</span></code> instead of <code class="docutils literal notranslate"><span class="pre">NaN</span></code> for cadences with all-NaN pixels. [#651]</p></li>
@@ -956,7 +1096,7 @@ it allows <code class="docutils literal notranslate"><span class="pre">DesignMat
 </ul>
 </section>
 <section id="id32">
-<h2>1.5.2 (2019-12-05)<a class="headerlink" href="#id32" title="Link to this heading">#</a></h2>
+<h2>1.5.2 (2019-12-05)<a class="headerlink" href="#id32" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug introduced in v1.5.0 which caused an <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> related to
 <code class="docutils literal notranslate"><span class="pre">astropy.stats.calculate_bin_edges</span></code> to be raised when a user has an older
@@ -966,14 +1106,14 @@ be off by one pixel. [#638]</p></li>
 </ul>
 </section>
 <section id="id33">
-<h2>1.5.1 (2019-11-22)<a class="headerlink" href="#id33" title="Link to this heading">#</a></h2>
+<h2>1.5.1 (2019-11-22)<a class="headerlink" href="#id33" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug introduced in Lightkurve v1.5 which caused <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">lightkurve</span></code>
 on Mac OSX to automatically select the Matplotlib Agg backend. [#640]</p></li>
 </ul>
 </section>
 <section id="id34">
-<h2>1.5.0 (2019-11-20)<a class="headerlink" href="#id34" title="Link to this heading">#</a></h2>
+<h2>1.5.0 (2019-11-20)<a class="headerlink" href="#id34" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Changed the representation of <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> objects to make it easier to
 see at a glance which quarter/campaign/sector a result belongs to. [#632]</p></li>
@@ -991,7 +1131,7 @@ Echelle diagrams to be plotted into an existing Matplotlib figure. [#635]</p></l
 </ul>
 </section>
 <section id="id35">
-<h2>1.4.1 (2019-11-18)<a class="headerlink" href="#id35" title="Link to this heading">#</a></h2>
+<h2>1.4.1 (2019-11-18)<a class="headerlink" href="#id35" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> and
 <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code> to raise an <code class="docutils literal notranslate"><span class="pre">IndexError</span></code> if the sector keyword
@@ -999,7 +1139,7 @@ was passed and the target was observed by both TESS &amp; Kepler. [#631]</p></li
 </ul>
 </section>
 <section id="id36">
-<h2>1.4.0 (2019-11-12)<a class="headerlink" href="#id36" title="Link to this heading">#</a></h2>
+<h2>1.4.0 (2019-11-12)<a class="headerlink" href="#id36" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added the generic <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> and <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> classes which
 provide a user-friendly way to use linear regression to remove background or
@@ -1016,7 +1156,7 @@ exception when MAST’s TESSCut service is overloaded and times out. [#627]</p><
 </ul>
 </section>
 <section id="id37">
-<h2>1.3.0 (2019-10-21)<a class="headerlink" href="#id37" title="Link to this heading">#</a></h2>
+<h2>1.3.0 (2019-10-21)<a class="headerlink" href="#id37" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added a <code class="docutils literal notranslate"><span class="pre">method=&quot;quadratic&quot;</span></code> option to <code class="docutils literal notranslate"><span class="pre">tpf.estimate_centroids()</span></code> which
 enables centroids to be estimated by fitting a bivariate polynomial to the
@@ -1033,7 +1173,7 @@ sampled grid in frequency space. [#614]</p></li>
 </ul>
 </section>
 <section id="id38">
-<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id38" title="Link to this heading">#</a></h2>
+<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id38" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">flux_unit</span></code> and <code class="docutils literal notranslate"><span class="pre">flux_quantity</span></code> properties to the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code>
 class to enable users to keep track of a light curve’s flux units. [#591]</p></li>
@@ -1055,7 +1195,7 @@ take all recent Lightkurve API changes into account. [#596]</p></li>
 </ul>
 </section>
 <section id="id39">
-<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id39" title="Link to this heading">#</a></h2>
+<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id39" title="Permalink to this headline">#</a></h2>
 <p>Lightkurve v1.1.1 is a bugfix release which includes the following changes:</p>
 <ul class="simple">
 <li><p>Changed <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> to emit a
@@ -1075,7 +1215,7 @@ Lightkurve to receive the “code quality A” certification by codacy.com.
 </ul>
 </section>
 <section id="id40">
-<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id40" title="Link to this heading">#</a></h2>
+<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id40" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">lightkurve.seismology</span></code> sub-package which enables quick-look
 asteroseismic quantities to be extracted from <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects. [#496]</p></li>
@@ -1111,7 +1251,7 @@ an AstroPy Quantity object. [#521]</p></li>
 </ul>
 </section>
 <section id="id41">
-<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id41" title="Link to this heading">#</a></h2>
+<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id41" title="Permalink to this headline">#</a></h2>
 <p>This is a minor bugfix release containing the following improvements:</p>
 <ul class="simple">
 <li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> [#498],
@@ -1126,7 +1266,7 @@ if the download cache contains a corrupt file. [#512]</p></li>
 </ul>
 </section>
 <section id="id42">
-<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id42" title="Link to this heading">#</a></h2>
+<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id42" title="Permalink to this headline">#</a></h2>
 <p>This is the first stable release of Lightkurve.  It was prepared with the help
 of 45 contributors!</p>
 <p>This release contains major changes to the <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> class:</p>
@@ -1155,7 +1295,7 @@ the <code class="docutils literal notranslate"><span class="pre">targetid</span>
 </ul>
 </section>
 <section id="b30-2019-03-27">
-<h2>1.0b30 (2019-03-27)<a class="headerlink" href="#b30-2019-03-27" title="Link to this heading">#</a></h2>
+<h2>1.0b30 (2019-03-27)<a class="headerlink" href="#b30-2019-03-27" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Significantly improved the performance of the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> feature for
 systematics removal. [#470]</p></li>
@@ -1166,7 +1306,7 @@ systematics removal. [#470]</p></li>
 </ul>
 </section>
 <section id="b29-2019-02-14">
-<h2>1.0b29 (2019-02-14)<a class="headerlink" href="#b29-2019-02-14" title="Link to this heading">#</a></h2>
+<h2>1.0b29 (2019-02-14)<a class="headerlink" href="#b29-2019-02-14" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">search_tesscut(...).download()</span></code> feature now supports downloading
 rectangular TESS FFI cut-outs. It previously only supported squares. [#441]</p></li>
@@ -1176,9 +1316,9 @@ downloading all sectors. [#440]</p></li>
 </ul>
 </section>
 <section id="b28-2019-02-09">
-<h2>1.0b28 (2019-02-09)<a class="headerlink" href="#b28-2019-02-09" title="Link to this heading">#</a></h2>
+<h2>1.0b28 (2019-02-09)<a class="headerlink" href="#b28-2019-02-09" title="Permalink to this headline">#</a></h2>
 <section id="changes">
-<h3>Changes<a class="headerlink" href="#changes" title="Link to this heading">#</a></h3>
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p>Simplified the installation of Lightkurve by turning several packages into
 optional rather than required dependencies (<code class="docutils literal notranslate"><span class="pre">celerite</span></code>, <code class="docutils literal notranslate"><span class="pre">pybind</span></code>,
@@ -1193,7 +1333,7 @@ deprecated in favor of the <code class="docutils literal notranslate"><span clas
 </ul>
 </section>
 <section id="bugfixes">
-<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Link to this heading">#</a></h3>
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p>Made <code class="docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code> robust against light curves that contain
 NaNs. [#432]</p></li>
@@ -1203,7 +1343,7 @@ MAST TessCut service. [#434]</p></li>
 </section>
 </section>
 <section id="b26-2019-02-04">
-<h2>1.0b26 (2019-02-04)<a class="headerlink" href="#b26-2019-02-04" title="Link to this heading">#</a></h2>
+<h2>1.0b26 (2019-02-04)<a class="headerlink" href="#b26-2019-02-04" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Introduced a new layout for the
 <a class="reference external" href="https://docs.lightkurve.org">online documentation</a>. [#360, #400, #406]</p></li>
@@ -1225,7 +1365,7 @@ time. [#414]</p></li>
 </ul>
 </section>
 <section id="b25-2018-12-14">
-<h2>1.0b25 (2018-12-14)<a class="headerlink" href="#b25-2018-12-14" title="Link to this heading">#</a></h2>
+<h2>1.0b25 (2018-12-14)<a class="headerlink" href="#b25-2018-12-14" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> bokeh app now includes a <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Lightcurve</span></code>
 button [#329].</p></li>
@@ -1233,7 +1373,7 @@ button [#329].</p></li>
 </ul>
 </section>
 <section id="b24-2018-12-10">
-<h2>1.0b24 (2018-12-10)<a class="headerlink" href="#b24-2018-12-10" title="Link to this heading">#</a></h2>
+<h2>1.0b24 (2018-12-10)<a class="headerlink" href="#b24-2018-12-10" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Added support for TESS to <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and
 <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> [#367].</p></li>
@@ -1248,7 +1388,7 @@ the <code class="docutils literal notranslate"><span class="pre">phase</span></c
 </ul>
 </section>
 <section id="b23-2018-11-30">
-<h2>1.0b23 (2018-11-30)<a class="headerlink" href="#b23-2018-11-30" title="Link to this heading">#</a></h2>
+<h2>1.0b23 (2018-11-30)<a class="headerlink" href="#b23-2018-11-30" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.create_threshold_mask()</span></code> now only returns one contiguous
 mask, which is configurable using the new <code class="docutils literal notranslate"><span class="pre">reference_pixel</span></code> argument [#345].</p></li>
@@ -1265,7 +1405,7 @@ Files and Light Curve files [#340, #350, #356].</p></li>
 </ul>
 </section>
 <section id="b22-2018-11-17">
-<h2>1.0b22 (2018-11-17)<a class="headerlink" href="#b22-2018-11-17" title="Link to this heading">#</a></h2>
+<h2>1.0b22 (2018-11-17)<a class="headerlink" href="#b22-2018-11-17" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> was added to provide a single function to read in any
 light curve or target pixel file from Kepler or TESS and return the appropriate
@@ -1279,7 +1419,7 @@ object [#317].</p></li>
 </ul>
 </section>
 <section id="b21-2018-10-29">
-<h2>1.0b21 (2018-10-29)<a class="headerlink" href="#b21-2018-10-29" title="Link to this heading">#</a></h2>
+<h2>1.0b21 (2018-10-29)<a class="headerlink" href="#b21-2018-10-29" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">from_archive()</span></code> methods of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> and
 <code class="docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> have been deprecated in favor of the new
@@ -1295,7 +1435,7 @@ algorithm has been changed from 1 to 10. [#312]</p></li>
 </ul>
 </section>
 <section id="b20-2018-10-16">
-<h2>1.0b20 (2018-10-16)<a class="headerlink" href="#b20-2018-10-16" title="Link to this heading">#</a></h2>
+<h2>1.0b20 (2018-10-16)<a class="headerlink" href="#b20-2018-10-16" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>We adopted a rule that all method names must include a verb, and all class
 properties must be a noun [#286].  As a result, we renamed the following methods:</p>
@@ -1316,7 +1456,7 @@ properties must be a noun [#286].  As a result, we renamed the following methods
 </ul>
 </section>
 <section id="b19-2018-10-10">
-<h2>1.0b19 (2018-10-10)<a class="headerlink" href="#b19-2018-10-10" title="Link to this heading">#</a></h2>
+<h2>1.0b19 (2018-10-10)<a class="headerlink" href="#b19-2018-10-10" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>The <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> class has been refactored;</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">LightCurve.remove_outliers()</span></code> method now accepts <code class="docutils literal notranslate"><span class="pre">sigma_lower</span></code> and
@@ -1326,190 +1466,51 @@ properties must be a noun [#286].  As a result, we renamed the following methods
 </section>
 
 
-                </article>
+              </div>
               
               
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="citing.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Citing Lightkurve &amp; its dependencies</p>
-      </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="citing.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Citing Lightkurve &amp; its dependencies</p>
+        </div>
     </a>
-    <a class="right-next"
-       href="other_software.html"
-       title="next page">
-      <div class="prev-next-info">
+    <a class='right-next' id="next-link" href="other_software.html" title="next page">
+    <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Other software</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
+    </div>
+    <i class="fas fa-angle-right"></i>
     </a>
 </div>
-                </footer>
               
-            </div>
-            
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+          </main>
+          
 
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unreleased">2.5.1  (unreleased)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">2.5.0 (2024-08-29)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">2.4.2 (2023-11-03)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">2.4.1 (2023-09-06)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">2.4.0 (2023-02-14)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">2.3.0 (2022-07-07)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">2.2.1 (2022-05-26)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">2.2.0 (2022-04-12)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">2.1.1 (2022-03-24)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">2.1.0 (2022-02-10)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">2.0.11 (2021-09-22)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">2.0.10 (2021-06-04)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">2.0.9 (2021-03-31)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">2.0.8 (2021-03-30)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">2.0.7 (2021-03-24)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">2.0.6 (2021-03-15)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">2.0.5 (2021-03-13)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">2.0.4 (2021-03-11)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">2.0.3 (2021-02-23)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">2.0.2 (2021-02-19)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">2.0.1 (2021-02-16)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">2.0.0 (2021-02-15)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#major-changes">Major changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-changes">Other changes</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#lightkurve-lightcurve">lightkurve.lightcurve</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#lightkurve-targetpixelfile">lightkurve.targetpixelfile</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#lightkurve-collections">lightkurve.collections</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#lightkurve-search">lightkurve.search</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#lightkurve-correctors">lightkurve.correctors</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#lightkurve-seismology">lightkurve.seismology</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#lightkurve-periodogram">lightkurve.periodogram</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">1.11.3 (2020-10-06)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">1.11.2 (2020-08-28)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id24">1.11.1 (2020-06-18)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id25">1.11.0 (2020-05-20)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id26">1.10.0 (2020-05-14)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id27">1.9.1 (2020-03-25)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id28">1.9.0 (2020-02-25)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id29">1.8.0 (2020-02-09)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id30">1.7.0 (2020-01-29)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id31">1.6.0 (2019-12-16)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id32">1.5.2 (2019-12-05)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id33">1.5.1 (2019-11-22)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id34">1.5.0 (2019-11-20)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id35">1.4.1 (2019-11-18)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id36">1.4.0 (2019-11-12)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id37">1.3.0 (2019-10-21)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id38">1.2.0 (2019-10-01)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id39">1.1.1 (2019-08-19)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id40">1.1.0 (2019-07-19)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id41">1.0.1 (2019-05-20)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id42">1.0.0 (2019-04-08)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b30-2019-03-27">1.0b30 (2019-03-27)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b29-2019-02-14">1.0b29 (2019-02-14)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b28-2019-02-09">1.0b28 (2019-02-09)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changes">Changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bugfixes">Bugfixes</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b26-2019-02-04">1.0b26 (2019-02-04)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b25-2018-12-14">1.0b25 (2018-12-14)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b24-2018-12-10">1.0b24 (2018-12-10)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b23-2018-11-30">1.0b23 (2018-11-30)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b22-2018-11-17">1.0b22 (2018-11-17)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b21-2018-10-29">1.0b21 (2018-10-29)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b20-2018-10-16">1.0b20 (2018-10-16)</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#b19-2018-10-10">1.0b19 (2018-10-10)</a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/about/changelog.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
-
-</div></div>
-              
-            
-          </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+      </div>
     </div>
-  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
-
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
-
-  <p class="copyright">
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
     
-      © Copyright Lightkurve developers.
-      <br/>
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
     
-  </p>
-</div>
-      
-        <div class="footer-item">
-
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    <br/>
-  </p>
-</div>
-      
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
     </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
-</p></div>
-      
-    </div>
-  
-</div>
-
-  </footer>
+    
+  </div>
+</footer>
   </body>
 </html>

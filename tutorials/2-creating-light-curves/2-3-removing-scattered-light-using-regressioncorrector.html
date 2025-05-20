@@ -1,431 +1,294 @@
 
 <!DOCTYPE html>
 
-
-<html lang="en" data-content_root="../../" >
-
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Removing scattered light from TESS light curves using linear regression (RegressionCorrector) &#8212; Lightkurve </title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
+    
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script src="../../_static/documentation_options.js?v=6d2724f8"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/2-creating-light-curves/2-3-removing-scattered-light-using-regressioncorrector';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Removing noise from K2 and TESS light curves using Pixel Level Decorrelation (PLDCorrector)" href="2-3-k2-pldcorrector.html" />
     <link rel="prev" title="Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (CBVCorrector)" href="2-3-how-to-use-cbvcorrector.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
-  
-  <dialog id="pst-search-dialog">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-<form class="bd-search d-flex align-items-center"
-      action="../../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
+    <div class="container-fluid" id="banner"></div>
 
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.5</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
   </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
 
   
-    
-  
-
-<a class="navbar-brand logo" href="../../index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">Lightkurve </p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
+ </a>
+</li>
+
     
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
+</ul>
+      </div>
+      
+    </div>
 
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-                </ul>
-            </li>
+    <div class="container-xl">
+      <div class="row">
+          
             
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-        </div>
-      
-      
-        <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
           
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
-  </div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)</span></li>
-  </ul>
-</nav>
-</div>
-      
-    </div>
-  
-  
-</div>
-</div>
-              
-              
-              
+              <div class="toc-item">
                 
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Learning-Goals">
+   Learning Goals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Introduction">
+   Introduction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#1.-Using-RegressionCorrector-on-TESSCut-FFI-Cutouts">
+   1. Using
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     RegressionCorrector
+    </span>
+   </code>
+   on TESSCut FFI Cutouts
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#2.-Creating-a-DesignMatrix-from-Pixel-Regressors">
+   2. Creating a
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     DesignMatrix
+    </span>
+   </code>
+   from Pixel Regressors
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#3.-Removing-Background-Scattered-Light-Using-Linear-Regression">
+   3. Removing Background Scattered Light Using Linear Regression
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#4.-Diagnosing-the-Correction">
+   4. Diagnosing the Correction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#5.-Using-RegressionCorrector-on-TESS-Two-Minute-Cadence-Target-Pixel-Files">
+   5. Using
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     RegressionCorrector
+    </span>
+   </code>
+   on
+   <em>
+    TESS
+   </em>
+   Two-Minute Cadence Target Pixel Files
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#6.-Should-I-use-RegressionCorrector-or-PLDCorrector?">
+   6. Should I use
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     RegressionCorrector
+    </span>
+   </code>
+   or
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     PLDCorrector
+    </span>
+   </code>
+   ?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#About-this-Notebook">
+   About this Notebook
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Citing-Lightkurve-and-its-Dependencies">
+   Citing Lightkurve and its Dependencies
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-3-removing-scattered-light-using-regressioncorrector.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-3-removing-scattered-light-using-regressioncorrector.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Removing-scattered-light-from-TESS-light-curves-using-linear-regression-(RegressionCorrector)">
-<h1>Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)<a class="headerlink" href="#Removing-scattered-light-from-TESS-light-curves-using-linear-regression-(RegressionCorrector)" title="Link to this heading">#</a></h1>
+<h1>Removing scattered light from <em>TESS</em> light curves using linear regression (<code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>)<a class="headerlink" href="#Removing-scattered-light-from-TESS-light-curves-using-linear-regression-(RegressionCorrector)" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">#</a></h2>
-<p>By the end of this tutorial, you will:</p>
-<ul class="simple">
-<li><p>Be familiar with the Lightkurve <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector">RegressionCorrector</a>.</p></li>
-<li><p>Understand how to create regressors from a <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/targetpixelfile.html">TargetPixelFile</a> object.</p></li>
-<li><p>Be able to remove the scattered light background signal from <em>TESS</em> data.</p></li>
-</ul>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<p>By the end of this tutorial, you will: - Be familiar with the Lightkurve <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector">RegressionCorrector</a>. - Understand how to create regressors from a <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/targetpixelfile.html">TargetPixelFile</a> object. - Be able to remove the scattered light background signal from <em>TESS</em> data.</p>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>Lightkurve offers several tools to the community for removing instrument noise and systematics from data from the <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> missions. This tutorial will demonstrate the use of Lightkurve’s <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> class to remove the scattered light and spacecraft motion noise from <a class="reference external" href="https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html#full-frame-images">TESS Full Frame Images (FFIs)</a>.</p>
 <p><em>TESS</em> FFIs have an additive scattered light background that has not been removed by the pipeline. This scattered light must be removed by the user. This can be done in a few ways, including a basic median subtraction. In this tutorial, we’ll show you how to use Lightkurve’s corrector tools to remove the scattered light.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>This tutorial requires the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> package, and also makes use of <a class="reference external" href="https://numpy.org/">NumPy</a> and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a>.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -436,19 +299,10 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/nthom/lightkurve/src/lightkurve/config/__init__.py:119: UserWarning: The default Lightkurve cache directory, used by download(), etc., has been moved to /Users/nthom/.lightkurve/cache. Please move all the files in the legacy directory /Users/nthom/.lightkurve-cache to the new location and remove the legacy directory. Refer to https://docs.lightkurve.org/reference/config.html#default-cache-directory-migration for more information.
-  warnings.warn(
-</pre></div></div>
-</div>
 <hr class="docutils" />
 </section>
 <section id="1.-Using-RegressionCorrector-on-TESSCut-FFI-Cutouts">
-<h2>1. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on TESSCut FFI Cutouts<a class="headerlink" href="#1.-Using-RegressionCorrector-on-TESSCut-FFI-Cutouts" title="Link to this heading">#</a></h2>
+<h2>1. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on TESSCut FFI Cutouts<a class="headerlink" href="#1.-Using-RegressionCorrector-on-TESSCut-FFI-Cutouts" title="Permalink to this headline">#</a></h2>
 <p>For this tutorial we will use the <em>TESS</em> Sector 15 data of <a class="reference external" href="https://en.wikipedia.org/wiki/Tabby%27s_Star">KIC 8462852</a> (also known as Boyajian’s Star). We’ll start by downloading the FFI data using MAST’s TESSCut service, querying it through Lightkurve.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -527,7 +381,7 @@ TessTargetPixelFile(TICID: KIC 8462852)
 </div>
 </section>
 <section id="2.-Creating-a-DesignMatrix-from-Pixel-Regressors">
-<h2>2. Creating a <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> from Pixel Regressors<a class="headerlink" href="#2.-Creating-a-DesignMatrix-from-Pixel-Regressors" title="Link to this heading">#</a></h2>
+<h2>2. Creating a <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> from Pixel Regressors<a class="headerlink" href="#2.-Creating-a-DesignMatrix-from-Pixel-Regressors" title="Permalink to this headline">#</a></h2>
 <p>The flux in the aperture appears to be dominated by scattered light. We can tell because <em>TESS</em> orbits Earth twice in each sector, thus patterns which appear twice within a sector are typically related to the <em>TESS</em> orbit (such as the scattered light effect).</p>
 <p>To remove this light, we are going to detrend the light curve against some vectors which we think are predictive of this systematic noise.</p>
 <p>In this case, we can use the <strong>pixels outside the aperture</strong> as vectors that are highly predictive of the systematic noise, that is, we will make the assumption that these pixels do not contain any flux from our target.</p>
@@ -677,7 +531,7 @@ by appending a “constant” to our design matrix.</p>
 </div>
 </section>
 <section id="3.-Removing-Background-Scattered-Light-Using-Linear-Regression">
-<h2>3. Removing Background Scattered Light Using Linear Regression<a class="headerlink" href="#3.-Removing-Background-Scattered-Light-Using-Linear-Regression" title="Link to this heading">#</a></h2>
+<h2>3. Removing Background Scattered Light Using Linear Regression<a class="headerlink" href="#3.-Removing-Background-Scattered-Light-Using-Linear-Regression" title="Permalink to this headline">#</a></h2>
 <p>Now that we have a design matrix, we only need to pass it into a <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/correctors.html">lightkurve.Corrector</a>. To use our design matrix, we can pass it to the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector">RegressionCorrector</a>, which will detrend the input light curve against the vectors we’ve built.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
@@ -734,7 +588,7 @@ RegressionCorrector (ID: KIC 8462852)
 <p>As shown above, the scattered light from the background has been removed. If we want to take a more in-depth look at the correction, we can use the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.RegressionCorrector.diagnose.html#lightkurve.correctors.RegressionCorrector.diagnose">diagnose()</a> method to see what the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> found as the best fitting solution.</p>
 </section>
 <section id="4.-Diagnosing-the-Correction">
-<h2>4. Diagnosing the Correction<a class="headerlink" href="#4.-Diagnosing-the-Correction" title="Link to this heading">#</a></h2>
+<h2>4. Diagnosing the Correction<a class="headerlink" href="#4.-Diagnosing-the-Correction" title="Permalink to this headline">#</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
@@ -768,29 +622,23 @@ RegressionCorrector (ID: KIC 8462852)
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=1190</i>
-<table id="table5233608848" class="table-striped table-bordered table-condensed">
+<table id="table13421204528" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th></tr></thead>
-<tr><td>1711.3882446289062</td><td>-341.18816068956767</td><td>0.0</td></tr>
-<tr><td>1711.4090576171875</td><td>-341.21407886453835</td><td>0.0</td></tr>
-<tr><td>1711.4298706054688</td><td>-341.96344397054054</td><td>0.0</td></tr>
-<tr><td>1711.4507446289062</td><td>-341.8382280405567</td><td>0.0</td></tr>
-<tr><td>1711.4715576171875</td><td>-342.1986575924984</td><td>0.0</td></tr>
-<tr><td>1711.4923706054688</td><td>-342.109194630596</td><td>0.0</td></tr>
-<tr><td>1711.5132446289062</td><td>-345.87990311619797</td><td>0.0</td></tr>
-<tr><td>1711.5340576171875</td><td>-347.9538232383493</td><td>0.0</td></tr>
-<tr><td>1711.5548706054688</td><td>-344.8516066170032</td><td>0.0</td></tr>
+<tr><td>1711.3882446289062</td><td>-341.18816068925025</td><td>0.0</td></tr>
+<tr><td>1711.4090576171875</td><td>-341.21407886438647</td><td>0.0</td></tr>
+<tr><td>1711.4298706054688</td><td>-341.9634439702595</td><td>0.0</td></tr>
+<tr><td>1711.4507446289062</td><td>-341.83822804039573</td><td>0.0</td></tr>
+<tr><td>1711.4715576171875</td><td>-342.1986575923138</td><td>0.0</td></tr>
+<tr><td>1711.4923706054688</td><td>-342.10919463036316</td><td>0.0</td></tr>
 <tr><td>...</td><td>...</td><td>...</td></tr>
-<tr><td>1737.2212524414062</td><td>467.26536951138314</td><td>0.0</td></tr>
-<tr><td>1737.2420654296875</td><td>386.197377841926</td><td>0.0</td></tr>
-<tr><td>1737.2628784179688</td><td>307.6174292907381</td><td>0.0</td></tr>
-<tr><td>1737.2837524414062</td><td>218.35482253326882</td><td>0.0</td></tr>
-<tr><td>1737.3045654296875</td><td>109.60592441164954</td><td>0.0</td></tr>
-<tr><td>1737.3253784179688</td><td>2.4883698943094714</td><td>0.0</td></tr>
-<tr><td>1737.3462524414062</td><td>-92.91965046656424</td><td>0.0</td></tr>
-<tr><td>1737.3670654296875</td><td>-179.7542373612332</td><td>0.0</td></tr>
-<tr><td>1737.3878784179688</td><td>-238.60812425227414</td><td>0.0</td></tr>
+<tr><td>1737.2837524414062</td><td>218.3548225328277</td><td>0.0</td></tr>
+<tr><td>1737.3045654296875</td><td>109.60592441127756</td><td>0.0</td></tr>
+<tr><td>1737.3253784179688</td><td>2.4883698938256202</td><td>0.0</td></tr>
+<tr><td>1737.3462524414062</td><td>-92.9196504669053</td><td>0.0</td></tr>
+<tr><td>1737.3670654296875</td><td>-179.75423736150515</td><td>0.0</td></tr>
+<tr><td>1737.3878784179688</td><td>-238.60812425258882</td><td>0.0</td></tr>
 </table></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -920,7 +768,7 @@ RegressionCorrector (ID: KIC 8462852)
 </div>
 </section>
 <section id="5.-Using-RegressionCorrector-on-TESS-Two-Minute-Cadence-Target-Pixel-Files">
-<h2>5. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on <em>TESS</em> Two-Minute Cadence Target Pixel Files<a class="headerlink" href="#5.-Using-RegressionCorrector-on-TESS-Two-Minute-Cadence-Target-Pixel-Files" title="Link to this heading">#</a></h2>
+<h2>5. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on <em>TESS</em> Two-Minute Cadence Target Pixel Files<a class="headerlink" href="#5.-Using-RegressionCorrector-on-TESS-Two-Minute-Cadence-Target-Pixel-Files" title="Permalink to this headline">#</a></h2>
 <p><em>TESS</em> releases high-time resolution TPFs of interesting targets. These higher time resolution TPFs have background removed for users by the pipeline. However, there are still common trends in TPF pixels that are not due to scattered light, but could be from, for example, spacecraft motion.</p>
 <p><code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> can be used in exactly the same way to remove these common trends.</p>
 <div class="nbinput nblast docutils container">
@@ -1030,11 +878,11 @@ $880.81385 \; \mathrm{ppm}$</div></div>
 </div>
 <div class="output_area docutils container">
 <div class="math notranslate nohighlight">
-$825.56258 \; \mathrm{ppm}$</div></div>
+$825.55526 \; \mathrm{ppm}$</div></div>
 </div>
 </section>
 <section id="6.-Should-I-use-RegressionCorrector-or-PLDCorrector?">
-<h2>6. Should I use <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> or <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>?<a class="headerlink" href="#6.-Should-I-use-RegressionCorrector-or-PLDCorrector?" title="Link to this heading">#</a></h2>
+<h2>6. Should I use <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> or <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>?<a class="headerlink" href="#6.-Should-I-use-RegressionCorrector-or-PLDCorrector?" title="Permalink to this headline">#</a></h2>
 <p>In addition to the corrector demonstrated in this tutorial, Lightkurve has a special case of <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> called <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector</a>. PLD, or Pixel Level Decorrelation, is a method of removing systematic noise from light curves using linear regression, with a design matrix constructed from a combination of pixel-level light curves.</p>
 <p>For more information about the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>, please see the tutorial specifically on removing instrumental noise from <em>K2</em> and <em>TESS</em> light curves using PLD.</p>
 <p>For <em>TESS</em>, the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> works in a very similar way to the <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code>. The major difference between them is that <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> constructs its own design matrix, making it a streamlined, versatile tool to apply to any <em>TESS</em> or <em>K2</em> light curve.</p>
@@ -1096,12 +944,12 @@ $825.56258 \; \mathrm{ppm}$</div></div>
 <p>When considering which corrector to use, remember that <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> is minimal and designed to be effective at removing both background scattered light from <em>TESS</em> and motion noise from <em>K2</em>, while <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> is flexible and gives you more control over the creation of the design matrix and the correction.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
 <p><strong>Authors:</strong> Christina Hedges (<a class="reference external" href="mailto:christinalouisehedges&#37;&#52;&#48;gmail&#46;com">christinalouisehedges<span>&#64;</span>gmail<span>&#46;</span>com</a>), Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>), Geert Barentsen</p>
 <p><strong>Updated On:</strong> 2020-09-28</p>
 </section>
 <section id="Citing-Lightkurve-and-its-Dependencies">
-<h2>Citing Lightkurve and its Dependencies<a class="headerlink" href="#Citing-Lightkurve-and-its-Dependencies" title="Link to this heading">#</a></h2>
+<h2>Citing Lightkurve and its Dependencies<a class="headerlink" href="#Citing-Lightkurve-and-its-Dependencies" title="Permalink to this headline">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
@@ -1304,130 +1152,51 @@ archivePrefix = "arXiv",
 </section>
 
 
-                </article>
+              </div>
               
               
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="2-3-how-to-use-cbvcorrector.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)</p>
-      </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="2-3-how-to-use-cbvcorrector.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)</p>
+        </div>
     </a>
-    <a class="right-next"
-       href="2-3-k2-pldcorrector.html"
-       title="next page">
-      <div class="prev-next-info">
+    <a class='right-next' id="next-link" href="2-3-k2-pldcorrector.html" title="next page">
+    <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
+    </div>
+    <i class="fas fa-angle-right"></i>
     </a>
 </div>
-                </footer>
               
-            </div>
-            
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+          </main>
+          
 
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Learning-Goals">Learning Goals</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Imports">Imports</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#1.-Using-RegressionCorrector-on-TESSCut-FFI-Cutouts">1. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on TESSCut FFI Cutouts</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#2.-Creating-a-DesignMatrix-from-Pixel-Regressors">2. Creating a <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code> from Pixel Regressors</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#3.-Removing-Background-Scattered-Light-Using-Linear-Regression">3. Removing Background Scattered Light Using Linear Regression</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#4.-Diagnosing-the-Correction">4. Diagnosing the Correction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#5.-Using-RegressionCorrector-on-TESS-Two-Minute-Cadence-Target-Pixel-Files">5. Using <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> on <em>TESS</em> Two-Minute Cadence Target Pixel Files</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#6.-Should-I-use-RegressionCorrector-or-PLDCorrector?">6. Should I use <code class="docutils literal notranslate"><span class="pre">RegressionCorrector</span></code> or <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#About-this-Notebook">About this Notebook</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Citing-Lightkurve-and-its-Dependencies">Citing Lightkurve and its Dependencies</a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/tutorials/2-creating-light-curves/2-3-removing-scattered-light-using-regressioncorrector.ipynb.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
-
-</div></div>
-              
-            
-          </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+      </div>
     </div>
-  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
-
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
-
-  <p class="copyright">
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
     
-      © Copyright Lightkurve developers.
-      <br/>
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
     
-  </p>
-</div>
-      
-        <div class="footer-item">
-
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    <br/>
-  </p>
-</div>
-      
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
     </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
-</p></div>
-      
-    </div>
-  
-</div>
-
-  </footer>
+    
+  </div>
+</footer>
   </body>
 </html>

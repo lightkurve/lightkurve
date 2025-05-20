@@ -1,433 +1,244 @@
 
 <!DOCTYPE html>
 
-
-<html lang="en" data-content_root="../../" >
-
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS &#8212; Lightkurve </title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
+    
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script src="../../_static/documentation_options.js?v=6d2724f8"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/2-creating-light-curves/2-2-how-to-use-cbvs';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (CBVCorrector)" href="2-3-how-to-use-cbvcorrector.html" />
     <link rel="prev" title="How to identify time-variable background noise (“rolling bands”)?" href="2-2-identifying-rolling-band.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
-  
-  <dialog id="pst-search-dialog">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-<form class="bd-search d-flex align-items-center"
-      action="../../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
+    <div class="container-fluid" id="banner"></div>
 
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.5</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
   </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
 
   
-    
-  
-
-<a class="navbar-brand logo" href="../../index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">Lightkurve </p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
+ </a>
+</li>
+
     
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
+</ul>
+      </div>
+      
+    </div>
 
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-                </ul>
-            </li>
+    <div class="container-xl">
+      <div class="row">
+          
             
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-        </div>
-      
-      
-        <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
           
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
-  </div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS</span></li>
-  </ul>
-</nav>
-</div>
-      
-    </div>
-  
-  
-</div>
-</div>
-              
-              
-              
+              <div class="toc-item">
                 
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Cotrending-Basis-Vector-Types">
+   Cotrending Basis Vector Types
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Obtaining-the-CBVs">
+   Obtaining the CBVs
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Converting-the-CBVs-to-a-Lightkurve-DesignMatrix">
+   Converting the CBVs to a Lightkurve
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     DesignMatrix
+    </span>
+   </code>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Aligning-the-CBVs-with-your-light-curve">
+   Aligning the CBVs with your light curve
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve">
+   Interpolating the CBVs to an arbitrary light curve
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Some-notes-about-interpolating-Cotrending-Basis-Vectors">
+     Some notes about interpolating Cotrending Basis Vectors
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS">
-<h1>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS<a class="headerlink" href="#How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS" title="Link to this heading">#</a></h1>
+<h1>How to load and use Cotrending Basis Vectors for Kepler, K2 and TESS<a class="headerlink" href="#How-to-load-and-use-Cotrending-Basis-Vectors-for-Kepler,-K2-and-TESS" title="Permalink to this headline">#</a></h1>
 <p>Cotrending Basis Vectors (CBVs) are generated in the Presearch Data Conditioning (PDC) component of the Kepler/K2/TESS pipeline and are used to remove systematic trends in light curves. They are built from the most common systematic trends observed in each PDC Unit of Work (Quarter for Kepler, Campaign for K2, and Sector for TESS). Each Kepler and K2 module output and each CCD in TESS has its own set of CBVs. You can read an introduction to the CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler
 Data</a> or to greater detail in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19081-003-KDPH.pdf">Kepler Data Processing Handbook</a>. The same basic method to generate CBVs is used for all three missions.</p>
 <p>This tutorial provides examples of how to load CBVs from MAST and set them up in a design matrix for use to remove systematic trends. Please consult the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix">DesignMatrix page</a> for the full details on that class. A convenient tool has been created called
 <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.CBVCorrector.html#lightkurve.correctors.CBVCorrector">CBVCorrector</a> which will utilize the CBVs for the custom removal of systematic trends. See the <a class="reference external" href="https://lightkurve.github.io/lightkurve/tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.html">CBVCorrector HOWTO page</a> for example usage.</p>
 <section id="Cotrending-Basis-Vector-Types">
-<h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Link to this heading">#</a></h2>
-<p>There are three basic types of CBVs:</p>
-<ul class="simple">
-<li><p><strong>Single-Scale</strong> contains all systematic trends combined in a single set of basis vectors.</p></li>
-<li><p><strong>Multi-Scale</strong> contains systematic trends in specific wavelet-based band passes. There are usually three sets of multi-scale basis vectors in three bands.</p></li>
-<li><p><strong>Spike</strong> contains only short impulsive spike systematics.</p></li>
-</ul>
+<h2>Cotrending Basis Vector Types<a class="headerlink" href="#Cotrending-Basis-Vector-Types" title="Permalink to this headline">#</a></h2>
+<p>There are three basic types of CBVs: - <strong>Single-Scale</strong> contains all systematic trends combined in a single set of basis vectors. - <strong>Multi-Scale</strong> contains systematic trends in specific wavelet-based band passes. There are usually three sets of multi-scale basis vectors in three bands. - <strong>Spike</strong> contains only short impulsive spike systematics.</p>
 <p>There are two different correction methods in PDC: Single-Scale and Multi-Scale. Single-Scale performs the correction in a single bandpass. Multi-Scale performs the correction in three separate wavelet-based bandpasses. Both corrections are performed in PDC but we can only export a single PDC light curve for each target. So, PDC must choose which of the two on a per-target basis. Generally speaking, single-scale performs better at preserving longer period signals. But at periods close to
 transiting planet durations multi-scale performs better at preserving signals. PDC therefore mostly chooses multi-scale for use within the planet finding pipeline and for the archive. You can find in the light curve FITS header which PDC method was chosen (keyword “PDCMETHD”). Additionally, a seperate correction is alway performed to remove short impulsive systematic spikes.</p>
 <p>For an individual’s research needs, the mission supplied PDC lightcurves might not be ideal and so the CBVs are provided to the user to perform their own correction. All three CBV types are provided at MAST for TESS, however only Single-Scale is provided at MAST for Kepler and K2. For TESS, Cotrending Basis Vectors are currently only supplied at a 2-minute cadence. For Kepler/K2 only for the 30-minute target cadence.</p>
 </section>
 <section id="Obtaining-the-CBVs">
-<h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Link to this heading">#</a></h2>
+<h2>Obtaining the CBVs<a class="headerlink" href="#Obtaining-the-CBVs" title="Permalink to this headline">#</a></h2>
 <p>Two tools are available to automatically download the CBVs relevent to your target of study: <code class="docutils literal notranslate"><span class="pre">load_tess_cbvs</span></code> and <code class="docutils literal notranslate"><span class="pre">load_kepler_cbvs</span></code>. Here is an example loading in the TESS Multi-Scale Band 2 CBVs for TESS target TIC 99180739, which happens to be on camera 1 and CCD 1. Note that you do not need to have a lightcurve object already loaded. One can directly request whichever CBVs one desires.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -440,15 +251,6 @@ transiting planet durations multi-scale performs better at preserving signals. P
 <span class="n">cbvs</span> <span class="o">=</span> <span class="n">load_tess_cbvs</span><span class="p">(</span><span class="n">sector</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">sector</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">ccd</span><span class="p">,</span> <span class="n">cbv_type</span><span class="o">=</span><span class="s1">&#39;MultiScale&#39;</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/nthom/lightkurve/src/lightkurve/config/__init__.py:119: UserWarning: The default Lightkurve cache directory, used by download(), etc., has been moved to /Users/nthom/.lightkurve/cache. Please move all the files in the legacy directory /Users/nthom/.lightkurve-cache to the new location and remove the legacy directory. Refer to https://docs.lightkurve.org/reference/config.html#default-cache-directory-migration for more information.
-  warnings.warn(
-</pre></div></div>
 </div>
 <p>This TessCotrendingBasisVectors object contains 8 Multi-Scale band 2 CBVs for Sector 10, Camera 1, CCD 1. A CBV object contains only one type of CBVs. To obtain all types you must request each seperately. The basis vectors themselves are containted in an astropy.timeseries.TimeSeries Table:</p>
 <div class="nbinput docutils container">
@@ -466,7 +268,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>TessCotrendingBasisVectors length=3</i>
-<table id="table4978453520" class="table-striped table-bordered table-condensed">
+<table id="table4421738896" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>CADENCENO</th><th>GAP</th><th>VECTOR_1</th><th>VECTOR_2</th><th>VECTOR_3</th><th>VECTOR_4</th><th>VECTOR_5</th><th>VECTOR_6</th><th>VECTOR_7</th><th>VECTOR_8</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>int32</th><th>bool</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -503,7 +305,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 </section>
 <section id="Converting-the-CBVs-to-a-Lightkurve-DesignMatrix">
-<h2>Converting the CBVs to a Lightkurve <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code><a class="headerlink" href="#Converting-the-CBVs-to-a-Lightkurve-DesignMatrix" title="Link to this heading">#</a></h2>
+<h2>Converting the CBVs to a Lightkurve <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code><a class="headerlink" href="#Converting-the-CBVs-to-a-Lightkurve-DesignMatrix" title="Permalink to this headline">#</a></h2>
 <p>You can access individual CBVs directly by referencing the column in the table (i.e. <code class="docutils literal notranslate"><span class="pre">cbvs['VECTOR_#']</span></code>) however a better way to use the CBVs for correcting your light curves is to <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/correctors/cbvcorrector.py#L1075">convert the CBVs to a LightKurve DesignMatrix</a>:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -540,7 +342,7 @@ transiting planet durations multi-scale performs better at preserving signals. P
 </div>
 </section>
 <section id="Aligning-the-CBVs-with-your-light-curve">
-<h2>Aligning the CBVs with your light curve<a class="headerlink" href="#Aligning-the-CBVs-with-your-light-curve" title="Link to this heading">#</a></h2>
+<h2>Aligning the CBVs with your light curve<a class="headerlink" href="#Aligning-the-CBVs-with-your-light-curve" title="Permalink to this headline">#</a></h2>
 <p>The CBVs obtained from MAST may not have the same cadences as the your target. A method called <code class="docutils literal notranslate"><span class="pre">align</span></code> will allow you to align your CBVs to the cadence numbers in your target lightcurve object. The method will use the cadence number (i.e. <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/targetpixelfile.py#L350">lc.cadenceno</a>) to perform the alignment. Only cadence numbers that exist in both the CBVs and the light curve will have values
 in the returned CBVs. All cadence numbers that exist in the light curve but not in the CBVs will have NaNs returned for the CBVs on those cadences and the GAP set to True.</p>
 <div class="nbinput docutils container">
@@ -562,7 +364,7 @@ in the returned CBVs. All cadence numbers that exist in the light curve but not 
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-np.False_
+False
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -590,12 +392,12 @@ The MultiScale CBVs do not appear to be well aligned to the light curve. Conside
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-np.True_
+True
 </pre></div></div>
 </div>
 </section>
 <section id="Interpolating-the-CBVs-to-an-arbitrary-light-curve">
-<h2>Interpolating the CBVs to an arbitrary light curve<a class="headerlink" href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve" title="Link to this heading">#</a></h2>
+<h2>Interpolating the CBVs to an arbitrary light curve<a class="headerlink" href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve" title="Permalink to this headline">#</a></h2>
 <p>The above <code class="docutils literal notranslate"><span class="pre">align</span></code> method will only keep cadences that line up exactly between the CBVs and the light curve based on the cadence numbers. What if you have a light curve with cadence times not exactly lining up with the CBV cadences? For example, what if you want to use the 2-minute CBVs for cotrending against the 30-minute FFIs? A more general method is <code class="docutils literal notranslate"><span class="pre">interpolate</span></code>, which uses PCHIP interpolation to generate CBVs at the cadence times of an arbitrary light curve. If the light curve has
 cadences past either end of the cadences in the CBVs then one must extrapolate. An optional argument, <code class="docutils literal notranslate"><span class="pre">extrapolate</span></code>, can be used to also extrapolate the CBV values to the light curve cadences. If <code class="docutils literal notranslate"><span class="pre">extrapolate=False</span></code> then the exterior values are set to zeros, which will probably result is a very poor fit.</p>
 <div class="nbinput nblast docutils container">
@@ -644,7 +446,7 @@ cadences past either end of the cadences in the CBVs then one must extrapolate. 
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-np.True_
+True
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -668,7 +470,7 @@ np.True_
 </div>
 </div>
 <section id="Some-notes-about-interpolating-Cotrending-Basis-Vectors">
-<h3>Some notes about interpolating Cotrending Basis Vectors<a class="headerlink" href="#Some-notes-about-interpolating-Cotrending-Basis-Vectors" title="Link to this heading">#</a></h3>
+<h3>Some notes about interpolating Cotrending Basis Vectors<a class="headerlink" href="#Some-notes-about-interpolating-Cotrending-Basis-Vectors" title="Permalink to this headline">#</a></h3>
 <ul class="simple">
 <li><p>Currently, only TESS 2-minute and Kepler/K2 30-minute CBVs are archived on MAST</p></li>
 <li><p>20-second CBVs will be available for the TESS extended mission beginning with Sector 27. Each set of 20-second CBVs will be for the entire field of view.</p></li>
@@ -681,127 +483,51 @@ np.True_
 </section>
 
 
-                </article>
+              </div>
               
               
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="2-2-identifying-rolling-band.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">How to identify time-variable background noise (“rolling bands”)?</p>
-      </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="2-2-identifying-rolling-band.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">How to identify time-variable background noise (“rolling bands”)?</p>
+        </div>
     </a>
-    <a class="right-next"
-       href="2-3-how-to-use-cbvcorrector.html"
-       title="next page">
-      <div class="prev-next-info">
+    <a class='right-next' id="next-link" href="2-3-how-to-use-cbvcorrector.html" title="next page">
+    <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
+    </div>
+    <i class="fas fa-angle-right"></i>
     </a>
 </div>
-                </footer>
               
-            </div>
-            
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+          </main>
+          
 
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Cotrending-Basis-Vector-Types">Cotrending Basis Vector Types</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Obtaining-the-CBVs">Obtaining the CBVs</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Converting-the-CBVs-to-a-Lightkurve-DesignMatrix">Converting the CBVs to a Lightkurve <code class="docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Aligning-the-CBVs-with-your-light-curve">Aligning the CBVs with your light curve</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Interpolating-the-CBVs-to-an-arbitrary-light-curve">Interpolating the CBVs to an arbitrary light curve</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Some-notes-about-interpolating-Cotrending-Basis-Vectors">Some notes about interpolating Cotrending Basis Vectors</a></li>
-</ul>
-</li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/tutorials/2-creating-light-curves/2-2-how-to-use-cbvs.ipynb.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
-
-</div></div>
-              
-            
-          </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+      </div>
     </div>
-  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
-
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
-
-  <p class="copyright">
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
     
-      © Copyright Lightkurve developers.
-      <br/>
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
     
-  </p>
-</div>
-      
-        <div class="footer-item">
-
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    <br/>
-  </p>
-</div>
-      
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
     </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
-</p></div>
-      
-    </div>
-  
-</div>
-
-  </footer>
+    
+  </div>
+</footer>
   </body>
 </html>

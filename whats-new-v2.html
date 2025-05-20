@@ -1,422 +1,319 @@
 
 <!DOCTYPE html>
 
-
-<html lang="en" data-content_root="./" >
-
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>What’s new in Lightkurve 2? &#8212; Lightkurve </title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
+    
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
-    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=05a62d9f" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script src="_static/documentation_options.js?v=6d2724f8"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'whats-new-v2';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Quickstart" href="quickstart.html" />
     <link rel="prev" title="Lightkurve" href="index.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
-  
-  <dialog id="pst-search-dialog">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-<form class="bd-search d-flex align-items-center"
-      action="search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
+    <div class="container-fluid" id="banner"></div>
 
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="index.html">
+<p class="title">Lightkurve v2.5</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
   </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
 
   
-    
-  
-
-<a class="navbar-brand logo" href="index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">Lightkurve </p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="about/index.html">
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="development/index.html">
+  Developing for Lightkurve
+ </a>
+</li>
+
     
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    What's new?
-  </a>
-</li>
+</ul>
+      </div>
+      
+    </div>
 
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="tutorials/index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-                </ul>
-            </li>
+    <div class="container-xl">
+      <div class="row">
+          
             
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
-          
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-        </div>
-      
-      
-        <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
     
   </div>
-  
-  
-    <div class="navbar-persistent--mobile">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
-    What's new?
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="tutorials/index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"></div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
-  </div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">What’s new in Lightkurve 2?</span></li>
-  </ul>
 </nav>
-</div>
-      
-    </div>
-  
-  
-</div>
-</div>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
-              
-              
+              <div class="toc-item">
                 
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Lightkurve-2-offers-improved-support-for-TESS">
+   Lightkurve 2 offers improved support for TESS
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#1.-LightCurve-objects-are-now-specialized-kinds-of-AstroPy-Tables">
+   1. LightCurve objects are now specialized kinds of AstroPy Tables
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-LightCurve-objects-behave-like-tables">
+     ✨ New: LightCurve objects behave like tables
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Light-curves-support-user-defined-columns">
+     ✨ New: Light curves support user-defined columns
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Columns-and-rows-can-be-accessed-using-index-notation">
+     ✨ New: Columns and rows can be accessed using index notation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Times-are-stored-as-an-AstroPy-Time-object">
+     ✨ New: Times are stored as an AstroPy Time object
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Read-and-write-light-curves-in-many-file-formats">
+     ✨ New: Read and write light curves in many file formats
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#2.-Search-&amp;-download-data-from-different-pipelines">
+   2. Search &amp; download data from different pipelines
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Search-operations-support-different-TESS-pipelines">
+     ✨ New: Search operations support different TESS pipelines
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Download-TESS-fast-cadence-data">
+     ✨ New: Download TESS fast cadence data
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#3.-New-noise-removal-tools">
+   3. New noise removal tools
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Remove-systematics-using-Cotrending-Basis-Vectors">
+     ✨ New: Remove systematics using Cotrending Basis Vectors
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics">
+     ✨ New: Remove systematics by optimizing under- and over-fitting metrics
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()">
+     ✨ New: Inspect pixel-by-pixel light curves using
+     <em>
+      plot_pixels()
+     </em>
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Other-changes">
+   Other changes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#FAQ">
+   FAQ
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#How-do-I-install-Lightkurve-2?">
+     How do I install Lightkurve 2?
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#How-do-I-keep-using-Lightkurve-1?">
+     How do I keep using Lightkurve 1?
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Will-existing-Lightkurve-code-break?">
+     Will existing Lightkurve code break?
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Contributors">
+   Contributors
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/whats-new-v2.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Fwhats-new-v2.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="What's-new-in-Lightkurve-2?">
-<h1>What’s new in Lightkurve 2?<a class="headerlink" href="#What's-new-in-Lightkurve-2?" title="Link to this heading">#</a></h1>
+<h1>What’s new in Lightkurve 2?<a class="headerlink" href="#What's-new-in-Lightkurve-2?" title="Permalink to this headline">#</a></h1>
 <p>This page shows you what is new in Lightkurve v2. If you’d like to see our changelog, which tracks minor version changes and patches, you can <a class="reference external" href="https://docs.lightkurve.org/about/changelog.html">click here</a>.</p>
 <section id="Lightkurve-2-offers-improved-support-for-TESS">
-<h2>Lightkurve 2 offers improved support for TESS<a class="headerlink" href="#Lightkurve-2-offers-improved-support-for-TESS" title="Link to this heading">#</a></h2>
+<h2>Lightkurve 2 offers improved support for TESS<a class="headerlink" href="#Lightkurve-2-offers-improved-support-for-TESS" title="Permalink to this headline">#</a></h2>
 <p>Lightkurve v1 has been a tremendous success. Owing to the efforts of <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/AUTHORS.rst">67 contributors</a>, Lightkurve grew into a popular tool to analyze the data archive of NASA’s Kepler space telescope. The package has been cited by nearly <a class="reference external" href="https://ui.adsabs.harvard.edu/search/q=full%3A%22Lightkurve%22">200 scientific publications</a> to date.</p>
 <p>In recent years, the success revealed a shortcoming: Lightkurve 1 was too focused on supporting Kepler data products. Over the past two years, our community has evolved in important ways:</p>
 <ul class="simple">
@@ -433,10 +330,10 @@
 <p>The remainder of this page briefly demonstrates these new features. They are explained in more detail in a new set of entry-level tutorials which are avaiable in the online documentation at <a class="reference external" href="https://docs.lightkurve.org/tutorials">docs.lightkurve.org/tutorials</a>.</p>
 </section>
 <section id="1.-LightCurve-objects-are-now-specialized-kinds-of-AstroPy-Tables">
-<h2>1. LightCurve objects are now specialized kinds of AstroPy Tables<a class="headerlink" href="#1.-LightCurve-objects-are-now-specialized-kinds-of-AstroPy-Tables" title="Link to this heading">#</a></h2>
+<h2>1. LightCurve objects are now specialized kinds of AstroPy Tables<a class="headerlink" href="#1.-LightCurve-objects-are-now-specialized-kinds-of-AstroPy-Tables" title="Permalink to this headline">#</a></h2>
 <p>The most important change in Lightkurve 2 is that light curves are now extensions of AstroPy <a class="reference external" href="https://docs.astropy.org/en/stable/timeseries/">TimeSeries</a> objects, which in turn are a sub-class of AstroPy Table. Compared to a generic table, the key difference is that each <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object is guaranteed to have <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">flux</span></code>, and <code class="docutils literal notranslate"><span class="pre">flux_err</span></code> columns. This allows Lightkurve to extend AstroPy with tools that are specific to the analysis of TESS-like time series photometry.</p>
 <section id="✨-New:-LightCurve-objects-behave-like-tables">
-<h3>✨ New: LightCurve objects behave like tables<a class="headerlink" href="#✨-New:-LightCurve-objects-behave-like-tables" title="Link to this heading">#</a></h3>
+<h3>✨ New: LightCurve objects behave like tables<a class="headerlink" href="#✨-New:-LightCurve-objects-behave-like-tables" title="Permalink to this headline">#</a></h3>
 <p>Light curves can still be created as before, but now look and act like tables:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -451,22 +348,13 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/nthom/lightkurve/src/lightkurve/config/__init__.py:119: UserWarning: The default Lightkurve cache directory, used by download(), etc., has been moved to /Users/nthom/.lightkurve/cache. Please move all the files in the legacy directory /Users/nthom/.lightkurve-cache to the new location and remove the legacy directory. Refer to https://docs.lightkurve.org/reference/config.html#default-cache-directory-migration for more information.
-  warnings.warn(
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=3</i>
-<table id="table4367978768" class="table-striped table-bordered table-condensed">
+<table id="table4360181840" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th></tr></thead>
@@ -477,7 +365,7 @@
 </div>
 </section>
 <section id="✨-New:-Light-curves-support-user-defined-columns">
-<h3>✨ New: Light curves support user-defined columns<a class="headerlink" href="#✨-New:-Light-curves-support-user-defined-columns" title="Link to this heading">#</a></h3>
+<h3>✨ New: Light curves support user-defined columns<a class="headerlink" href="#✨-New:-Light-curves-support-user-defined-columns" title="Permalink to this headline">#</a></h3>
 <p>Because light curves are now tables, they can contain arbitrary user-defined columns:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -494,7 +382,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=3</i>
-<table id="table4367978768" class="table-striped table-bordered table-condensed">
+<table id="table4360181840" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -505,7 +393,7 @@
 </div>
 </section>
 <section id="✨-New:-Columns-and-rows-can-be-accessed-using-index-notation">
-<h3>✨ New: Columns and rows can be accessed using index notation<a class="headerlink" href="#✨-New:-Columns-and-rows-can-be-accessed-using-index-notation" title="Link to this heading">#</a></h3>
+<h3>✨ New: Columns and rows can be accessed using index notation<a class="headerlink" href="#✨-New:-Columns-and-rows-can-be-accessed-using-index-notation" title="Permalink to this headline">#</a></h3>
 <p>Just like Table objects, columns and rows can be accessed using index notation:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -521,7 +409,7 @@
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=2</i>
-<table id="table4368671184" class="table-striped table-bordered table-condensed">
+<table id="table4360181456" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -547,7 +435,7 @@ $[1,~1,~1] \; \mathrm{}$</div></div>
 </div>
 </section>
 <section id="✨-New:-Times-are-stored-as-an-AstroPy-Time-object">
-<h3>✨ New: Times are stored as an AstroPy Time object<a class="headerlink" href="#✨-New:-Times-are-stored-as-an-AstroPy-Time-object" title="Link to this heading">#</a></h3>
+<h3>✨ New: Times are stored as an AstroPy Time object<a class="headerlink" href="#✨-New:-Times-are-stored-as-an-AstroPy-Time-object" title="Permalink to this headline">#</a></h3>
 <p>Lightkurve 2 extends <a class="reference external" href="https://docs.astropy.org/en/stable/time/">AstroPy Time</a> by adding support for the TESS and Kepler time formats (“BTJD” and “BKJD”). As a result, the time column is now always a Time object, which enables user to leverage this standard AstroPy feature:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -603,7 +491,7 @@ array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
 </div>
 </section>
 <section id="✨-New:-Read-and-write-light-curves-in-many-file-formats">
-<h3>✨ New: Read and write light curves in many file formats<a class="headerlink" href="#✨-New:-Read-and-write-light-curves-in-many-file-formats" title="Link to this heading">#</a></h3>
+<h3>✨ New: Read and write light curves in many file formats<a class="headerlink" href="#✨-New:-Read-and-write-light-curves-in-many-file-formats" title="Permalink to this headline">#</a></h3>
 <p>Because light curves act like tables, they now have easy <code class="docutils literal notranslate"><span class="pre">read()</span></code> and <code class="docutils literal notranslate"><span class="pre">write()</span></code> methods which allow a <a class="reference external" href="https://docs.astropy.org/en/stable/io/unified.html#built-in-readers-writers">variety of data formats</a> to be used. For example, it is now much easier to store a light curve to a human-readable text file:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -639,7 +527,7 @@ array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=3</i>
-<table id="table4906578000" class="table-striped table-bordered table-condensed">
+<table id="table4360067536" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>color</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float64</th><th>str5</th></tr></thead>
@@ -651,10 +539,10 @@ array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
 </section>
 </section>
 <section id="2.-Search-&amp;-download-data-from-different-pipelines">
-<h2>2. Search &amp; download data from different pipelines<a class="headerlink" href="#2.-Search-&-download-data-from-different-pipelines" title="Link to this heading">#</a></h2>
+<h2>2. Search &amp; download data from different pipelines<a class="headerlink" href="#2.-Search-&-download-data-from-different-pipelines" title="Permalink to this headline">#</a></h2>
 <p>Lightkurve 2 significantly expands the data sets that can be searched and downloaded from the TESS &amp; Kepler data archives at MAST.</p>
 <section id="✨-New:-Search-operations-support-different-TESS-pipelines">
-<h3>✨ New: Search operations support different TESS pipelines<a class="headerlink" href="#✨-New:-Search-operations-support-different-TESS-pipelines" title="Link to this heading">#</a></h3>
+<h3>✨ New: Search operations support different TESS pipelines<a class="headerlink" href="#✨-New:-Search-operations-support-different-TESS-pipelines" title="Permalink to this headline">#</a></h3>
 <p>The search operations now support all the Kepler &amp; TESS light curves available from the data archive at MAST, including community-contributed light curves. A new <code class="docutils literal notranslate"><span class="pre">author</span></code> column in the search results identifies the pipeline (click on a pipeline name for details). As an added bonus, the search and download operations are now <em>much</em> faster owing to improved caching.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
@@ -670,9 +558,9 @@ array([&#39;2020-05-30 12:00:00.000&#39;, &#39;2020-05-30 14:24:00.000&#39;,
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
-SearchResult containing 20 data products.
+SearchResult containing 21 data products.
 
-<table id="table4912083216">
+<table id="table4360181744">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 19</td><td>2019</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/data-handling.html'>SPOC</a></td><td>120</td><td>303256075</td><td>0.0</td></tr>
@@ -681,25 +569,20 @@ SearchResult containing 20 data products.
 <tr><td>3</td><td>TESS Sector 86</td><td>2024</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/data-handling.html'>SPOC</a></td><td>120</td><td>303256075</td><td>0.0</td></tr>
 <tr><td>4</td><td>TESS Sector 19</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/tess-spoc'>TESS-SPOC</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
 <tr><td>5</td><td>TESS Sector 19</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>6</td><td>TESS Sector 20</td><td>2019</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>7</td><td>TESS Sector 26</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>8</td><td>TESS Sector 25</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>9</td><td>TESS Sector 40</td><td>2021</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>10</td><td>TESS Sector 47</td><td>2021</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>11</td><td>TESS Sector 59</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>12</td><td>TESS Sector 60</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>13</td><td>TESS Sector 52</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
 <tr><td>14</td><td>TESS Sector 53</td><td>2022</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>600</td><td>303256075</td><td>0.0</td></tr>
 <tr><td>15</td><td>TESS Sector 73</td><td>2023</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>303256075</td><td>0.0</td></tr>
 <tr><td>16</td><td>TESS Sector 74</td><td>2024</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>303256075</td><td>0.0</td></tr>
 <tr><td>17</td><td>TESS Sector 79</td><td>2024</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>303256075</td><td>0.0</td></tr>
-<tr><td>18</td><td>TESS Sector 26</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/tasoc'>TASOC</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
+<tr><td>18</td><td>TESS Sector 86</td><td>2024</td><td><a href='https://archive.stsci.edu/hlsp/qlp'>QLP</a></td><td>200</td><td>303256075</td><td>0.0</td></tr>
 <tr><td>19</td><td>TESS Sector 26</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/tasoc'>TASOC</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
-</table></div>
+<tr><td>20</td><td>TESS Sector 26</td><td>2020</td><td><a href='https://archive.stsci.edu/hlsp/tasoc'>TASOC</a></td><td>1800</td><td>303256075</td><td>0.0</td></tr>
+</table>
+Length = 21 rows</div>
 </div>
 </section>
 <section id="✨-New:-Download-TESS-fast-cadence-data">
-<h3>✨ New: Download TESS fast cadence data<a class="headerlink" href="#✨-New:-Download-TESS-fast-cadence-data" title="Link to this heading">#</a></h3>
+<h3>✨ New: Download TESS fast cadence data<a class="headerlink" href="#✨-New:-Download-TESS-fast-cadence-data" title="Permalink to this headline">#</a></h3>
 <p>The TESS mission recently introduced a new 20-second exposure time mode and decreased the exposure time of its Full Frame Images to 10 minutes. In response, Lightkurve now allows user to specify the exact exposure time via the optional <code class="docutils literal notranslate"><span class="pre">exptime</span></code> argument and column.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
@@ -716,7 +599,7 @@ SearchResult containing 20 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table4912792464">
+<table id="table6394853840">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 27</td><td>2020</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/data-handling.html'>SPOC</a></td><td>20</td><td>441420236</td><td>0.0</td></tr>
@@ -742,9 +625,9 @@ SearchResult containing 1 data products.
 </section>
 </section>
 <section id="3.-New-noise-removal-tools">
-<h2>3. New noise removal tools<a class="headerlink" href="#3.-New-noise-removal-tools" title="Link to this heading">#</a></h2>
+<h2>3. New noise removal tools<a class="headerlink" href="#3.-New-noise-removal-tools" title="Permalink to this headline">#</a></h2>
 <section id="✨-New:-Remove-systematics-using-Cotrending-Basis-Vectors">
-<h3>✨ New: Remove systematics using Cotrending Basis Vectors<a class="headerlink" href="#✨-New:-Remove-systematics-using-Cotrending-Basis-Vectors" title="Link to this heading">#</a></h3>
+<h3>✨ New: Remove systematics using Cotrending Basis Vectors<a class="headerlink" href="#✨-New:-Remove-systematics-using-Cotrending-Basis-Vectors" title="Permalink to this headline">#</a></h3>
 <p>Lightkurve 2 adds a new <code class="docutils literal notranslate"><span class="pre">CotrendingBasisVectors</span></code> class to provide a convenient interface to work with the official TESS and Kepler basis vector data products. We also re-implemented the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> class from scratch to perform the correction in a way that is more similar to the official Kepler/TESS pipeline. This work was led by one of the authors of the official pipeline, Jeff Smith.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -763,9 +646,9 @@ SearchResult containing 1 data products.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996601266327703
-Optimized Under-fitting metric: 0.8235752568541984
-Optimized Alpha: 9.787e+03
+Optimized Over-fitting metric: 0.9996593894863415
+Optimized Under-fitting metric: 0.8235751613785623
+Optimized Alpha: 9.672e+03
 </pre></div></div>
 </div>
 <p>The corrector now produces detailed diagnostic plots showing the light curve before (grey) and after (black) the noise (blue) was removed:</p>
@@ -779,7 +662,7 @@ Optimized Alpha: 9.787e+03
 </div>
 </section>
 <section id="✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics">
-<h3>✨ New: Remove systematics by optimizing under- and over-fitting metrics<a class="headerlink" href="#✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics" title="Link to this heading">#</a></h3>
+<h3>✨ New: Remove systematics by optimizing under- and over-fitting metrics<a class="headerlink" href="#✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics" title="Permalink to this headline">#</a></h3>
 <p>A <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors.metrics</span></code> module was added to provide functions which can estimate the degree of over- and under-fitting of a corrected light curve. The new <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> utilizes these metrics to find an appropriate, user-tuneable tradeoff. You can learn more about this new feature in the <a class="reference external" href="tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector.html">new CBVCorrector tutorial</a>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
@@ -791,7 +674,7 @@ Optimized Alpha: 9.787e+03
 </div>
 </section>
 <section id="✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()">
-<h3>✨ New: Inspect pixel-by-pixel light curves using <em>plot_pixels()</em><a class="headerlink" href="#✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()" title="Link to this heading">#</a></h3>
+<h3>✨ New: Inspect pixel-by-pixel light curves using <em>plot_pixels()</em><a class="headerlink" href="#✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()" title="Permalink to this headline">#</a></h3>
 <p>A new <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.plot_pixels()</span></code> method has been added which enables the light curves and periodograms of individual pixels to be inspected within a pixel file. This is very useful for investigating the location of specific signals. A <a class="reference external" href="tutorials/3-science-examples/periodograms-verifying-the-location-of-a-signal.html">dedicated tutorial</a> explains this new feature in detail.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
@@ -805,7 +688,7 @@ Optimized Alpha: 9.787e+03
 </section>
 </section>
 <section id="Other-changes">
-<h2>Other changes<a class="headerlink" href="#Other-changes" title="Link to this heading">#</a></h2>
+<h2>Other changes<a class="headerlink" href="#Other-changes" title="Permalink to this headline">#</a></h2>
 <ul class="simple">
 <li><p>Support for Python 2 has been removed.</p></li>
 <li><p>The <a class="reference external" href="https://docs.lightkurve.org">online documentation</a> has been updated to provide numerous new tutorials and a more comprehensive API reference guide.</p></li>
@@ -819,23 +702,23 @@ Optimized Alpha: 9.787e+03
 <p>In addition, Lightkurve 2 contains numerous smaller improvements and bugfixes. To see a detailed list of all changes, please see the <a class="reference external" href="http://docs.lightkurve.org/about/changelog.html">Full Changelog</a>.</p>
 </section>
 <section id="FAQ">
-<h2>FAQ<a class="headerlink" href="#FAQ" title="Link to this heading">#</a></h2>
+<h2>FAQ<a class="headerlink" href="#FAQ" title="Permalink to this headline">#</a></h2>
 <section id="How-do-I-install-Lightkurve-2?">
-<h3>How do I install Lightkurve 2?<a class="headerlink" href="#How-do-I-install-Lightkurve-2?" title="Link to this heading">#</a></h3>
+<h3>How do I install Lightkurve 2?<a class="headerlink" href="#How-do-I-install-Lightkurve-2?" title="Permalink to this headline">#</a></h3>
 <p>You can upgrade Lightkurve using pip:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>python -m pip install --upgrade lightkurve
 </pre></div>
 </div>
 </section>
 <section id="How-do-I-keep-using-Lightkurve-1?">
-<h3>How do I keep using Lightkurve 1?<a class="headerlink" href="#How-do-I-keep-using-Lightkurve-1?" title="Link to this heading">#</a></h3>
+<h3>How do I keep using Lightkurve 1?<a class="headerlink" href="#How-do-I-keep-using-Lightkurve-1?" title="Permalink to this headline">#</a></h3>
 <p>You can continue to use Lightkurve 1 by pinning the version number using pip, for example:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>python -m pip install lightkurve==1.11
 </pre></div>
 </div>
 </section>
 <section id="Will-existing-Lightkurve-code-break?">
-<h3>Will existing Lightkurve code break?<a class="headerlink" href="#Will-existing-Lightkurve-code-break?" title="Link to this heading">#</a></h3>
+<h3>Will existing Lightkurve code break?<a class="headerlink" href="#Will-existing-Lightkurve-code-break?" title="Permalink to this headline">#</a></h3>
 <p>While we tried to maximize backwards compatibility, Lightkurve 2 does contain a small number of changes that may break existing code for the following reasons:</p>
 <ol class="arabic simple">
 <li><p><strong>lc.time is now always an Astropy Time object.</strong> Unfortunately, many NumPy and SciPy functions do not deal seamlessly with <code class="docutils literal notranslate"><span class="pre">Time</span></code> objects yet. Existing code may have to be modified to pass <code class="docutils literal notranslate"><span class="pre">lc.time.value</span></code> to NumPy/SciPy functions where <code class="docutils literal notranslate"><span class="pre">lc.time</span></code> was passed before.</p></li>
@@ -858,7 +741,7 @@ Optimized Alpha: 9.787e+03
 </section>
 </section>
 <section id="Contributors">
-<h2>Contributors<a class="headerlink" href="#Contributors" title="Link to this heading">#</a></h2>
+<h2>Contributors<a class="headerlink" href="#Contributors" title="Permalink to this headline">#</a></h2>
 <p>The people who contributed to Lightkurve 2 include:</p>
 <p>Thomas Barclay, Geert Barentsen, Keaton Bell, Zachory K. Berta-Thompson, Colin J. Burke, Nuno Ramos Carvalho, Ann Marie Cody, Isabel Coleman, Kaiming Cui, Guy Davies, Jessie Dotson, Stephanie Douglas, Scott Fleming, Daniel Foreman-Mackey, Michael Gully-Santiago, Oliver Hall, Christina Hedges, Daniel Hey, Michael Higgins, Derek Homeier, Rebekah Hounsell, Sam Lee, Jose A. Lerma III, Ken Mighell, Susan Mullally, Szabo Pal, Sheila Sagear, Nicholas Saunders, Jeff Smith, Anand Sundaram, Emma
 Turtelboom, Andrew Vanderburg, Brennan Vincello, José Vinícius de Miranda Cardoso, Peter Williams, Johnny Zhang.</p>
@@ -866,147 +749,51 @@ Turtelboom, Andrew Vanderburg, Brennan Vincello, José Vinícius de Miranda Card
 </section>
 
 
-                </article>
+              </div>
               
               
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="index.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Lightkurve</p>
-      </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Lightkurve</p>
+        </div>
     </a>
-    <a class="right-next"
-       href="quickstart.html"
-       title="next page">
-      <div class="prev-next-info">
+    <a class='right-next' id="next-link" href="quickstart.html" title="next page">
+    <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Quickstart</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
+    </div>
+    <i class="fas fa-angle-right"></i>
     </a>
 </div>
-                </footer>
               
-            </div>
-            
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+          </main>
+          
 
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Lightkurve-2-offers-improved-support-for-TESS">Lightkurve 2 offers improved support for TESS</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#1.-LightCurve-objects-are-now-specialized-kinds-of-AstroPy-Tables">1. LightCurve objects are now specialized kinds of AstroPy Tables</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-LightCurve-objects-behave-like-tables">✨ New: LightCurve objects behave like tables</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Light-curves-support-user-defined-columns">✨ New: Light curves support user-defined columns</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Columns-and-rows-can-be-accessed-using-index-notation">✨ New: Columns and rows can be accessed using index notation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Times-are-stored-as-an-AstroPy-Time-object">✨ New: Times are stored as an AstroPy Time object</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Read-and-write-light-curves-in-many-file-formats">✨ New: Read and write light curves in many file formats</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#2.-Search-&amp;-download-data-from-different-pipelines">2. Search &amp; download data from different pipelines</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Search-operations-support-different-TESS-pipelines">✨ New: Search operations support different TESS pipelines</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Download-TESS-fast-cadence-data">✨ New: Download TESS fast cadence data</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#3.-New-noise-removal-tools">3. New noise removal tools</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Remove-systematics-using-Cotrending-Basis-Vectors">✨ New: Remove systematics using Cotrending Basis Vectors</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Remove-systematics-by-optimizing-under--and-over-fitting-metrics">✨ New: Remove systematics by optimizing under- and over-fitting metrics</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#✨-New:-Inspect-pixel-by-pixel-light-curves-using-plot_pixels()">✨ New: Inspect pixel-by-pixel light curves using <em>plot_pixels()</em></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Other-changes">Other changes</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#FAQ">FAQ</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#How-do-I-install-Lightkurve-2?">How do I install Lightkurve 2?</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#How-do-I-keep-using-Lightkurve-1?">How do I keep using Lightkurve 1?</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Will-existing-Lightkurve-code-break?">Will existing Lightkurve code break?</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Contributors">Contributors</a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/whats-new-v2.ipynb.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
-
-</div></div>
-              
-            
-          </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+      </div>
     </div>
-  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
-
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
-
-  <p class="copyright">
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
     
-      © Copyright Lightkurve developers.
-      <br/>
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
     
-  </p>
-</div>
-      
-        <div class="footer-item">
-
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    <br/>
-  </p>
-</div>
-      
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
     </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
-</p></div>
-      
-    </div>
-  
-</div>
-
-  </footer>
+    
+  </div>
+</footer>
   </body>
 </html>

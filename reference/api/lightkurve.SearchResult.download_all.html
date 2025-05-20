@@ -1,659 +1,1328 @@
 
 <!DOCTYPE html>
 
-
-<html lang="en" data-content_root="../../" >
-
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>lightkurve.SearchResult.download_all &#8212; Lightkurve </title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
+    
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script src="../../_static/documentation_options.js?v=6d2724f8"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'reference/api/lightkurve.SearchResult.download_all';</script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.SearchResult.mission" href="lightkurve.SearchResult.mission.html" />
     <link rel="prev" title="lightkurve.SearchResult.download" href="lightkurve.SearchResult.download.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
-  
-  <dialog id="pst-search-dialog">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-<form class="bd-search d-flex align-items-center"
-      action="../../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
+    <div class="container-fluid" id="banner"></div>
 
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.5</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
   </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
 
   
-    
-  
-
-<a class="navbar-brand logo" href="../../index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">Lightkurve </p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
+ </a>
+</li>
+
     
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
+</ul>
+      </div>
+      
+    </div>
 
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials/index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-                </ul>
-            </li>
+    <div class="container-xl">
+      <div class="row">
+          
             
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../search.html">
+   Downloading data
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.search_targetpixelfile.html">
+     lightkurve.search_targetpixelfile
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.search_lightcurve.html">
+     lightkurve.search_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.search_tesscut.html">
+     lightkurve.search_tesscut
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.html">
+     lightkurve.SearchResult
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.download.html">
+     lightkurve.SearchResult.download
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     lightkurve.SearchResult.download_all
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.mission.html">
+     lightkurve.SearchResult.mission
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.year.html">
+     lightkurve.SearchResult.year
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.author.html">
+     lightkurve.SearchResult.author
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.target_name.html">
+     lightkurve.SearchResult.target_name
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.exptime.html">
+     lightkurve.SearchResult.exptime
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.distance.html">
+     lightkurve.SearchResult.distance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.ra.html">
+     lightkurve.SearchResult.ra
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.dec.html">
+     lightkurve.SearchResult.dec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.table.html">
+     lightkurve.SearchResult.table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.SearchResult.display_extra_columns.html">
+     lightkurve.SearchResult.display_extra_columns
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurveCollection.html">
+     lightkurve.LightCurveCollection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurveCollection.stitch.html">
+     lightkurve.LightCurveCollection.stitch
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurveCollection.plot.html">
+     lightkurve.LightCurveCollection.plot
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurveCollection.append.html">
+     lightkurve.LightCurveCollection.append
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurveCollection.campaign.html">
+     lightkurve.LightCurveCollection.campaign
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurveCollection.quarter.html">
+     lightkurve.LightCurveCollection.quarter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurveCollection.sector.html">
+     lightkurve.LightCurveCollection.sector
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.TargetPixelFileCollection.html">
+     lightkurve.TargetPixelFileCollection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.TargetPixelFileCollection.plot.html">
+     lightkurve.TargetPixelFileCollection.plot
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.TargetPixelFileCollection.append.html">
+     lightkurve.TargetPixelFileCollection.append
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.TargetPixelFileCollection.campaign.html">
+     lightkurve.TargetPixelFileCollection.campaign
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.TargetPixelFileCollection.quarter.html">
+     lightkurve.TargetPixelFileCollection.quarter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.TargetPixelFileCollection.sector.html">
+     lightkurve.TargetPixelFileCollection.sector
+    </a>
+   </li>
   </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
-          
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-        </div>
-      
-      
-        <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
-    What's new?
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../lightcurve.html">
+   LightCurve
   </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../tutorials/index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.html">
+     lightkurve.LightCurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.time.html">
+     lightkurve.LightCurve.time
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.flux.html">
+     lightkurve.LightCurve.flux
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.flux_err.html">
+     lightkurve.LightCurve.flux_err
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.meta.html">
+     lightkurve.LightCurve.meta
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.plot.html">
+     lightkurve.LightCurve.plot
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.scatter.html">
+     lightkurve.LightCurve.scatter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.errorbar.html">
+     lightkurve.LightCurve.errorbar
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.plot_river.html">
+     lightkurve.LightCurve.plot_river
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.MPLSTYLE.html">
+     lightkurve.MPLSTYLE
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.append.html">
+     lightkurve.LightCurve.append
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.copy.html">
+     lightkurve.LightCurve.copy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.bin.html">
+     lightkurve.LightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.fill_gaps.html">
+     lightkurve.LightCurve.fill_gaps
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.flatten.html">
+     lightkurve.LightCurve.flatten
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.fold.html">
+     lightkurve.LightCurve.fold
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.head.html">
+     lightkurve.LightCurve.head
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.normalize.html">
+     lightkurve.LightCurve.normalize
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.remove_nans.html">
+     lightkurve.LightCurve.remove_nans
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.remove_outliers.html">
+     lightkurve.LightCurve.remove_outliers
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.select_flux.html">
+     lightkurve.LightCurve.select_flux
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.tail.html">
+     lightkurve.LightCurve.tail
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.truncate.html">
+     lightkurve.LightCurve.truncate
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.to_corrector.html">
+     lightkurve.LightCurve.to_corrector
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.to_csv.html">
+     lightkurve.LightCurve.to_csv
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.to_excel.html">
+     lightkurve.LightCurve.to_excel
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.to_fits.html">
+     lightkurve.LightCurve.to_fits
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.to_pandas.html">
+     lightkurve.LightCurve.to_pandas
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.to_periodogram.html">
+     lightkurve.LightCurve.to_periodogram
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.to_seismology.html">
+     lightkurve.LightCurve.to_seismology
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.to_table.html">
+     lightkurve.LightCurve.to_table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.write.html">
+     lightkurve.LightCurve.write
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.estimate_cdpp.html">
+     lightkurve.LightCurve.estimate_cdpp
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.query_solar_system_objects.html">
+     lightkurve.LightCurve.query_solar_system_objects
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.interact_bls.html">
+     lightkurve.LightCurve.interact_bls
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.create_transit_mask.html">
+     lightkurve.LightCurve.create_transit_mask
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.search_neighbors.html">
+     lightkurve.LightCurve.search_neighbors
+    </a>
+   </li>
   </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../search.html">Downloading data</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.search_targetpixelfile.html">lightkurve.search_targetpixelfile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.search_lightcurve.html">lightkurve.search_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.search_tesscut.html">lightkurve.search_tesscut</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.html">lightkurve.SearchResult</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.download.html">lightkurve.SearchResult.download</a></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">lightkurve.SearchResult.download_all</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.mission.html">lightkurve.SearchResult.mission</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.year.html">lightkurve.SearchResult.year</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.author.html">lightkurve.SearchResult.author</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.target_name.html">lightkurve.SearchResult.target_name</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.exptime.html">lightkurve.SearchResult.exptime</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.distance.html">lightkurve.SearchResult.distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.ra.html">lightkurve.SearchResult.ra</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.dec.html">lightkurve.SearchResult.dec</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.table.html">lightkurve.SearchResult.table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.SearchResult.display_extra_columns.html">lightkurve.SearchResult.display_extra_columns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurveCollection.html">lightkurve.LightCurveCollection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurveCollection.stitch.html">lightkurve.LightCurveCollection.stitch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurveCollection.plot.html">lightkurve.LightCurveCollection.plot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurveCollection.append.html">lightkurve.LightCurveCollection.append</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurveCollection.campaign.html">lightkurve.LightCurveCollection.campaign</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurveCollection.quarter.html">lightkurve.LightCurveCollection.quarter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurveCollection.sector.html">lightkurve.LightCurveCollection.sector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.TargetPixelFileCollection.html">lightkurve.TargetPixelFileCollection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.TargetPixelFileCollection.plot.html">lightkurve.TargetPixelFileCollection.plot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.TargetPixelFileCollection.append.html">lightkurve.TargetPixelFileCollection.append</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.TargetPixelFileCollection.campaign.html">lightkurve.TargetPixelFileCollection.campaign</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.TargetPixelFileCollection.quarter.html">lightkurve.TargetPixelFileCollection.quarter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.TargetPixelFileCollection.sector.html">lightkurve.TargetPixelFileCollection.sector</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../lightcurve.html">LightCurve</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.html">lightkurve.LightCurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.time.html">lightkurve.LightCurve.time</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.flux.html">lightkurve.LightCurve.flux</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.flux_err.html">lightkurve.LightCurve.flux_err</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.meta.html">lightkurve.LightCurve.meta</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.plot.html">lightkurve.LightCurve.plot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.scatter.html">lightkurve.LightCurve.scatter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.errorbar.html">lightkurve.LightCurve.errorbar</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.plot_river.html">lightkurve.LightCurve.plot_river</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.MPLSTYLE.html">lightkurve.MPLSTYLE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.append.html">lightkurve.LightCurve.append</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.copy.html">lightkurve.LightCurve.copy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.bin.html">lightkurve.LightCurve.bin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.fill_gaps.html">lightkurve.LightCurve.fill_gaps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.flatten.html">lightkurve.LightCurve.flatten</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.fold.html">lightkurve.LightCurve.fold</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.head.html">lightkurve.LightCurve.head</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.normalize.html">lightkurve.LightCurve.normalize</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.remove_nans.html">lightkurve.LightCurve.remove_nans</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.remove_outliers.html">lightkurve.LightCurve.remove_outliers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.select_flux.html">lightkurve.LightCurve.select_flux</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.tail.html">lightkurve.LightCurve.tail</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.truncate.html">lightkurve.LightCurve.truncate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.to_corrector.html">lightkurve.LightCurve.to_corrector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.to_csv.html">lightkurve.LightCurve.to_csv</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.to_excel.html">lightkurve.LightCurve.to_excel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.to_fits.html">lightkurve.LightCurve.to_fits</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.to_pandas.html">lightkurve.LightCurve.to_pandas</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.to_periodogram.html">lightkurve.LightCurve.to_periodogram</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.to_seismology.html">lightkurve.LightCurve.to_seismology</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.to_table.html">lightkurve.LightCurve.to_table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.write.html">lightkurve.LightCurve.write</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.estimate_cdpp.html">lightkurve.LightCurve.estimate_cdpp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.query_solar_system_objects.html">lightkurve.LightCurve.query_solar_system_objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.interact_bls.html">lightkurve.LightCurve.interact_bls</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.create_transit_mask.html">lightkurve.LightCurve.create_transit_mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.LightCurve.search_neighbors.html">lightkurve.LightCurve.search_neighbors</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../foldedlightcurve.html">FoldedLightCurve</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.html">lightkurve.FoldedLightCurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.phase.html">lightkurve.FoldedLightCurve.phase</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.cycle.html">lightkurve.FoldedLightCurve.cycle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">lightkurve.FoldedLightCurve.odd_mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.even_mask.html">lightkurve.FoldedLightCurve.even_mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.plot.html">lightkurve.FoldedLightCurve.plot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.scatter.html">lightkurve.FoldedLightCurve.scatter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.errorbar.html">lightkurve.FoldedLightCurve.errorbar</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">lightkurve.FoldedLightCurve.plot_river</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../targetpixelfile.html">TargetPixelFile</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.html">lightkurve.KeplerTargetPixelFile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.TessTargetPixelFile.html">lightkurve.TessTargetPixelFile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.hdu.html">lightkurve.KeplerTargetPixelFile.hdu</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.ra.html">lightkurve.KeplerTargetPixelFile.ra</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.dec.html">lightkurve.KeplerTargetPixelFile.dec</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.column.html">lightkurve.KeplerTargetPixelFile.column</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.row.html">lightkurve.KeplerTargetPixelFile.row</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pos_corr1.html">lightkurve.KeplerTargetPixelFile.pos_corr1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pos_corr2.html">lightkurve.KeplerTargetPixelFile.pos_corr2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pipeline_mask.html">lightkurve.KeplerTargetPixelFile.pipeline_mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.shape.html">lightkurve.KeplerTargetPixelFile.shape</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.time.html">lightkurve.KeplerTargetPixelFile.time</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.cadenceno.html">lightkurve.KeplerTargetPixelFile.cadenceno</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.nan_time_mask.html">lightkurve.KeplerTargetPixelFile.nan_time_mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux.html">lightkurve.KeplerTargetPixelFile.flux</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_err.html">lightkurve.KeplerTargetPixelFile.flux_err</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_bkg.html">lightkurve.KeplerTargetPixelFile.flux_bkg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_bkg_err.html">lightkurve.KeplerTargetPixelFile.flux_bkg_err</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.quality.html">lightkurve.KeplerTargetPixelFile.quality</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.wcs.html">lightkurve.KeplerTargetPixelFile.wcs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_coordinates.html">lightkurve.KeplerTargetPixelFile.get_coordinates</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_lightcurve.html">lightkurve.KeplerTargetPixelFile.to_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.extract_aperture_photometry.html">lightkurve.KeplerTargetPixelFile.extract_aperture_photometry</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.extract_prf_photometry.html">lightkurve.KeplerTargetPixelFile.extract_prf_photometry</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_model.html">lightkurve.KeplerTargetPixelFile.get_model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.create_threshold_mask.html">lightkurve.KeplerTargetPixelFile.create_threshold_mask</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.estimate_background.html">lightkurve.KeplerTargetPixelFile.estimate_background</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.estimate_centroids.html">lightkurve.KeplerTargetPixelFile.estimate_centroids</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.query_solar_system_objects.html">lightkurve.KeplerTargetPixelFile.query_solar_system_objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.plot.html">lightkurve.KeplerTargetPixelFile.plot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_fits.html">lightkurve.KeplerTargetPixelFile.to_fits</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.interact.html">lightkurve.KeplerTargetPixelFile.interact</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.interact_sky.html">lightkurve.KeplerTargetPixelFile.interact_sky</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_corrector.html">lightkurve.KeplerTargetPixelFile.to_corrector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.cutout.html">lightkurve.KeplerTargetPixelFile.cutout</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.from_fits_images.html">lightkurve.KeplerTargetPixelFile.from_fits_images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.plot_pixels.html">lightkurve.KeplerTargetPixelFile.plot_pixels</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_header.html">lightkurve.KeplerTargetPixelFile.get_header</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_keyword.html">lightkurve.KeplerTargetPixelFile.get_keyword</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerTargetPixelFile.animate.html">lightkurve.KeplerTargetPixelFile.animate</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../periodogram.html">Periodogram</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.html">lightkurve.periodogram.Periodogram</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html">lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html">lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.frequency.html">lightkurve.periodogram.Periodogram.frequency</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.frequency_at_max_power.html">lightkurve.periodogram.Periodogram.frequency_at_max_power</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.period.html">lightkurve.periodogram.Periodogram.period</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.period_at_max_power.html">lightkurve.periodogram.Periodogram.period_at_max_power</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.power.html">lightkurve.periodogram.Periodogram.power</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.max_power.html">lightkurve.periodogram.Periodogram.max_power</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.bin.html">lightkurve.periodogram.Periodogram.bin</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.copy.html">lightkurve.periodogram.Periodogram.copy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.flatten.html">lightkurve.periodogram.Periodogram.flatten</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.plot.html">lightkurve.periodogram.Periodogram.plot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.show_properties.html">lightkurve.periodogram.Periodogram.show_properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.smooth.html">lightkurve.periodogram.Periodogram.smooth</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.to_seismology.html">lightkurve.periodogram.Periodogram.to_seismology</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.Periodogram.to_table.html">lightkurve.periodogram.Periodogram.to_table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html">lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html">lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../seismology.html">Seismology</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.html">lightkurve.seismology.Seismology</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.from_lightcurve.html">lightkurve.seismology.Seismology.from_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.periodogram.html">lightkurve.seismology.Seismology.periodogram</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.estimate_numax.html">lightkurve.seismology.Seismology.estimate_numax</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.estimate_deltanu.html">lightkurve.seismology.Seismology.estimate_deltanu</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.estimate_radius.html">lightkurve.seismology.Seismology.estimate_radius</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.estimate_mass.html">lightkurve.seismology.Seismology.estimate_mass</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.estimate_logg.html">lightkurve.seismology.Seismology.estimate_logg</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.diagnose_numax.html">lightkurve.seismology.Seismology.diagnose_numax</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.diagnose_deltanu.html">lightkurve.seismology.Seismology.diagnose_deltanu</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.plot_echelle.html">lightkurve.seismology.Seismology.plot_echelle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.seismology.Seismology.interact_echelle.html">lightkurve.seismology.Seismology.interact_echelle</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../correctors.html">Correcting systematics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.load_tess_cbvs.html">lightkurve.correctors.load_tess_cbvs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.load_kepler_cbvs.html">lightkurve.correctors.load_kepler_cbvs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.CBVCorrector.html">lightkurve.correctors.CBVCorrector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.CBVCorrector.correct.html">lightkurve.correctors.CBVCorrector.correct</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.CBVCorrector.diagnose.html">lightkurve.correctors.CBVCorrector.diagnose</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.PLDCorrector.html">lightkurve.correctors.PLDCorrector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.PLDCorrector.correct.html">lightkurve.correctors.PLDCorrector.correct</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.PLDCorrector.diagnose.html">lightkurve.correctors.PLDCorrector.diagnose</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.PLDCorrector.diagnose_masks.html">lightkurve.correctors.PLDCorrector.diagnose_masks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">lightkurve.correctors.SFFCorrector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.correct.html">lightkurve.correctors.SFFCorrector.correct</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.diagnose.html">lightkurve.correctors.SFFCorrector.diagnose</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.diagnose_arclength.html">lightkurve.correctors.SFFCorrector.diagnose_arclength</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html">lightkurve.correctors.RegressionCorrector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.RegressionCorrector.correct.html">lightkurve.correctors.RegressionCorrector.correct</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.RegressionCorrector.diagnose.html">lightkurve.correctors.RegressionCorrector.diagnose</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.html">lightkurve.correctors.DesignMatrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrixCollection.html">lightkurve.correctors.DesignMatrixCollection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.SparseDesignMatrix.html">lightkurve.correctors.SparseDesignMatrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.SparseDesignMatrixCollection.html">lightkurve.correctors.SparseDesignMatrixCollection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.X.html">lightkurve.correctors.DesignMatrix.X</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.rank.html">lightkurve.correctors.DesignMatrix.rank</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.shape.html">lightkurve.correctors.DesignMatrix.shape</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.values.html">lightkurve.correctors.DesignMatrix.values</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.append_constant.html">lightkurve.correctors.DesignMatrix.append_constant</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.collect.html">lightkurve.correctors.DesignMatrix.collect</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.copy.html">lightkurve.correctors.DesignMatrix.copy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.pca.html">lightkurve.correctors.DesignMatrix.pca</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.plot.html">lightkurve.correctors.DesignMatrix.plot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.plot_priors.html">lightkurve.correctors.DesignMatrix.plot_priors</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.split.html">lightkurve.correctors.DesignMatrix.split</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.standardize.html">lightkurve.correctors.DesignMatrix.standardize</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.to_sparse.html">lightkurve.correctors.DesignMatrix.to_sparse</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.DesignMatrix.validate.html">lightkurve.correctors.DesignMatrix.validate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.corrector.Corrector.html">lightkurve.correctors.corrector.Corrector</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.corrector.Corrector.correct.html">lightkurve.correctors.corrector.Corrector.correct</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.correctors.corrector.Corrector.diagnose.html">lightkurve.correctors.corrector.Corrector.diagnose</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../io.html">Reading Data Products</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.read.html">lightkurve.io.read</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.kepler.read_kepler_lightcurve.html">lightkurve.io.kepler.read_kepler_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.everest.read_everest_lightcurve.html">lightkurve.io.everest.read_everest_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.kepseismic.read_kepseismic_lightcurve.html">lightkurve.io.kepseismic.read_kepseismic_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.k2sff.read_k2sff_lightcurve.html">lightkurve.io.k2sff.read_k2sff_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.tess.read_tess_lightcurve.html">lightkurve.io.tess.read_tess_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.cdips.read_cdips_lightcurve.html">lightkurve.io.cdips.read_cdips_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.eleanor.read_eleanor_lightcurve.html">lightkurve.io.eleanor.read_eleanor_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.pathos.read_pathos_lightcurve.html">lightkurve.io.pathos.read_pathos_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.qlp.read_qlp_lightcurve.html">lightkurve.io.qlp.read_qlp_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.tasoc.read_tasoc_lightcurve.html">lightkurve.io.tasoc.read_tasoc_lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.io.tglc.read_tglc_lightcurve.html">lightkurve.io.tglc.read_tglc_lightcurve</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../config.html">Configuration</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.conf.html">lightkurve.conf</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.config.get_cache_dir.html">lightkurve.config.get_cache_dir</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.config.get_config_dir.html">lightkurve.config.get_config_dir</a></li>
-</ul>
-</details></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../misc.html">Miscellaneous utilities</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.KeplerQualityFlags.html">lightkurve.KeplerQualityFlags</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.TessQualityFlags.html">lightkurve.TessQualityFlags</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightkurve.utils.plot_image.html">lightkurve.utils.plot_image</a></li>
-</ul>
-</details></li>
-</ul>
-</div>
-</nav></div>
-    </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
-  </div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
-              
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API</a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="../search.html" class="nav-link">Downloading data</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">lightkurve.SearchResult.download_all</span></li>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../foldedlightcurve.html">
+   FoldedLightCurve
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.html">
+     lightkurve.FoldedLightCurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.phase.html">
+     lightkurve.FoldedLightCurve.phase
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.cycle.html">
+     lightkurve.FoldedLightCurve.cycle
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
+     lightkurve.FoldedLightCurve.odd_mask
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.even_mask.html">
+     lightkurve.FoldedLightCurve.even_mask
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.plot.html">
+     lightkurve.FoldedLightCurve.plot
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.scatter.html">
+     lightkurve.FoldedLightCurve.scatter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.errorbar.html">
+     lightkurve.FoldedLightCurve.errorbar
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
+     lightkurve.FoldedLightCurve.plot_river
+    </a>
+   </li>
   </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../targetpixelfile.html">
+   TargetPixelFile
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.html">
+     lightkurve.KeplerTargetPixelFile
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.TessTargetPixelFile.html">
+     lightkurve.TessTargetPixelFile
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.hdu.html">
+     lightkurve.KeplerTargetPixelFile.hdu
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.ra.html">
+     lightkurve.KeplerTargetPixelFile.ra
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.dec.html">
+     lightkurve.KeplerTargetPixelFile.dec
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.column.html">
+     lightkurve.KeplerTargetPixelFile.column
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.row.html">
+     lightkurve.KeplerTargetPixelFile.row
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pos_corr1.html">
+     lightkurve.KeplerTargetPixelFile.pos_corr1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pos_corr2.html">
+     lightkurve.KeplerTargetPixelFile.pos_corr2
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.pipeline_mask.html">
+     lightkurve.KeplerTargetPixelFile.pipeline_mask
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.shape.html">
+     lightkurve.KeplerTargetPixelFile.shape
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.time.html">
+     lightkurve.KeplerTargetPixelFile.time
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.cadenceno.html">
+     lightkurve.KeplerTargetPixelFile.cadenceno
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.nan_time_mask.html">
+     lightkurve.KeplerTargetPixelFile.nan_time_mask
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux.html">
+     lightkurve.KeplerTargetPixelFile.flux
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_err.html">
+     lightkurve.KeplerTargetPixelFile.flux_err
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_bkg.html">
+     lightkurve.KeplerTargetPixelFile.flux_bkg
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.flux_bkg_err.html">
+     lightkurve.KeplerTargetPixelFile.flux_bkg_err
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.quality.html">
+     lightkurve.KeplerTargetPixelFile.quality
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.wcs.html">
+     lightkurve.KeplerTargetPixelFile.wcs
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_coordinates.html">
+     lightkurve.KeplerTargetPixelFile.get_coordinates
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_lightcurve.html">
+     lightkurve.KeplerTargetPixelFile.to_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.extract_aperture_photometry.html">
+     lightkurve.KeplerTargetPixelFile.extract_aperture_photometry
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.extract_prf_photometry.html">
+     lightkurve.KeplerTargetPixelFile.extract_prf_photometry
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_model.html">
+     lightkurve.KeplerTargetPixelFile.get_model
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.create_threshold_mask.html">
+     lightkurve.KeplerTargetPixelFile.create_threshold_mask
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.estimate_background.html">
+     lightkurve.KeplerTargetPixelFile.estimate_background
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.estimate_centroids.html">
+     lightkurve.KeplerTargetPixelFile.estimate_centroids
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.query_solar_system_objects.html">
+     lightkurve.KeplerTargetPixelFile.query_solar_system_objects
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.plot.html">
+     lightkurve.KeplerTargetPixelFile.plot
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_fits.html">
+     lightkurve.KeplerTargetPixelFile.to_fits
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.interact.html">
+     lightkurve.KeplerTargetPixelFile.interact
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.interact_sky.html">
+     lightkurve.KeplerTargetPixelFile.interact_sky
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_corrector.html">
+     lightkurve.KeplerTargetPixelFile.to_corrector
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.cutout.html">
+     lightkurve.KeplerTargetPixelFile.cutout
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.from_fits_images.html">
+     lightkurve.KeplerTargetPixelFile.from_fits_images
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.plot_pixels.html">
+     lightkurve.KeplerTargetPixelFile.plot_pixels
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_header.html">
+     lightkurve.KeplerTargetPixelFile.get_header
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.get_keyword.html">
+     lightkurve.KeplerTargetPixelFile.get_keyword
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.animate.html">
+     lightkurve.KeplerTargetPixelFile.animate
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../periodogram.html">
+   Periodogram
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.html">
+     lightkurve.periodogram.Periodogram
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html">
+     lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.frequency.html">
+     lightkurve.periodogram.Periodogram.frequency
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.frequency_at_max_power.html">
+     lightkurve.periodogram.Periodogram.frequency_at_max_power
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.period.html">
+     lightkurve.periodogram.Periodogram.period
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.period_at_max_power.html">
+     lightkurve.periodogram.Periodogram.period_at_max_power
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.power.html">
+     lightkurve.periodogram.Periodogram.power
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.max_power.html">
+     lightkurve.periodogram.Periodogram.max_power
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.bin.html">
+     lightkurve.periodogram.Periodogram.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.copy.html">
+     lightkurve.periodogram.Periodogram.copy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.flatten.html">
+     lightkurve.periodogram.Periodogram.flatten
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.plot.html">
+     lightkurve.periodogram.Periodogram.plot
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.show_properties.html">
+     lightkurve.periodogram.Periodogram.show_properties
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.smooth.html">
+     lightkurve.periodogram.Periodogram.smooth
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.to_seismology.html">
+     lightkurve.periodogram.Periodogram.to_seismology
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.Periodogram.to_table.html">
+     lightkurve.periodogram.Periodogram.to_table
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model.html">
+     lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../seismology.html">
+   Seismology
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+  <label for="toctree-checkbox-6">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.html">
+     lightkurve.seismology.Seismology
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.from_lightcurve.html">
+     lightkurve.seismology.Seismology.from_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.periodogram.html">
+     lightkurve.seismology.Seismology.periodogram
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.estimate_numax.html">
+     lightkurve.seismology.Seismology.estimate_numax
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.estimate_deltanu.html">
+     lightkurve.seismology.Seismology.estimate_deltanu
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.estimate_radius.html">
+     lightkurve.seismology.Seismology.estimate_radius
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.estimate_mass.html">
+     lightkurve.seismology.Seismology.estimate_mass
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.estimate_logg.html">
+     lightkurve.seismology.Seismology.estimate_logg
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.diagnose_numax.html">
+     lightkurve.seismology.Seismology.diagnose_numax
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.diagnose_deltanu.html">
+     lightkurve.seismology.Seismology.diagnose_deltanu
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.plot_echelle.html">
+     lightkurve.seismology.Seismology.plot_echelle
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.seismology.Seismology.interact_echelle.html">
+     lightkurve.seismology.Seismology.interact_echelle
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../correctors.html">
+   Correcting systematics
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+  <label for="toctree-checkbox-7">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.load_tess_cbvs.html">
+     lightkurve.correctors.load_tess_cbvs
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.load_kepler_cbvs.html">
+     lightkurve.correctors.load_kepler_cbvs
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.CBVCorrector.html">
+     lightkurve.correctors.CBVCorrector
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.CBVCorrector.correct.html">
+     lightkurve.correctors.CBVCorrector.correct
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.CBVCorrector.diagnose.html">
+     lightkurve.correctors.CBVCorrector.diagnose
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.PLDCorrector.html">
+     lightkurve.correctors.PLDCorrector
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.PLDCorrector.correct.html">
+     lightkurve.correctors.PLDCorrector.correct
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.PLDCorrector.diagnose.html">
+     lightkurve.correctors.PLDCorrector.diagnose
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.PLDCorrector.diagnose_masks.html">
+     lightkurve.correctors.PLDCorrector.diagnose_masks
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">
+     lightkurve.correctors.SFFCorrector
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.SFFCorrector.correct.html">
+     lightkurve.correctors.SFFCorrector.correct
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.SFFCorrector.diagnose.html">
+     lightkurve.correctors.SFFCorrector.diagnose
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.SFFCorrector.diagnose_arclength.html">
+     lightkurve.correctors.SFFCorrector.diagnose_arclength
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html">
+     lightkurve.correctors.RegressionCorrector
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.correct.html">
+     lightkurve.correctors.RegressionCorrector.correct
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.diagnose.html">
+     lightkurve.correctors.RegressionCorrector.diagnose
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html">
+     lightkurve.correctors.DesignMatrix
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrixCollection.html">
+     lightkurve.correctors.DesignMatrixCollection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.SparseDesignMatrix.html">
+     lightkurve.correctors.SparseDesignMatrix
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.SparseDesignMatrixCollection.html">
+     lightkurve.correctors.SparseDesignMatrixCollection
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.X.html">
+     lightkurve.correctors.DesignMatrix.X
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.rank.html">
+     lightkurve.correctors.DesignMatrix.rank
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.shape.html">
+     lightkurve.correctors.DesignMatrix.shape
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.values.html">
+     lightkurve.correctors.DesignMatrix.values
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.append_constant.html">
+     lightkurve.correctors.DesignMatrix.append_constant
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.collect.html">
+     lightkurve.correctors.DesignMatrix.collect
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.copy.html">
+     lightkurve.correctors.DesignMatrix.copy
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.pca.html">
+     lightkurve.correctors.DesignMatrix.pca
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.plot.html">
+     lightkurve.correctors.DesignMatrix.plot
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.plot_priors.html">
+     lightkurve.correctors.DesignMatrix.plot_priors
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.split.html">
+     lightkurve.correctors.DesignMatrix.split
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.standardize.html">
+     lightkurve.correctors.DesignMatrix.standardize
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.to_sparse.html">
+     lightkurve.correctors.DesignMatrix.to_sparse
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.DesignMatrix.validate.html">
+     lightkurve.correctors.DesignMatrix.validate
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.corrector.Corrector.html">
+     lightkurve.correctors.corrector.Corrector
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.corrector.Corrector.correct.html">
+     lightkurve.correctors.corrector.Corrector.correct
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.correctors.corrector.Corrector.diagnose.html">
+     lightkurve.correctors.corrector.Corrector.diagnose
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../io.html">
+   Reading Data Products
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+  <label for="toctree-checkbox-8">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.read.html">
+     lightkurve.io.read
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.kepler.read_kepler_lightcurve.html">
+     lightkurve.io.kepler.read_kepler_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.everest.read_everest_lightcurve.html">
+     lightkurve.io.everest.read_everest_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.kepseismic.read_kepseismic_lightcurve.html">
+     lightkurve.io.kepseismic.read_kepseismic_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.k2sff.read_k2sff_lightcurve.html">
+     lightkurve.io.k2sff.read_k2sff_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.tess.read_tess_lightcurve.html">
+     lightkurve.io.tess.read_tess_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.cdips.read_cdips_lightcurve.html">
+     lightkurve.io.cdips.read_cdips_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.eleanor.read_eleanor_lightcurve.html">
+     lightkurve.io.eleanor.read_eleanor_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.pathos.read_pathos_lightcurve.html">
+     lightkurve.io.pathos.read_pathos_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.qlp.read_qlp_lightcurve.html">
+     lightkurve.io.qlp.read_qlp_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.tasoc.read_tasoc_lightcurve.html">
+     lightkurve.io.tasoc.read_tasoc_lightcurve
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.io.tglc.read_tglc_lightcurve.html">
+     lightkurve.io.tglc.read_tglc_lightcurve
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../config.html">
+   Configuration
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+  <label for="toctree-checkbox-9">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.conf.html">
+     lightkurve.conf
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.config.get_cache_dir.html">
+     lightkurve.config.get_cache_dir
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.config.get_config_dir.html">
+     lightkurve.config.get_config_dir
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../misc.html">
+   Miscellaneous utilities
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+  <label for="toctree-checkbox-10">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.KeplerQualityFlags.html">
+     lightkurve.KeplerQualityFlags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.TessQualityFlags.html">
+     lightkurve.TessQualityFlags
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.utils.plot_image.html">
+     lightkurve.utils.plot_image
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
 </nav>
-</div>
-      
-    </div>
-  
-  
-</div>
-</div>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
-              
-              
+              <div class="toc-item">
                 
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <section id="lightkurve-searchresult-download-all">
-<h1>lightkurve.SearchResult.download_all<a class="headerlink" href="#lightkurve-searchresult-download-all" title="Link to this heading">#</a></h1>
+<h1>lightkurve.SearchResult.download_all<a class="headerlink" href="#lightkurve-searchresult-download-all" title="Permalink to this headline">#</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.SearchResult.download_all">
-<span class="sig-prename descclassname"><span class="pre">SearchResult.</span></span><span class="sig-name descname"><span class="pre">download_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality_bitmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#SearchResult.download_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.SearchResult.download_all" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">SearchResult.</span></span><span class="sig-name descname"><span class="pre">download_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality_bitmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#SearchResult.download_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.SearchResult.download_all" title="Permalink to this definition">#</a></dt>
 <dd><p>Download and open all data products in the search result.</p>
 <p>This method will return a <a class="reference internal" href="lightkurve.TargetPixelFileCollection.html#lightkurve.TargetPixelFileCollection" title="lightkurve.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a> or
 <a class="reference internal" href="lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a>.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
 <dt><strong>quality_bitmask</strong><span class="classifier">str or int, optional</span></dt><dd><p>Bitmask (integer) which identifies the quality flag bitmask that should
 be used to mask out bad cadences. If a string is passed, it has the
@@ -685,7 +1354,7 @@ Typically ‘pdcsap_flux’ or ‘sap_flux’.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
 <dt><strong>collection</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Collection</span></code> object</span></dt><dd><p>Returns a <a class="reference internal" href="lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a> or
 <a class="reference internal" href="lightkurve.TargetPixelFileCollection.html#lightkurve.TargetPixelFileCollection" title="lightkurve.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a>,
@@ -693,7 +1362,7 @@ containing all entries in the products table</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dt class="field-odd">Raises</dt>
 <dd class="field-odd"><dl class="simple">
 <dt>HTTPError</dt><dd><p>If the TESSCut service times out (i.e. returns HTTP status 504).</p>
 </dd>
@@ -707,120 +1376,51 @@ containing all entries in the products table</p>
 </section>
 
 
-                </article>
+              </div>
               
               
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="lightkurve.SearchResult.download.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">lightkurve.SearchResult.download</p>
-      </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="lightkurve.SearchResult.download.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">lightkurve.SearchResult.download</p>
+        </div>
     </a>
-    <a class="right-next"
-       href="lightkurve.SearchResult.mission.html"
-       title="next page">
-      <div class="prev-next-info">
+    <a class='right-next' id="next-link" href="lightkurve.SearchResult.mission.html" title="next page">
+    <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">lightkurve.SearchResult.mission</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
+    </div>
+    <i class="fas fa-angle-right"></i>
     </a>
 </div>
-                </footer>
               
-            </div>
-            
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+          </main>
+          
 
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lightkurve.SearchResult.download_all"><code class="docutils literal notranslate"><span class="pre">SearchResult.download_all()</span></code></a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/reference/api/lightkurve.SearchResult.download_all.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
-
-</div></div>
-              
-            
-          </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+      </div>
     </div>
-  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
-
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
-
-  <p class="copyright">
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
     
-      © Copyright Lightkurve developers.
-      <br/>
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
     
-  </p>
-</div>
-      
-        <div class="footer-item">
-
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    <br/>
-  </p>
-</div>
-      
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
     </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
-</p></div>
-      
-    </div>
-  
-</div>
-
-  </footer>
+    
+  </div>
+</footer>
   </body>
 </html>

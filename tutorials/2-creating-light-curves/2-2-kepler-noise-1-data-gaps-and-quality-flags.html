@@ -1,415 +1,293 @@
 
 <!DOCTYPE html>
 
-
-<html lang="en" data-content_root="../../" >
-
+<html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Instrumental Noise in Kepler and K2 #1: Data Gaps and Quality Flags &#8212; Lightkurve </title>
-  
-  
-  
-  <script data-cfasync="false">
-    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
-  </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
-  
+    
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
-  
-  <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script src="../../_static/documentation_options.js?v=6d2724f8"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/2-creating-light-curves/2-2-kepler-noise-1-data-gaps-and-quality-flags';</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Instrumental Noise in Kepler and K2 #2: Spurious Signals and Time Sampling Effects" href="2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.html" />
     <link rel="prev" title="How to save a LightCurve in FITS format?" href="2-1-saving-a-light-curve.html" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="2.5" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
-  
-  
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
-  
-  <div id="pst-scroll-pixel-helper"></div>
-  
-  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
-  
-  <dialog id="pst-search-dialog">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
-<form class="bd-search d-flex align-items-center"
-      action="../../search.html"
-      method="get">
-  <i class="fa-solid fa-magnifying-glass"></i>
-  <input type="search"
-         class="form-control"
-         name="q"
-         placeholder="Search the docs ..."
-         aria-label="Search the docs ..."
-         autocomplete="off"
-         autocorrect="off"
-         autocapitalize="off"
-         spellcheck="false"/>
-  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
+    <div class="container-fluid" id="banner"></div>
 
-  <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
-</div>
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
 
-  
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
-<div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
-    <span class="fa-solid fa-bars"></span>
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.5</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
   </button>
-  
-  
-  <div class="col-lg-3 navbar-header-items__start">
-    
-      <div class="navbar-item">
 
   
-    
-  
-
-<a class="navbar-brand logo" href="../../index.html">
-  
-  
-  
-  
-  
-  
-    <p class="title logo__title">Lightkurve </p>
-  
-</a></div>
-    
-  </div>
-  
-  <div class="col-lg-9 navbar-header-items">
-    
-    <div class="me-auto navbar-header-items__center">
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
       
-        <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
+ </a>
+</li>
+
     
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
+</ul>
+      </div>
+      
+    </div>
 
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-                </ul>
-            </li>
+    <div class="container-xl">
+      <div class="row">
+          
             
-  </ul>
-</nav></div>
-      
-    </div>
-    
-    
-    <div class="navbar-header-items__end">
-      
-        <div class="navbar-item navbar-persistent--container">
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-        </div>
-      
-      
-        <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-      
-        <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
           
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-      
-    </div>
-    
-  </div>
-  
-  
-    <div class="navbar-persistent--mobile">
-
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">Search</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button>
-    </div>
-  
-
-  
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
-</div>
-
-    </header>
-  
-
-  <div class="bd-container">
-    <div class="bd-container__inner bd-page-width">
-      
-      
-      
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
-        
-
-  
-  <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-      <div class="sidebar-header-items__center">
-        
-          
-          
-            <div class="navbar-item">
-<nav>
-  <ul class="bd-navbar-elements navbar-nav">
-    
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
-    What's new?
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../quickstart.html">
-    Quickstart
-  </a>
-</li>
-
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../index.html">
-    Tutorials
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference/index.html">
-    API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../about/index.html">
-    About Lightkurve
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../development/index.html">
-    Developing for Lightkurve
-  </a>
-</li>
-
-  </ul>
-</nav></div>
-          
-        
-      </div>
-    
-    
-    
-      <div class="sidebar-header-items__end">
-        
-          <div class="navbar-item">
-
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button></div>
-        
-          <div class="navbar-item"><ul class="navbar-icon-links"
-    aria-label="Icon Links">
-        <li class="nav-item">
-          
-          
-          
-          
-          
-          
-          
-          
-          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
-            <span class="sr-only">GitHub</span></a>
-        </li>
-</ul></div>
-        
-      </div>
-    
-  </div>
-  
-  
-  <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
-  </div>
-
-
-      </div>
-      
-      <main id="main-content" class="bd-main" role="main">
-        
-        
-          <div class="bd-content">
-            <div class="bd-article-container">
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
               
-              <div class="bd-header-article d-print-none">
-<div class="header-article-items header-article__inner">
-  
-    <div class="header-article-items__start">
-      
-        <div class="header-article-item">
-
-<nav aria-label="Breadcrumb" class="d-print-none">
-  <ul class="bd-breadcrumbs">
-    
-    <li class="breadcrumb-item breadcrumb-home">
-      <a href="../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
-      </a>
-    </li>
-    
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags</span></li>
-  </ul>
-</nav>
-</div>
-      
-    </div>
-  
-  
-</div>
-</div>
-              
-              
-              
+              <div class="toc-item">
                 
-<div id="searchbox"></div>
-                <article class="bd-article">
-                  
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Learning-Goals">
+   Learning Goals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Introduction">
+   Introduction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#1.-Background">
+   1. Background
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#1.1-Quality-flags">
+     1.1 Quality flags
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#2.-Common-Data-Gaps">
+   2. Common Data Gaps
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#2.1-Monthly-data-downlink">
+     2.1 Monthly data downlink
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#2.2-Safe-modes">
+     2.2 Safe modes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#2.3-Coarse-pointing-and-loss-of-fine-pointing">
+     2.3 Coarse pointing and loss of fine pointing
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#3.-Single-Cadence-Events">
+   3. Single-Cadence Events
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.1-Cosmic-rays">
+     3.1 Cosmic rays
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.2-Argabrightening">
+     3.2 Argabrightening
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.3-Attitude-tweaks">
+     3.3 Attitude tweaks
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.4-Reaction-wheel-events">
+     3.4 Reaction wheel events
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#3.5-Manual-exclusions">
+     3.5 Manual exclusions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#4.-K2">
+   4.
+   <em>
+    K2
+   </em>
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#About-this-Notebook">
+   About this Notebook
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">
+   Citing Lightkurve and Astropy
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
   <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-2-kepler-noise-1-data-gaps-and-quality-flags.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-2-kepler-noise-1-data-gaps-and-quality-flags.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Instrumental-Noise-in-Kepler-and-K2-#1:-Data-Gaps-and-Quality-Flags">
-<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#1:-Data-Gaps-and-Quality-Flags" title="Link to this heading">#</a></h1>
+<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#1:-Data-Gaps-and-Quality-Flags" title="Permalink to this headline">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Have a working knowledge of <em>Kepler</em> quality flags and be able to access them in light curve and TPF data.</p></li>
@@ -418,13 +296,13 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
 <p>This notebook is the first part of a series on identifying instrumental and systematic sources of noise in <em>Kepler</em> and <em>K2</em> data. In this tutorial, we will look at practical examples of data gaps and single-cadence quality issues in <em>Kepler</em> data, and learn to identify their causes. Assumed knowledge for this tutorial is a good familiarity with light curve and target pixel file (TPF) data products, and the ability to work with their metadata.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
 <p>We’ll use <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to perform a few auxiliary functions, and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
@@ -435,23 +313,14 @@
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/nthom/lightkurve/src/lightkurve/config/__init__.py:119: UserWarning: The default Lightkurve cache directory, used by download(), etc., has been moved to /Users/nthom/.lightkurve/cache. Please move all the files in the legacy directory /Users/nthom/.lightkurve-cache to the new location and remove the legacy directory. Refer to https://docs.lightkurve.org/reference/config.html#default-cache-directory-migration for more information.
-  warnings.warn(
-</pre></div></div>
-</div>
 <hr class="docutils" />
 </section>
 <section id="1.-Background">
-<h2>1. Background<a class="headerlink" href="#1.-Background" title="Link to this heading">#</a></h2>
+<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">#</a></h2>
 <p>The <em>Kepler</em> space telescope observed the same patch of sky for four continuous years, between 2009 and 2013. Over the course of 18 observing quarters, it collected light curves and pixel data for 150,000 stars in 30-minute Long Cadence mode, and 512 stars per quarter in one-minute Short Cadence mode. Following the failure of two of the telescope’s four reaction wheels, the telescope continued as the <em>K2</em> mission, which observed along the ecliptic plane for 20 campaigns.</p>
 <p>In this tutorial, we’ll explore some quality issues that arose during both the <em>Kepler</em> and <em>K2</em> missions, and learn how to identify and mitigate them. It’s important to note that many of these issues only appear in the calibrated pixels or simple aperture photometry (SAP) data, and more still are removed by a quality masking process which we’ll discuss in the next section. If you’re working with presearch data conditioning SAP (PDCSAP) light curves, you won’t run into many of these issues.</p>
 <section id="1.1-Quality-flags">
-<h3>1.1 Quality flags<a class="headerlink" href="#1.1-Quality-flags" title="Link to this heading">#</a></h3>
+<h3>1.1 Quality flags<a class="headerlink" href="#1.1-Quality-flags" title="Permalink to this headline">#</a></h3>
 <p>Before we look at some practical examples in time series data, let’s familiarize ourselves with how data gaps and single-cadence quality events are identified in <em>Kepler</em> data files. Every <em>Kepler</em> FITS file has a <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/utils.py#L43">QUALITY</a> column, which contains a quality flag for each individual data cadence. These flags comprise of one or more binary bits, which are expressed as an integer. A
 handy reference document for <em>Kepler</em>’s quality flags is Table 2-3 in the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/k2/_documents/MAST_Kepler_Archive_Manual_2020.pdf">MAST Kepler Archive Manual</a>.</p>
 <p>Let’s start by downloading the data we’ll work with throughout this tutorial:</p>
@@ -563,13 +432,13 @@ array([4060, 5767, 6432, 6796, 6797], dtype=&#39;&gt;i4&#39;)
 </section>
 </section>
 <section id="2.-Common-Data-Gaps">
-<h2>2. Common Data Gaps<a class="headerlink" href="#2.-Common-Data-Gaps" title="Link to this heading">#</a></h2>
+<h2>2. Common Data Gaps<a class="headerlink" href="#2.-Common-Data-Gaps" title="Permalink to this headline">#</a></h2>
 <p>The nominal <em>Kepler</em> mission observed one area continuously between 2009 and 2013 — but of course, there were various necessary breaks in that continuity. For example, the telescope rotated at the end of each quarter, which necessitated a break in data collection.</p>
 <p>We can use quality flags to identify these various events, but often it’s more convenient to check the <em>Kepler</em> Mission Timeline, from the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>:</p>
-<p><img alt="Kepler Mission Timeline from the Data Characteristics Handbook, a calendar showing Quarters 0–17 from 2009–13, with major events and data gaps marked." src="../../_images/kepler-mission-timeline.png" /></p>
+<img alt="Kepler Mission Timeline from the Data Characteristics Handbook, a calendar showing Quarters 0–17 from 2009–13, with major events and data gaps marked." src="../../_images/kepler-mission-timeline.png" />
 <p>Throughout this section we’ll explore the most common reasons for gaps in <em>Kepler</em> data: monthly data downlinks, safe modes, and coarse pointing/loss of fine pointing. Though we’re looking at <em>Kepler</em> data here, these data gaps can also be found in <em>K2</em> mission data.</p>
 <section id="2.1-Monthly-data-downlink">
-<h3>2.1 Monthly data downlink<a class="headerlink" href="#2.1-Monthly-data-downlink" title="Link to this heading">#</a></h3>
+<h3>2.1 Monthly data downlink<a class="headerlink" href="#2.1-Monthly-data-downlink" title="Permalink to this headline">#</a></h3>
 <p>During the <em>Kepler</em> mission, the telescope changed its orientation once a month to point at Earth and downlink the last month of data. This caused a gap in the time series data, as the telescope could not collect while it was downlinking. When the telescope returned to regular pointing, its motion induced what is known as a “thermal transient.” This means that the telescope components and detector electronics underwent a temperature change, and the electron count reading was temporarily
 increased. A change in temperature can slightly change the telescope focus. This manifests in the simple aperture photometry (SAP) data as a downward slope caused by “reheating,” while the flux returns to its previous level. The thermal transient is corrected in PDCSAP data; there is no quality flag for data affected by a thermal transient. (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics
 Handbook</a>, Section 5.5.)</p>
@@ -594,7 +463,7 @@ Handbook</a>, Section 5.5.)</p>
 </div>
 </section>
 <section id="2.2-Safe-modes">
-<h3>2.2 Safe modes<a class="headerlink" href="#2.2-Safe-modes" title="Link to this heading">#</a></h3>
+<h3>2.2 Safe modes<a class="headerlink" href="#2.2-Safe-modes" title="Permalink to this headline">#</a></h3>
 <p>Safe modes (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.2) are another type of thermal transient that appears in <em>Kepler</em> data. A safe mode occured when the telescope temporarily shut off operation due to an unexpected event, usually caused by an issue with the detector electronics.</p>
 <p>There were eleven safe mode events throughout the <em>Kepler</em> mission, and three during <em>K2</em>, in Campaigns 0, 9, and 12. The following code zooms in on the Quarter 2 safe mode, in the same data we’ve used above; note the similarity in appearance between the two thermal transient events.</p>
 <div class="nbinput docutils container">
@@ -617,7 +486,7 @@ Handbook</a>, Section 5.5.)</p>
 </div>
 </section>
 <section id="2.3-Coarse-pointing-and-loss-of-fine-pointing">
-<h3>2.3 Coarse pointing and loss of fine pointing<a class="headerlink" href="#2.3-Coarse-pointing-and-loss-of-fine-pointing" title="Link to this heading">#</a></h3>
+<h3>2.3 Coarse pointing and loss of fine pointing<a class="headerlink" href="#2.3-Coarse-pointing-and-loss-of-fine-pointing" title="Permalink to this headline">#</a></h3>
 <p>Running the code below, you’ll see two highlighted regions where there is no thermal transient, but still a gap in the data. Often, gaps like this are caused by a loss of fine pointing (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.3). Because there is lower photometric precision when this occurs, these cadences are not suggested for use in photometry, and are replaced
 with NaNs.</p>
 <p>In the <code class="docutils literal notranslate"><span class="pre">QUALITY</span></code> column, there are two flags for this situation: a 4 (bit 3) for coarse point, and 32768 (bit 16) for a loss of fine point. Coarse point is a manual flag, based on preprocessing, and coarse point cadences are removed based on an expected loss of fine pointing. Cadences marked as “no fine point” are due to unexpected events; in practice, these two quality issues manifest in the same manner as gapped data.</p>
@@ -672,10 +541,10 @@ with NaNs.</p>
 </section>
 </section>
 <section id="3.-Single-Cadence-Events">
-<h2>3. Single-Cadence Events<a class="headerlink" href="#3.-Single-Cadence-Events" title="Link to this heading">#</a></h2>
+<h2>3. Single-Cadence Events<a class="headerlink" href="#3.-Single-Cadence-Events" title="Permalink to this headline">#</a></h2>
 <p>We’ve now seen some situations in <em>Kepler</em> data where you’ll observe a gap in the data — or NaN flux — and what the time series looks like on either side of those events. But there are many quality issues which can have an impact on one or more cadences at a time, which aren’t necessarily as evident as data gaps. In the following sections, we’ll look at some of the causes behind these single-cadence quality issues, where you’ll find them, and how to mitigate them in a practical context.</p>
 <section id="3.1-Cosmic-rays">
-<h3>3.1 Cosmic rays<a class="headerlink" href="#3.1-Cosmic-rays" title="Link to this heading">#</a></h3>
+<h3>3.1 Cosmic rays<a class="headerlink" href="#3.1-Cosmic-rays" title="Permalink to this headline">#</a></h3>
 <p>Cosmic rays on the detector (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 4.16) are an unavoidable source of quality issues in all space based data. Depending on the severity of the event, an incidence of a cosmic ray can lead to sudden pixel sensitivity dropouts (SPSD) — covered in another tutorial in this series — or even long-term damage. Here, we’ll only look at the
 short-term events.</p>
 <p>The cell below plots a section of our light curve for KIC 2436365 from above, showing a spike caused by a cosmic ray hitting the detector. Note that this is PDCSAP flux: most cosmic rays are removed by presearch data conditioning (PDC), but those that aren’t can be caught by outlier clipping or, in this case, may not be a large enough spike to cause problems.</p>
@@ -696,7 +565,7 @@ short-term events.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.FillBetweenPolyCollection at 0x149a0e2d0&gt;
+&lt;matplotlib.collections.PolyCollection at 0x17f25e520&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -708,7 +577,7 @@ short-term events.</p>
 </div>
 </section>
 <section id="3.2-Argabrightening">
-<h3>3.2 Argabrightening<a class="headerlink" href="#3.2-Argabrightening" title="Link to this heading">#</a></h3>
+<h3>3.2 Argabrightening<a class="headerlink" href="#3.2-Argabrightening" title="Permalink to this headline">#</a></h3>
 <p>Argabrightening (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.8) is a single-cadence quality issue that looks similar to a cosmic ray on the detector. In fact, Argabrightening is thought to be caused by debris hitting the instrument, causing a brief increase in flux. This is distinct from the electronic event caused by a cosmic ray corrupting the pixel readout:
 Argabrightening is the result of physical illumination.</p>
 <p>Using Lightkurve’s <code class="docutils literal notranslate"><span class="pre">KeplerQualityFlags.decode()</span></code> function in <a class="reference internal" href="#1.1-Quality-flags"><span class="std std-ref">Section 1.1</span></a>, we saw that a quality flag of 4160 indicates an Argabrightening event on the charge-coupled device (CCD) and in the optimal aperture used for photometry. Let’s see where that shows up in our data:</p>
@@ -751,7 +620,7 @@ array([191.8960099 , 226.77612309, 240.36418455, 247.80180137,
 </div>
 </section>
 <section id="3.3-Attitude-tweaks">
-<h3>3.3 Attitude tweaks<a class="headerlink" href="#3.3-Attitude-tweaks" title="Link to this heading">#</a></h3>
+<h3>3.3 Attitude tweaks<a class="headerlink" href="#3.3-Attitude-tweaks" title="Permalink to this headline">#</a></h3>
 <p><em>Kepler</em>’s orientation, or attitude, was adjusted every few days during Quarters 0, 1, and 2 of the nominal mission. Specifically, attitude tweaks ensured that no star would ever move more than 1/100th of a pixel from its expected location in each cadence (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 4.4). From Quarter 3 onwards, changes to the telescope’s Fine Guidance
 Sensor (FGS) system (see the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, particularly sections 2.1 and 2.5.1) led to reduced drift, which meant that attitude tweaks were no longer necessary.</p>
 <p>Because the drift distances in <em>Kepler</em>’s first three quarters were so small, they’re hard to detect without checking the quality flags. Additionally, the discontinuities were for the most part corrected by the data processing pipeline, with only a few remaining:</p>
@@ -775,7 +644,7 @@ Sensor (FGS) system (see the <a class="reference external" href="https://archive
 </div>
 </section>
 <section id="3.4-Reaction-wheel-events">
-<h3>3.4 Reaction wheel events<a class="headerlink" href="#3.4-Reaction-wheel-events" title="Link to this heading">#</a></h3>
+<h3>3.4 Reaction wheel events<a class="headerlink" href="#3.4-Reaction-wheel-events" title="Permalink to this headline">#</a></h3>
 <p><em>Kepler</em>’s attitude was controlled initially by four reaction wheels. Bits 5 and 6 are allocated to two data quality events caused by the reaction wheels: zero crossings and momentum desaturation.</p>
 <p>Zero crossings (bit 5/integer 16) occur when the reaction wheels have zero angular velocity (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.4). This caused the telescope’s point to degrade for a few minutes at a time. Because of this short timescale, reaction wheel zero crossings are mostly an issue in Short Cadence data, where they manifest as negative spikes in the
 flux data. Zero crossing events became less prominent after the failure of one of <em>Kepler</em>’s reaction wheels in Quarter 14, due to an increase in speed of the remaining reaction wheels. There were no reaction wheel zero crossings in the <em>K2</em> mission.</p>
@@ -783,7 +652,7 @@ flux data. Zero crossing events became less prominent after the failure of one o
 time.</p>
 </section>
 <section id="3.5-Manual-exclusions">
-<h3>3.5 Manual exclusions<a class="headerlink" href="#3.5-Manual-exclusions" title="Link to this heading">#</a></h3>
+<h3>3.5 Manual exclusions<a class="headerlink" href="#3.5-Manual-exclusions" title="Permalink to this headline">#</a></h3>
 <p>For various reasons, some cadences were manually excluded during the data processing stage. In general, these cadences were those on either side of gaps and discontinuities, but sometimes manual exclusions were used to cover specific events that didn’t fall under any other category. For example, during Quarter 12, a series of three coronal mass ejections from the Sun led to multiple cadences being manually excluded (<a class="reference external" href="https://archive.stsci.edu/kepler/release_notes/release_notes25/KSCI-19065-002DRN25.pdf">Kepler Data Release 25
 Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to manual exclusions in Campaign 15 of <em>K2</em> (<a class="reference external" href="https://archive.stsci.edu/missions/k2/doc/drn/KSCI-19138-002_K2-DRN22_C15.pdf">K2 Data Release 22 Notes</a>, Section 2.2). On both occasions, these incidences led to increased noise and reduced accuracy in pointing.</p>
 <p>The code below plots the SAP light curve for Quarter 12 of KIC 8805616 with no quality-flagged data excluded. Here, you can clearly see the data quality issues caused by the coronal mass ejections, which are highlighted:</p>
@@ -810,7 +679,7 @@ Notes</a>, Section 12.2). Further solar flares and coronal mass ejections led to
 </section>
 </section>
 <section id="4.-K2">
-<h2>4. <em>K2</em><a class="headerlink" href="#4.-K2" title="Link to this heading">#</a></h2>
+<h2>4. <em>K2</em><a class="headerlink" href="#4.-K2" title="Permalink to this headline">#</a></h2>
 <p>The <em>K2</em> mission relied on only two of <em>Kepler</em>’s reaction wheels, meaning it required an additional thruster firing every six hours to maintain pointing. This led to a six-hour drift in <em>K2</em> data; while the drift is corrected in Long Cadence data by PDC, data taken during the thruster firings is treated the same way as gaps or single-cadence quality issues in <em>Kepler</em> data. There are two quality bits allocated to thruster firings: bit 21 for a thruster firing, and bit 20 for a possible thruster
 firing.</p>
 <p>To get an idea of what the six-hour drift looks like, let’s start by downloading some <em>K2</em> data.</p>
@@ -885,12 +754,12 @@ firing.</p>
 <p>In the next tutorial in this series, we’ll revisit EPIC 211414081, and look at how the thruster firings lead to persistent systematics in Short Cadence data.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-29</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">#</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
@@ -1093,143 +962,51 @@ archivePrefix = "arXiv",
 </section>
 
 
-                </article>
+              </div>
               
               
-              
-              
-              
-                <footer class="prev-next-footer d-print-none">
-                  
-<div class="prev-next-area">
-    <a class="left-prev"
-       href="2-1-saving-a-light-curve.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">How to save a LightCurve in FITS format?</p>
-      </div>
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="2-1-saving-a-light-curve.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">How to save a LightCurve in FITS format?</p>
+        </div>
     </a>
-    <a class="right-next"
-       href="2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.html"
-       title="next page">
-      <div class="prev-next-info">
+    <a class='right-next' id="next-link" href="2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.html" title="next page">
+    <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #2: Spurious Signals and Time Sampling Effects</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
+    </div>
+    <i class="fas fa-angle-right"></i>
     </a>
 </div>
-                </footer>
               
-            </div>
-            
-            
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+          </main>
+          
 
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Learning-Goals">Learning Goals</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Imports">Imports</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#1.-Background">1. Background</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#1.1-Quality-flags">1.1 Quality flags</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#2.-Common-Data-Gaps">2. Common Data Gaps</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#2.1-Monthly-data-downlink">2.1 Monthly data downlink</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#2.2-Safe-modes">2.2 Safe modes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#2.3-Coarse-pointing-and-loss-of-fine-pointing">2.3 Coarse pointing and loss of fine pointing</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#3.-Single-Cadence-Events">3. Single-Cadence Events</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.1-Cosmic-rays">3.1 Cosmic rays</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.2-Argabrightening">3.2 Argabrightening</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.3-Attitude-tweaks">3.3 Attitude tweaks</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.4-Reaction-wheel-events">3.4 Reaction wheel events</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.5-Manual-exclusions">3.5 Manual exclusions</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#4.-K2">4. <em>K2</em></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#About-this-Notebook">About this Notebook</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">Citing Lightkurve and Astropy</a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/tutorials/2-creating-light-curves/2-2-kepler-noise-1-data-gaps-and-quality-flags.ipynb.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
-
-</div></div>
-              
-            
-          </div>
-          <footer class="bd-footer-content">
-            
-          </footer>
-        
-      </main>
+      </div>
     </div>
-  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
-
-  <footer class="bd-footer">
-<div class="bd-footer__inner bd-page-width">
-  
-    <div class="footer-items__start">
-      
-        <div class="footer-item">
-
-  <p class="copyright">
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
     
-      © Copyright Lightkurve developers.
-      <br/>
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
     
-  </p>
-</div>
-      
-        <div class="footer-item">
-
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
-    <br/>
-  </p>
-</div>
-      
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+</p>
     </div>
-  
-  
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
-</p></div>
-      
-    </div>
-  
-</div>
-
-  </footer>
+    
+  </div>
+</footer>
   </body>
 </html>
