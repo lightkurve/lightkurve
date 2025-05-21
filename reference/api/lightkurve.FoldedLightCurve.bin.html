@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>lightkurve.LightCurve.estimate_cdpp &#8212; Lightkurve </title>
+    <title>lightkurve.FoldedLightCurve.bin &#8212; Lightkurve </title>
     
   <!-- Loaded before other Sphinx assets -->
   <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -32,8 +32,8 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="lightkurve.LightCurve.query_solar_system_objects" href="lightkurve.LightCurve.query_solar_system_objects.html" />
-    <link rel="prev" title="lightkurve.LightCurve.write" href="lightkurve.LightCurve.write.html" />
+    <link rel="next" title="TargetPixelFile" href="../targetpixelfile.html" />
+    <link rel="prev" title="lightkurve.FoldedLightCurve.plot_river" href="lightkurve.FoldedLightCurve.plot_river.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -306,16 +306,16 @@
    </li>
   </ul>
  </li>
- <li class="toctree-l1 current active has-children">
+ <li class="toctree-l1 has-children">
   <a class="reference internal" href="../lightcurve.html">
    LightCurve
   </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
   <label for="toctree-checkbox-2">
    <i class="fas fa-chevron-down">
    </i>
   </label>
-  <ul class="current">
+  <ul>
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.LightCurve.html">
      lightkurve.LightCurve
@@ -476,8 +476,8 @@
      lightkurve.LightCurve.write
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.LightCurve.estimate_cdpp.html">
      lightkurve.LightCurve.estimate_cdpp
     </a>
    </li>
@@ -503,16 +503,16 @@
    </li>
   </ul>
  </li>
- <li class="toctree-l1 has-children">
+ <li class="toctree-l1 current active has-children">
   <a class="reference internal" href="../foldedlightcurve.html">
    FoldedLightCurve
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
   <label for="toctree-checkbox-3">
    <i class="fas fa-chevron-down">
    </i>
   </label>
-  <ul>
+  <ul class="current">
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.html">
      lightkurve.FoldedLightCurve
@@ -558,8 +558,8 @@
      lightkurve.FoldedLightCurve.plot_river
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
      lightkurve.FoldedLightCurve.bin
     </a>
    </li>
@@ -1318,65 +1318,50 @@
               
               <div>
                 
-  <section id="lightkurve-lightcurve-estimate-cdpp">
-<h1>lightkurve.LightCurve.estimate_cdpp<a class="headerlink" href="#lightkurve-lightcurve-estimate-cdpp" title="Permalink to this headline">#</a></h1>
+  <section id="lightkurve-foldedlightcurve-bin">
+<h1>lightkurve.FoldedLightCurve.bin<a class="headerlink" href="#lightkurve-foldedlightcurve-bin" title="Permalink to this headline">#</a></h1>
 <dl class="py method">
-<dt class="sig sig-object py" id="lightkurve.LightCurve.estimate_cdpp">
-<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">estimate_cdpp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transit_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">13</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savgol_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">101</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savgol_polyorder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.estimate_cdpp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.estimate_cdpp" title="Permalink to this definition">#</a></dt>
-<dd><p>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</p>
-<p>A common estimate of the noise in a lightcurve is the scatter that
-remains after all long term trends have been removed. This is the idea
-behind the Combined Differential Photometric Precision (CDPP) metric.
-The official Kepler Pipeline computes this metric using a wavelet-based
-algorithm to calculate the signal-to-noise of the specific waveform of
-transits of various durations. In this implementation, we use the
-simpler “sgCDPP proxy algorithm” discussed by Gilliland et al
-(2011ApJS..197….6G) and Van Cleve et al (2016PASP..128g5002V).</p>
-<dl class="simple">
-<dt>The steps of this algorithm are:</dt><dd><ol class="arabic simple">
-<li><p>Remove low frequency signals using a Savitzky-Golay filter with
-window length <code class="xref py py-obj docutils literal notranslate"><span class="pre">savgol_window</span></code> and polynomial order <code class="xref py py-obj docutils literal notranslate"><span class="pre">savgol_polyorder</span></code>.</p></li>
-<li><p>Remove outliers by rejecting data points which are separated from
-the mean by <code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code> times the standard deviation.</p></li>
-<li><p>Compute the standard deviation of a running mean with
-a configurable window length equal to <code class="xref py py-obj docutils literal notranslate"><span class="pre">transit_duration</span></code>.</p></li>
-</ol>
-</dd>
-</dl>
-<p>We use a running mean (as opposed to block averaging) to strongly
-attenuate the signal above 1/transit_duration whilst retaining
-the original frequency sampling.  Block averaging would set the Nyquist
-limit to 1/transit_duration.</p>
-<dl class="field-list simple">
+<dt class="sig sig-object py" id="lightkurve.FoldedLightCurve.bin">
+<span class="sig-prename descclassname"><span class="pre">FoldedLightCurve.</span></span><span class="sig-name descname"><span class="pre">bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#FoldedLightCurve.bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.FoldedLightCurve.bin" title="Permalink to this definition">#</a></dt>
+<dd><p>Bins a FoldedLightCurve in equally-spaced bins in phase.
+Binning always occurs in time units (not normalized phase units)</p>
+<p>If the original light curve contains flux uncertainties (<code class="docutils literal notranslate"><span class="pre">flux_err</span></code>),
+the binned lightcurve will report the root-mean-square error.
+If no uncertainties are included, the binned curve will return the
+standard deviation of the data.</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>transit_duration</strong><span class="classifier">int, optional</span></dt><dd><p>The transit duration in units of number of cadences. This is the
-length of the window used to compute the running mean. The default
-is 13, which corresponds to a 6.5 hour transit in data sampled at
-30-min cadence.</p>
+<dd class="field-odd"><dl>
+<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>,`~astropy.time.TimeDelta`, or scalar (optional)</span></dt><dd><p>The time interval for the binned time series - this is either a scalar
+value (in which case all time bins will be assumed to have the same
+duration) or as an array of values (in which case each phase bin can
+have a different duration). In cases where the lightcurve is phase-normalized, a scalar
+input will be assumed to be in normalized phase units (u.dimensionless_unscaled)
+(Default: 0.5 days; default unit: days.)</p>
 </dd>
-<dt><strong>savgol_window</strong><span class="classifier">int, optional</span></dt><dd><p>Width of Savitsky-Golay filter in cadences (odd number).
-Default value 101 (2.0 days in Kepler Long Cadence mode).</p>
+<dt><strong>time_bin_start</strong><span class="classifier">Time like value, optional</span></dt><dd><p>The start phase for the binned time series. This can also be a scalar
+value if <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code> is provided. Defaults to the first
+time in the sampled time series.</p>
 </dd>
-<dt><strong>savgol_polyorder</strong><span class="classifier">int, optional</span></dt><dd><p>Polynomial order of the Savitsky-Golay filter.
-The recommended value is 2.</p>
+<dt><strong>aggregate_func</strong><span class="classifier">callable, optional</span></dt><dd><p>The function to use for combining points in the same bin. Defaults
+to np.nanmean.</p>
 </dd>
-<dt><strong>sigma</strong><span class="classifier">float, optional</span></dt><dd><p>The number of standard deviations to use for clipping outliers.
-The default is 5.</p>
+<dt><strong>bins</strong><span class="classifier">int, optional</span></dt><dd><p>int which gives the number of bins to divide the lightkurve into.
+This adjusts the length of <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code>
+to accommodate the input time series length.</p>
+</dd>
+<dt><strong>n_bins:</strong></dt><dd><p>This functionality is deprecated for FoldedLightCurves. If provided, asserts
+bins=n_bins</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>cdpp</strong><span class="classifier">float</span></dt><dd><p>Savitzky-Golay CDPP noise metric in units parts-per-million (ppm).</p>
+<dd class="field-even"><dl>
+<dt><strong>binned_lc</strong><span class="classifier"><a class="reference internal" href="lightkurve.FoldedLightCurve.html#lightkurve.FoldedLightCurve" title="lightkurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a></span></dt><dd><p>A new folded light curve which has been binned, with the ‘time’ column phase in days</p>
 </dd>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>This implementation is adapted from the Matlab version used by
-Jeff van Cleve but lacks the normalization factor used there:
-svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 </dd></dl>
 
 </section>
@@ -1387,17 +1372,17 @@ svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="lightkurve.LightCurve.write.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="lightkurve.FoldedLightCurve.plot_river.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">lightkurve.LightCurve.write</p>
+            <p class="prev-next-title">lightkurve.FoldedLightCurve.plot_river</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="lightkurve.LightCurve.query_solar_system_objects.html" title="next page">
+    <a class='right-next' id="next-link" href="../targetpixelfile.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">lightkurve.LightCurve.query_solar_system_objects</p>
+        <p class="prev-next-title">TargetPixelFile</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
