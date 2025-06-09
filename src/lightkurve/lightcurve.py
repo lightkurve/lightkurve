@@ -74,6 +74,35 @@ def rmse(x):
         return np.nan
 
 
+def rmse_reduceat(values, indices):
+    # for the purpose of sum, map np.nan and masked vals to 0
+    if hasattr(values, "mask"):
+        vals_filled = values.filled(0)
+    else:
+        vals_filled = values.copy()
+    vals_filled[np.isnan(values)] = 0
+
+    # for counting, ignore np.nan and masked values
+    if hasattr(values, "mask"):
+        vals_for_count = ~values.mask & np.isfinite(values)
+        if isinstance(vals_for_count, Masked):
+            # workaround for case astropy Masked (does not support reduceat yet)
+            vals_for_count = vals_for_count.filled(0)
+    else:
+        vals_for_count = np.isfinite(values)
+
+    sum_of_squares = np.add.reduceat(np.square(vals_filled), indices)
+
+    count = np.add.reduceat(vals_for_count, indices)
+    count[count == 0] = 1  # to avoid divide by zero
+
+    # return np.sqrt(sum_of_squares / count)  # FIXME: this is probably the correct one
+    return np.sqrt(sum_of_squares) / count
+
+
+rmse.reduceat = rmse_reduceat
+
+
 class LightCurve(TimeSeries):
     """
     Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
