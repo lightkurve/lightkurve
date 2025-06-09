@@ -1655,7 +1655,8 @@ class LightCurve(TimeSeries):
             # If `flux_err` is populated, assume the errors combine as the root-mean-square
             if np.any(np.isfinite(self.flux_err)):
                 ts_err = aggregate_downsample(
-                    self,
+                    # only column flux_err needs to be binned
+                    TimeSeries(data=dict(time=self.time.copy(), flux_err=self.flux_err)),
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
