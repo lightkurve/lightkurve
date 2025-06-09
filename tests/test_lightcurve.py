@@ -15,7 +15,7 @@ import tempfile
 import warnings
 
 from lightkurve.io import read
-from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve, rmse
 from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning, LightkurveError
@@ -597,6 +597,30 @@ def test_cdpp_tabby():
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
     lc2 = LightCurve(time=lc.time[:1000], flux=lc.flux[:1000])
     assert np.abs(lc2.estimate_cdpp().value - lc.cdpp6_0) < 30
+
+
+def test_rmse():
+    """Test RMS implementation used in ``bin()``."""
+
+    # ensure RMS implementation correctly handles np.nan and masked values
+    n = np.nan  # for shorthand below
+    data = [n, 3, 4, 9, n]
+    mask = [0, 0, 0, 1, 1]
+    # expected = np.sqrt((3**2 + 4**2) / 2)  # 3.535...  # FIXME: shouldn't rms be this?
+    expected = np.sqrt((3**2 + 4**2)) / 2  # 2.5
+
+    # type astropy MaskedNDArray from MaskedQuantity, typical for SPOC TESS lightcurve
+    vals = Masked(data * u.dimensionless_unscaled, mask=mask).value
+    actual = rmse(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(rmse(vals[3:])), "edge case: all masked values"
+
+    vals = np.ma.MaskedArray(data=data, mask=mask)
+    actual = rmse(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(rmse(vals[3:])), "edge case: all masked values"
 
 
 def test_bin():

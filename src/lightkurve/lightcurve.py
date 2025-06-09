@@ -67,6 +67,13 @@ def _is_np_structured_array(data1):
     return isinstance(data1, np.ndarray) and data1.dtype.names is not None
 
 
+def rmse(x):
+    if np.any(np.isfinite(x)):
+        return np.sqrt(np.nansum(x**2)) / np.nansum(np.isfinite(x))
+    else:
+        return np.nan
+
+
 class LightCurve(TimeSeries):
     """
     Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
@@ -1618,18 +1625,13 @@ class LightCurve(TimeSeries):
 
             # If `flux_err` is populated, assume the errors combine as the root-mean-square
             if np.any(np.isfinite(self.flux_err)):
-                rmse_func = (
-                    lambda x: np.sqrt(np.nansum(x**2)) / len(np.atleast_1d(x))
-                    if np.any(np.isfinite(x))
-                    else np.nan
-                )
                 ts_err = aggregate_downsample(
                     self,
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
                     time_bin_end=time_bin_end,
-                    aggregate_func=rmse_func,
+                    aggregate_func=rmse,
                 )
                 ts["flux_err"] = ts_err["flux_err"]
             # If `flux_err` is unavailable, populate `flux_err` as nanstd(flux)
