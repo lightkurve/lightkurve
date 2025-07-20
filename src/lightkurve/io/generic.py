@@ -95,21 +95,53 @@ def read_generic_lightcurve(
             log.debug("Ignoring {} rows with NaN times".format(np.sum(nans)))
         tab = tab[~nans]
 
+        ####################################################################
+        
         # Prepare a special time column
         if not time_format:
-            if hdulist[ext].header.get("BJDREFI") == 2454833:
+            if hdulist[ext].header.get("BJDREFI") == 2454833: # Kepler specific
                 time_format = "bkjd"
-            elif hdulist[ext].header.get("BJDREFI") == 2457000:
+            elif hdulist[ext].header.get("BJDREFI") == 2457000: # TESS specific
                 time_format = "btjd"
+            elif hdulist[ext].header.get("TIMESYS", "tdb") == 'local':
+                if hdulist[ext].header.get("TUNIT1") == 'h': # If x-axis is in units of hours
+                    time_format = 'mjd'   # 'mjd' is necessary as using 'jd' will mess up the xlabel
+                    time = Time(
+                        tab["time"].data,    # CHOICE: if you multiply by u.h, will turn values to fractional day which is in agreement with time_format
+                        scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
+                        format=time_format,
+                    )
+                    tab.remove_column("time")
+                    
+                elif hdulist[ext].header.get("TUNIT1") == 's': # If x-axis is in units of seconds
+                    time_format = 'mjd'
+                    time = Time(
+                        tab["time"].data,
+                        scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
+                        format=time_format,
+                    )
+                    tab.remove_column("time")
+        
+                else:
+                    time_format = 'jd'         # Handing case of fractional day x-axis
+                    
+            elif hdulist[ext].header.get("TIMESYS", "tdb") == 'mjd':
+                time_format = 'mjd'
+            elif hdulist[ext].header.get("TIMESYS", "tdb") == 'jd':
+                time_format = 'jd'
             else:
                 raise ValueError(f"Input file has unclear time format: {filename}")
-        time = Time(
-            tab["time"].data,
-            scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
-            format=time_format,
-        )
-        tab.remove_column("time")
-
+        
+        if 'time' not in locals():
+            time = Time(
+                tab["time"].data,
+                scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
+                format=time_format,
+            )
+            tab.remove_column("time")
+        
+        ###################################################################
+        
         # For backwards compatibility with Lightkurve v1.x,
         # we make sure standard columns and attributes exist.
         if "flux" not in tab.columns:
