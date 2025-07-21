@@ -103,31 +103,19 @@ def read_generic_lightcurve(
                 time_format = "bkjd"
             elif hdulist[ext].header.get("BJDREFI") == 2457000: # TESS specific
                 time_format = "btjd"
-            elif hdulist[ext].header.get("TIMESYS", "tdb") == 'local':
-                if hdulist[ext].header.get("TUNIT1") == 'h': # If x-axis is in units of hours
-                    time_format = 'mjd'   # 'mjd' is necessary as using 'jd' will mess up the xlabel
-                    time = Time(
-                        tab["time"].data,    # CHOICE: if you multiply by u.h, will turn values to fractional day which is in agreement with time_format
-                        scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
-                        format=time_format,
+            elif hdulist[ext].header.get("TIMESYS") == "local":
+                try:
+                    unit = u.Unit(hdulist[ext].header.get("TUNIT1"))    # Modified to account such that TUNIT1 dictates the astropy.time unit
+                    time = TimeDelta(
+                        tab["time"].data*unit,    # CHOICE: if you multiply by u.h, will turn values to fractional day which is in agreement with time_format
                     )
                     tab.remove_column("time")
+                except:
+                    raise KeyError(f"Unclear unit for local time system: TUNIT1 must be astropy.unit value.")            # Error handling for invalid astropy.unit value or if the TUNIT1 keyword is missing from header         
                     
-                elif hdulist[ext].header.get("TUNIT1") == 's': # If x-axis is in units of seconds
-                    time_format = 'mjd'
-                    time = Time(
-                        tab["time"].data,
-                        scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
-                        format=time_format,
-                    )
-                    tab.remove_column("time")
-        
-                else:
-                    time_format = 'jd'         # Handing case of fractional day x-axis
-                    
-            elif hdulist[ext].header.get("TIMESYS", "tdb") == 'mjd':
+            elif hdulist[ext].header.get("TIMESYS") == "mjd":
                 time_format = 'mjd'
-            elif hdulist[ext].header.get("TIMESYS", "tdb") == 'jd':
+            elif hdulist[ext].header.get("TIMESYS") == "jd":
                 time_format = 'jd'
             else:
                 raise ValueError(f"Input file has unclear time format: {filename}")
