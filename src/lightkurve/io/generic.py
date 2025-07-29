@@ -4,7 +4,7 @@ import warnings
 
 from astropy.io import fits
 from astropy.table import Table
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
 from astropy.units import UnitsWarning
 import numpy as np
 
