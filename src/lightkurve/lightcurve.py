@@ -2471,6 +2471,8 @@ class LightCurve(TimeSeries):
                 "DATE": datetime.datetime.now().strftime("%Y-%m-%d"),
                 "CREATOR": "lightkurve.LightCurve.to_fits()",
                 "PROCVER": str(__version__),
+                "MISSION": self.meta.get("MISSION"),
+                "TELESCOP": self.meta.get("TELESCOP"),
             }
 
             for kw in default:
@@ -3153,6 +3155,74 @@ class FoldedLightCurve(LightCurve):
             period=self.period, epoch_time=self.epoch_time, **kwargs
         )
         return ax
+    
+    def to_fits(
+        self,
+        path=None,
+        overwrite=False,
+        flux_column_name="FLUX",
+        aperture_mask=None,
+        **extra_data,
+    ):
+        """Writes the FoldedLightCurve to a FITS file.
+
+        Parameters
+        ----------
+        path : string, default None
+            File path, if `None` returns an astropy.io.fits.HDUList object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        flux_column_name : str
+            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
+        aperture_mask : array-like
+            Optional 2D aperture mask to save with this lightcurve object, if
+            defined.  The mask can be either a boolean mask or an integer mask
+            mimicking the Kepler/TESS convention; boolean masks are
+            automatically converted to the Kepler/TESS conventions
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        folded_specific_data = {
+            "OBJECT": "{}".format(self.targetid),
+            #"MISSION": self.meta.get("MISSION"),
+            "RA_OBJ": self.meta.get("RA"),
+            #"TELESCOP": self.meta.get("MISSION"),
+            "CAMERA": self.meta.get("CAMERA"),
+            "CCD": self.meta.get("CCD"),
+            "SECTOR": self.meta.get("SECTOR"),
+            "TARGETID": self.meta.get("TARGETID"),
+            "DEC_OBJ": self.meta.get("DEC"),
+            "MOM_CENTR1": self.centroid_col,
+            "MOM_CENTR2": self.centroid_row,
+            "PERIOD": self.period.to('day').value,
+        }
+
+        for kw in folded_specific_data:
+            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                extra_data[kw] = folded_specific_data[kw]
+        hdu = super(FoldedLightCurve, self).to_fits(
+            path=None, overwrite=overwrite, **extra_data
+        )
+
+        # We do this because the TESS file format is subtly different in the
+        #    name of this column.
+        hdu[1].columns.change_name("SAP_QUALITY", "QUALITY")
+
+        #hdu = _make_aperture_extension(hdu, aperture_mask)
+
+        if path is not None:
+            hdu.writeto(path, overwrite=overwrite, checksum=True)
+        else:
+            return hdu
 
 
 class KeplerLightCurve(LightCurve):

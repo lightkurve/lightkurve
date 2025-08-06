@@ -6,7 +6,7 @@ from .generic import read_generic_lightcurve
 
 
 def read_tess_lightcurve(
-    filename, flux_column="pdcsap_flux", quality_bitmask="default"
+    filename, flux_column="pdcsap_flux", quality_bitmask="default", time_format="btjd",
 ):
     """Returns a TESS `~lightkurve.lightcurve.LightCurve`.
 
@@ -30,7 +30,7 @@ def read_tess_lightcurve(
 
         See the `~lightkurve.utils.TessQualityFlags` class for details on the bitmasks.
     """
-    lc = read_generic_lightcurve(filename, flux_column=flux_column, time_format="btjd")
+    lc = read_generic_lightcurve(filename, flux_column=flux_column, time_format=time_format)
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns

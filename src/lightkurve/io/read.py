@@ -6,7 +6,7 @@ from astropy.utils import deprecated
 
 from lightkurve.targetpixelfile import TargetPixelFile
 
-from ..lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
+from ..lightcurve import KeplerLightCurve, TessLightCurve, LightCurve, FoldedLightCurve
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 from ..utils import LightkurveDeprecationWarning, LightkurveError
 from .detect import detect_filetype
@@ -127,6 +127,10 @@ def read(path_or_url, **kwargs):
             return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
         elif filetype == "TGLC":
             return TessLightCurve.read(path_or_url, format="tglc", **kwargs)
+        elif filetype == "FoldedTess":
+            return(FoldedLightCurve.read(path_or_url, format='tess', **kwargs))
+        elif filetype == "FoldedKepler":
+            return(FoldedLightCurve.read(path_or_url, format='kepler', **kwargs))
     except BaseException as exc:
         # ensure path_or_url is in the error
         raise LightkurveError(

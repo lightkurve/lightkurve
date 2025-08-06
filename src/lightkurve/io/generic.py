@@ -66,6 +66,8 @@ def read_generic_lightcurve(
             unitstr = str(tab[colname].unit)
             if unitstr == "e-/s":
                 tab[colname].unit = "electron/s"
+            if unitstr == "electron / s": #lightcurve.to_fits() saves as this string
+                tab[colname].unit = "electron/s"
             elif unitstr == "pixels":
                 tab[colname].unit = "pixel"
             elif unitstr == "ppm" and repr(tab[colname].unit).startswith("Unrecognized"):

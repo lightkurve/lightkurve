@@ -125,14 +125,19 @@ def detect_filetype(hdulist: HDUList) -> str:
     try:
         # use `telescop` keyword to determine mission
         # and `creator` to determine tpf or lc
+        creator = header["creator"].lower()
+        origin = header["origin"].lower()
+
+        
         if "TELESCOP" in header.keys():
             telescop = header["telescop"].lower()
         else:
             # Some old custom TESS data did not define the `TELESCOP` card
             telescop = header["mission"].lower()
-        creator = header["creator"].lower()
-        origin = header["origin"].lower()
+
         if telescop == "kepler":
+            if "PERIOD" in header.keys():
+                return "FoldedKepler"
             # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:
                 return "KeplerTargetPixelFile"
@@ -144,6 +149,8 @@ def detect_filetype(hdulist: HDUList) -> str:
             ):
                 return "KeplerLightCurve"
         elif telescop == "tess":
+            if "PERIOD" in header.keys():
+                return "FoldedTess"
             # TESS TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:
                 return "TessTargetPixelFile"
@@ -153,6 +160,9 @@ def detect_filetype(hdulist: HDUList) -> str:
             # Early versions of TESScut did not set a good CREATOR keyword
             elif "stsci" in origin:
                 return "TessTargetPixelFile"
+
+            
+
     # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):
