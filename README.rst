@@ -18,7 +18,7 @@ Lightkurve
 .. |astropy-badge| image:: https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
                    :target: http://www.astropy.org
 .. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1181928.svg
-              :target: https://docs.lightkurve.org/about/citing.html             
+              :target: https://lightkurve.github.io/lightkurve/about/citing.html             
 
 **Lightkurve** is a community-developed, open-source Python package which offers a beautiful and user-friendly way
 to analyze astronomical flux time series data,

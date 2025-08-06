@@ -104,7 +104,7 @@ class SFFCorrector(RegressionCorrector):
             of input light curve time.
         breakindex : None, int or list of ints (optional)
             Optionally the user can break the light curve into sections. Set
-            break index to either an index at which to break, or list of indicies.
+            break index to either an index at which to break, or list of indices.
         degree : int
             The degree of polynomials in the splines in time and arclength. Higher
             values will create smoother splines. Default 3.
@@ -171,12 +171,12 @@ class SFFCorrector(RegressionCorrector):
                 ar = np.copy(self.arclength)
 
             # Temporary workaround for issue #1161: AstroPy v5.0
-            # Masked arrays cannot be passed to `np.in1d` below
+            # Masked arrays cannot be passed to `np.isin` below
             if hasattr(self.arclength, 'mask'):
                 ar = ar.unmasked
 
             knots = list(np.percentile(ar[a:b], np.linspace(0, 100, bins + 1)[1:-1]))
-            ar[~np.in1d(ar, ar[a:b])] = 0
+            ar[~np.isin(ar, ar[a:b])] = 0
 
             dm = spline(ar, knots=knots, degree=degree).copy()
             dm.columns = [
