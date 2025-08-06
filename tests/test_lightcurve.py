@@ -257,6 +257,7 @@ def test_lightcurve_fold():
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
     fold = lc.fold(period=1, epoch_time=-0.1)
+    assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
@@ -266,7 +267,7 @@ def test_lightcurve_fold():
         # `transit_midpoint` is deprecated and its use will emit a warning
         warnings.simplefilter("ignore", LightkurveWarning)
         fold = lc.fold(period=1, transit_midpoint=-0.1)
-    assert_almost_equal(fold.time[0], -0.5, 2)
+    assert_almost_equal(fold.phase[0], -0.5, 2)
     ax = fold.plot()
     assert "Phase" in ax.get_xlabel()
     ax = fold.scatter()
@@ -279,6 +280,33 @@ def test_lightcurve_fold():
     # if user tries a t0 in JD but time is in BKJD
     with pytest.warns(LightkurveWarning, match="appears to be given in JD"):
         lc.fold(10, 2456600)
+
+    # Make sure binning a phase-normalized folded lightcurve works (#1422)
+    fold = lc.fold(period=1.5, normalize_phase=False)
+    assert isinstance(fold.time, TimeDelta)
+    assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1.5, 1)
+    assert len(fold.bin(bins=10)) == 10
+    fold = lc.fold(period=1.5, normalize_phase=True)
+    assert isinstance(lc.time, Time)
+    assert isinstance(fold.time, u.Quantity)
+    assert fold.time.unit == u.dimensionless_unscaled
+    assert_almost_equal(np.max(fold.phase)-np.min(fold.phase), 1, 1)
+    binned = fold.bin(bins=10)
+    assert len(binned) == 10
+    # ensure fold was not changed
+    assert len(fold) == 100
+    assert isinstance(fold.time, u.Quantity)
+
+    # Make sure 'copy()' works as expected
+    fold_copy = fold.copy()
+    assert_array_equal(fold.time, fold_copy.time)
+    assert_array_equal(fold.flux, fold_copy.flux)
+    # ensure the it is a deep copy
+    assert fold is not fold_copy
+    assert fold.time is not fold_copy.time
+    assert fold.flux is not fold_copy.flux
+
+
 
 
 @pytest.mark.parametrize(
@@ -305,6 +333,12 @@ def test_lightcurve_fold_odd_even_masks(normalize_phase):
     even = fold.even_mask
     assert len(odd) == len(fold.time)
     assert np.all(odd == ~even)
+
+    # Check wrap_phase keyword works as expected for normalized folded lightcurves (see #1423)
+    wrapped_fold = lc.fold(period=period, epoch_time=epoch_time, epoch_phase=0.5, normalize_phase=normalize_phase, wrap_phase=0.25)
+    assert_almost_equal(wrapped_fold.phase[-1].value, 0.25, decimal = 1)
+
+
 
     # cycle 0: time [0, 1)
     # cycle 1: time [1, 5)
@@ -1390,13 +1424,13 @@ def test_fold_v2():
     fld = lc.fold(period=1)
     fld2 = lc.fold(period=1 * u.day)
     assert_array_equal(fld.phase, fld2.phase)
-    assert isinstance(fld.time, TimeDelta)
+    assert isinstance(fld.phase, TimeDelta)
     fld.plot_river()
     plt.close()
 
     # Does phase normalization work?
     fld = lc.fold(period=1, normalize_phase=True)
-    assert isinstance(fld.time, u.Quantity)
+    assert isinstance(fld.phase, u.Quantity)
     fld.plot_river()
     plt.close()
 
