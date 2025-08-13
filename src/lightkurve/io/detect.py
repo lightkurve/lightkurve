@@ -135,8 +135,9 @@ def detect_filetype(hdulist: HDUList) -> str:
             # Some old custom TESS data did not define the `TELESCOP` card
             telescop = header["mission"].lower()
 
+
         if telescop == "kepler":
-            if "PERIOD" in header.keys():
+            if 'folded' in creator:
                 return "FoldedKepler"
             # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:
@@ -145,11 +146,10 @@ def detect_filetype(hdulist: HDUList) -> str:
             elif (
                 "fluxexporter" in creator
                 or "lightcurve" in creator
-                or "lightcurve" in creator
             ):
                 return "KeplerLightCurve"
         elif telescop == "tess":
-            if "PERIOD" in header.keys():
+            if 'folded' in creator:
                 return "FoldedTess"
             # TESS TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:

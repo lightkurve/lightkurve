@@ -1096,6 +1096,7 @@ class LightCurve(TimeSeries):
             self.time.copy(), name="time_original", index=len(self._required_columns)
         )
         lc.meta["PERIOD"] = period
+        lc.meta["NORMALIZE_PHASE"] = normalize_phase
         lc.meta["EPOCH_TIME"] = epoch_time
         lc.meta["EPOCH_PHASE"] = epoch_phase
         lc.meta["WRAP_PHASE"] = wrap_phase
@@ -2473,7 +2474,7 @@ class LightCurve(TimeSeries):
             float: "D",
             bool: "L",
             np.int32: "J",
-            np.int32: "K",
+            np.int64: "K",
             np.float32: "E",
             np.float64: "D",
         }
@@ -2545,6 +2546,7 @@ class LightCurve(TimeSeries):
                         array=self.flux,
                     )
                 )
+            
             if hasattr(self, "flux_err"):
                 if ~(flux_column_name.upper() + "_ERR" in extra_data.keys()):
                     cols.append(
@@ -2590,7 +2592,7 @@ class LightCurve(TimeSeries):
                         name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
                     )
                 )
-
+            
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
@@ -3054,6 +3056,39 @@ class FoldedLightCurve(LightCurve):
     extra properties (``phase``, ``odd_mask``, ``even_mask``),
     and implements different plotting defaults.
     """
+    '''def read(cls, *args, **kwargs):
+        """Returns a `KeplerLightCurve` by reading the given file.
+
+        Parameters
+        ----------
+        filename : str
+            Local path or remote url of a Kepler light curve FITS file.
+        flux_column : str, optional
+            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
+            Typically 'pdcsap_flux' or 'sap_flux'.
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` class for details on the bitmasks.
+        format : str, optional
+            The format of the Kepler FITS file. Should be one of 'kepler', 'k2sff', 'everest'. Defaults to 'kepler'.
+        """
+        # Default to Kepler file format
+        if kwargs.get("format") is None:
+            kwargs["format"] = "FoldedTess"
+        lc = super().read(*args, **kwargs)
+        hdu = fits.open(lc.filename)
+        lc.meta['period'] = hdu[0]['PERIOD']'''
+        
 
     @property
     def phase(self):
@@ -3275,17 +3310,19 @@ class FoldedLightCurve(LightCurve):
         """
         folded_specific_data = {
             "OBJECT": "{}".format(self.targetid),
-            #"MISSION": self.meta.get("MISSION"),
+            "MISSION": self.meta.get("MISSION"),
             "RA_OBJ": self.meta.get("RA"),
-            #"TELESCOP": self.meta.get("MISSION"),
-            "CAMERA": self.meta.get("CAMERA"),
-            "CCD": self.meta.get("CCD"),
-            "SECTOR": self.meta.get("SECTOR"),
             "TARGETID": self.meta.get("TARGETID"),
             "DEC_OBJ": self.meta.get("DEC"),
             "MOM_CENTR1": self.centroid_col,
             "MOM_CENTR2": self.centroid_row,
             "PERIOD": self.period.to('day').value,
+            #"NMLZ_PH": fits.Card('NMLZ_P', self.meta['NORMALIZE_PHASE'], 'boolean FoldedLightCurve normalized time'),
+            "CREATOR": "lightkurve.FoldedLightCurve.to_fits()",
+            "PH_NORM": self.meta['NORMALIZE_PHASE'],#'F' if self.meta['NORMALIZE_PHASE'] else 'T',
+            "EPOCH": self.meta['EPOCH_TIME'].value if self.meta['EPOCH_TIME'] else '',
+            "PH_EPOCH": self.meta['EPOCH_PHASE'].value,
+            #"WRP_PH": self.meta['WRAP_PHASE'].value if self.meta['WRAP_PHASE'] is not None else '',
         }
 
         for kw in folded_specific_data:
@@ -3297,8 +3334,12 @@ class FoldedLightCurve(LightCurve):
 
         # We do this because the TESS file format is subtly different in the
         #    name of this column.
-        hdu[1].columns.change_name("SAP_QUALITY", "QUALITY")
-
+        #hdu[1].columns.change_name("SAP_QUALITY", "QUALITY")
+        #hdu[0].header["PERIOD"] = period
+        #hdu[0].header["EPOCH_TIME"] = epoch_time
+        #hdu[0].header["EPOCH_PHASE"] = epoch_phase
+        #hdu[0].header["WRAP_PHASE"] = wrap_phase
+        #hdu[0].header["NORMALIZE_PHASE"] = self.h,
         #hdu = _make_aperture_extension(hdu, aperture_mask)
 
         if path is not None:
@@ -3534,9 +3575,12 @@ class KeplerLightCurve(LightCurve):
             "EQUINOX": 2000,
             "DATE-OBS": Time(self.time[0] + 2454833.0, format=("jd")).isot,
             "SAP_QUALITY": self.quality,
-            "MOM_CENTR1": self.centroid_col,
-            "MOM_CENTR2": self.centroid_row,
         }
+        # Not every HLSP has centroid col/row information, so only pass this along if the data exists
+        if hasattr(self, 'centroid_col'):
+            kepler_specific_data["MOM_CENTR1"] = self.centroid_col
+            kepler_specific_data["MOM_CENTR2"] = self.centroid_row
+
 
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
@@ -3630,7 +3674,7 @@ class TessLightCurve(LightCurve):
             defined.  The mask can be either a boolean mask or an integer mask
             mimicking the Kepler/TESS convention; boolean masks are
             automatically converted to the Kepler/TESS conventions
-        extra_data : dict
+        extra_data : 
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
             keywords in the primary header.
@@ -3652,9 +3696,16 @@ class TessLightCurve(LightCurve):
             "SECTOR": self.meta.get("SECTOR"),
             "TARGETID": self.meta.get("TARGETID"),
             "DEC_OBJ": self.meta.get("DEC"),
-            "MOM_CENTR1": self.centroid_col,
-            "MOM_CENTR2": self.centroid_row,
         }
+        
+        # If users give a dictionary of values, we first need to "remove" the values from the dictionary
+        if 'extra_data' in extra_data.keys():
+            extra_data = extra_data['extra_data']
+
+        # Not every HLSP has centroid col/row information, so only pass this along if the data exists
+        if hasattr(self, 'centroid_col'):
+            tess_specific_data["MOM_CENTR1"] = self.centroid_col
+            tess_specific_data["MOM_CENTR2"] = self.centroid_row
 
         for kw in tess_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
