@@ -160,9 +160,6 @@ def detect_filetype(hdulist: HDUList) -> str:
             # Early versions of TESScut did not set a good CREATOR keyword
             elif "stsci" in origin:
                 return "TessTargetPixelFile"
-
-            
-
     # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):

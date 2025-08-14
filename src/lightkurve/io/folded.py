@@ -1,6 +1,5 @@
-"""Reader for official TESS light curve FITS files produced by the Ames SPOC pipeline."""
+"""Reader for folded light curve FITS files produced by lightkurve.lightcurve.FoldedLightCurve."""
 from ..lightcurve import FoldedLightCurve
-#from ..utils import TessQualityFlags
 from astropy.io import fits
 
 from .generic import read_generic_lightcurve
@@ -21,7 +20,7 @@ def read_folded_lightcurve(
     """
 
 
-    lc = read_generic_lightcurve(filename, flux_column='FLUX', time_format='jd')
+    lc = read_generic_lightcurve(filename, flux_column='FLUX', time_format=time_format)
     hdu = fits.open(lc.filename)
 
     lc.meta["PERIOD"] = hdu[0].header["PERIOD"]
