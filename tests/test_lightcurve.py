@@ -973,7 +973,7 @@ def test_to_fits():
     hdu = read(TESS_SIM).to_fits(period=1.2, message='Test string')
     lc = read(hdu)
     assert lc.period == 1.2
-    assert lc.message = 'Test string'
+    assert lc.message == 'Test string'
     # Test reading a generic lc without TESS/Kepler information #649
     basic_lc = LightCurve(time=[1,2,3], flux=[4,5,6])
     basic_hdu = basic_lc.to_fits()
