@@ -100,18 +100,33 @@ def read_generic_lightcurve(
 
         # Prepare a special time column
         if not time_format:
-            if hdulist[ext].header.get("BJDREFI") == 2454833:
+            if hdulist[ext].header.get("BJDREFI") == 2454833: # Kepler specific
                 time_format = "bkjd"
-            elif hdulist[ext].header.get("BJDREFI") == 2457000:
+            elif hdulist[ext].header.get("BJDREFI") == 2457000: # TESS specific
                 time_format = "btjd"
+            elif hdulist[ext].header.get("TIMESYS") == "local":
+                try:
+                    unit = u.Unit(hdulist[ext].header.get("TUNIT1"))    # Modified to account such that TUNIT1 dictates the astropy.time unit
+                    time = TimeDelta(
+                        tab["time"].data*unit,    # CHOICE: if you multiply by u.h, will turn values to fractional day which is in agreement with time_format
+                    )
+                    tab.remove_column("time")
+                except:
+                    raise KeyError(f"Unclear unit for local time system: TUNIT1 must be astropy.unit value.")            # Error handling for invalid astropy.unit value or if the TUNIT1 keyword is missing from header         
+
+            elif hdulist[ext].header.get("TIMESYS") == "mjd":
+                time_format = 'mjd'
+            elif hdulist[ext].header.get("TIMESYS") == "jd":
+                time_format = 'jd'
             else:
                 raise ValueError(f"Input file has unclear time format: {filename}")
-        time = Time(
-            tab["time"].data,
-            scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
-            format=time_format,
-        )
-        tab.remove_column("time")
+        if 'time' not in locals():
+            time = Time(
+                tab["time"].data,
+                scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
+                format=time_format,
+            )
+            tab.remove_column("time")
 
         # For backwards compatibility with Lightkurve v1.x,
         # we make sure standard columns and attributes exist.

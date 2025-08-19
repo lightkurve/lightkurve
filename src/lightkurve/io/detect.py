@@ -128,17 +128,22 @@ def detect_filetype(hdulist: HDUList) -> str:
         creator = header["creator"].lower()
         origin = header["origin"].lower()
 
+        if 'folded' in creator:
+            return "Folded"
+
         
         if "TELESCOP" in header.keys():
             telescop = header["telescop"].lower()
         else:
             # Some old custom TESS data did not define the `TELESCOP` card
             telescop = header["mission"].lower()
+        
+
 
 
         if telescop == "kepler":
-            if 'folded' in creator:
-                return "FoldedKepler"
+            #if 'folded' in creator:
+            #    return "Folded"
             # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:
                 return "KeplerTargetPixelFile"
@@ -149,8 +154,8 @@ def detect_filetype(hdulist: HDUList) -> str:
             ):
                 return "KeplerLightCurve"
         elif telescop == "tess":
-            if 'folded' in creator:
-                return "FoldedTess"
+            #if 'folded' in creator:
+            #    return "Folded"
             # TESS TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:
                 return "TessTargetPixelFile"
@@ -163,4 +168,6 @@ def detect_filetype(hdulist: HDUList) -> str:
     # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):
-        return None
+        return "generic" #None
+    
+

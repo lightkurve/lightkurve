@@ -8,7 +8,9 @@ from .generic import read_generic_lightcurve
 def read_folded_lightcurve(
     filename, time_format="jd",
 ):
-    """Returns a `~lightkurve.lightcurve.FoldedLightCurve`.
+    """
+    Reads in lightcurves created by lightkurve.lightcurve.FoldedLightCurve().to_fits()
+    Returns a `~lightkurve.lightcurve.FoldedLightCurve()`.
 
     Parameters
     ----------
@@ -23,9 +25,11 @@ def read_folded_lightcurve(
     lc = read_generic_lightcurve(filename, flux_column='FLUX', time_format=time_format)
     hdu = fits.open(lc.filename)
 
+    # These features are automatically added by lightkurve when creating a folded lc
+    # They are required in the meta data for functions such as plotting
     lc.meta["PERIOD"] = hdu[0].header["PERIOD"]
-    lc.meta["NORMALIZE_PHASE"] = hdu[0].header["PH_NORM"]
+    lc.meta["NORMALIZE_PHASE"] = hdu[0].header["PHNORM"]
     lc.meta["EPOCH_TIME"] = hdu[0].header["EPOCH"]
-    lc.meta["EPOCH_PHASE"] = hdu[0].header["PH_EPOCH"]
+    lc.meta["EPOCH_PHASE"] = hdu[0].header["PHEPOCH"]
 
     return FoldedLightCurve(data=lc)

@@ -9,6 +9,7 @@ from lightkurve.targetpixelfile import TargetPixelFile
 from ..lightcurve import KeplerLightCurve, TessLightCurve, LightCurve, FoldedLightCurve
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 from ..utils import LightkurveDeprecationWarning, LightkurveError
+from .generic import read_generic_lightcurve
 from .detect import detect_filetype
 
 log = logging.getLogger(__name__)
@@ -127,10 +128,12 @@ def read(path_or_url, **kwargs):
             return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
         elif filetype == "TGLC":
             return TessLightCurve.read(path_or_url, format="tglc", **kwargs)
-        elif filetype == "FoldedTess":
-            return(FoldedLightCurve.read(path_or_url, format='tess', **kwargs))
-        elif filetype == "FoldedKepler":
-            return(FoldedLightCurve.read(path_or_url, format='kepler', **kwargs))
+        elif filetype == "Folded":
+            return FoldedLightCurve.read(path_or_url, format='folded', **kwargs)
+        #elif filetype == "FoldedKepler":
+        #    return(FoldedLightCurve.read(path_or_url, format='kepler', **kwargs))
+        elif filetype == "generic":
+            return read_generic_lightcurve(path_or_url, **kwargs)
     except BaseException as exc:
         # ensure path_or_url is in the error
         raise LightkurveError(

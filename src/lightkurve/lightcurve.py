@@ -3289,9 +3289,9 @@ class FoldedLightCurve(LightCurve):
             "DEC_OBJ": self.meta.get("DEC"),
             "PERIOD": self.period.to('day').value,
             "CREATOR": "lightkurve.FoldedLightCurve.to_fits()",
-            "PH_NORM": self.meta['NORMALIZE_PHASE'],
+            "PHNORM": self.meta['NORMALIZE_PHASE'],
             "EPOCH": self.meta['EPOCH_TIME'].value if self.meta['EPOCH_TIME'] else '',
-            "PH_EPOCH": self.meta['EPOCH_PHASE'].value,
+            "PHEPOCH": self.meta['EPOCH_PHASE'].value,
         }
 
         # Not every HLSP has centroid col/row information, so only pass this along if the data exists
