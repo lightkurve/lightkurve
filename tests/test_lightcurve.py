@@ -982,7 +982,7 @@ def test_to_fits():
         read(basic_hdu)
     # providing time_format should allow creating a generic lk object
     basic_lc = read(basic_hdu, time_format='jd')
-    assert basic_lc.time.value == [1,2,3]
+    assert (basic_lc.time.value == [1,2,3]).all()
     assert basic_lc.time.format == 'jd'
 
 
