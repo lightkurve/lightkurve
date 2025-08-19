@@ -21,10 +21,12 @@ def read_folded_lightcurve(
 
     """
 
-
     lc = read_generic_lightcurve(filename, flux_column='FLUX', time_format=time_format)
-    hdu = fits.open(lc.filename)
-
+    if isinstance(lc.filename, fits.HDUList):
+        hdu = lc.filename
+    else: 
+        hdu = fits.open(lc.filename)
+    print(hdu)
     # These features are automatically added by lightkurve when creating a folded lc
     # They are required in the meta data for functions such as plotting
     lc.meta["PERIOD"] = hdu[0].header["PERIOD"]

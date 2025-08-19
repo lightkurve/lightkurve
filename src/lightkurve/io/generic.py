@@ -6,6 +6,7 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy.time import Time
 from astropy.units import UnitsWarning
+import astropy.units as u
 import numpy as np
 
 from ..utils import validate_method

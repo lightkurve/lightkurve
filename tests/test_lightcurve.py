@@ -18,7 +18,7 @@ from lightkurve.io import read
 from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning
+from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning, LightkurveError
 from lightkurve.search import search_lightcurve
 from lightkurve.collections import LightCurveCollection
 
@@ -964,6 +964,30 @@ def test_to_fits():
             overwrite=True,
             extra_data={"BKG": bkg_lc.flux},
         )
+    # Test round trip saving a folded lightcurve
+    folded_hdu = read(TESS_SIM).fold(1.2*u.day).to_fits()
+    folded_lc = read(folded_hdu)
+    assert folded_lc.normalize_phase == False
+    assert folded_lc.period == 1.2
+    # Test adding additional keywords (#1369)
+    hdu = read(TESS_SIM).to_fits(period=1.2, message='Test string')
+    lc = read(hdu)
+    assert lc.period == 1.2
+    assert lc.message = 'Test string'
+    # Test reading a generic lc without TESS/Kepler information #649
+    basic_lc = LightCurve(time=[1,2,3], flux=[4,5,6])
+    basic_hdu = basic_lc.to_fits()
+    # The random data does not have time units, so this should fail if not specified
+    with pytest.raises(LightkurveError, match="Error in reading Data product"):
+        read(basic_hdu)
+    # providing time_format should allow creating a generic lk object
+    basic_lc = read(basic_hdu, time_format='jd')
+    assert basic_lc.time.value == [1,2,3]
+    assert basic_lc.time.format == 'jd'
+
+
+    
+
 
 
 def test_to_fits_flux_units_in_header():

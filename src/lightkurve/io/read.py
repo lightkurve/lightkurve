@@ -10,6 +10,7 @@ from ..lightcurve import KeplerLightCurve, TessLightCurve, LightCurve, FoldedLig
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 from ..utils import LightkurveDeprecationWarning, LightkurveError
 from .generic import read_generic_lightcurve
+from .folded import read_folded_lightcurve
 from .detect import detect_filetype
 
 log = logging.getLogger(__name__)
@@ -87,6 +88,8 @@ def read(path_or_url, **kwargs):
             # path_or_url is an S3 cloud URI
             with fits.open(path_or_url, use_fsspec=True, fsspec_kwargs={"anon": True}) as temp:
                 filetype = detect_filetype(temp)
+        elif isinstance(path_or_url, fits.HDUList):
+            filetype = detect_filetype(path_or_url)
         else:
             with fits.open(path_or_url) as temp:
                 filetype = detect_filetype(temp)
@@ -129,7 +132,8 @@ def read(path_or_url, **kwargs):
         elif filetype == "TGLC":
             return TessLightCurve.read(path_or_url, format="tglc", **kwargs)
         elif filetype == "Folded":
-            return FoldedLightCurve.read(path_or_url, format='folded', **kwargs)
+            #return FoldedLightCurve.read(path_or_url, astropy_native=True, **kwargs)
+            return read_folded_lightcurve(path_or_url, **kwargs)
         #elif filetype == "FoldedKepler":
         #    return(FoldedLightCurve.read(path_or_url, format='kepler', **kwargs))
         elif filetype == "generic":
