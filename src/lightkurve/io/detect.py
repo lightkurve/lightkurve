@@ -28,6 +28,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'KEPSEISMIC'`
         * `'CDIPS'`
         * `'TGLC'`
+        * `'Folded'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -128,6 +129,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         creator = header["creator"].lower()
         origin = header["origin"].lower()
 
+        # check if the file was a folded lightcurve, as saved by lightkurve.FoldedLightCurve().to_fits()
         if 'folded' in creator:
             return "Folded"
 
@@ -142,8 +144,6 @@ def detect_filetype(hdulist: HDUList) -> str:
 
 
         if telescop == "kepler":
-            #if 'folded' in creator:
-            #    return "Folded"
             # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:
                 return "KeplerTargetPixelFile"
@@ -154,8 +154,6 @@ def detect_filetype(hdulist: HDUList) -> str:
             ):
                 return "KeplerLightCurve"
         elif telescop == "tess":
-            #if 'folded' in creator:
-            #    return "Folded"
             # TESS TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:
                 return "TessTargetPixelFile"
@@ -168,6 +166,6 @@ def detect_filetype(hdulist: HDUList) -> str:
     # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):
-        return "generic" #None
+        return "generic" #Try using the generic lc reader
     
 

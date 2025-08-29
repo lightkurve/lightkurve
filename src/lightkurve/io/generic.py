@@ -105,6 +105,7 @@ def read_generic_lightcurve(
                 time_format = "bkjd"
             elif hdulist[ext].header.get("BJDREFI") == 2457000: # TESS specific
                 time_format = "btjd"
+            # make compatible with normalized light curves without absolute start sime (see #1502) 
             elif hdulist[ext].header.get("TIMESYS") == "local":
                 try:
                     unit = u.Unit(hdulist[ext].header.get("TUNIT1"))    # Modified to account such that TUNIT1 dictates the astropy.time unit

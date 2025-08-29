@@ -26,7 +26,7 @@ def read_folded_lightcurve(
         hdu = lc.filename
     else: 
         hdu = fits.open(lc.filename)
-    print(hdu)
+        
     # These features are automatically added by lightkurve when creating a folded lc
     # They are required in the meta data for functions such as plotting
     lc.meta["PERIOD"] = hdu[0].header["PERIOD"]

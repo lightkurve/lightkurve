@@ -15,7 +15,6 @@ from . import (
     tess,
     tglc,
     folded,
-    generic,
 )
 from .detect import *
 from .read import *
@@ -40,6 +39,5 @@ try:
     )
     registry.register_reader("tglc", LightCurve, tglc.read_tglc_lightcurve)
     registry.register_reader("folded", LightCurve, folded.read_folded_lightcurve)
-    #registry.register_reader("generic", LightCurve, generic.read_generic_lightcurve)
 except registry.IORegistryError:
     pass  # necessary to enable autoreload during debugging

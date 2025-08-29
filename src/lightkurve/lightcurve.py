@@ -2590,15 +2590,12 @@ class LightCurve(TimeSeries):
                             array=extra_data[kw],
                         )
                     )
-
-
             if "SAP_QUALITY" not in extra_data:
                 cols.append(
                     fits.Column(
                         name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
                     )
                 )
-            
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
@@ -3062,38 +3059,6 @@ class FoldedLightCurve(LightCurve):
     extra properties (``phase``, ``odd_mask``, ``even_mask``),
     and implements different plotting defaults.
     """     
-    @classmethod
-    def read(cls, *args, **kwargs):
-        """Returns a `KeplerLightCurve` by reading the given file.
-
-        Parameters
-        ----------
-        filename : str
-            Local path or remote url of a Kepler light curve FITS file.
-        flux_column : str, optional
-            The column in the FITS file to be read as `flux`. Defaults to 'pdcsap_flux'.
-            Typically 'pdcsap_flux' or 'sap_flux'.
-        quality_bitmask : str or int, optional
-            Bitmask (integer) which identifies the quality flag bitmask that should
-            be used to mask out bad cadences. If a string is passed, it has the
-            following meaning:
-
-                * "none": no cadences will be ignored
-                * "default": cadences with severe quality issues will be ignored
-                * "hard": more conservative choice of flags to ignore
-                  This is known to remove good data.
-                * "hardest": removes all data that has been flagged
-                  This mask is not recommended.
-
-            See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` class for details on the bitmasks.
-        format : str, optional
-            The format of the Kepler FITS file. Should be one of 'kepler', 'k2sff', 'everest'. Defaults to 'kepler'.
-        """
-        # Default to Kepler file format
-        if kwargs.get("format") is None:
-            kwargs["format"] = "folded"
-        return super().read(*args, **kwargs)
-
     @property
     def phase(self):
         """Alias for `LightCurve.time`."""
