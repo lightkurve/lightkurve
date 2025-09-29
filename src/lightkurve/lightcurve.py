@@ -3076,6 +3076,7 @@ class FoldedLightCurve(LightCurve):
     def phase(self):
         """Alias for `LightCurve.time`."""
         return self.time
+    
 
     @property
     def cycle(self):
@@ -3137,6 +3138,9 @@ class FoldedLightCurve(LightCurve):
                 "The function should be invoked on a folded lightcurve with normalized phase. No-Op."
             )
             return
+        
+        if self.period is not None and not isinstance(self.period, Quantity):
+            self.period *= u.day
 
         # If the phase folded lightcurve is normalized, unnormalize it
         with self._delay_required_column_checks():
@@ -3158,6 +3162,9 @@ class FoldedLightCurve(LightCurve):
                 "Attempt to restore normalized phase while the phase has already been normalized. No-op."
             )
             return
+        
+        if self.period is not None and not isinstance(self.period, Quantity):
+            self.period *= u.day
 
 
         with self._delay_required_column_checks():
