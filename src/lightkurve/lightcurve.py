@@ -1095,6 +1095,11 @@ class LightCurve(TimeSeries):
         lc.add_column(
             self.time.copy(), name="time_original", index=len(self._required_columns)
         )
+        if isinstance(period, Quantity):
+            try:
+                period.to(u.day)
+            except:
+                UnitConversionError
         lc.meta["PERIOD"] = period
         lc.meta["NORMALIZE_PHASE"] = normalize_phase
         lc.meta["EPOCH_TIME"] = epoch_time
@@ -2596,6 +2601,14 @@ class LightCurve(TimeSeries):
                         name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
                     )
                 )
+            '''if "BJDREFI" in self.hdu[1].header:
+                cols.append(
+                    fits.Column(
+                        name="{}".format(kw).upper(),
+                        format="D",
+                        array = self.hdu[1].header['BJDREFI']
+                    )
+                )'''
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
@@ -3147,9 +3160,10 @@ class FoldedLightCurve(LightCurve):
             )
             return
 
+
         with self._delay_required_column_checks():
             phase = self.time
-            normalized_phase = phase / self.period
+            normalized_phase = Quantity(phase.value / self.period)
             self.remove_column("time")
             self.add_column(normalized_phase, name="time", index=0)
 
@@ -3298,9 +3312,17 @@ class FoldedLightCurve(LightCurve):
         for kw in folded_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = folded_specific_data[kw]
+
+        if self.normalize_phase == True:
+            self._replace_normalized_phase()
+
         hdu = super(FoldedLightCurve, self).to_fits(
             path=None, overwrite=overwrite, **extra_data
         )
+
+        if self.normalize_phase == True:
+            self._restore_normalized_phase()
+
         if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         else:

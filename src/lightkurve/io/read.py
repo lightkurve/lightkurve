@@ -6,7 +6,7 @@ from astropy.utils import deprecated
 
 from lightkurve.targetpixelfile import TargetPixelFile
 
-from ..lightcurve import KeplerLightCurve, TessLightCurve, LightCurve, FoldedLightCurve
+from ..lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 from ..utils import LightkurveDeprecationWarning, LightkurveError
 from .generic import read_generic_lightcurve
@@ -41,6 +41,9 @@ def read(path_or_url, **kwargs):
         * `KeplerLightCurve` (typical suffix "llc.fits");
         * `TessTargetPixelFile` (typical suffix "_tp.fits");
         * `TessLightCurve` (typical suffix "_lc.fits").
+        * `FoldedLightCurve` (assuming the folded lightcurve was saved with lightkurve.lightcurve.FoldedLightCurve.to_fits())
+
+    If the filetype is not detected, read_generic_lightcurve will be used to try to read in the file.
 
     Parameters
     ----------
@@ -132,10 +135,7 @@ def read(path_or_url, **kwargs):
         elif filetype == "TGLC":
             return TessLightCurve.read(path_or_url, format="tglc", **kwargs)
         elif filetype == "Folded":
-            #return FoldedLightCurve.read(path_or_url, astropy_native=True, **kwargs)
             return read_folded_lightcurve(path_or_url, **kwargs)
-        #elif filetype == "FoldedKepler":
-        #    return(FoldedLightCurve.read(path_or_url, format='kepler', **kwargs))
         elif filetype == "generic":
             return read_generic_lightcurve(path_or_url, **kwargs)
     except BaseException as exc:
