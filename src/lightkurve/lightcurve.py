@@ -1099,7 +1099,7 @@ class LightCurve(TimeSeries):
             try:
                 period.to(u.day)
             except:
-                UnitConversionError
+                u.UnitConversionError
         lc.meta["PERIOD"] = period
         lc.meta["NORMALIZE_PHASE"] = normalize_phase
         lc.meta["EPOCH_TIME"] = epoch_time
