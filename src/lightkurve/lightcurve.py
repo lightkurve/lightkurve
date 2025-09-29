@@ -3140,9 +3140,8 @@ class FoldedLightCurve(LightCurve):
 
         # If the phase folded lightcurve is normalized, unnormalize it
         with self._delay_required_column_checks():
-            normalized_phase = self.time
-            # print(normalized_phase * self.period)
-            phase = TimeDelta(normalized_phase * self.period)
+            normalized_phase = self.time.value
+            phase = TimeDelta(normalized_phase * self.period.value)#Time(normalized_phase*self.period.value, scale='tdb', format='jd')
             self.remove_column("time")
             self.add_column(phase, name="time", index=0)
         # return self
@@ -3163,7 +3162,7 @@ class FoldedLightCurve(LightCurve):
 
         with self._delay_required_column_checks():
             phase = self.time
-            normalized_phase = Quantity(phase.value / self.period)
+            normalized_phase = Quantity(phase.value / self.period.value)
             self.remove_column("time")
             self.add_column(normalized_phase, name="time", index=0)
 
