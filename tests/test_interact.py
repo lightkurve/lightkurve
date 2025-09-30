@@ -257,7 +257,7 @@ def test_interact_sky_functions_add_nearby_tics_weird_dtype():
     df, source_colnames_extras, tooltips_extras = _add_nearby_tics_if_tess(tpf, magnitude_limit, df_before)
 
     # some TICs are added successfully, without any error raised.
-    assert len(df['tic'] != '') > 0
+    assert len(df[df['tic'] != '']) > 0
 
 
 @pytest.mark.remote_data

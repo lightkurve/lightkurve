@@ -43,6 +43,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         A string describing the detected filetype. If the filetype is not
         recognized, `None` will be returned.
     """
+    # The 'origin' fits header value gives institution responsible for creating the file
 
     # Is it a MIT/QLP TESS FFI Quicklook Pipeline light curve?
     # cf. http://archive.stsci.edu/hlsp/qlp
@@ -124,8 +125,7 @@ def detect_filetype(hdulist: HDUList) -> str:
     # Is it an official data product?
     header = hdulist[0].header
     try:
-        # use `telescop` keyword to determine mission
-        # and `creator` to determine tpf or lc
+        # Use `creator` keyword to determine tpf or lc
         creator = header["creator"].lower()
         origin = header["origin"].lower()
 
@@ -133,7 +133,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         if 'folded' in creator:
             return "Folded"
 
-        
+        # use `telescop` keyword to determine mission
         if "TELESCOP" in header.keys():
             telescop = header["telescop"].lower()
         else:

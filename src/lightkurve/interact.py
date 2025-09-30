@@ -69,14 +69,14 @@ def _search_nearby_of_tess_target(tic_id):
                       format="csv",
                       fast_reader=False,
                       converters={
-                          "GAIA DR2": [ascii.convert_numpy(str)],
+                          "Gaia DR2": [ascii.convert_numpy(str)],
                           "TIC ID": [ascii.convert_numpy(str)],
                           "TOI": [ascii.convert_numpy(str)],
                           })
 
 
 def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
-    res = tab[tab['GAIA DR2'] == str(nearby_gaia_id)]
+    res = tab[tab['Gaia DR2'] == str(nearby_gaia_id)]
     if len(res) > 0:
         return res[0][key]
     else:
@@ -426,11 +426,11 @@ def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limi
     # filter out those with matching gaia ids
     # (handled in `_add_tics_with_matching_gaia_ids_to()`)
     gaia_str_ids = [str(id) for id in gaia_ids]
-    tab = tab[np.isin(tab['GAIA DR2'], gaia_str_ids, invert=True)]
+    tab = tab[np.isin(tab['Gaia DR2'], gaia_str_ids, invert=True)]
 
     # filter out those with gaia ids, but Gaia Mag is smaller than magnitude_limit
     # (they won't appear in the given gaia_ids list)
-    tab = tab[tab['GAIA Mag'] < magnitude_limit]
+    tab = tab[tab['Gaia Mag'] < magnitude_limit]
 
     # apply magnitude_limit filter for those with no Gaia data using TESS mag
     tab = tab[tab['TESS Mag'] < magnitude_limit]
