@@ -946,10 +946,16 @@ def _search_products(
                 "".format(target)
             )
         # see: https://archive.stsci.edu/k2/manuals/KSCI-19082-021.pdf
-        elif (0 < 200000000) and (target < 252090718): 
+        elif (target > 200000000) and (target < 252090718): 
             log.warning(
                 "Warning: {} may refer to a different K2 or TESS target. "
                 "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
+                "".format(target)
+            )
+        elif target < 0:
+            log.warning(
+                "Warning: {} input value does not correspond to valid values in 'TIC' 'KIC' or 'EPIC'. "
+                "Please check target name and try again."
                 "".format(target)
             )
         # astroquery 0.4.11 update breaks if passing an integer, so convert to string

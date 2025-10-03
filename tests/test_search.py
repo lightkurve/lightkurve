@@ -111,7 +111,7 @@ def test_search_lightcurve(caplog):
     )
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
     search_lightcurve(-999)
-    assert "disambiguate" in caplog.text
+    assert "correspond" in caplog.text
     search_lightcurve("DOES_NOT_EXIST (UNIT TEST)")
     assert "disambiguate" in caplog.text
     # If we ask for all cadence types, there should be four Kepler files given
