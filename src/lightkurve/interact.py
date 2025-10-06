@@ -65,11 +65,13 @@ except Exception as e:
 def _search_nearby_of_tess_target(tic_id):
     # To avoid warnings / overflow error in attempting to convert GAIA DR2, TIC ID, TOI
     # as int32 (the default) in some cases
+    # PR2152 found the table returned to have Gaia (lower case) rather than all caps. This is a workaround.
     return ascii.read(f"https://exofop.ipac.caltech.edu/tess/download_nearbytarget.php?id={tic_id}&output=csv",
                       format="csv",
                       fast_reader=False,
                       converters={
                           "GAIA DR2": [ascii.convert_numpy(str)],
+                          "Gaia DR2": [ascii.convert_numpy(str)],
                           "TIC ID": [ascii.convert_numpy(str)],
                           "TOI": [ascii.convert_numpy(str)],
                           })
