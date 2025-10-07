@@ -960,7 +960,7 @@ def _search_products(
                 "Please check target name and try again."
                 "".format(target)
             )
-            target = str(target)
+            return None
             
         # astroquery 0.4.11 update breaks if passing an integer, so convert to string
         else:
