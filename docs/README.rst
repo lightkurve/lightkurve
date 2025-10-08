@@ -18,7 +18,7 @@ Building documentation
     Building the documentation is not necessary unless you are
     writing new documentation or do not have internet access, because the
     latest version of the documentation is available online at
-    `docs.lightkurve.org <https://docs.lightkurve.org/>`_ .
+    `lightkurve.github.io/lightkurve <https://lightkurve.github.io/lightkurve/>`_ .
 
 Building the *lightkurve* documentation requires `sphinx` and a few extra packages. We recommend using `poetry` to install the development dependencies::
 

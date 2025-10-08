@@ -2,6 +2,7 @@
 =====================
 - Patch for changes to astroquery 0.4.11. Search results using GAIA DR2 now case insensitive. Integer searches converted to string. [#1511]
 
+
 2.5.1  (2025-05-20)
 =====================
 
@@ -742,7 +743,7 @@ lightkurve.periodogram
   which deprecated the ``polyorder`` keyword in favor of ``degree``.
   [#613, #616, #617, #626]
 
-- Changed the `tutorials index page <https://docs.lightkurve.org/tutorials>`_
+- Changed the `tutorials index page <https://lightkurve.github.io/lightkurve/tutorials>`_
   in the online docs to make the tutorials easier to navigate.
 
 - Added a tutorial which demonstrates the use of Lightkurve's seismology module
@@ -800,7 +801,7 @@ lightkurve.periodogram
 - Added support for performing mathematical operations involving ``LightCurve``
   objects, e.g. two ``LightCurve`` objects can now be added together. [#532]
 
-- Updated the online tutorials (https://docs.lightkurve.org/tutorials) to
+- Updated the online tutorials (https://lightkurve.github.io/lightkurve/tutorials) to
   take all recent Lightkurve API changes into account. [#596]
 
 
@@ -1002,7 +1003,7 @@ Bugfixes
 ===================
 
 - Introduced a new layout for the
-  `online documentation <https://docs.lightkurve.org>`_. [#360, #400, #406]
+  `online documentation <https://lightkurve.github.io/lightkurve/>`_. [#360, #400, #406]
 
 - Added ``LightCurve.interact_bls()``: an interactive Bokeh widget to find
   planets using the Box Least Squares (BLS) method. [#401]
