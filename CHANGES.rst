@@ -1,4 +1,7 @@
-2.5.1  (unreleased)
+2.5.2dev  (unreleased)
+=====================
+
+2.5.1  (2025-05-20)
 =====================
 
 - Fixed pixel to world coordinate transformation in ``TargetPixelFile.get_coordinates()``
