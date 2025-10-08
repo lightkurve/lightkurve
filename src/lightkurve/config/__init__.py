@@ -4,7 +4,7 @@ import warnings
 import astropy.config as astropyconfig
 
 
-ROOTNAME = 'lightkurve'
+ROOTNAME = "lightkurve"
 
 
 class ConfigNamespace(astropyconfig.ConfigNamespace):
@@ -104,7 +104,7 @@ def warn_if_default_cache_dir_migration_needed():
         return
 
     cache_dir = conf.cache_dir
-    if not(cache_dir is None or cache_dir == ""):
+    if not (cache_dir is None or cache_dir == ""):
         # If an user has specified a custom cache dir, the check won't be performed.
         # Not only is the check somewhat irrelevant, the behavior is also required
         # to support the case that the user configures the legacy `~/.lightkurve-cache`
@@ -120,6 +120,6 @@ def warn_if_default_cache_dir_migration_needed():
             f"The default Lightkurve cache directory, used by download(), etc., has been moved to {new_cache_dir}. "
             f"Please move all the files in the legacy directory {old_cache_dir} to the new location "
             f"and remove the legacy directory. "
-            f"Refer to https://docs.lightkurve.org/reference/config.html#default-cache-directory-migration "
+            f"Refer to https://lightkurve.github.io/lightkurve/reference/config.html#default-cache-directory-migration "
             f"for more information."
         )

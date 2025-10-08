@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "lightkurve"
-version = "2.5.1"
+version = "2.5.2dev"
 description = "A friendly package for Kepler & TESS time series analysis in Python."
 license = "MIT"
 authors = ["Geert Barentsen <hello@geert.io>", "TESS Science Support Center <tesshelp@bigbang.gsfc.nasa.gov>"]
 readme = "README.rst"
-homepage = "https://docs.lightkurve.org"
+homepage = "https://lightkurve.github.io/lightkurve/"
 repository = "https://github.com/lightkurve/lightkurve"
 keywords = ["NASA", "Kepler", "TESS", "Astronomy"]
 classifiers = [
@@ -19,7 +19,7 @@ classifiers = [
 include = ["AUTHORS.rst", "CHANGES.rst", "CONTRIBUTING.rst", "CITATION"]
 
 [tool.poetry.urls]
-"Documentation" = "https://docs.lightkurve.org"
+"Documentation" = "https://lightkurve.github.io/lightkurve/"
 "Bug Tracker" = "https://github.com/lightkurve/lightkurve/issues"
 
 [tool.poetry.dependencies]
@@ -77,6 +77,7 @@ mistune = "<2.0.0"  # Workaround for #1162 (not a true dependency)
 # docutils 0.21 cannot be installed with poetry
 # See https://github.com/python-poetry/poetry/issues/9293
 docutils = "!=0.21"
+lxml-html-clean = "^0.4.2"
 
 [build-system]
 requires = ["poetry-core"]
