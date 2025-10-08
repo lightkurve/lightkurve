@@ -17,6 +17,7 @@ from __future__ import division, print_function
 import os
 import logging
 import warnings
+import fnmatch
 
 import numpy as np
 from astropy.coordinates import SkyCoord, Angle
@@ -70,7 +71,8 @@ def _search_nearby_of_tess_target(tic_id):
                       format="csv",
                       fast_reader=False,
                       converters={
-                          "[Gg][Aa][Ii][Aa] [Dd][Rr]2": [ascii.convert_numpy(str)],
+                          "GAIA DR2": [ascii.convert_numpy(str)],
+                          "Gaia DR2": [ascii.convert_numpy(str)],
                           "TIC ID": [ascii.convert_numpy(str)],
                           "TOI": [ascii.convert_numpy(str)],
                           })
