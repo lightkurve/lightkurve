@@ -552,22 +552,32 @@ class LightCurve(TimeSeries):
             raise ValueError(f"'{flux_err_column}' is not a column")
 
         lc = self.copy()
-        lc["flux"] = lc[flux_column]
+        new_flux = lc[flux_column]
+        # For consistency with how lightkurve inially sets the flux (See issue #1505)
+        if not isinstance(new_flux, Quantity):
+            new_flux = Quantity(new_flux, self.flux.unit)
+        lc["flux"] = new_flux
         if flux_err_column:  # not None
-            lc["flux_err"] = lc[flux_err_column]
+            new_flux_err = lc[flux_err_column]
         else:
             # if `flux_err_column` is unspecified, we attempt to use
             # f"{flux_column}_err" if it exists
             flux_err_column = f"{flux_column}_err"
             if flux_err_column in lc.columns:
-                lc["flux_err"] = lc[flux_err_column]
+                new_flux_err = lc[flux_err_column]
             else:
                 # fill in a dummy all-nan flux_err column
                 # ensure the unit of new flux_err is consistent with that of flux.
                 flux_err_col_vals = np.full(lc["flux"].shape, np.nan)
-                if lc["flux"].unit is not None:
+                if new_flux_err.unit is not None:
                     flux_err_col_vals = flux_err_col_vals * lc["flux"].unit
-                lc["flux_err"] = flux_err_col_vals
+                new_flux_err = flux_err_col_vals
+
+
+        if not isinstance(new_flux_err, Quantity):
+            lc["flux_err"] = Quantity(new_flux_err, lc["flux"].unit)
+        else:
+            lc["flux_err"] = new_flux_err
 
         # Ensure resulting flux / flux_err have the same
         # Do the check here after the columns are selected so as to uniformly handle
