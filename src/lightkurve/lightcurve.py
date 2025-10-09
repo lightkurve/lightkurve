@@ -2601,14 +2601,6 @@ class LightCurve(TimeSeries):
                         name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
                     )
                 )
-            '''if "BJDREFI" in self.hdu[1].header:
-                cols.append(
-                    fits.Column(
-                        name="{}".format(kw).upper(),
-                        format="D",
-                        array = self.hdu[1].header['BJDREFI']
-                    )
-                )'''
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
