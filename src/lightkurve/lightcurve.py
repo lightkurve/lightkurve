@@ -1105,7 +1105,13 @@ class LightCurve(TimeSeries):
         lc.add_column(
             self.time.copy(), name="time_original", index=len(self._required_columns)
         )
+        if isinstance(period, Quantity):
+            try:
+                period.to(u.day)
+            except:
+                u.UnitConversionError
         lc.meta["PERIOD"] = period
+        lc.meta["NORMALIZE_PHASE"] = normalize_phase
         lc.meta["EPOCH_TIME"] = epoch_time
         lc.meta["EPOCH_PHASE"] = epoch_phase
         lc.meta["WRAP_PHASE"] = wrap_phase
@@ -2483,10 +2489,16 @@ class LightCurve(TimeSeries):
             float: "D",
             bool: "L",
             np.int32: "J",
-            np.int32: "K",
+            np.int64: "K",
             np.float32: "E",
             np.float64: "D",
         }
+
+        # If users give a dictionary of values, we first need to "remove" the values from the dictionary
+        if extra_data.get('extra_data') is not None:
+            for k in extra_data.get('extra_data').keys():
+                extra_data[k] = extra_data['extra_data'][k]
+            extra_data.pop('extra_data')
 
         def _header_template(extension):
             """Returns a template `fits.Header` object for a given extension."""
@@ -2513,6 +2525,8 @@ class LightCurve(TimeSeries):
                 "DATE": datetime.datetime.now().strftime("%Y-%m-%d"),
                 "CREATOR": "lightkurve.LightCurve.to_fits()",
                 "PROCVER": str(__version__),
+                "MISSION": self.meta.get("MISSION"),
+                "TELESCOP": self.meta.get("TELESCOP"),
             }
 
             for kw in default:
@@ -2553,6 +2567,7 @@ class LightCurve(TimeSeries):
                         array=self.flux,
                     )
                 )
+            
             if hasattr(self, "flux_err"):
                 if ~(flux_column_name.upper() + "_ERR" in extra_data.keys()):
                     cols.append(
@@ -2571,7 +2586,18 @@ class LightCurve(TimeSeries):
                         fits.Column(name="CADENCENO", format="J", array=self.cadenceno)
                     )
             for kw in extra_data:
-                if isinstance(extra_data[kw], (np.ndarray, list)):
+                if isinstance(extra_data[kw], TimeBase):
+                    cols.append(
+                        fits.Column(
+                            name="{}".format(kw).upper(),
+                            format="D",
+                            unit=extra_data[kw].format,
+                            array=extra_data[kw].value,
+                        )
+                    )
+
+                
+                elif isinstance(extra_data[kw], (np.ndarray, list)):
                     cols.append(
                         fits.Column(
                             name="{}".format(kw).upper(),
@@ -2585,7 +2611,6 @@ class LightCurve(TimeSeries):
                         name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
                     )
                 )
-
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
@@ -3048,12 +3073,12 @@ class FoldedLightCurve(LightCurve):
     ``wrap_phase``, ``normalize_phase``), an extra column (``time_original``),
     extra properties (``phase``, ``odd_mask``, ``even_mask``),
     and implements different plotting defaults.
-    """
-
+    """     
     @property
     def phase(self):
         """Alias for `LightCurve.time`."""
         return self.time
+    
 
     @property
     def cycle(self):
@@ -3115,12 +3140,14 @@ class FoldedLightCurve(LightCurve):
                 "The function should be invoked on a folded lightcurve with normalized phase. No-Op."
             )
             return
+        
+        if self.period is not None and not isinstance(self.period, Quantity):
+            self.period *= u.day
 
         # If the phase folded lightcurve is normalized, unnormalize it
         with self._delay_required_column_checks():
-            normalized_phase = self.time
-            # print(normalized_phase * self.period)
-            phase = TimeDelta(normalized_phase * self.period)
+            normalized_phase = self.time.value
+            phase = TimeDelta(normalized_phase * self.period.value)#Time(normalized_phase*self.period.value, scale='tdb', format='jd')
             self.remove_column("time")
             self.add_column(phase, name="time", index=0)
         # return self
@@ -3137,10 +3164,14 @@ class FoldedLightCurve(LightCurve):
                 "Attempt to restore normalized phase while the phase has already been normalized. No-op."
             )
             return
+        
+        if self.period is not None and not isinstance(self.period, Quantity):
+            self.period *= u.day
+
 
         with self._delay_required_column_checks():
             phase = self.time
-            normalized_phase = phase / self.period
+            normalized_phase = Quantity(phase.value / self.period.value)
             self.remove_column("time")
             self.add_column(normalized_phase, name="time", index=0)
 
@@ -3232,6 +3263,78 @@ class FoldedLightCurve(LightCurve):
             period=self.period, epoch_time=self.epoch_time, **kwargs
         )
         return ax
+    
+    def to_fits(
+        self,
+        path=None,
+        overwrite=False,
+        flux_column_name="FLUX",
+        aperture_mask=None,
+        **extra_data,
+    ):
+        """Writes the FoldedLightCurve to a FITS file.
+
+        Parameters
+        ----------
+        path : string, default None
+            File path, if `None` returns an astropy.io.fits.HDUList object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        flux_column_name : str
+            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
+        aperture_mask : array-like
+            Optional 2D aperture mask to save with this lightcurve object, if
+            defined.  The mask can be either a boolean mask or an integer mask
+            mimicking the Kepler/TESS convention; boolean masks are
+            automatically converted to the Kepler/TESS conventions
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        folded_specific_data = {
+            "OBJECT": "{}".format(self.targetid),
+            "MISSION": self.meta.get("MISSION"),
+            "RA_OBJ": self.meta.get("RA"),
+            "TARGETID": self.meta.get("TARGETID"),
+            "DEC_OBJ": self.meta.get("DEC"),
+            "PERIOD": self.period.to('day').value,
+            "CREATOR": "lightkurve.FoldedLightCurve.to_fits()",
+            "PHNORM": self.meta['NORMALIZE_PHASE'],
+            "EPOCH": self.meta['EPOCH_TIME'].value if self.meta['EPOCH_TIME'] else '',
+            "PHEPOCH": self.meta['EPOCH_PHASE'].value,
+        }
+
+        # Not every HLSP has centroid col/row information, so only pass this along if the data exists
+        if hasattr(self, 'centroid_col'):
+            folded_specific_data["MOM_CENTR1"] = self.centroid_col
+            folded_specific_data["MOM_CENTR2"] = self.centroid_row
+
+        for kw in folded_specific_data:
+            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                extra_data[kw] = folded_specific_data[kw]
+
+        if self.normalize_phase == True:
+            self._replace_normalized_phase()
+
+        hdu = super(FoldedLightCurve, self).to_fits(
+            path=None, overwrite=overwrite, **extra_data
+        )
+
+        if self.normalize_phase == True:
+            self._restore_normalized_phase()
+
+        if path is not None:
+            hdu.writeto(path, overwrite=overwrite, checksum=True)
+        else:
+            return hdu
 
     def bin(
         self,
@@ -3449,6 +3552,7 @@ class KeplerLightCurve(LightCurve):
         hdu : astropy.io.fits
             Returns an astropy.io.fits object if path is None
         """
+
         kepler_specific_data = {
             "TELESCOP": "KEPLER",
             "INSTRUME": "Kepler Photometer",
@@ -3461,9 +3565,12 @@ class KeplerLightCurve(LightCurve):
             "EQUINOX": 2000,
             "DATE-OBS": Time(self.time[0] + 2454833.0, format=("jd")).isot,
             "SAP_QUALITY": self.quality,
-            "MOM_CENTR1": self.centroid_col,
-            "MOM_CENTR2": self.centroid_row,
         }
+        # Not every HLSP has centroid col/row information, so only pass this along if the data exists
+        if hasattr(self, 'centroid_col'):
+            kepler_specific_data["MOM_CENTR1"] = self.centroid_col
+            kepler_specific_data["MOM_CENTR2"] = self.centroid_row
+
 
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
@@ -3557,7 +3664,7 @@ class TessLightCurve(LightCurve):
             defined.  The mask can be either a boolean mask or an integer mask
             mimicking the Kepler/TESS convention; boolean masks are
             automatically converted to the Kepler/TESS conventions
-        extra_data : dict
+        extra_data : 
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
             keywords in the primary header.
@@ -3579,9 +3686,14 @@ class TessLightCurve(LightCurve):
             "SECTOR": self.meta.get("SECTOR"),
             "TARGETID": self.meta.get("TARGETID"),
             "DEC_OBJ": self.meta.get("DEC"),
-            "MOM_CENTR1": self.centroid_col,
-            "MOM_CENTR2": self.centroid_row,
         }
+
+
+
+        # Not every HLSP has centroid col/row information, so only pass this along if the data exists
+        if hasattr(self, 'centroid_col'):
+            tess_specific_data["MOM_CENTR1"] = self.centroid_col
+            tess_specific_data["MOM_CENTR2"] = self.centroid_row
 
         for kw in tess_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
