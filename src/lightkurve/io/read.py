@@ -9,6 +9,8 @@ from lightkurve.targetpixelfile import TargetPixelFile
 from ..lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from ..collections import LightCurveCollection, TargetPixelFileCollection
 from ..utils import LightkurveDeprecationWarning, LightkurveError
+from .generic import read_generic_lightcurve
+from .folded import read_folded_lightcurve
 from .detect import detect_filetype
 
 log = logging.getLogger(__name__)
@@ -39,6 +41,9 @@ def read(path_or_url, **kwargs):
         * `KeplerLightCurve` (typical suffix "llc.fits");
         * `TessTargetPixelFile` (typical suffix "_tp.fits");
         * `TessLightCurve` (typical suffix "_lc.fits").
+        * `FoldedLightCurve` (assuming the folded lightcurve was saved with lightkurve.lightcurve.FoldedLightCurve.to_fits())
+
+    If the filetype is not detected, read_generic_lightcurve will be used to try to read in the file.
 
     Parameters
     ----------
@@ -86,6 +91,8 @@ def read(path_or_url, **kwargs):
             # path_or_url is an S3 cloud URI
             with fits.open(path_or_url, use_fsspec=True, fsspec_kwargs={"anon": True}) as temp:
                 filetype = detect_filetype(temp)
+        elif isinstance(path_or_url, fits.HDUList):
+            filetype = detect_filetype(path_or_url)
         else:
             with fits.open(path_or_url) as temp:
                 filetype = detect_filetype(temp)
@@ -127,6 +134,10 @@ def read(path_or_url, **kwargs):
             return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
         elif filetype == "TGLC":
             return TessLightCurve.read(path_or_url, format="tglc", **kwargs)
+        elif filetype == "Folded":
+            return read_folded_lightcurve(path_or_url, **kwargs)
+        elif filetype == "generic":
+            return read_generic_lightcurve(path_or_url, **kwargs)
     except BaseException as exc:
         # ensure path_or_url is in the error
         raise LightkurveError(
