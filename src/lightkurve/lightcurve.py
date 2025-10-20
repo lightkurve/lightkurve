@@ -85,15 +85,16 @@ def rmse_reduceat(values, indices):
     # for counting, ignore np.nan and masked values
     if hasattr(values, "mask"):
         vals_for_count = ~values.mask & np.isfinite(values)
-        if isinstance(vals_for_count, Masked):
-            # workaround for case astropy Masked (does not support reduceat yet)
-            vals_for_count = vals_for_count.filled(0)
+        vals_for_count = vals_for_count.filled(0)
     else:
         vals_for_count = np.isfinite(values)
 
     sum_of_squares = np.add.reduceat(np.square(vals_filled), indices)
 
     count = np.add.reduceat(vals_for_count, indices)
+
+    # for bins with all masked values / nan, i.e., count is 0, the result should be nan
+    sum_of_squares[count == 0] = np.nan
     count[count == 0] = 1  # to avoid divide by zero
 
     # return np.sqrt(sum_of_squares / count)  # FIXME: this is probably the correct one
