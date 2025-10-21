@@ -15,7 +15,7 @@ import tempfile
 import warnings
 
 from lightkurve.io import read
-from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve, rmse, rmse_reduceat, nanstd
+from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve, rmse, nanstd
 from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning, LightkurveError
@@ -632,13 +632,13 @@ def test_rmse():
     expected2 = [expected, expected, n]
 
     vals2 = Masked(data2 * u.dimensionless_unscaled, mask=mask2).value
-    actual2 = rmse_reduceat(vals2, indices2)
+    actual2 = rmse.reduceat(vals2, indices2)
     assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
     assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
     assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
 
     vals2 = np.ma.MaskedArray(data=data2, mask=mask2)
-    actual2 = rmse_reduceat(vals2, indices2)
+    actual2 = rmse.reduceat(vals2, indices2)
     assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
     assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
     assert np.isnan(actual2[2]), "edge case: the bin with all masked values"

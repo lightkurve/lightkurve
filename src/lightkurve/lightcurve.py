@@ -68,6 +68,7 @@ def _is_np_structured_array(data1):
 
 
 def rmse(x):
+    """Root Mean Square Error implementation for `bin`"""
     if np.any(np.isfinite(x)):
         return np.sqrt(np.nansum(x**2)) / np.nansum(np.isfinite(x))
     else:
@@ -91,11 +92,9 @@ def rmse_reduceat(values, indices):
 
     sum_of_squares = np.add.reduceat(np.square(vals_filled), indices)
 
-    count = np.add.reduceat(vals_for_count, indices)
-
+    count = np.add.reduceat(vals_for_count, indices).astype(float)
     # for bins with all masked values / nan, i.e., count is 0, the result should be nan
-    sum_of_squares[count == 0] = np.nan
-    count[count == 0] = 1  # to avoid divide by zero
+    count[count == 0] = np.nan
 
     # return np.sqrt(sum_of_squares / count)  # FIXME: this is probably the correct one
     return np.sqrt(sum_of_squares) / count
@@ -132,7 +131,8 @@ def nanstd_reduceat(values, indices):
 
     # calculate per-bin values
     count = np.add.reduceat(vals_for_count, indices).astype(float)
-    count[count == 0] = np.nan  # to avoid divide by zero
+    # for bins with all masked values / nan, i.e., count is 0, the result should be nan
+    count[count == 0] = np.nan
     means = np.add.reduceat(vals_filled, indices) / count
 
     # Broadcast per-bin means back to original shape
