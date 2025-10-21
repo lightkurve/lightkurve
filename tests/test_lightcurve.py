@@ -15,7 +15,7 @@ import tempfile
 import warnings
 
 from lightkurve.io import read
-from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve, rmse, rmse_reduceat
+from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve, rmse, rmse_reduceat, nanstd
 from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning, LightkurveError
@@ -642,6 +642,51 @@ def test_rmse():
     assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
     assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
     assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+
+def test_nanstd():
+    """Test custom nanstd implementation used in ``bin()``."""
+
+    # ensure nanstd implementation correctly handles np.nan and masked values
+    n = np.nan  # for shorthand below
+    data = [n, 3, 4, 9, n]
+    mask = [0, 0, 0, 1, 1]
+    expected = np.std([3, 4])
+
+    # type astropy MaskedNDArray from MaskedQuantity, typical for SPOC TESS lightcurve
+    vals = Masked(data * u.dimensionless_unscaled, mask=mask).value
+    actual = nanstd(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(nanstd(vals[3:])), "edge case: all masked values"
+
+    vals = np.ma.MaskedArray(data=data, mask=mask)
+    actual = nanstd(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(nanstd(vals[3:])), "edge case: all masked values"
+
+    #
+    # test nanstd_reduceat
+    # conceptually create 3 bins, 2 average bins, and 1 bin with all values masked
+    #
+    data2 = data + data + [4, n]
+    mask2 = mask + mask + [1, 1]
+    indices2 = [0, 5, 10]
+    expected2 = [expected, expected, n]
+
+    vals2 = Masked(data2 * u.dimensionless_unscaled, mask=mask2).value
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
 
 
 def test_bin():

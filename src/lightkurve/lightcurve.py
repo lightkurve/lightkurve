@@ -104,6 +104,57 @@ def rmse_reduceat(values, indices):
 rmse.reduceat = rmse_reduceat
 
 
+def nanstd(x):
+    """Custom `nanstd` implementation for `bin`"""
+    # for our purpose, we treat masked values as nan, to avoid the ambiguous behavior
+    # for cases where a bin with all values masked. Without filled(nan), in such case,
+    # - astropy Masked will return a masked value,
+    # - numpy.ma.MaskedArray results in error (https://github.com/numpy/numpy/issues/29117)
+    if hasattr(x, "mask"):
+        x = x.filled(np.nan)
+    return np.nanstd(x)
+
+
+def nanstd_reduceat(values, indices):
+    # for the purpose of sum, map np.nan and masked vals to 0
+    if hasattr(values, "mask"):
+        vals_filled = values.filled(0)
+    else:
+        vals_filled = values.copy()
+    vals_filled[np.isnan(values)] = 0
+
+    # for counting, ignore np.nan and masked values
+    if hasattr(values, "mask"):
+        vals_for_count = ~values.mask & np.isfinite(values)
+        vals_for_count = vals_for_count.filled(0)
+    else:
+        vals_for_count = np.isfinite(values)
+
+    # calculate per-bin values
+    count = np.add.reduceat(vals_for_count, indices).astype(float)
+    count[count == 0] = np.nan  # to avoid divide by zero
+    means = np.add.reduceat(vals_filled, indices) / count
+
+    # Broadcast per-bin means back to original shape
+    bin_ids = np.searchsorted(indices, np.arange(len(vals_filled)), side='right') - 1
+    means_expanded = means[bin_ids]
+
+    # square diff (per-element of the original shape)
+    sq_diff = (vals_filled - means_expanded) ** 2
+    # for each element that is either masked or nan, set the square diff as 0 to ignore it.
+    if hasattr(values, "mask"):
+        sq_diff[values.mask] = 0
+    sq_diff[np.isnan(values)] = 0
+
+    # per-bin sum of square diffs
+    sum_sq_diff = np.add.reduceat(sq_diff, indices)
+
+    return np.sqrt(sum_sq_diff / count)
+
+
+nanstd.reduceat = nanstd_reduceat
+
+
 class LightCurve(TimeSeries):
     """
     Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
@@ -1668,12 +1719,13 @@ class LightCurve(TimeSeries):
             # If `flux_err` is unavailable, populate `flux_err` as nanstd(flux)
             else:
                 ts_err = aggregate_downsample(
-                    self,
+                    # only column flux (to be used as binned flux_err) needs to be binned
+                    TimeSeries(data=dict(time=self.time.copy(), flux=self.flux)),
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
                     time_bin_end=time_bin_end,
-                    aggregate_func=np.nanstd,
+                    aggregate_func=nanstd,
                 )
                 ts["flux_err"] = ts_err["flux"]
 
