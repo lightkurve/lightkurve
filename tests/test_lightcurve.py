@@ -606,8 +606,7 @@ def test_rmse():
     n = np.nan  # for shorthand below
     data = [n, 3, 4, 9, n]
     mask = [0, 0, 0, 1, 1]
-    # expected = np.sqrt((3**2 + 4**2) / 2)  # 3.535...  # FIXME: shouldn't rms be this?
-    expected = np.sqrt((3**2 + 4**2)) / 2  # 2.5
+    expected = np.sqrt((3**2 + 4**2) / 2)  # 3.535
 
     # type astropy MaskedNDArray from MaskedQuantity, typical for SPOC TESS lightcurve
     vals = Masked(data * u.dimensionless_unscaled, mask=mask).value
@@ -687,7 +686,7 @@ def test_nanstd():
     assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
     assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
 
-    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)  # used by MaskedColumn
     actual2 = nanstd.reduceat(vals2, indices2)
     assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
     assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
@@ -714,7 +713,9 @@ def test_bin():
         # stderr changed since with the initial workaround for `binsize` in 2.x
         # the first bin gets 3, the last only a single point!
         if _HAS_VAR_BINS:  # With Astropy 5.0 check the exact numbers again
-            assert_allclose(binned_lc.flux_err, np.ones(5))
+            # case with finite `flux_err`, binned value should be RMSE of `flux_err`
+            err_expected = np.sqrt(((2 ** 0.5) ** 2 + (2 ** 0.5) ** 2) / 2)
+            assert_allclose(binned_lc.flux_err, err_expected * np.ones(5))
         else:
             assert_allclose(binned_lc.flux_err, np.sqrt([2./3, 1, 1, 1, 2]))
         assert len(binned_lc.time) == 5
