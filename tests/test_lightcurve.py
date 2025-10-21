@@ -637,11 +637,17 @@ def test_rmse():
     assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
     assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
 
-    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)  # used by MaskedColumn
     actual2 = rmse.reduceat(vals2, indices2)
     assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
     assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
     assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2).filled(np.nan)  # non masked Column / Quantity
+    actual2 = rmse.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all nan"
 
 
 def test_nanstd():
@@ -660,7 +666,7 @@ def test_nanstd():
     assert np.isfinite(actual), "result should not be masked value"
     assert np.isnan(nanstd(vals[3:])), "edge case: all masked values"
 
-    vals = np.ma.MaskedArray(data=data, mask=mask)
+    vals = np.ma.MaskedArray(data=data, mask=mask)  # used by MaskedColumn
     actual = nanstd(vals)
     assert_almost_equal(actual, expected)  # <-- will let masked value pass
     assert np.isfinite(actual), "result should not be masked value"
@@ -686,6 +692,12 @@ def test_nanstd():
     assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
     assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
     assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2).filled(np.nan)  # non masked Column / Quantity
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all nan"
 
 
 
