@@ -15,7 +15,7 @@ import tempfile
 import warnings
 
 from lightkurve.io import read
-from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve, rmse, nanstd
 from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning, LightkurveError
@@ -599,6 +599,107 @@ def test_cdpp_tabby():
     assert np.abs(lc2.estimate_cdpp().value - lc.cdpp6_0) < 30
 
 
+def test_rmse():
+    """Test RMS implementation used in ``bin()``."""
+
+    # ensure RMS implementation correctly handles np.nan and masked values
+    n = np.nan  # for shorthand below
+    data = [n, 3, 4, 9, n]
+    mask = [0, 0, 0, 1, 1]
+    expected = np.sqrt((3**2 + 4**2) / 2)  # 3.535
+
+    # type astropy MaskedNDArray from MaskedQuantity, typical for SPOC TESS lightcurve
+    vals = Masked(data * u.dimensionless_unscaled, mask=mask).value
+    actual = rmse(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(rmse(vals[3:])), "edge case: all masked values"
+
+    vals = np.ma.MaskedArray(data=data, mask=mask)
+    actual = rmse(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(rmse(vals[3:])), "edge case: all masked values"
+
+    #
+    # test rmse_reduceat
+    # conceptually create 3 bins, 2 average bins, and 1 bin with all values masked
+    #
+    data2 = data + data + [4, n]
+    mask2 = mask + mask + [1, 1]
+    indices2 = [0, 5, 10]
+    expected2 = [expected, expected, n]
+
+    vals2 = Masked(data2 * u.dimensionless_unscaled, mask=mask2).value
+    actual2 = rmse.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)  # used by MaskedColumn
+    actual2 = rmse.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2).filled(np.nan)  # non masked Column / Quantity
+    actual2 = rmse.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all nan"
+
+
+def test_nanstd():
+    """Test custom nanstd implementation used in ``bin()``."""
+
+    # ensure nanstd implementation correctly handles np.nan and masked values
+    n = np.nan  # for shorthand below
+    data = [n, 3, 4, 9, n]
+    mask = [0, 0, 0, 1, 1]
+    expected = np.std([3, 4])
+
+    # type astropy MaskedNDArray from MaskedQuantity, typical for SPOC TESS lightcurve
+    vals = Masked(data * u.dimensionless_unscaled, mask=mask).value
+    actual = nanstd(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(nanstd(vals[3:])), "edge case: all masked values"
+
+    vals = np.ma.MaskedArray(data=data, mask=mask)  # used by MaskedColumn
+    actual = nanstd(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(nanstd(vals[3:])), "edge case: all masked values"
+
+    #
+    # test nanstd_reduceat
+    # conceptually create 3 bins, 2 average bins, and 1 bin with all values masked
+    #
+    data2 = data + data + [4, n]
+    mask2 = mask + mask + [1, 1]
+    indices2 = [0, 5, 10]
+    expected2 = [expected, expected, n]
+
+    vals2 = Masked(data2 * u.dimensionless_unscaled, mask=mask2).value
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)  # used by MaskedColumn
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2).filled(np.nan)  # non masked Column / Quantity
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all nan"
+
+
+
 def test_bin():
     """Does binning work?"""
     with warnings.catch_warnings():  # binsize is deprecated
@@ -612,7 +713,9 @@ def test_bin():
         # stderr changed since with the initial workaround for `binsize` in 2.x
         # the first bin gets 3, the last only a single point!
         if _HAS_VAR_BINS:  # With Astropy 5.0 check the exact numbers again
-            assert_allclose(binned_lc.flux_err, np.ones(5))
+            # case with finite `flux_err`, binned value should be RMSE of `flux_err`
+            err_expected = np.sqrt(((2 ** 0.5) ** 2 + (2 ** 0.5) ** 2) / 2)
+            assert_allclose(binned_lc.flux_err, err_expected * np.ones(5))
         else:
             assert_allclose(binned_lc.flux_err, np.sqrt([2./3, 1, 1, 1, 2]))
         assert len(binned_lc.time) == 5
