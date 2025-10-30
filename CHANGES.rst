@@ -5,6 +5,7 @@
 - Pass reader to ``read_generic_lightcurve()`` if Kepler/K2/TESS file type not recognized [#1488]
 - Fixes bug for reading in data with flux units listed as 'electron / s' [#1488] from issue [#1504]
 - Include MOM_CENTR1 and MOM_CENTR2, if it exists, when saving fits files [#1488]
+- Fixed bugs in ``bin`` for ``flux_err`` column. Improved ``bin`` performance. [#1499]
 
 2.5.1  (2025-05-20)
 =====================
