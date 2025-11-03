@@ -138,7 +138,7 @@ class SearchResult(object):
         self.table["sort_order"] = [
             sort_priority.get(author, 9) for author in self.table["author"]
         ]
-        self.table.sort(["distance",  "sort_order", "author", "mission","year", "exptime"])
+        self.table.sort(["distance",  "sort_order", "author", "exptime", "mission", "year"])
 
     def _add_columns(self):
         """Adds a user-friendly index (``#``) column and adds column unit
