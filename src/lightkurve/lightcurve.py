@@ -655,14 +655,12 @@ class LightCurve(TimeSeries):
             else:
                 # fill in a dummy all-nan flux_err column
                 # ensure the unit of new flux_err is consistent with that of flux.
-                flux_err_col_vals = np.full(lc["flux"].shape, np.nan)
-                if new_flux_err.unit is not None:
-                    flux_err_col_vals = flux_err_col_vals * lc["flux"].unit
-                new_flux_err = flux_err_col_vals
-
+                new_flux_err = np.full(lc["flux"].shape, np.nan)
+                if new_flux.unit is not None:
+                    new_flux_err = new_flux_err * lc["flux"].unit
 
         if not isinstance(new_flux_err, Quantity):
-            lc["flux_err"] = Quantity(new_flux_err, lc["flux"].unit)
+            lc["flux_err"] = Quantity(new_flux_err, new_flux_err.unit)
         else:
             lc["flux_err"] = new_flux_err
 
