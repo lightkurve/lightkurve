@@ -1411,7 +1411,12 @@ class LightCurve(TimeSeries):
         return LightCurve(data=newdata, meta=self.meta)
 
     def remove_outliers(
-        self, sigma=5.0, sigma_lower=None, sigma_upper=None, return_mask=False, **kwargs
+        self, sigma=5.0, 
+        sigma_lower=None, 
+        sigma_upper=None, 
+        return_mask=False, 
+        column="flux",
+        **kwargs
     ):
         """Removes outlier data points using sigma-clipping.
 
@@ -1498,25 +1503,25 @@ class LightCurve(TimeSeries):
         from astropy.stats.sigma_clipping import sigma_clip
 
         # astropy.stats.sigma_clip won't work with masked ndarrays so we convert to regular arrays
-        flux = self.flux.copy()
-        if isinstance(flux, Masked):
-            flux = flux.filled(np.nan)
+        outlier_data = self[column].copy()
+        if isinstance(outlier_data, Masked):
+            outlier_data = outlier_data.filled(np.nan)
 
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
-            flux = self.flux
-            if isinstance(flux, Masked):
+            outlier_data = self[column]
+            if isinstance(outlier_data, Masked):
                 # Workaround for https://github.com/astropy/astropy/issues/14360
                 # in passing MaskedQuantity to sigma_clip, by converting it to Quantity.
                 # We explicitly fill masked values with `np.nan` here to ensure they are masked during sigma clipping.
                 # To handle unlikely edge case, convert int to float to ensure filing `np.nan` work.
                 # The conversion is acceptable because only the mask of the sigma_clip() result is used.
-                if np.issubdtype(flux.dtype, np.int_):
-                    flux = flux.astype(float)
-                flux = flux.filled(np.nan)
+                if np.issubdtype(outlier_data.dtype, np.int_):
+                    outlier_data = outlier_data.astype(float)
+                outlier_data = outlier_data.filled(np.nan)
             outlier_mask = sigma_clip(
-                data=flux,
+                data=outlier_data,
                 sigma=sigma,
                 sigma_lower=sigma_lower,
                 sigma_upper=sigma_upper,

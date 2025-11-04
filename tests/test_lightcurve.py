@@ -1208,10 +1208,14 @@ def test_remove_nans():
 
 def test_remove_outliers():
     # Does `remove_outliers()` remove outliers?
-    lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1])
+    lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1], flux_err = [.1,100,.1,.1])
     lc_clean = lc.remove_outliers(sigma=1)
     assert_array_equal(lc_clean.time.value, [1, 2, 4])
     assert_array_equal(lc_clean.flux, [1, 1, 1])
+    # Check we can specify a column for the sigma clip
+    lc_clean = lc.remove_outliers(sigma=1, column='flux_err')
+    assert_array_equal(lc_clean.time.value, [1, 3, 4])
+    assert_array_equal(lc_clean.flux, [1, 1000, 1])
     # It should also be possible to return the outlier mask
     lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
     assert len(outlier_mask) == len(lc.flux)
