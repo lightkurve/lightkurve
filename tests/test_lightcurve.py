@@ -2112,6 +2112,8 @@ def test_select_flux():
                           'newflux_n3_err': [1, 2, 3] * u.percent,
                           'newflux_n4': [4, 5, 6] * u_e_s,  # case flux and _err have different units
                           'newflux_n4_err': [.01, .02, .03],  # normalized, no unit
+                          'masked_flux':ma.masked_array([2,3,4],mask=[0,0,1]),
+                          'masked_flux_err':[0,1,2] * u_e_s,
                           },
                           )
     # Can we set flux to newflux?
@@ -2146,6 +2148,11 @@ def test_select_flux():
     assert lc.meta.get("NORMALIZED", False) is False  # expected behavior, not the real test
     assert lc.select_flux("newflux_n1").meta.get("NORMALIZED", False)  # actual test 2a, the new column is normalized
     assert lc.select_flux("newflux_n2").meta.get("NORMALIZED", False)  # actual test 2b, the new column is normalized
+
+    # Are masked columns converted to Quantity when using select_flux() [#1505]?
+    assert isinstance(lc.masked_flux, np.ma.masked_array)
+    assert not isinstance(lc.flux, np.ma.masked_array)
+    assert not isinstance(lc.select_flux("masked_array").flux, np.ma.masked_array)
 
 
 def test_transit_mask_with_quantities():
