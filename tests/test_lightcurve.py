@@ -2,6 +2,7 @@ from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.masked import Masked
 from astropy import units as u
+from astropy.units import Quantity
 from astropy.table import Table, Column, MaskedColumn
 from astropy.time import Time, TimeDelta
 from astropy.timeseries import aggregate_downsample
