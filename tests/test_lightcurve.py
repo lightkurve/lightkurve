@@ -2151,8 +2151,8 @@ def test_select_flux():
 
     # Are masked columns converted to Quantity when using select_flux() [#1505]?
     assert isinstance(lc.masked_flux, np.ma.masked_array)
-    assert not isinstance(lc.flux, np.ma.masked_array)
-    assert not isinstance(lc.select_flux("masked_array").flux, np.ma.masked_array)
+    assert isinstance(lc.flux, np.ma.masked_array) is False
+    assert isinstance(lc.select_flux("masked_array").flux, np.ma.masked_array) is False
 
 
 def test_transit_mask_with_quantities():
