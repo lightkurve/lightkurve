@@ -642,7 +642,7 @@ class LightCurve(TimeSeries):
         new_flux = lc[flux_column]
         # For consistency with how lightkurve inially sets the flux (See issue #1505)
         if not isinstance(new_flux, Quantity):
-            new_flux = Quantity(new_flux, self.flux.unit)
+            new_flux = Quantity(new_flux, new_flux.unit)
         lc["flux"] = new_flux
         if flux_err_column:  # not None
             new_flux_err = lc[flux_err_column]
