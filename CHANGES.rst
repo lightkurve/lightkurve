@@ -6,6 +6,7 @@
 - Fixes bug for reading in data with flux units listed as 'electron / s' [#1488] from issue [#1504]
 - Include MOM_CENTR1 and MOM_CENTR2, if it exists, when saving fits files [#1488]
 - Fixed bugs in ``bin`` for ``flux_err`` column. Improved ``bin`` performance. [#1499]
+- Updated search result sort order [#1384]
 
 2.5.1  (2025-05-20)
 =====================
