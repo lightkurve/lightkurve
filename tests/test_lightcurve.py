@@ -2112,7 +2112,7 @@ def test_select_flux():
                           'newflux_n3_err': [1, 2, 3] * u.percent,
                           'newflux_n4': [4, 5, 6] * u_e_s,  # case flux and _err have different units
                           'newflux_n4_err': [.01, .02, .03],  # normalized, no unit
-                          'masked_flux': np.ma.masked_array([2,3,4],mask=[0,0,1]),
+                          'masked_flux': np.ma.masked_array([2,3,4],mask=[0,0,1]) * u_e_s,
                           'masked_flux_err':[0,1,2] * u_e_s,
                           },
                           )
@@ -2152,7 +2152,7 @@ def test_select_flux():
     # Are masked columns converted to Quantity when using select_flux() [#1505]?
     assert isinstance(lc.masked_flux, np.ma.masked_array)
     assert isinstance(lc.flux, np.ma.masked_array) is False
-    assert isinstance(lc.select_flux("masked_array").flux, np.ma.masked_array) is False
+    assert isinstance(lc.select_flux("masked_flux").flux, np.ma.masked_array) is False
 
 
 def test_transit_mask_with_quantities():
