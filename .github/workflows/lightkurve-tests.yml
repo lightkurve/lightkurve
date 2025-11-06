@@ -32,22 +32,22 @@ jobs:
         include:
           - name: "3.9-remote-data"
             python-version: "3.9"
-            pytest-command: poetry run pytest --remote-data --doctest-modules
+            pytest-command: ./poetry/bin/poetry run pytest --remote-data --doctest-modules
           - name: "3.9-memtest"
             python-version: "3.9"
-            pytest-command: poetry run pytest -m memtest --remote-data
+            pytest-command: ./poetry/bin/poetry run pytest -m memtest --remote-data
           - name: "3.10"
             python-version: "3.10"
-            pytest-command: poetry run pytest
+            pytest-command: ./poetry/bin/poetry run pytest
           - name: "3.11"
             python-version: "3.11"
-            pytest-command: poetry run pytest
+            pytest-command: ./poetry/bin/poetry run pytest
           - name: "3.12-remote-data"
             python-version: "3.12"
-            pytest-command: poetry run pytest
+            pytest-command: ./poetry/bin/poetry run pytest
           - name: "3.13"
             python-version: "3.13"
-            pytest-command: poetry run pytest
+            pytest-command: ./poetry/bin/poetry run pytest
     steps:
     - uses: actions/checkout@v5
     - name: Set up Python ${{ matrix.python-version }}
@@ -56,9 +56,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install poetry
-        poetry install --with dev
+        mkdir poetry
+        python -m venv ./poetry
+        ./poetry/bin/python -m pip install --upgrade pip
+        ./poetry/bin/pip install poetry==2.2.1
+        ./poetry/bin/poetry install --with dev
     - name: Test with ${{ matrix.pytest-command }}
       run: |
         ${{ matrix.pytest-command }}
@@ -78,11 +80,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        mkdir poetry
+        python -m venv poetry
+        .\poetry\Scripts\activate.ps1
         python -m pip install --upgrade pip
-        python -m pip install poetry==2.2.1
+        python -m pip install poetry
         poetry install --with dev
     - name: Test with pytest
       run: |
+        .\poetry\Scripts\activate.ps1
         poetry run pytest
 
   # Run unit tests on Mac OSX
@@ -99,12 +105,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install poetry==2.2.1
-        poetry install --with dev
+        mkdir poetry
+        python -m venv ./poetry
+        ./poetry/bin/python -m pip install --upgrade pip
+        ./poetry/bin/pip install poetry==2.2.1
+        ./poetry/bin/poetry install --with dev
     - name: Test with pytest
       run: |
-        poetry run pytest
+        ./poetry/bin/poetry run pytest
 
   # Use the `flake8` tool to check for syntax errors
   flake8-linter:
@@ -120,12 +128,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install flake8
       run: |
-        python -m pip install --upgrade pip
-        python -m pip install poetry==2.2.1
-        poetry install --with dev
+        mkdir poetry
+        python -m venv ./poetry
+        ./poetry/bin/python -m pip install --upgrade pip
+        ./poetry/bin/pip install poetry==2.2.1
+        ./poetry/bin/poetry install --with dev
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude="setup.py,test_*"
+        ./poetry/bin/poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude="setup.py,test_*,poetry"
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        poetry run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude="setup.py,test_*"
+        ./poetry/bin/poetry run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude="setup.py,test_*,poetry"
