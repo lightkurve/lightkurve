@@ -1033,7 +1033,7 @@ def test_to_fits():
     hdu = lc.select_flux("sap_bkg").to_fits()
     lc_new = KeplerLightCurve.read(hdu)
     assert (lc_new.flux == lc.sap_bkg).all()
-    assert lc_new.flux_origin == 'to_fits()'
+    assert lc_new.flux_origin == 'lightkurve.LightCurve.to_fits()'
 
 
     hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
@@ -1044,7 +1044,7 @@ def test_to_fits():
     assert hdu[1].header["TTYPE1"] == "TIME"
     assert hdu[1].header["TTYPE2"] == "FLUX"
     assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
-    assert lc_new.meta['FLUX_ORIGIN'] == 'to_fits()' #1371
+    assert lc_new.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
 
     # Test aperture mask support in to_fits
     for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
