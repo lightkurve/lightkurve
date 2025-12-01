@@ -2529,7 +2529,11 @@ class LightCurve(TimeSeries):
         return Seismology.from_lightcurve(self, **kwargs)
 
     def to_fits(
-        self, path=None, overwrite=False, flux_column_name="FLUX", **extra_data
+        self, 
+        path=None, 
+        overwrite=False, 
+        flux_column_name="FLUX", 
+        **extra_data
     ):
         """Converts the light curve to a FITS file in the Kepler/TESS file format.
 
@@ -2568,11 +2572,13 @@ class LightCurve(TimeSeries):
             np.float64: "D",
         }
 
+
         # If users give a dictionary of values, we first need to "remove" the values from the dictionary
         if extra_data.get('extra_data') is not None:
             for k in extra_data.get('extra_data').keys():
                 extra_data[k] = extra_data['extra_data'][k]
             extra_data.pop('extra_data')
+
 
         def _header_template(extension):
             """Returns a template `fits.Header` object for a given extension."""
@@ -2631,7 +2637,7 @@ class LightCurve(TimeSeries):
                     )
                 )
             if ~np.asarray(
-                [flux_column_name in k.upper() for k in extra_data.keys()]
+                [flux_column_name == k.upper() for k in extra_data.keys()]
             ).any():
                 cols.append(
                     fits.Column(
@@ -2688,6 +2694,8 @@ class LightCurve(TimeSeries):
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
+
+                
             return hdu
 
         def _hdulist(**extra_data):
@@ -3342,8 +3350,6 @@ class FoldedLightCurve(LightCurve):
         self,
         path=None,
         overwrite=False,
-        flux_column_name="FLUX",
-        aperture_mask=None,
         **extra_data,
     ):
         """Writes the FoldedLightCurve to a FITS file.
@@ -3595,7 +3601,6 @@ class KeplerLightCurve(LightCurve):
         self,
         path=None,
         overwrite=False,
-        flux_column_name="FLUX",
         aperture_mask=None,
         **extra_data,
     ):
@@ -3719,7 +3724,6 @@ class TessLightCurve(LightCurve):
         self,
         path=None,
         overwrite=False,
-        flux_column_name="FLUX",
         aperture_mask=None,
         **extra_data,
     ):
