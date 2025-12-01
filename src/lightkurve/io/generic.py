@@ -162,7 +162,7 @@ def read_generic_lightcurve(
         # as we don't know if other manipulation (like detrending) also occurred
         # So, we populate the 'FLUX_ORIGIN' meta data with 'to_fits' to contain that ambiguity 
         if ("CREATOR" in hdulist[0].header) and (hdulist[0].header["CREATOR"] == 'lightkurve.LightCurve.to_fits()'):
-            tab.meta["FLUX_ORIGIN"] = "to_fits()"
+            tab.meta["FLUX_ORIGIN"] = "lightkurve.LightCurve.to_fits()"
         else:
             tab.meta["FLUX_ORIGIN"] = flux_column
 
