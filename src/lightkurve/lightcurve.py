@@ -2679,16 +2679,15 @@ class LightCurve(TimeSeries):
                             array=extra_data[kw],
                         )
                     )
-            #RAH
             #Want to add a statement here asking if the oject belongs to TESS/Kepler/K2
             #If it does then do the following otherwise dont
-            if hasattr(self, "mission"):
-                if (self.mission == "TESS" and "SAP_QUALITY" not in extra_data) or (self.mission == "Kepler" and "SAP_QUALITY" not in extra_data) or (self.mission == "K2"  and "SAP_QUALITY" not in extra_data):
-                    cols.append(
-                        fits.Column(
-                            name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
-                        )
+            allowed_missions = ['TESS', 'Kepler', 'K2']
+            if (self.meta.get("MISSION") in allowed_missions and "SAP_QUALITY" not in extra_data) or ("MISSION" in extra_data and extra_data["MISSION"] in allowed_missions and "SAP_QUALITY" not in extra_data):
+                cols.append(
+                    fits.Column(
+                        name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
                     )
+                )
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
