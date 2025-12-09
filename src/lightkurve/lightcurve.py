@@ -2641,7 +2641,7 @@ class LightCurve(TimeSeries):
                         array=self.flux,
                     )
                 )
-            
+
             if hasattr(self, "flux_err"):
                 if ~(flux_column_name.upper() + "_ERR" in extra_data.keys()):
                     cols.append(
@@ -2670,7 +2670,7 @@ class LightCurve(TimeSeries):
                         )
                     )
 
-                
+
                 elif isinstance(extra_data[kw], (np.ndarray, list)):
                     cols.append(
                         fits.Column(
@@ -3147,12 +3147,149 @@ class FoldedLightCurve(LightCurve):
     ``wrap_phase``, ``normalize_phase``), an extra column (``time_original``),
     extra properties (``phase``, ``odd_mask``, ``even_mask``),
     and implements different plotting defaults.
-    """     
+    """
+
+    def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
+        # BEGIN copied from Lightcurve.__init__()
+        # TODO: refactor
+        def get_time_idx_in(names):
+            time_indices = np.argwhere(np.asarray(names) == "time")
+            if len(time_indices) > 0:
+                return time_indices[0][0]
+            else:
+                return None
+
+        def get_time_in_data_list():
+            if len(data) < 1:
+                return None
+            names = kwargs.get("names")
+            if names is None:
+                # the first item MUST be time if no names specified
+                if isinstance(data[0], TimeBase):  # Time or TimeDelta
+                    return data[0]
+                else:
+                    return None
+            else:
+                time_idx = get_time_idx_in(names)
+                if time_idx is not None:
+                    return data[time_idx]
+                else:
+                    return None
+
+        def set_time_in_data_list(value):
+            if len(data) < 1:
+                raise AssertionError("data should be non-empty")
+            names = kwargs.get("names")
+            if names is None:
+                # the first item MUST be time if no names specified
+                # this is to support base Table's select columns
+                # in __getitem__()
+                # https://github.com/astropy/astropy/blob/326435449ad8d859f1abf36800c3fb88d49c27ea/astropy/table/table.py#L1888
+                data[0] = value
+            else:
+                time_idx = get_time_idx_in(names)
+                if time_idx is not None:
+                    data[time_idx] = value
+                else:
+                    raise AssertionError("data should have time column")
+
+        def get_time_in_data_np_structured_array():
+            if data.dtype.names is None:  # no labeled filed, not a structured array
+                return None
+            if "time" not in data.dtype.names:
+                return None
+            return data["time"]
+
+        def remove_time_from_data_np_structured_array():
+            if data.dtype.names is None:
+                raise AssertionError("data should be a numpy structured array")
+            if "time" not in data.dtype.names:
+                raise AssertionError("data should have a time field")
+            filtered_names = [n for n in data.dtype.names if n != "time"]
+            return data[filtered_names]
+
+        def has_time_in_data():
+            """Check if the data has a column with the name"""
+            if data is None:
+                return False
+            elif _is_dict_like(data):
+                # data is a dict-like object with keys
+                return "time" in data.keys()
+            elif _is_list_like(data):
+                # case data is a list-like object (a list of columns, etc.)
+                return get_time_in_data_list() is not None
+            elif _is_np_structured_array(data):
+                # case numpy structured array (supported by base TimeSeries)
+                # https://numpy.org/doc/stable/user/basics.rec.html
+                return get_time_in_data_np_structured_array() is not None
+            else:
+                raise ValueError(f"Unsupported type for time in data: {type(data)}")
+
+        def get_time_in_data():
+            if _is_dict_like(data):
+                # data is a dict-like object with keys
+                return data["time"]
+            elif _is_list_like(data):
+                return get_time_in_data_list()
+            elif _is_np_structured_array(data):
+                return get_time_in_data_np_structured_array()
+            else:
+                # should never reach here. It'd have been caught by `has_time_in()``
+                raise AssertionError("Unsupported type for time in data")  # modified
+                raise AssertionError("Unsupported type for time in data")
+
+        def set_time_in_data(value):
+            if _is_dict_like(data):
+                # data is a dict-like object with keys
+                data["time"] = value
+            elif _is_list_like(data):
+                set_time_in_data_list(value)
+            elif _is_np_structured_array(data):
+                # astropy Time cannot be assigned to a column in np structured array
+                # we have special codepath handling it outside this function
+                raise AssertionError(
+                    "Setting Time instances to np structured array is not supported"
+                )
+            else:
+                # should never reach here. It'd have been caught by `has_time_in()``
+                raise AssertionError("Unsupported type for time in data")
+        # END   copied from Lightcurve.__init__()
+
+        if has_time_in_data():
+            time_in_args = get_time_in_data()
+        else:
+            time_in_args = time
+
+        if not isinstance(time_in_args, Quantity):
+            # typical cases
+            super().__init__(data, *args, time=time, flux=flux, flux_err=flux_err, **kwargs)
+        else:
+            # case time is normalized phase
+            # workaround the problem with regular __init__() by
+            # temporarily replacing normalized phase with a dummy TimeDelta
+
+            # basically self._replace_normalized_phase(),
+            # but needs to doen separately as this is __init__()
+            normalized_phase = time_in_args
+            time_in_delta = TimeDelta(normalized_phase.value * u.s)
+            if has_time_in_data():
+                set_time_in_data(time_in_delta)
+            else:
+                time = time_in_delta
+
+            # do the main init with time in dummy TimeDelta
+            super().__init__(data, *args, time=time, flux=flux, flux_err=flux_err, **kwargs)
+
+            # basically self._restore_normalized_phase()
+            with self._delay_required_column_checks():
+                self.remove_column("time")
+                self.add_column(normalized_phase, name="time", index=0)
+
     @property
     def phase(self):
         """Alias for `LightCurve.time`."""
         return self.time
-    
+
 
     @property
     def cycle(self):
@@ -3214,7 +3351,7 @@ class FoldedLightCurve(LightCurve):
                 "The function should be invoked on a folded lightcurve with normalized phase. No-Op."
             )
             return
-        
+
         if self.period is not None and not isinstance(self.period, Quantity):
             self.period *= u.day
 
@@ -3238,7 +3375,7 @@ class FoldedLightCurve(LightCurve):
                 "Attempt to restore normalized phase while the phase has already been normalized. No-op."
             )
             return
-        
+
         if self.period is not None and not isinstance(self.period, Quantity):
             self.period *= u.day
 
@@ -3337,7 +3474,7 @@ class FoldedLightCurve(LightCurve):
             period=self.period, epoch_time=self.epoch_time, **kwargs
         )
         return ax
-    
+
     def to_fits(
         self,
         path=None,
@@ -3738,7 +3875,7 @@ class TessLightCurve(LightCurve):
             defined.  The mask can be either a boolean mask or an integer mask
             mimicking the Kepler/TESS convention; boolean masks are
             automatically converted to the Kepler/TESS conventions
-        extra_data : 
+        extra_data :
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
             keywords in the primary header.
