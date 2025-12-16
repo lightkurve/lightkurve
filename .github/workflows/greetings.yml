@@ -4,6 +4,7 @@ on: [pull_request, issues]
 
 jobs:
   greeting:
+    name: Greet First-Time Contributors
     runs-on: ubuntu-latest
     steps:
     - uses: actions/first-interaction@v3
