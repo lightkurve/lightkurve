@@ -7,6 +7,7 @@
 - Include MOM_CENTR1 and MOM_CENTR2, if it exists, when saving fits files [#1488]
 - Fixed bugs in ``bin`` for ``flux_err`` column. Improved ``bin`` performance. [#1499]
 - Updated search result sort order [#1384]
+- Fixed bugs in ``FoldedLightCurve`` objects with normalized phase to support pickle / dill [#1529]
 
 2.5.1  (2025-05-20)
 =====================
