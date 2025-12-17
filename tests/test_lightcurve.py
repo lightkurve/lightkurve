@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
+import pickle
 import pytest
 import tempfile
 import warnings
@@ -1089,7 +1090,7 @@ def test_to_fits():
     assert basic_lc.time.format == 'jd'
 
 
-    
+
 
 
 
@@ -2049,6 +2050,58 @@ def test_timedelta():
 def test_issue_916():
     """Regression test for #916: Can we flatten after folding?"""
     LightCurve(flux=np.random.randn(100)).fold(period=2.5).flatten()
+
+
+def assert_lc_equal(actual, expected, label):
+    assert len(actual) == len(expected), label
+    assert_array_equal(actual.colnames, expected.colnames, label)
+    # can't compare meta dict, because some values are Python objects in real data, e.g.,
+    # 'TIERABSO': <astropy.io.fits.card.Undefined object at 0x000002E157B8BDA0>,
+    assert len(actual.meta) == len(expected.meta), label
+    for c in expected.colnames:
+        assert_array_equal(actual[c], expected[c], f"{label}, column {c}")
+
+
+def do_pickle_dump_load(lc):
+    dump = pickle.dumps(lc)
+    lc_s = pickle.loads(dump)
+    return lc_s
+
+
+def do_test_pickle(lc, label):
+    # Test: basic
+    lc_from_pickle = do_pickle_dump_load(lc)
+    assert_lc_equal(lc_from_pickle, lc, label)
+
+    # Test: folded lightcurve
+    lc_f = lc.fold(epoch_time=3, period=2)
+    lc_from_pickle = do_pickle_dump_load(lc_f)
+    assert_lc_equal(lc_from_pickle, lc_f, f"{label}-folded")
+
+    # Test: folded lightcurve with normalized phases
+    # https://github.com/lightkurve/lightkurve/issues/1527
+    lc_f = lc.fold(epoch_time=3, period=2, normalize_phase=True)
+    lc_from_pickle = do_pickle_dump_load(lc_f)
+    assert_lc_equal(lc_from_pickle, lc_f, f"{label}-folded-normalized-phase")
+
+
+def test_pickle_basic():
+    lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1., 2, 1, 2, 1])
+    lc.meta["LABEL"] = "LC test pickle"
+    do_test_pickle(lc, "Basic minimal LC")
+
+
+@pytest.mark.xfail  # https://github.com/astropy/astropy/issues/19040 (still works with `dill`)
+@pytest.mark.remote_data
+@pytest.mark.parametrize("lc_url, lc_label", [
+    (TABBY_Q8, "Kepler LC"),
+    (K2_C08, "K2 LC"),
+    (TESS_SIM, "TESS LC"),
+])
+def test_pickle_mission_data(lc_url, lc_label):
+    # An integrated test for pickle with real mission data
+    lc = read(lc_url)
+    do_test_pickle(lc, lc_label)
 
 
 @pytest.mark.remote_data
