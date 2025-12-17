@@ -53,8 +53,11 @@ You can set up the environment as follows:
 .. code-block:: bash
 
     $ cd lightkurve
-    $ python -m pip install poetry
+    $ curl -sSL https://install.python-poetry.org | python -
     $ poetry install
+
+Refer to `poetry documentation <https://python-poetry.org/docs/#installation>`_ for
+poetry installation options, in addition to the `curl` used in the above example.
 
 A key advantage of the development environment is that any changes you make to the Lightkurve source
 code will be reflected right away, i.e., there is no need to re-install Lightkurve or the environment
