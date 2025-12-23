@@ -140,6 +140,11 @@ def read_generic_lightcurve(
                 flux_err_column = flux_column + "_err"
             if flux_err_column in tab.columns:
                 tab.add_column(tab[flux_err_column], name="flux_err", index=1)
+        #RAH
+        #If a generic light curve this column should not exist
+        #Want to remove. Should have a key defining telescopes that need it
+        #TESS, Kepler, K2, but everything else should not need.
+        #Made change in lightcurve.py
         if "quality" not in tab.columns and quality_column in tab.columns:
             tab.add_column(tab[quality_column], name="quality", index=2)
         if "cadenceno" not in tab.columns and cadenceno_column in tab.columns:
