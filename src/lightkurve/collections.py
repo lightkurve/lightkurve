@@ -177,6 +177,11 @@ class LightCurveCollection(Collection):
         before stitching. For example, passing "lambda x: x.normalize().flatten()"
         will normalize and flatten each light curve before stitching.
 
+        All columns from all component lightcurves are saved. When a column is
+        missing from a component lightcurve, the column is filled with dummy 
+        value -999 in the stiched lightcurve. 
+        (Addressing github issue #1278)
+
         Parameters
         ----------
         corrector_func : function
@@ -195,32 +200,13 @@ class LightCurveCollection(Collection):
             warnings.filterwarnings("ignore", message=".*already.*")
             lcs = [corrector_func(lc) for lc in self]
 
-        # Address issue #954: ignore incompatible columns with the same name
-        columns_to_remove = set()
-        for col in lcs[0].columns:
-            for lc in lcs[1:]:
-                if col in lc.columns:
-                    if not (
-                        issubclass(lcs[0][col].__class__, lc[col].__class__)
-                        or issubclass(lc[col].__class__, lcs[0][col].__class__)
-                        or lcs[0][col].__class__.info is lc[col].__class__.info
-                    ):
-                        columns_to_remove.add(col)
-                        continue
-
-        if len(columns_to_remove) > 0:
-            warnings.warn(
-                f"The following columns will be excluded from stitching because the column types are incompatible: {columns_to_remove}",
-                LightkurveWarning,
-            )
-            lcs = [lc.copy() for lc in lcs]
-            [
-                lc.remove_columns(columns_to_remove.intersection(lc.columns))
-                for lc in lcs
-            ]
-
         # Need `join_type='inner'` until AstroPy supports masked Quantities
-        return vstack(lcs, join_type="inner", metadata_conflicts="silent")
+        lc_vstack = vstack(lcs, join_type="outer", metadata_conflicts="silent")
+        for col in lc_vstack.columns:
+          if col not in ['time','flux','flux_err']:
+              lc_vstack[col] = lc_vstack[col].value.filled(-999)
+
+        return lc_vstack
 
     def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
         """Plots all light curves in the collection on a single plot.
