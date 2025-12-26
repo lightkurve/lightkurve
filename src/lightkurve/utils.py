@@ -721,8 +721,9 @@ def _query_solar_system_objects(
         Search radius in degrees.
     location : str
         Spacecraft location. Options include `'kepler'` and `'tess'`.
-    cache : bool
+    cache : bool or "update"
         Whether to cache the search result. Default is True.
+        Note the astropy cache is used. See download_file for details. 
     show_progress : bool
         Whether to display a progress bar during the download. Default is True.
 
