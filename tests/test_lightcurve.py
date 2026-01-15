@@ -2115,6 +2115,8 @@ def test_select_flux():
                           'newflux_n4_err': [.01, .02, .03],  # normalized, no unit
                           'masked_flux': Masked([2,3,4] * u_e_s,mask=[0,0,1]),
                           'masked_flux_err':[0,1,2] * u_e_s,
+                          'nounit_flux':[4,5,6],
+                          'nounit_flux_err':[1,1,1],
                           },
                           )
     # Can we set flux to newflux?
@@ -2156,6 +2158,7 @@ def test_select_flux():
     assert isinstance(lc.select_flux("masked_flux").flux, Quantity)
     assert isinstance(lc.newflux_n2, Quantity) is False
     assert isinstance(lc.select_flux("newflux_n2").flux, Quantity)
+    assert lc.select_flux("nounit_flux").flux.unit == u.dimensionless_unscaled
 
 
 def test_transit_mask_with_quantities():
