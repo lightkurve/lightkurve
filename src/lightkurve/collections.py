@@ -200,11 +200,16 @@ class LightCurveCollection(Collection):
         for col in lcs[0].columns:
             for lc in lcs[1:]:
                 if col in lc.columns:
-                    if not (
-                        issubclass(lcs[0][col].__class__, lc[col].__class__)
-                        or issubclass(lc[col].__class__, lcs[0][col].__class__)
-                        or lcs[0][col].__class__.info is lc[col].__class__.info
-                    ):
+                    if (
+                        not (
+                         (issubclass(lcs[0][col].__class__, lc[col].__class__)
+                          or issubclass(lc[col].__class__, lcs[0][col].__class__)
+                          or (lcs[0][col].__class__.info is lc[col].__class__.info))
+                         )
+                        or not (
+                         np.can_cast(lcs[0][col].value.dtype, lc[col].value.dtype, "same_kind")
+                         and np.can_cast(lc[col].value.dtype, lcs[0][col].value.dtype, "same_kind"))
+                        ):
                         columns_to_remove.add(col)
                         continue
 

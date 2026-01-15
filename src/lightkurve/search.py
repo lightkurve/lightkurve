@@ -140,6 +140,7 @@ class SearchResult(object):
         ]
         self.table.sort(["distance", "sort_order", "author", "year", "exptime", "mission",])
 
+
     def _add_columns(self):
         """Adds a user-friendly index (``#``) column and adds column unit
         and display format information.

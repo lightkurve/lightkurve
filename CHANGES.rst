@@ -8,6 +8,7 @@
 - Fixed bugs in ``bin`` for ``flux_err`` column. Improved ``bin`` performance. [#1499]
 - Updated search result sort order [#1384]
 - When reading in data saved with to_fits, change meta.flux_origin to reflect origin [#1371]
+- Fixed bugs in ``FoldedLightCurve`` objects with normalized phase to support pickle / dill [#1529]
 
 2.5.1  (2025-05-20)
 =====================
