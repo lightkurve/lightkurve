@@ -641,8 +641,9 @@ class LightCurve(TimeSeries):
         lc = self.copy()
         new_flux = lc[flux_column]
         # For consistency with how lightkurve inially sets the flux (See issue #1505)
+        # If no unit exists, default to dimensionless
         if not isinstance(new_flux, Quantity):
-            new_flux = Quantity(new_flux, new_flux.unit)
+            new_flux = Quantity(new_flux, getattr(new_flux, 'unit', u.dimensionless_unscaled))
         lc["flux"] = new_flux
         if flux_err_column:  # not None
             new_flux_err = lc[flux_err_column]
@@ -660,7 +661,7 @@ class LightCurve(TimeSeries):
                     new_flux_err = new_flux_err * lc["flux"].unit
 
         if not isinstance(new_flux_err, Quantity):
-            lc["flux_err"] = Quantity(new_flux_err, new_flux_err.unit)
+            lc["flux_err"] = Quantity(new_flux_err, getattr(new_flux_err, 'unit', u.dimensionless_unscaled))
         else:
             lc["flux_err"] = new_flux_err
 
