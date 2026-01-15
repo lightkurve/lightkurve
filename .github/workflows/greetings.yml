@@ -4,10 +4,11 @@ on: [pull_request, issues]
 
 jobs:
   greeting:
+    name: Greet First-Time Contributors
     runs-on: ubuntu-latest
     steps:
     - uses: actions/first-interaction@v3
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: 'Hi there! 👋  Thank you for opening your first Lightkurve issue! 🙏  One of our maintainers will get back to you as soon as possible. 👩‍🚀  You can expect a response within 7 days. 📅  If you haven’t heard anything by then, feel free to ping this thread. 🛎️  We love that you are using Lightkurve and appreciate your feedback. 👍'
-        pr-message: 'Hi there! 👋  Thank you for opening your first Lightkurve pull request! 🙏  One of our maintainers will get back to you as soon as possible. 👩‍🚀  You can expect a response within 7 days. 📅  If you haven’t heard anything by then, feel free to ping this thread. 🛎️  We love that you are using Lightkurve and appreciate your input. 👍'
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        issue_message: 'Hi there! 👋  Thank you for opening your first Lightkurve issue! 🙏  One of our maintainers will get back to you as soon as possible. 👩‍🚀  You can expect a response within 7 days. 📅  If you haven’t heard anything by then, feel free to ping this thread. 🛎️  We love that you are using Lightkurve and appreciate your feedback. 👍'
+        pr_message: 'Hi there! 👋  Thank you for opening your first Lightkurve pull request! 🙏  One of our maintainers will get back to you as soon as possible. 👩‍🚀  You can expect a response within 7 days. 📅  If you haven’t heard anything by then, feel free to ping this thread. 🛎️  We love that you are using Lightkurve and appreciate your input. 👍'
