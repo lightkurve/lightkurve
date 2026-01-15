@@ -63,12 +63,15 @@ pytest-remotedata = ">=0.3.2"
 pytest-doctestplus = ">=0.8.0"
 pytest-xdist = ">=2.1.0"
 jupyter = ">=1.0.0"
-Sphinx = ">=4.3.0"
+Sphinx = [
+    {version = ">=5.3.0", python = "<3.13"},
+    {version = ">=6.2.0", python = ">=3.13"}
+]
 nbsphinx = ">=0.8.7"
 numpydoc = ">=1.1.0"
 sphinx-automodapi = ">=0.13"
 sphinxcontrib-rawfiles = ">=0.1.1"
-pydata-sphinx-theme = "==0.8.1"
+pydata-sphinx-theme = ">=0.8.1"
 pylint = ">=2.6.0"
 ghp-import = "^2.1.0"
 openpyxl = ">=3.0.7"
