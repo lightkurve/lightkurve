@@ -899,7 +899,7 @@ class LightCurve(TimeSeries):
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
-    def append(self, others, inplace=False):
+    def append(self, others, inplace=False, sort_by=None):
         """Append one or more other `LightCurve` object(s) to this one.
 
         Parameters
@@ -909,6 +909,9 @@ class LightCurve(TimeSeries):
         inplace : bool
             If True, change the current `LightCurve` instance in place instead
             of creating and returning a new one. Defaults to False.
+        sort_by : str or list of str
+            The key(s) to order the light curves by. 
+            If None, the light curves will not be sorted.
 
         Returns
         -------
@@ -925,7 +928,7 @@ class LightCurve(TimeSeries):
         # Re-use LightCurveCollection.stitch() to avoid code duplication
         from .collections import LightCurveCollection  # avoid circular import
 
-        return LightCurveCollection((self, *others)).stitch(corrector_func=None)
+        return LightCurveCollection((self, *others)).stitch(corrector_func=None, sort_by=sort_by)
 
     def flatten(
         self,
