@@ -2687,7 +2687,10 @@ class LightCurve(TimeSeries):
                             array=extra_data[kw],
                         )
                     )
-            if "SAP_QUALITY" not in extra_data:
+            #Want to add a statement here asking if the oject belongs to TESS/Kepler/K2
+            #If it does then do the following otherwise dont
+            allowed_missions = ['TESS', 'Kepler', 'K2']
+            if (self.meta.get("MISSION") in allowed_missions and "SAP_QUALITY" not in extra_data) or ("MISSION" in extra_data and extra_data["MISSION"] in allowed_missions and "SAP_QUALITY" not in extra_data):
                 cols.append(
                     fits.Column(
                         name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
