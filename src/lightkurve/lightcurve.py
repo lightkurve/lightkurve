@@ -2637,7 +2637,7 @@ class LightCurve(TimeSeries):
                     )
                 )
             if ~np.asarray(
-                [flux_column_name == k.upper() for k in extra_data.keys()]
+                [flux_column_name.upper() == k.upper() for k in extra_data.keys()]
             ).any():
                 cols.append(
                     fits.Column(
@@ -3360,13 +3360,6 @@ class FoldedLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_column_name : str
-            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
-        aperture_mask : array-like
-            Optional 2D aperture mask to save with this lightcurve object, if
-            defined.  The mask can be either a boolean mask or an integer mask
-            mimicking the Kepler/TESS convention; boolean masks are
-            automatically converted to the Kepler/TESS conventions
         extra_data : dict
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
@@ -3612,8 +3605,6 @@ class KeplerLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_column_name : str
-            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
         aperture_mask : array-like
             Optional 2D aperture mask to save with this lightcurve object, if
             defined.  The mask can be either a boolean mask or an integer mask
@@ -3735,8 +3726,6 @@ class TessLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_column_name : str
-            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
         aperture_mask : array-like
             Optional 2D aperture mask to save with this lightcurve object, if
             defined.  The mask can be either a boolean mask or an integer mask

@@ -1086,6 +1086,7 @@ def test_to_fits():
     lc = read(hdu)
     assert lc.period == 1.2
     assert lc.message == 'Test string'
+    assert lc.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
     # Test reading a generic lc without TESS/Kepler information #649
     basic_lc = LightCurve(time=[1,2,3], flux=[4,5,6])
     basic_hdu = basic_lc.to_fits()
@@ -1096,6 +1097,7 @@ def test_to_fits():
     basic_lc = read(basic_hdu, time_format='jd')
     assert (basic_lc.time.value == [1,2,3]).all()
     assert basic_lc.time.format == 'jd'
+    assert basic_lc.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
 
 
     
