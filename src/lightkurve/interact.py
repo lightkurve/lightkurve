@@ -17,6 +17,7 @@ from __future__ import division, print_function
 import os
 import logging
 import warnings
+import fnmatch
 
 import numpy as np
 from astropy.coordinates import SkyCoord, Angle
@@ -65,18 +66,22 @@ except Exception as e:
 def _search_nearby_of_tess_target(tic_id):
     # To avoid warnings / overflow error in attempting to convert GAIA DR2, TIC ID, TOI
     # as int32 (the default) in some cases
+    # PR2152 found the table returned to have Gaia (lower case) rather than all caps. This is a workaround.
     return ascii.read(f"https://exofop.ipac.caltech.edu/tess/download_nearbytarget.php?id={tic_id}&output=csv",
                       format="csv",
                       fast_reader=False,
                       converters={
                           "GAIA DR2": [ascii.convert_numpy(str)],
+                          "Gaia DR2": [ascii.convert_numpy(str)],
                           "TIC ID": [ascii.convert_numpy(str)],
                           "TOI": [ascii.convert_numpy(str)],
                           })
 
 
 def _get_tic_meta_of_gaia_in_nearby(tab, nearby_gaia_id, key, default=None):
-    res = tab[tab['GAIA DR2'] == str(nearby_gaia_id)]
+    gaia_col = fnmatch.filter(tab.colnames, "G[Aa][Ii][Aa] [Dd][Rr]2")[0]
+    
+    res = tab[tab[gaia_col] == str(nearby_gaia_id)]
     if len(res) > 0:
         return res[0][key]
     else:
@@ -426,11 +431,13 @@ def _add_tics_with_no_matching_gaia_ids_to(result, tab, gaia_ids, magnitude_limi
     # filter out those with matching gaia ids
     # (handled in `_add_tics_with_matching_gaia_ids_to()`)
     gaia_str_ids = [str(id) for id in gaia_ids]
-    tab = tab[np.isin(tab['GAIA DR2'], gaia_str_ids, invert=True)]
+    gaia_col = fnmatch.filter(tab.colnames, "G[Aa][Ii][Aa] [Dd][Rr]2")[0]
+    tab = tab[np.isin(tab[gaia_col], gaia_str_ids, invert=True)]
 
     # filter out those with gaia ids, but Gaia Mag is smaller than magnitude_limit
     # (they won't appear in the given gaia_ids list)
-    tab = tab[tab['GAIA Mag'] < magnitude_limit]
+    gaiamag_col = fnmatch.filter(tab.colnames, "G[Aa][Ii][Aa] [Mm][Aa][Gg]")[0]
+    tab = tab[tab[gaiamag_col] < magnitude_limit]
 
     # apply magnitude_limit filter for those with no Gaia data using TESS mag
     tab = tab[tab['TESS Mag'] < magnitude_limit]

@@ -1,6 +1,14 @@
-2.5.2dev (unreleased)
+2.5.2dev  (unreleased)
 =====================
-
+- Patch for changes to astroquery 0.4.11. Search results using GAIA DR2 now case insensitive. Integer searches converted to string. [#1511]
+- Added Folded lightcurve reader to open data saved with ``lk.FoldedLightCurve.to_fits()`` [#1488]
+- Pass reader to ``read_generic_lightcurve()`` if Kepler/K2/TESS file type not recognized [#1488]
+- Fixes bug for reading in data with flux units listed as 'electron / s' [#1488] from issue [#1504]
+- Include MOM_CENTR1 and MOM_CENTR2, if it exists, when saving fits files [#1488]
+- Fixed bugs in ``bin`` for ``flux_err`` column. Improved ``bin`` performance. [#1499]
+- Updated search result sort order [#1384]
+- Convert flux and flux_err to Quantity objects when using ``select_flux`` [#1513]
+- Fixed bugs in ``FoldedLightCurve`` objects with normalized phase to support pickle / dill [#1529]
 
 2.5.1  (2025-05-20)
 =====================
@@ -23,7 +31,7 @@
 - Fixed the bug in ``bin()`` function with ``bin`` parameter for ``FoldedLightCurve`` objects. [#1491]
 - Modified ``copy()`` and ``bin()`` functions for ``FoldedLightCurve`` objects to fix issues with normalized phase [#1491]
 - Removed ``binsize`` and ``time_bin_end`` as input options for ``FoldedLightCurve`` objects [#1491]
-- Changed calls of ```np.in1d``` to ``np.isin`` for numpy v2 compatibility [#1492]
+- Changed calls of ``np.in1d`` to ``np.isin`` for numpy v2 compatibility [#1492]
 
 2.5.0 (2024-08-29)
 =====================

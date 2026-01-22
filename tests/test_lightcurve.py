@@ -2,6 +2,7 @@ from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.masked import Masked
 from astropy import units as u
+from astropy.units import Quantity
 from astropy.table import Table, Column, MaskedColumn
 from astropy.time import Time, TimeDelta
 from astropy.timeseries import aggregate_downsample
@@ -10,15 +11,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
+import pickle
 import pytest
 import tempfile
 import warnings
 
 from lightkurve.io import read
-from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from lightkurve.lightcurve import LightCurve, KeplerLightCurve, TessLightCurve, rmse, nanstd
 from lightkurve.lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning
+from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning, LightkurveError
 from lightkurve.search import search_lightcurve
 from lightkurve.collections import LightCurveCollection
 
@@ -599,6 +601,107 @@ def test_cdpp_tabby():
     assert np.abs(lc2.estimate_cdpp().value - lc.cdpp6_0) < 30
 
 
+def test_rmse():
+    """Test RMS implementation used in ``bin()``."""
+
+    # ensure RMS implementation correctly handles np.nan and masked values
+    n = np.nan  # for shorthand below
+    data = [n, 3, 4, 9, n]
+    mask = [0, 0, 0, 1, 1]
+    expected = np.sqrt((3**2 + 4**2) / 2)  # 3.535
+
+    # type astropy MaskedNDArray from MaskedQuantity, typical for SPOC TESS lightcurve
+    vals = Masked(data * u.dimensionless_unscaled, mask=mask).value
+    actual = rmse(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(rmse(vals[3:])), "edge case: all masked values"
+
+    vals = np.ma.MaskedArray(data=data, mask=mask)
+    actual = rmse(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(rmse(vals[3:])), "edge case: all masked values"
+
+    #
+    # test rmse_reduceat
+    # conceptually create 3 bins, 2 average bins, and 1 bin with all values masked
+    #
+    data2 = data + data + [4, n]
+    mask2 = mask + mask + [1, 1]
+    indices2 = [0, 5, 10]
+    expected2 = [expected, expected, n]
+
+    vals2 = Masked(data2 * u.dimensionless_unscaled, mask=mask2).value
+    actual2 = rmse.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)  # used by MaskedColumn
+    actual2 = rmse.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2).filled(np.nan)  # non masked Column / Quantity
+    actual2 = rmse.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all nan"
+
+
+def test_nanstd():
+    """Test custom nanstd implementation used in ``bin()``."""
+
+    # ensure nanstd implementation correctly handles np.nan and masked values
+    n = np.nan  # for shorthand below
+    data = [n, 3, 4, 9, n]
+    mask = [0, 0, 0, 1, 1]
+    expected = np.std([3, 4])
+
+    # type astropy MaskedNDArray from MaskedQuantity, typical for SPOC TESS lightcurve
+    vals = Masked(data * u.dimensionless_unscaled, mask=mask).value
+    actual = nanstd(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(nanstd(vals[3:])), "edge case: all masked values"
+
+    vals = np.ma.MaskedArray(data=data, mask=mask)  # used by MaskedColumn
+    actual = nanstd(vals)
+    assert_almost_equal(actual, expected)  # <-- will let masked value pass
+    assert np.isfinite(actual), "result should not be masked value"
+    assert np.isnan(nanstd(vals[3:])), "edge case: all masked values"
+
+    #
+    # test nanstd_reduceat
+    # conceptually create 3 bins, 2 average bins, and 1 bin with all values masked
+    #
+    data2 = data + data + [4, n]
+    mask2 = mask + mask + [1, 1]
+    indices2 = [0, 5, 10]
+    expected2 = [expected, expected, n]
+
+    vals2 = Masked(data2 * u.dimensionless_unscaled, mask=mask2).value
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2)  # used by MaskedColumn
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all masked values"
+
+    vals2 = np.ma.MaskedArray(data=data2, mask=mask2).filled(np.nan)  # non masked Column / Quantity
+    actual2 = nanstd.reduceat(vals2, indices2)
+    assert_allclose(actual2[:2], expected2[:2])  # <-- will let masked value pass
+    assert np.all(np.isfinite(actual2[:2])), "result should not be masked value"
+    assert np.isnan(actual2[2]), "edge case: the bin with all nan"
+
+
+
 def test_bin():
     """Does binning work?"""
     with warnings.catch_warnings():  # binsize is deprecated
@@ -612,7 +715,9 @@ def test_bin():
         # stderr changed since with the initial workaround for `binsize` in 2.x
         # the first bin gets 3, the last only a single point!
         if _HAS_VAR_BINS:  # With Astropy 5.0 check the exact numbers again
-            assert_allclose(binned_lc.flux_err, np.ones(5))
+            # case with finite `flux_err`, binned value should be RMSE of `flux_err`
+            err_expected = np.sqrt(((2 ** 0.5) ** 2 + (2 ** 0.5) ** 2) / 2)
+            assert_allclose(binned_lc.flux_err, err_expected * np.ones(5))
         else:
             assert_allclose(binned_lc.flux_err, np.sqrt([2./3, 1, 1, 1, 2]))
         assert len(binned_lc.time) == 5
@@ -964,6 +1069,30 @@ def test_to_fits():
             overwrite=True,
             extra_data={"BKG": bkg_lc.flux},
         )
+    # Test round trip saving a folded lightcurve
+    folded_hdu = read(TESS_SIM).fold(1.2*u.day).to_fits()
+    folded_lc = read(folded_hdu)
+    assert folded_lc.normalize_phase == False
+    assert folded_lc.period == 1.2
+    # Test adding additional keywords (#1369)
+    hdu = read(TESS_SIM).to_fits(period=1.2, message='Test string')
+    lc = read(hdu)
+    assert lc.period == 1.2
+    assert lc.message == 'Test string'
+    # Test reading a generic lc without TESS/Kepler information #649
+    basic_lc = LightCurve(time=[1,2,3], flux=[4,5,6])
+    basic_hdu = basic_lc.to_fits()
+    # The random data does not have time units, so this should fail if not specified
+    with pytest.raises(LightkurveError, match="Error in reading Data product"):
+        read(basic_hdu)
+    # providing time_format should allow creating a generic lk object
+    basic_lc = read(basic_hdu, time_format='jd')
+    assert (basic_lc.time.value == [1,2,3]).all()
+    assert basic_lc.time.format == 'jd'
+
+
+
+
 
 
 def test_to_fits_flux_units_in_header():
@@ -1081,10 +1210,14 @@ def test_remove_nans():
 
 def test_remove_outliers():
     # Does `remove_outliers()` remove outliers?
-    lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1])
+    lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1], flux_err = [.1,100,.1,.1])
     lc_clean = lc.remove_outliers(sigma=1)
     assert_array_equal(lc_clean.time.value, [1, 2, 4])
     assert_array_equal(lc_clean.flux, [1, 1, 1])
+    # Check we can specify a column for the sigma clip
+    lc_clean = lc.remove_outliers(sigma=1, column='flux_err')
+    assert_array_equal(lc_clean.time.value, [1, 3, 4])
+    assert_array_equal(lc_clean.flux, [1, 1000, 1])
     # It should also be possible to return the outlier mask
     lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
     assert len(outlier_mask) == len(lc.flux)
@@ -1924,6 +2057,58 @@ def test_issue_916():
     LightCurve(flux=np.random.randn(100)).fold(period=2.5).flatten()
 
 
+def assert_lc_equal(actual, expected, label):
+    assert len(actual) == len(expected), label
+    assert_array_equal(actual.colnames, expected.colnames, label)
+    # can't compare meta dict, because some values are Python objects in real data, e.g.,
+    # 'TIERABSO': <astropy.io.fits.card.Undefined object at 0x000002E157B8BDA0>,
+    assert len(actual.meta) == len(expected.meta), label
+    for c in expected.colnames:
+        assert_array_equal(actual[c], expected[c], f"{label}, column {c}")
+
+
+def do_pickle_dump_load(lc):
+    dump = pickle.dumps(lc)
+    lc_s = pickle.loads(dump)
+    return lc_s
+
+
+def do_test_pickle(lc, label):
+    # Test: basic
+    lc_from_pickle = do_pickle_dump_load(lc)
+    assert_lc_equal(lc_from_pickle, lc, label)
+
+    # Test: folded lightcurve
+    lc_f = lc.fold(epoch_time=3, period=2)
+    lc_from_pickle = do_pickle_dump_load(lc_f)
+    assert_lc_equal(lc_from_pickle, lc_f, f"{label}-folded")
+
+    # Test: folded lightcurve with normalized phases
+    # https://github.com/lightkurve/lightkurve/issues/1527
+    lc_f = lc.fold(epoch_time=3, period=2, normalize_phase=True)
+    lc_from_pickle = do_pickle_dump_load(lc_f)
+    assert_lc_equal(lc_from_pickle, lc_f, f"{label}-folded-normalized-phase")
+
+
+def test_pickle_basic():
+    lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1., 2, 1, 2, 1])
+    lc.meta["LABEL"] = "LC test pickle"
+    do_test_pickle(lc, "Basic minimal LC")
+
+
+@pytest.mark.xfail  # https://github.com/astropy/astropy/issues/19040 (still works with `dill`)
+@pytest.mark.remote_data
+@pytest.mark.parametrize("lc_url, lc_label", [
+    (TABBY_Q8, "Kepler LC"),
+    (K2_C08, "K2 LC"),
+    (TESS_SIM, "TESS LC"),
+])
+def test_pickle_mission_data(lc_url, lc_label):
+    # An integrated test for pickle with real mission data
+    lc = read(lc_url)
+    do_test_pickle(lc, lc_label)
+
+
 @pytest.mark.remote_data
 def test_search_neighbors():
     """The closest neighbor to Proxima Cen in Sector 11 is TIC 388852407."""
@@ -1985,6 +2170,10 @@ def test_select_flux():
                           'newflux_n3_err': [1, 2, 3] * u.percent,
                           'newflux_n4': [4, 5, 6] * u_e_s,  # case flux and _err have different units
                           'newflux_n4_err': [.01, .02, .03],  # normalized, no unit
+                          'masked_flux': Masked([2,3,4] * u_e_s,mask=[0,0,1]),
+                          'masked_flux_err':[0,1,2] * u_e_s,
+                          'nounit_flux':[4,5,6],
+                          'nounit_flux_err':[1,1,1],
                           },
                           )
     # Can we set flux to newflux?
@@ -2019,6 +2208,14 @@ def test_select_flux():
     assert lc.meta.get("NORMALIZED", False) is False  # expected behavior, not the real test
     assert lc.select_flux("newflux_n1").meta.get("NORMALIZED", False)  # actual test 2a, the new column is normalized
     assert lc.select_flux("newflux_n2").meta.get("NORMALIZED", False)  # actual test 2b, the new column is normalized
+
+    # Are masked columns converted to Quantity when using select_flux() [#1505]?
+    assert isinstance(lc.masked_flux, Quantity)
+    assert isinstance(lc.flux, Quantity)
+    assert isinstance(lc.select_flux("masked_flux").flux, Quantity)
+    assert isinstance(lc.newflux_n2, Quantity) is False
+    assert isinstance(lc.select_flux("newflux_n2").flux, Quantity)
+    assert lc.select_flux("nounit_flux").flux.unit == u.dimensionless_unscaled
 
 
 def test_transit_mask_with_quantities():

@@ -28,6 +28,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'KEPSEISMIC'`
         * `'CDIPS'`
         * `'TGLC'`
+        * `'Folded'`
 
     If the data product cannot be detected, `None` will be returned.
 
@@ -42,6 +43,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         A string describing the detected filetype. If the filetype is not
         recognized, `None` will be returned.
     """
+    # The 'origin' fits header value gives institution responsible for creating the file
 
     # Is it a MIT/QLP TESS FFI Quicklook Pipeline light curve?
     # cf. http://archive.stsci.edu/hlsp/qlp
@@ -123,15 +125,24 @@ def detect_filetype(hdulist: HDUList) -> str:
     # Is it an official data product?
     header = hdulist[0].header
     try:
+        # Use `creator` keyword to determine tpf or lc
+        creator = header["creator"].lower()
+        origin = header["origin"].lower()
+
+        # check if the file was a folded lightcurve, as saved by lightkurve.FoldedLightCurve().to_fits()
+        if 'folded' in creator:
+            return "Folded"
+
         # use `telescop` keyword to determine mission
-        # and `creator` to determine tpf or lc
         if "TELESCOP" in header.keys():
             telescop = header["telescop"].lower()
         else:
             # Some old custom TESS data did not define the `TELESCOP` card
             telescop = header["mission"].lower()
-        creator = header["creator"].lower()
-        origin = header["origin"].lower()
+        
+
+
+
         if telescop == "kepler":
             # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
             if "targetpixel" in creator:
@@ -139,7 +150,6 @@ def detect_filetype(hdulist: HDUList) -> str:
             # Kepler LCFs will contain "FluxExporter2PipelineModule"
             elif (
                 "fluxexporter" in creator
-                or "lightcurve" in creator
                 or "lightcurve" in creator
             ):
                 return "KeplerLightCurve"
@@ -156,4 +166,6 @@ def detect_filetype(hdulist: HDUList) -> str:
     # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):
-        return None
+        return "generic" #Try using the generic lc reader
+    
+

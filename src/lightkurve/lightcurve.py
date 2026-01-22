@@ -67,6 +67,190 @@ def _is_np_structured_array(data1):
     return isinstance(data1, np.ndarray) and data1.dtype.names is not None
 
 
+# BEGIN the helpers ` {has,get,set}_time_in_data*()`
+# , used by LightCurve.__init__() and FoldedLightCurve.__init__() internally
+
+def _get_time_idx_in(names):
+    names = np.asarray(names)
+    time_indices = np.argwhere(names == "time")
+    if len(time_indices) > 0:
+        return int(time_indices[0][0])
+    else:
+        return None
+
+
+def _get_time_in_data_list(data, names):
+    if len(data) < 1:
+        return None
+    if names is None:
+        if isinstance(data[0], TimeBase):
+            return data[0]
+        else:
+            return None
+    else:
+        time_idx = _get_time_idx_in(names)
+        if time_idx is not None:
+            return data[time_idx]
+        else:
+            return None
+
+
+def _set_time_in_data_list(data, value, names):
+    if len(data) < 1:
+        raise AssertionError("data should be non-empty")
+    if names is None:
+        data[0] = value
+    else:
+        time_idx = _get_time_idx_in(names)
+        if time_idx is not None:
+            data[time_idx] = value
+        else:
+            raise AssertionError("data should have time column")
+
+
+def _get_time_in_data_np_structured_array(data):
+    if data.dtype.names is None:
+        return None
+    if "time" not in data.dtype.names:
+        return None
+    return data["time"]
+
+
+def _remove_time_from_data_np_structured_array(data):
+    if data.dtype.names is None:
+        raise AssertionError("data should be a numpy structured array")
+    if "time" not in data.dtype.names:
+        raise AssertionError("data should have a time field")
+    filtered_names = [n for n in data.dtype.names if n != "time"]
+    return data[filtered_names]
+
+
+def _has_time_in_data(data, names=None):
+    if data is None:
+        return False
+    elif _is_dict_like(data):
+        return "time" in data.keys()
+    elif _is_list_like(data):
+        return _get_time_in_data_list(data, names) is not None
+    elif _is_np_structured_array(data):
+        return _get_time_in_data_np_structured_array(data) is not None
+    else:
+        raise ValueError(f"Unsupported type for time in data: {type(data)}")
+
+
+def _get_time_in_data(data, names):
+    if _is_dict_like(data):
+        return data["time"]
+    elif _is_list_like(data):
+        return _get_time_in_data_list(data, names)
+    elif _is_np_structured_array(data):
+        return _get_time_in_data_np_structured_array(data)
+    else:
+        raise AssertionError("Unsupported type for time in data")
+
+
+def _set_time_in_data(data, value, names):
+    if _is_dict_like(data):
+        data["time"] = value
+    elif _is_list_like(data):
+        _set_time_in_data_list(data, value, names)
+    elif _is_np_structured_array(data):
+        raise AssertionError(
+            "Setting Time instances to np structured array is not supported"
+        )
+    else:
+        raise AssertionError("Unsupported type for time in data")
+
+# END   the helpers ` {has,get,set}_time_in_data*()`
+
+
+def rmse(x):
+    """Root Mean Square Error implementation for `bin`"""
+    if np.any(np.isfinite(x)):
+        return np.sqrt(np.nansum(x**2) / np.nansum(np.isfinite(x)))
+    else:
+        return np.nan
+
+
+def rmse_reduceat(values, indices):
+    # for the purpose of sum, map np.nan and masked vals to 0
+    if hasattr(values, "mask"):
+        vals_filled = values.filled(0)
+    else:
+        vals_filled = values.copy()
+    vals_filled[np.isnan(values)] = 0
+
+    # for counting, ignore np.nan and masked values
+    if hasattr(values, "mask"):
+        vals_for_count = ~values.mask & np.isfinite(values)
+        vals_for_count = vals_for_count.filled(0)
+    else:
+        vals_for_count = np.isfinite(values)
+
+    sum_of_squares = np.add.reduceat(np.square(vals_filled), indices)
+
+    count = np.add.reduceat(vals_for_count, indices).astype(float)
+    # for bins with all masked values / nan, i.e., count is 0, the result should be nan
+    count[count == 0] = np.nan
+
+    return np.sqrt(sum_of_squares / count)
+
+
+rmse.reduceat = rmse_reduceat
+
+
+def nanstd(x):
+    """Custom `nanstd` implementation for `bin`"""
+    # for our purpose, we treat masked values as nan, to avoid the ambiguous behavior
+    # for cases where a bin with all values masked. Without filled(nan), in such case,
+    # - astropy Masked will return a masked value,
+    # - numpy.ma.MaskedArray results in error (https://github.com/numpy/numpy/issues/29117)
+    if hasattr(x, "mask"):
+        x = x.filled(np.nan)
+    return np.nanstd(x)
+
+
+def nanstd_reduceat(values, indices):
+    # for the purpose of sum, map np.nan and masked vals to 0
+    if hasattr(values, "mask"):
+        vals_filled = values.filled(0)
+    else:
+        vals_filled = values.copy()
+    vals_filled[np.isnan(values)] = 0
+
+    # for counting, ignore np.nan and masked values
+    if hasattr(values, "mask"):
+        vals_for_count = ~values.mask & np.isfinite(values)
+        vals_for_count = vals_for_count.filled(0)
+    else:
+        vals_for_count = np.isfinite(values)
+
+    # calculate per-bin values
+    count = np.add.reduceat(vals_for_count, indices).astype(float)
+    # for bins with all masked values / nan, i.e., count is 0, the result should be nan
+    count[count == 0] = np.nan
+    means = np.add.reduceat(vals_filled, indices) / count
+
+    # Broadcast per-bin means back to original shape
+    bin_ids = np.searchsorted(indices, np.arange(len(vals_filled)), side='right') - 1
+    means_expanded = means[bin_ids]
+
+    # square diff (per-element of the original shape)
+    sq_diff = (vals_filled - means_expanded) ** 2
+    # for each element that is either masked or nan, set the square diff as 0 to ignore it.
+    if hasattr(values, "mask"):
+        sq_diff[values.mask] = 0
+    sq_diff[np.isnan(values)] = 0
+
+    # per-bin sum of square diffs
+    sum_sq_diff = np.add.reduceat(sq_diff, indices)
+
+    return np.sqrt(sum_sq_diff / count)
+
+
+nanstd.reduceat = nanstd_reduceat
+
+
 class LightCurve(TimeSeries):
     """
     Subclass of AstroPy `~astropy.table.Table` guaranteed to have *time*, *flux*, and *flux_err* columns.
@@ -169,109 +353,6 @@ class LightCurve(TimeSeries):
     __array_priority__ = 100_000
 
     def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
-        # the ` {has,get,set}_time_in_data()`: helpers to handle `data` of different types
-        # in some cases, they also need to access kwargs["names"] as well
-
-        def get_time_idx_in(names):
-            time_indices = np.argwhere(np.asarray(names) == "time")
-            if len(time_indices) > 0:
-                return time_indices[0][0]
-            else:
-                return None
-
-        def get_time_in_data_list():
-            if len(data) < 1:
-                return None
-            names = kwargs.get("names")
-            if names is None:
-                # the first item MUST be time if no names specified
-                if isinstance(data[0], TimeBase):  # Time or TimeDelta
-                    return data[0]
-                else:
-                    return None
-            else:
-                time_idx = get_time_idx_in(names)
-                if time_idx is not None:
-                    return data[time_idx]
-                else:
-                    return None
-
-        def set_time_in_data_list(value):
-            if len(data) < 1:
-                raise AssertionError("data should be non-empty")
-            names = kwargs.get("names")
-            if names is None:
-                # the first item MUST be time if no names specified
-                # this is to support base Table's select columns
-                # in __getitem__()
-                # https://github.com/astropy/astropy/blob/326435449ad8d859f1abf36800c3fb88d49c27ea/astropy/table/table.py#L1888
-                data[0] = value
-            else:
-                time_idx = get_time_idx_in(names)
-                if time_idx is not None:
-                    data[time_idx] = value
-                else:
-                    raise AssertionError("data should have time column")
-
-        def get_time_in_data_np_structured_array():
-            if data.dtype.names is None:  # no labeled filed, not a structured array
-                return None
-            if "time" not in data.dtype.names:
-                return None
-            return data["time"]
-
-        def remove_time_from_data_np_structured_array():
-            if data.dtype.names is None:
-                raise AssertionError("data should be a numpy structured array")
-            if "time" not in data.dtype.names:
-                raise AssertionError("data should have a time field")
-            filtered_names = [n for n in data.dtype.names if n != "time"]
-            return data[filtered_names]
-
-        def has_time_in_data():
-            """Check if the data has a column with the name"""
-            if data is None:
-                return False
-            elif _is_dict_like(data):
-                # data is a dict-like object with keys
-                return "time" in data.keys()
-            elif _is_list_like(data):
-                # case data is a list-like object (a list of columns, etc.)
-                return get_time_in_data_list() is not None
-            elif _is_np_structured_array(data):
-                # case numpy structured array (supported by base TimeSeries)
-                # https://numpy.org/doc/stable/user/basics.rec.html
-                return get_time_in_data_np_structured_array() is not None
-            else:
-                raise ValueError(f"Unsupported type for time in data: {type(data)}")
-
-        def get_time_in_data():
-            if _is_dict_like(data):
-                # data is a dict-like object with keys
-                return data["time"]
-            elif _is_list_like(data):
-                return get_time_in_data_list()
-            elif _is_np_structured_array(data):
-                return get_time_in_data_np_structured_array()
-            else:
-                # should never reach here. It'd have been caught by `has_time_in()``
-                raise AssertionError("Unsupported type for time in data")
-
-        def set_time_in_data(value):
-            if _is_dict_like(data):
-                # data is a dict-like object with keys
-                data["time"] = value
-            elif _is_list_like(data):
-                set_time_in_data_list(value)
-            elif _is_np_structured_array(data):
-                # astropy Time cannot be assigned to a column in np structured array
-                # we have special codepath handling it outside this function
-                raise AssertionError(
-                    "Setting Time instances to np structured array is not supported"
-                )
-            else:
-                # should never reach here. It'd have been caught by `has_time_in()``
-                raise AssertionError("Unsupported type for time in data")
 
         # Delay checking for required columns until the end
         self._required_columns_relax = True
@@ -303,7 +384,7 @@ class LightCurve(TimeSeries):
                 deprecated_column_kws[kw] = kwargs.pop(kw)
 
         # If `time` is passed as keyword argument, we populate it with integer numbers
-        if data is None or not has_time_in_data():
+        if data is None or not _has_time_in_data(data, kwargs.get("names")):
             if time is None and flux is not None:
                 time = np.arange(len(flux))
             # We are tolerant of missing time format
@@ -317,10 +398,10 @@ class LightCurve(TimeSeries):
                 )
 
         # Also be tolerant of missing time format if time is passed via `data`
-        if data is not None and has_time_in_data():
-            if not isinstance(get_time_in_data(), (Time, TimeDelta)):
+        if data is not None and _has_time_in_data(data, kwargs.get("names")):
+            if not isinstance(_get_time_in_data(data, kwargs.get("names")), (Time, TimeDelta)):
                 tmp_time = Time(
-                    get_time_in_data(),
+                    _get_time_in_data(data, kwargs.get("names")),
                     format=deprecated_kws.get("time_format", self._default_time_format),
                     scale=deprecated_kws.get("time_scale", self._default_time_scale),
                 )
@@ -329,9 +410,9 @@ class LightCurve(TimeSeries):
                     # one cannot set a `Time` instance to it
                     # so we set the time to the `time` param, and take it out of data
                     time = tmp_time
-                    data = remove_time_from_data_np_structured_array()
+                    data = _remove_time_from_data_np_structured_array(data)
                 else:
-                    set_time_in_data(tmp_time)
+                    _set_time_in_data(data, tmp_time, kwargs.get("names"))
 
         # Allow overriding the required columns
         self._required_columns = kwargs.pop("_required_columns", self._required_columns)
@@ -552,22 +633,31 @@ class LightCurve(TimeSeries):
             raise ValueError(f"'{flux_err_column}' is not a column")
 
         lc = self.copy()
-        lc["flux"] = lc[flux_column]
+        new_flux = lc[flux_column]
+        # For consistency with how lightkurve inially sets the flux (See issue #1505)
+        # If no unit exists, default to dimensionless
+        if not isinstance(new_flux, Quantity):
+            new_flux = Quantity(new_flux, getattr(new_flux, 'unit', u.dimensionless_unscaled))
+        lc["flux"] = new_flux
         if flux_err_column:  # not None
-            lc["flux_err"] = lc[flux_err_column]
+            new_flux_err = lc[flux_err_column]
         else:
             # if `flux_err_column` is unspecified, we attempt to use
             # f"{flux_column}_err" if it exists
             flux_err_column = f"{flux_column}_err"
             if flux_err_column in lc.columns:
-                lc["flux_err"] = lc[flux_err_column]
+                new_flux_err = lc[flux_err_column]
             else:
                 # fill in a dummy all-nan flux_err column
                 # ensure the unit of new flux_err is consistent with that of flux.
-                flux_err_col_vals = np.full(lc["flux"].shape, np.nan)
-                if lc["flux"].unit is not None:
-                    flux_err_col_vals = flux_err_col_vals * lc["flux"].unit
-                lc["flux_err"] = flux_err_col_vals
+                new_flux_err = np.full(lc["flux"].shape, np.nan)
+                if new_flux.unit is not None:
+                    new_flux_err = new_flux_err * lc["flux"].unit
+
+        if not isinstance(new_flux_err, Quantity):
+            lc["flux_err"] = Quantity(new_flux_err, getattr(new_flux_err, 'unit', u.dimensionless_unscaled))
+        else:
+            lc["flux_err"] = new_flux_err
 
         # Ensure resulting flux / flux_err have the same
         # Do the check here after the columns are selected so as to uniformly handle
@@ -1095,7 +1185,13 @@ class LightCurve(TimeSeries):
         lc.add_column(
             self.time.copy(), name="time_original", index=len(self._required_columns)
         )
+        if isinstance(period, Quantity):
+            try:
+                period.to(u.day)
+            except:
+                u.UnitConversionError
         lc.meta["PERIOD"] = period
+        lc.meta["NORMALIZE_PHASE"] = normalize_phase
         lc.meta["EPOCH_TIME"] = epoch_time
         lc.meta["EPOCH_PHASE"] = epoch_phase
         lc.meta["WRAP_PHASE"] = wrap_phase
@@ -1318,7 +1414,12 @@ class LightCurve(TimeSeries):
         return LightCurve(data=newdata, meta=self.meta)
 
     def remove_outliers(
-        self, sigma=5.0, sigma_lower=None, sigma_upper=None, return_mask=False, **kwargs
+        self, sigma=5.0, 
+        sigma_lower=None, 
+        sigma_upper=None, 
+        return_mask=False, 
+        column="flux",
+        **kwargs
     ):
         """Removes outlier data points using sigma-clipping.
 
@@ -1405,25 +1506,25 @@ class LightCurve(TimeSeries):
         from astropy.stats.sigma_clipping import sigma_clip
 
         # astropy.stats.sigma_clip won't work with masked ndarrays so we convert to regular arrays
-        flux = self.flux.copy()
-        if isinstance(flux, Masked):
-            flux = flux.filled(np.nan)
+        outlier_data = self[column].copy()
+        if isinstance(outlier_data, Masked):
+            outlier_data = outlier_data.filled(np.nan)
 
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
-            flux = self.flux
-            if isinstance(flux, Masked):
+            outlier_data = self[column]
+            if isinstance(outlier_data, Masked):
                 # Workaround for https://github.com/astropy/astropy/issues/14360
                 # in passing MaskedQuantity to sigma_clip, by converting it to Quantity.
                 # We explicitly fill masked values with `np.nan` here to ensure they are masked during sigma clipping.
                 # To handle unlikely edge case, convert int to float to ensure filing `np.nan` work.
                 # The conversion is acceptable because only the mask of the sigma_clip() result is used.
-                if np.issubdtype(flux.dtype, np.int_):
-                    flux = flux.astype(float)
-                flux = flux.filled(np.nan)
+                if np.issubdtype(outlier_data.dtype, np.int_):
+                    outlier_data = outlier_data.astype(float)
+                outlier_data = outlier_data.filled(np.nan)
             outlier_mask = sigma_clip(
-                data=flux,
+                data=outlier_data,
                 sigma=sigma,
                 sigma_lower=sigma_lower,
                 sigma_upper=sigma_upper,
@@ -1612,29 +1713,26 @@ class LightCurve(TimeSeries):
 
             # If `flux_err` is populated, assume the errors combine as the root-mean-square
             if np.any(np.isfinite(self.flux_err)):
-                rmse_func = (
-                    lambda x: np.sqrt(np.nansum(x**2)) / len(np.atleast_1d(x))
-                    if np.any(np.isfinite(x))
-                    else np.nan
-                )
                 ts_err = aggregate_downsample(
-                    self,
+                    # only column flux_err needs to be binned
+                    TimeSeries(data=dict(time=self.time.copy(), flux_err=self.flux_err)),
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
                     time_bin_end=time_bin_end,
-                    aggregate_func=rmse_func,
+                    aggregate_func=rmse,
                 )
                 ts["flux_err"] = ts_err["flux_err"]
             # If `flux_err` is unavailable, populate `flux_err` as nanstd(flux)
             else:
                 ts_err = aggregate_downsample(
-                    self,
+                    # only column flux (to be used as binned flux_err) needs to be binned
+                    TimeSeries(data=dict(time=self.time.copy(), flux=self.flux)),
                     time_bin_size=time_bin_size,
                     n_bins=n_bins,
                     time_bin_start=time_bin_start,
                     time_bin_end=time_bin_end,
-                    aggregate_func=np.nanstd,
+                    aggregate_func=nanstd,
                 )
                 ts["flux_err"] = ts_err["flux"]
 
@@ -2473,10 +2571,16 @@ class LightCurve(TimeSeries):
             float: "D",
             bool: "L",
             np.int32: "J",
-            np.int32: "K",
+            np.int64: "K",
             np.float32: "E",
             np.float64: "D",
         }
+
+        # If users give a dictionary of values, we first need to "remove" the values from the dictionary
+        if extra_data.get('extra_data') is not None:
+            for k in extra_data.get('extra_data').keys():
+                extra_data[k] = extra_data['extra_data'][k]
+            extra_data.pop('extra_data')
 
         def _header_template(extension):
             """Returns a template `fits.Header` object for a given extension."""
@@ -2503,6 +2607,8 @@ class LightCurve(TimeSeries):
                 "DATE": datetime.datetime.now().strftime("%Y-%m-%d"),
                 "CREATOR": "lightkurve.LightCurve.to_fits()",
                 "PROCVER": str(__version__),
+                "MISSION": self.meta.get("MISSION"),
+                "TELESCOP": self.meta.get("TELESCOP"),
             }
 
             for kw in default:
@@ -2543,6 +2649,7 @@ class LightCurve(TimeSeries):
                         array=self.flux,
                     )
                 )
+
             if hasattr(self, "flux_err"):
                 if ~(flux_column_name.upper() + "_ERR" in extra_data.keys()):
                     cols.append(
@@ -2561,7 +2668,18 @@ class LightCurve(TimeSeries):
                         fits.Column(name="CADENCENO", format="J", array=self.cadenceno)
                     )
             for kw in extra_data:
-                if isinstance(extra_data[kw], (np.ndarray, list)):
+                if isinstance(extra_data[kw], TimeBase):
+                    cols.append(
+                        fits.Column(
+                            name="{}".format(kw).upper(),
+                            format="D",
+                            unit=extra_data[kw].format,
+                            array=extra_data[kw].value,
+                        )
+                    )
+
+
+                elif isinstance(extra_data[kw], (np.ndarray, list)):
                     cols.append(
                         fits.Column(
                             name="{}".format(kw).upper(),
@@ -2575,7 +2693,6 @@ class LightCurve(TimeSeries):
                         name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
                     )
                 )
-
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
@@ -3040,10 +3157,42 @@ class FoldedLightCurve(LightCurve):
     and implements different plotting defaults.
     """
 
+    def __init__(self, data=None, *args, time=None, flux=None, flux_err=None, **kwargs):
+        if _has_time_in_data(data, kwargs.get("names")):
+            time_in_args = _get_time_in_data(data, kwargs.get("names"))
+        else:
+            time_in_args = time
+
+        if not isinstance(time_in_args, Quantity):
+            # typical cases
+            super().__init__(data, *args, time=time, flux=flux, flux_err=flux_err, **kwargs)
+        else:
+            # case time is normalized phase
+            # workaround the problem with regular __init__() by
+            # temporarily replacing normalized phase with a dummy TimeDelta
+
+            # basically self._replace_normalized_phase(),
+            # but needs to doen separately as this is __init__()
+            normalized_phase = time_in_args
+            time_in_delta = TimeDelta(normalized_phase.value * u.s)
+            if _has_time_in_data(data, kwargs.get("names")):
+                _set_time_in_data(data, time_in_delta, kwargs.get("names"))
+            else:
+                time = time_in_delta
+
+            # do the main init with time in dummy TimeDelta
+            super().__init__(data, *args, time=time, flux=flux, flux_err=flux_err, **kwargs)
+
+            # basically self._restore_normalized_phase()
+            with self._delay_required_column_checks():
+                self.remove_column("time")
+                self.add_column(normalized_phase, name="time", index=0)
+
     @property
     def phase(self):
         """Alias for `LightCurve.time`."""
         return self.time
+
 
     @property
     def cycle(self):
@@ -3106,11 +3255,13 @@ class FoldedLightCurve(LightCurve):
             )
             return
 
+        if self.period is not None and not isinstance(self.period, Quantity):
+            self.period *= u.day
+
         # If the phase folded lightcurve is normalized, unnormalize it
         with self._delay_required_column_checks():
-            normalized_phase = self.time
-            # print(normalized_phase * self.period)
-            phase = TimeDelta(normalized_phase * self.period)
+            normalized_phase = self.time.value
+            phase = TimeDelta(normalized_phase * self.period.value)#Time(normalized_phase*self.period.value, scale='tdb', format='jd')
             self.remove_column("time")
             self.add_column(phase, name="time", index=0)
         # return self
@@ -3128,9 +3279,13 @@ class FoldedLightCurve(LightCurve):
             )
             return
 
+        if self.period is not None and not isinstance(self.period, Quantity):
+            self.period *= u.day
+
+
         with self._delay_required_column_checks():
             phase = self.time
-            normalized_phase = phase / self.period
+            normalized_phase = Quantity(phase.value / self.period.value)
             self.remove_column("time")
             self.add_column(normalized_phase, name="time", index=0)
 
@@ -3222,6 +3377,78 @@ class FoldedLightCurve(LightCurve):
             period=self.period, epoch_time=self.epoch_time, **kwargs
         )
         return ax
+
+    def to_fits(
+        self,
+        path=None,
+        overwrite=False,
+        flux_column_name="FLUX",
+        aperture_mask=None,
+        **extra_data,
+    ):
+        """Writes the FoldedLightCurve to a FITS file.
+
+        Parameters
+        ----------
+        path : string, default None
+            File path, if `None` returns an astropy.io.fits.HDUList object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        flux_column_name : str
+            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
+        aperture_mask : array-like
+            Optional 2D aperture mask to save with this lightcurve object, if
+            defined.  The mask can be either a boolean mask or an integer mask
+            mimicking the Kepler/TESS convention; boolean masks are
+            automatically converted to the Kepler/TESS conventions
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        folded_specific_data = {
+            "OBJECT": "{}".format(self.targetid),
+            "MISSION": self.meta.get("MISSION"),
+            "RA_OBJ": self.meta.get("RA"),
+            "TARGETID": self.meta.get("TARGETID"),
+            "DEC_OBJ": self.meta.get("DEC"),
+            "PERIOD": self.period.to('day').value,
+            "CREATOR": "lightkurve.FoldedLightCurve.to_fits()",
+            "PHNORM": self.meta['NORMALIZE_PHASE'],
+            "EPOCH": self.meta['EPOCH_TIME'].value if self.meta['EPOCH_TIME'] else '',
+            "PHEPOCH": self.meta['EPOCH_PHASE'].value,
+        }
+
+        # Not every HLSP has centroid col/row information, so only pass this along if the data exists
+        if hasattr(self, 'centroid_col'):
+            folded_specific_data["MOM_CENTR1"] = self.centroid_col
+            folded_specific_data["MOM_CENTR2"] = self.centroid_row
+
+        for kw in folded_specific_data:
+            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                extra_data[kw] = folded_specific_data[kw]
+
+        if self.normalize_phase == True:
+            self._replace_normalized_phase()
+
+        hdu = super(FoldedLightCurve, self).to_fits(
+            path=None, overwrite=overwrite, **extra_data
+        )
+
+        if self.normalize_phase == True:
+            self._restore_normalized_phase()
+
+        if path is not None:
+            hdu.writeto(path, overwrite=overwrite, checksum=True)
+        else:
+            return hdu
 
     def bin(
         self,
@@ -3439,6 +3666,7 @@ class KeplerLightCurve(LightCurve):
         hdu : astropy.io.fits
             Returns an astropy.io.fits object if path is None
         """
+
         kepler_specific_data = {
             "TELESCOP": "KEPLER",
             "INSTRUME": "Kepler Photometer",
@@ -3451,9 +3679,12 @@ class KeplerLightCurve(LightCurve):
             "EQUINOX": 2000,
             "DATE-OBS": Time(self.time[0] + 2454833.0, format=("jd")).isot,
             "SAP_QUALITY": self.quality,
-            "MOM_CENTR1": self.centroid_col,
-            "MOM_CENTR2": self.centroid_row,
         }
+        # Not every HLSP has centroid col/row information, so only pass this along if the data exists
+        if hasattr(self, 'centroid_col'):
+            kepler_specific_data["MOM_CENTR1"] = self.centroid_col
+            kepler_specific_data["MOM_CENTR2"] = self.centroid_row
+
 
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
@@ -3547,7 +3778,7 @@ class TessLightCurve(LightCurve):
             defined.  The mask can be either a boolean mask or an integer mask
             mimicking the Kepler/TESS convention; boolean masks are
             automatically converted to the Kepler/TESS conventions
-        extra_data : dict
+        extra_data :
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
             keywords in the primary header.
@@ -3569,9 +3800,14 @@ class TessLightCurve(LightCurve):
             "SECTOR": self.meta.get("SECTOR"),
             "TARGETID": self.meta.get("TARGETID"),
             "DEC_OBJ": self.meta.get("DEC"),
-            "MOM_CENTR1": self.centroid_col,
-            "MOM_CENTR2": self.centroid_row,
         }
+
+
+
+        # Not every HLSP has centroid col/row information, so only pass this along if the data exists
+        if hasattr(self, 'centroid_col'):
+            tess_specific_data["MOM_CENTR1"] = self.centroid_col
+            tess_specific_data["MOM_CENTR2"] = self.centroid_row
 
         for kw in tess_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():

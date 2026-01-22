@@ -138,7 +138,8 @@ class SearchResult(object):
         self.table["sort_order"] = [
             sort_priority.get(author, 9) for author in self.table["author"]
         ]
-        self.table.sort(["distance", "project", "sort_order", "year", "exptime"])
+        self.table.sort(["distance", "sort_order", "author", "year", "exptime", "mission",])
+
 
     def _add_columns(self):
         """Adds a user-friendly index (``#``) column and adds column unit
@@ -938,18 +939,34 @@ def _search_products(
     SearchResult : :class:`SearchResult` object.
     """
     if isinstance(target, int):
+        # see: https://archive.stsci.edu/search_fields.php?mission=kic10
         if (0 < target) and (target < 13161030):
             log.warning(
                 "Warning: {} may refer to a different Kepler or TESS target. "
                 "Please add the prefix 'KIC' or 'TIC' to disambiguate."
                 "".format(target)
             )
-        elif (0 < 200000000) and (target < 251813739):
+            target = str(target)
+        # see: https://archive.stsci.edu/k2/manuals/KSCI-19082-021.pdf
+        elif (target > 200000000) and (target < 252090718): 
             log.warning(
                 "Warning: {} may refer to a different K2 or TESS target. "
                 "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
                 "".format(target)
             )
+            target = str(target)
+        elif target < 0:
+            log.warning(
+                "Warning: {} input value does not correspond to valid values in 'TIC' 'KIC' or 'EPIC'. "
+                "Please check target name and try again."
+                "".format(target)
+            )
+            return None
+            
+        # astroquery 0.4.11 update breaks if passing an integer, so convert to string
+        else:
+            target = f"TIC {target}"
+
 
     # Specifying quarter, campaign, or quarter should constrain the mission
     if quarter is not None:
