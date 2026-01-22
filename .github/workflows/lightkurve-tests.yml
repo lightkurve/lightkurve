@@ -41,7 +41,7 @@ jobs:
             pytest-command: ./poetry/bin/poetry run pytest
           - name: "3.11"
             python-version: "3.11"
-            pytest-command: poetry run pytest
+            pytest-command: ./poetry/bin/poetry run pytest
           - name: "3.12"
             python-version: "3.12"
             pytest-command: ./poetry/bin/poetry run pytest
