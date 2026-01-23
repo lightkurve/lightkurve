@@ -99,12 +99,29 @@ def read_generic_lightcurve(
             log.debug("Ignoring {} rows with NaN times".format(np.sum(nans)))
         tab = tab[~nans]
 
+        # Set default reference time value to 0.0
+        reference_time_value = 0.0
+
         # Prepare a special time column
         if not time_format:
+            # Check for the Kepler and TESS special cases
             if hdulist[ext].header.get("BJDREFI") == 2454833: # Kepler specific
                 time_format = "bkjd"
             elif hdulist[ext].header.get("BJDREFI") == 2457000: # TESS specific
                 time_format = "btjd"
+            # Work through options from the FITS Standard  v4.0 Section 9.2.2
+            elif ("MJDREFI" in hdulist[ext].header) and ("MJDREFF" in hdulist[ext].header):  # Check if MJDREFI and MJDREFF set
+                time_format = "mjd"
+                reference_time_value = hdulist[ext].header.get("MJDREFI") + hdulist[ext].header.get("MJDREFF")
+            elif "MJDREF" in hdulist[ext].header:  # Check if MJDREF set
+                time_format = "mjd"
+                reference_time_value = hdulist[ext].header.get("MJDREF")
+            elif ("JDREFI" in hdulist[ext].header) and ("JDREFF" in hdulist[ext].header):  # Check if JDREFI and JDREFF set
+                time_format = "jd"
+                reference_time_value = hdulist[ext].header.get("JDREFI") + hdulist[ext].header.get("JDREFF")
+            elif "JDREF" in hdulist[ext].header:  # Check if JDREF set
+                time_format = "jd"
+                reference_time_value = hdulist[ext].header.get("JDREF")
             # make compatible with normalized light curves without absolute start sime (see #1502) 
             elif hdulist[ext].header.get("TIMESYS") == "local":
                 try:
@@ -115,14 +132,20 @@ def read_generic_lightcurve(
                     tab.remove_column("time")
                 except:
                     raise KeyError(f"Unclear unit for local time system: TUNIT1 must be astropy.unit value.")            # Error handling for invalid astropy.unit value or if the TUNIT1 keyword is missing from header         
-
+            # Check for nonstandard, format-flavored values of TIMESYS
             elif hdulist[ext].header.get("TIMESYS") == "mjd":
                 time_format = 'mjd'
             elif hdulist[ext].header.get("TIMESYS") == "jd":
                 time_format = 'jd'
+            # Default to assuming vanilla MJD with MJDREF=0, per the FITS Standard
             else:
-                raise ValueError(f"Input file has unclear time format: {filename}")
+                warnings.warn(f"No reference time or format found in {filename}. Assuming time stamps are in MJD format with MJDREF={reference_time_value}.")
+                time_format = "mjd"
         if 'time' not in locals():
+            if (tab["time"].unit != u.d) and (type(tab["time"].unit) is not u.UnrecognizedUnit) and (tab["time"].unit is not None):
+                # If time column is in a recognized unit other than days...
+                tab["time"] <<= u.d  # ...convert to days.
+            tab["time"] += reference_time_value  # Add reference time to the time column values
             time = Time(
                 tab["time"].data,
                 scale=hdulist[ext].header.get("TIMESYS", "tdb").lower(),
