@@ -2537,7 +2537,11 @@ class LightCurve(TimeSeries):
         return Seismology.from_lightcurve(self, **kwargs)
 
     def to_fits(
-        self, path=None, overwrite=False, flux_column_name="FLUX", **extra_data
+        self, 
+        path=None, 
+        overwrite=False, 
+        flux_column_name="FLUX", 
+        **extra_data
     ):
         """Converts the light curve to a FITS file in the Kepler/TESS file format.
 
@@ -2576,11 +2580,13 @@ class LightCurve(TimeSeries):
             np.float64: "D",
         }
 
+
         # If users give a dictionary of values, we first need to "remove" the values from the dictionary
         if extra_data.get('extra_data') is not None:
             for k in extra_data.get('extra_data').keys():
                 extra_data[k] = extra_data['extra_data'][k]
             extra_data.pop('extra_data')
+
 
         def _header_template(extension):
             """Returns a template `fits.Header` object for a given extension."""
@@ -2639,7 +2645,7 @@ class LightCurve(TimeSeries):
                     )
                 )
             if ~np.asarray(
-                [flux_column_name in k.upper() for k in extra_data.keys()]
+                [flux_column_name.upper() == k.upper() for k in extra_data.keys()]
             ).any():
                 cols.append(
                     fits.Column(
@@ -2696,6 +2702,8 @@ class LightCurve(TimeSeries):
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
+
+                
             return hdu
 
         def _hdulist(**extra_data):
@@ -3382,8 +3390,6 @@ class FoldedLightCurve(LightCurve):
         self,
         path=None,
         overwrite=False,
-        flux_column_name="FLUX",
-        aperture_mask=None,
         **extra_data,
     ):
         """Writes the FoldedLightCurve to a FITS file.
@@ -3394,13 +3400,6 @@ class FoldedLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_column_name : str
-            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
-        aperture_mask : array-like
-            Optional 2D aperture mask to save with this lightcurve object, if
-            defined.  The mask can be either a boolean mask or an integer mask
-            mimicking the Kepler/TESS convention; boolean masks are
-            automatically converted to the Kepler/TESS conventions
         extra_data : dict
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
@@ -3635,7 +3634,6 @@ class KeplerLightCurve(LightCurve):
         self,
         path=None,
         overwrite=False,
-        flux_column_name="FLUX",
         aperture_mask=None,
         **extra_data,
     ):
@@ -3647,8 +3645,6 @@ class KeplerLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_column_name : str
-            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
         aperture_mask : array-like
             Optional 2D aperture mask to save with this lightcurve object, if
             defined.  The mask can be either a boolean mask or an integer mask
@@ -3759,7 +3755,6 @@ class TessLightCurve(LightCurve):
         self,
         path=None,
         overwrite=False,
-        flux_column_name="FLUX",
         aperture_mask=None,
         **extra_data,
     ):
@@ -3771,8 +3766,6 @@ class TessLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_column_name : str
-            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
         aperture_mask : array-like
             Optional 2D aperture mask to save with this lightcurve object, if
             defined.  The mask can be either a boolean mask or an integer mask

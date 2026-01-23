@@ -1022,7 +1022,7 @@ def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
     lc = KeplerLightCurve.read(TABBY_Q8)
     hdu = lc.to_fits()
-    KeplerLightCurve.read(hdu)  # Regression test for #233
+    lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
     assert type(hdu).__name__ == "HDUList"
     assert len(hdu) == 2
     assert hdu[0].header["EXTNAME"] == "PRIMARY"
@@ -1030,14 +1030,23 @@ def test_to_fits():
     assert hdu[1].header["TTYPE1"] == "TIME"
     assert hdu[1].header["TTYPE2"] == "FLUX"
     assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
-    hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
+    assert (lc_new.flux == lc.flux).all()
 
+    hdu = lc.select_flux("sap_bkg").to_fits()
+    lc_new = KeplerLightCurve.read(hdu)
+    assert (lc_new.flux == lc.sap_bkg).all()
+    assert lc_new.flux_origin == 'lightkurve.LightCurve.to_fits()'
+
+
+    hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
     # Test "round-tripping": can we read-in what we write
     lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
     assert hdu[0].header["EXTNAME"] == "PRIMARY"
     assert hdu[1].header["EXTNAME"] == "LIGHTCURVE"
     assert hdu[1].header["TTYPE1"] == "TIME"
     assert hdu[1].header["TTYPE2"] == "FLUX"
+    assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
+    assert lc_new.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
 
     # Test aperture mask support in to_fits
     for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
@@ -1079,6 +1088,7 @@ def test_to_fits():
     lc = read(hdu)
     assert lc.period == 1.2
     assert lc.message == 'Test string'
+    assert lc.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
     # Test reading a generic lc without TESS/Kepler information #649
     basic_lc = LightCurve(time=[1,2,3], flux=[4,5,6])
     basic_hdu = basic_lc.to_fits()
@@ -1089,6 +1099,7 @@ def test_to_fits():
     basic_lc = read(basic_hdu, time_format='jd')
     assert (basic_lc.time.value == [1,2,3]).all()
     assert basic_lc.time.format == 'jd'
+    assert basic_lc.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
 
 
 
