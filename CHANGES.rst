@@ -9,6 +9,7 @@
 - Updated search result sort order [#1384]
 - Convert flux and flux_err to Quantity objects when using ``select_flux`` [#1513]
 - Fixed bugs in ``FoldedLightCurve`` objects with normalized phase to support pickle / dill [#1529]
+- Added support in ``read_generic_lightcurve()`` for FITS Standard reference time keywords like [M]JDREF
 
 2.5.1  (2025-05-20)
 =====================
