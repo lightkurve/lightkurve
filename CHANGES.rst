@@ -7,6 +7,10 @@
 - Include MOM_CENTR1 and MOM_CENTR2, if it exists, when saving fits files [#1488]
 - Fixed bugs in ``bin`` for ``flux_err`` column. Improved ``bin`` performance. [#1499]
 - Updated search result sort order [#1384]
+- When reading in data saved with to_fits, change meta.flux_origin to reflect origin [#1371]
+- Convert flux and flux_err to Quantity objects when using ``select_flux`` [#1513]
+- Fixed bugs in ``FoldedLightCurve`` objects with normalized phase to support pickle / dill [#1529]
+- Capped pandas version at <3.0.0 for breaking changes [#1534]
 
 2.5.1  (2025-05-20)
 =====================

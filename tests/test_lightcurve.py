@@ -2,6 +2,7 @@ from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy.utils.masked import Masked
 from astropy import units as u
+from astropy.units import Quantity
 from astropy.table import Table, Column, MaskedColumn
 from astropy.time import Time, TimeDelta
 from astropy.timeseries import aggregate_downsample
@@ -10,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
+import pickle
 import pytest
 import tempfile
 import warnings
@@ -1020,7 +1022,7 @@ def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
     lc = KeplerLightCurve.read(TABBY_Q8)
     hdu = lc.to_fits()
-    KeplerLightCurve.read(hdu)  # Regression test for #233
+    lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
     assert type(hdu).__name__ == "HDUList"
     assert len(hdu) == 2
     assert hdu[0].header["EXTNAME"] == "PRIMARY"
@@ -1031,13 +1033,23 @@ def test_to_fits():
     #RAH
     extra_data = {"MISSION": "Kepler"}
     hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
+    assert (lc_new.flux == lc.flux).all()
 
+    hdu = lc.select_flux("sap_bkg").to_fits()
+    lc_new = KeplerLightCurve.read(hdu)
+    assert (lc_new.flux == lc.sap_bkg).all()
+    assert lc_new.flux_origin == 'lightkurve.LightCurve.to_fits()'
+
+
+    hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
     # Test "round-tripping": can we read-in what we write
     lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
     assert hdu[0].header["EXTNAME"] == "PRIMARY"
     assert hdu[1].header["EXTNAME"] == "LIGHTCURVE"
     assert hdu[1].header["TTYPE1"] == "TIME"
     assert hdu[1].header["TTYPE2"] == "FLUX"
+    assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
+    assert lc_new.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
 
     # Test aperture mask support in to_fits
     for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
@@ -1079,6 +1091,7 @@ def test_to_fits():
     lc = read(hdu)
     assert lc.period == 1.2
     assert lc.message == 'Test string'
+    assert lc.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
     # Test reading a generic lc without TESS/Kepler information #649
     basic_lc = LightCurve(time=[1,2,3], flux=[4,5,6])
     basic_hdu = basic_lc.to_fits()
@@ -1089,9 +1102,10 @@ def test_to_fits():
     basic_lc = read(basic_hdu, time_format='jd')
     assert (basic_lc.time.value == [1,2,3]).all()
     assert basic_lc.time.format == 'jd'
+    assert basic_lc.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
 
 
-    
+
 
 
 
@@ -1210,10 +1224,14 @@ def test_remove_nans():
 
 def test_remove_outliers():
     # Does `remove_outliers()` remove outliers?
-    lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1])
+    lc = LightCurve(time=[1, 2, 3, 4], flux=[1, 1, 1000, 1], flux_err = [.1,100,.1,.1])
     lc_clean = lc.remove_outliers(sigma=1)
     assert_array_equal(lc_clean.time.value, [1, 2, 4])
     assert_array_equal(lc_clean.flux, [1, 1, 1])
+    # Check we can specify a column for the sigma clip
+    lc_clean = lc.remove_outliers(sigma=1, column='flux_err')
+    assert_array_equal(lc_clean.time.value, [1, 3, 4])
+    assert_array_equal(lc_clean.flux, [1, 1000, 1])
     # It should also be possible to return the outlier mask
     lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
     assert len(outlier_mask) == len(lc.flux)
@@ -2053,6 +2071,58 @@ def test_issue_916():
     LightCurve(flux=np.random.randn(100)).fold(period=2.5).flatten()
 
 
+def assert_lc_equal(actual, expected, label):
+    assert len(actual) == len(expected), label
+    assert_array_equal(actual.colnames, expected.colnames, label)
+    # can't compare meta dict, because some values are Python objects in real data, e.g.,
+    # 'TIERABSO': <astropy.io.fits.card.Undefined object at 0x000002E157B8BDA0>,
+    assert len(actual.meta) == len(expected.meta), label
+    for c in expected.colnames:
+        assert_array_equal(actual[c], expected[c], f"{label}, column {c}")
+
+
+def do_pickle_dump_load(lc):
+    dump = pickle.dumps(lc)
+    lc_s = pickle.loads(dump)
+    return lc_s
+
+
+def do_test_pickle(lc, label):
+    # Test: basic
+    lc_from_pickle = do_pickle_dump_load(lc)
+    assert_lc_equal(lc_from_pickle, lc, label)
+
+    # Test: folded lightcurve
+    lc_f = lc.fold(epoch_time=3, period=2)
+    lc_from_pickle = do_pickle_dump_load(lc_f)
+    assert_lc_equal(lc_from_pickle, lc_f, f"{label}-folded")
+
+    # Test: folded lightcurve with normalized phases
+    # https://github.com/lightkurve/lightkurve/issues/1527
+    lc_f = lc.fold(epoch_time=3, period=2, normalize_phase=True)
+    lc_from_pickle = do_pickle_dump_load(lc_f)
+    assert_lc_equal(lc_from_pickle, lc_f, f"{label}-folded-normalized-phase")
+
+
+def test_pickle_basic():
+    lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1., 2, 1, 2, 1])
+    lc.meta["LABEL"] = "LC test pickle"
+    do_test_pickle(lc, "Basic minimal LC")
+
+
+@pytest.mark.xfail  # https://github.com/astropy/astropy/issues/19040 (still works with `dill`)
+@pytest.mark.remote_data
+@pytest.mark.parametrize("lc_url, lc_label", [
+    (TABBY_Q8, "Kepler LC"),
+    (K2_C08, "K2 LC"),
+    (TESS_SIM, "TESS LC"),
+])
+def test_pickle_mission_data(lc_url, lc_label):
+    # An integrated test for pickle with real mission data
+    lc = read(lc_url)
+    do_test_pickle(lc, lc_label)
+
+
 @pytest.mark.remote_data
 def test_search_neighbors():
     """The closest neighbor to Proxima Cen in Sector 11 is TIC 388852407."""
@@ -2114,6 +2184,10 @@ def test_select_flux():
                           'newflux_n3_err': [1, 2, 3] * u.percent,
                           'newflux_n4': [4, 5, 6] * u_e_s,  # case flux and _err have different units
                           'newflux_n4_err': [.01, .02, .03],  # normalized, no unit
+                          'masked_flux': Masked([2,3,4] * u_e_s,mask=[0,0,1]),
+                          'masked_flux_err':[0,1,2] * u_e_s,
+                          'nounit_flux':[4,5,6],
+                          'nounit_flux_err':[1,1,1],
                           },
                           )
     # Can we set flux to newflux?
@@ -2148,6 +2222,14 @@ def test_select_flux():
     assert lc.meta.get("NORMALIZED", False) is False  # expected behavior, not the real test
     assert lc.select_flux("newflux_n1").meta.get("NORMALIZED", False)  # actual test 2a, the new column is normalized
     assert lc.select_flux("newflux_n2").meta.get("NORMALIZED", False)  # actual test 2b, the new column is normalized
+
+    # Are masked columns converted to Quantity when using select_flux() [#1505]?
+    assert isinstance(lc.masked_flux, Quantity)
+    assert isinstance(lc.flux, Quantity)
+    assert isinstance(lc.select_flux("masked_flux").flux, Quantity)
+    assert isinstance(lc.newflux_n2, Quantity) is False
+    assert isinstance(lc.select_flux("newflux_n2").flux, Quantity)
+    assert lc.select_flux("nounit_flux").flux.unit == u.dimensionless_unscaled
 
 
 def test_transit_mask_with_quantities():

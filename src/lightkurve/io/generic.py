@@ -156,7 +156,15 @@ def read_generic_lightcurve(
         tab.meta["RA"] = hdulist[0].header.get("RA_OBJ")
         tab.meta["DEC"] = hdulist[0].header.get("DEC_OBJ")
         tab.meta["FILENAME"] = filename
-        tab.meta["FLUX_ORIGIN"] = flux_column
+        # issue 1371 - 
+        # When reading in a file saved with to_fits, the flux source is not known
+        # We could save the flux_origin keyword, but that is an incomplete story, 
+        # as we don't know if other manipulation (like detrending) also occurred
+        # So, we populate the 'FLUX_ORIGIN' meta data with 'to_fits' to contain that ambiguity 
+        if ("CREATOR" in hdulist[0].header) and (hdulist[0].header["CREATOR"] == 'lightkurve.LightCurve.to_fits()'):
+            tab.meta["FLUX_ORIGIN"] = "lightkurve.LightCurve.to_fits()"
+        else:
+            tab.meta["FLUX_ORIGIN"] = flux_column
 
         return LightCurve(time=time, data=tab)
     finally:
