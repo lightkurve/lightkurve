@@ -137,14 +137,13 @@ def read_generic_lightcurve(
                 time_format = 'mjd'
             elif hdulist[ext].header.get("TIMESYS") == "jd":
                 time_format = 'jd'
-            # Default to assuming vanilla MJD with MJDREF=0, per the FITS Standard
+            # Raise error if reference time (or related variants) not found
             else:
-                warnings.warn(f"No reference time or format found in {filename}. Assuming time stamps are in MJD format with MJDREF={reference_time_value}.")
-                time_format = "mjd"
+                raise ValueError(f"No reference time found in {filename}. Pass in a common time_format manually, or edit the FITS header.")
         if 'time' not in locals():
-            if (tab["time"].unit != u.d) and (type(tab["time"].unit) is not u.UnrecognizedUnit) and (tab["time"].unit is not None):
+            if (tab["time"].unit is not None) and (tab["time"].unit != u.d) and (type(tab["time"].unit) is not u.UnrecognizedUnit):
                 # If time column is in a recognized unit other than days...
-                tab["time"] <<= u.d  # ...convert to days.
+                tab["time"] = tab["time"].to(u.d, copy=False) # ...convert to days.
             tab["time"] += reference_time_value  # Add reference time to the time column values
             time = Time(
                 tab["time"].data,
