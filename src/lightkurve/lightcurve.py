@@ -2679,10 +2679,11 @@ class LightCurve(TimeSeries):
                             array=extra_data[kw],
                         )
                     )
-            if "SAP_QUALITY" not in extra_data:
-                cols.append(
-                    fits.Column(
-                        name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
+            #RAH - Edit this out as should not be part of general reader
+            #if "SAP_QUALITY" not in extra_data:
+            #    cols.append(
+            #        fits.Column(
+            #            name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
                     )
                 )
             coldefs = fits.ColDefs(cols)
@@ -3750,6 +3751,7 @@ class TessLightCurve(LightCurve):
         hdu : astropy.io.fits
             Returns an astropy.io.fits object if path is None
         """
+        
         tess_specific_data = {
             "OBJECT": "{}".format(self.targetid),
             "MISSION": self.meta.get("MISSION"),
@@ -3760,6 +3762,7 @@ class TessLightCurve(LightCurve):
             "SECTOR": self.meta.get("SECTOR"),
             "TARGETID": self.meta.get("TARGETID"),
             "DEC_OBJ": self.meta.get("DEC"),
+            "SAP_QUALITY": self.meta.get("QUALITY"),
         }
 
 

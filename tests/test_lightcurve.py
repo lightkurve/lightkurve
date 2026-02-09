@@ -1028,7 +1028,9 @@ def test_to_fits():
     assert hdu[1].header["TTYPE1"] == "TIME"
     assert hdu[1].header["TTYPE2"] == "FLUX"
     assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
-    hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
+    #RAH
+    extra_data = {"MISSION": "Kepler"}
+    hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
 
     # Test "round-tripping": can we read-in what we write
     lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
