@@ -133,8 +133,9 @@ class CBVCorrector(RegressionCorrector):
             raise Exception('interpolate_cbvs must be True if extrapolate_cbvs is True')
         
         # Check if the lightkurve has 20-s cadence.
-        if 'fast' in lc.filename:
-            fast = True
+        if hasattr(lc, 'filename'):
+            if 'fast' in lc.filename:
+                fast = True
 
         # We do not want any NaNs
         lc = lc.remove_nans()
