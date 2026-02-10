@@ -2698,8 +2698,8 @@ class LightCurve(TimeSeries):
             #    cols.append(
             #        fits.Column(
             #            name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
-                    )
-                )
+            #        )
+            #    )
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
