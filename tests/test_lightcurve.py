@@ -1041,7 +1041,7 @@ def test_to_fits():
     assert lc_new.flux_origin == 'lightkurve.LightCurve.to_fits()'
 
 
-    hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
+    hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(sap_quality=np.array([0,0,0,0,0]))
     # Test "round-tripping": can we read-in what we write
     lc_new = KeplerLightCurve.read(hdu)  # Regression test for #233
     assert hdu[0].header["EXTNAME"] == "PRIMARY"
