@@ -3795,7 +3795,7 @@ class TessLightCurve(LightCurve):
             "SECTOR": self.meta.get("SECTOR"),
             "TARGETID": self.meta.get("TARGETID"),
             "DEC_OBJ": self.meta.get("DEC"),
-            "SAP_QUALITY": self.meta.get("QUALITY"),
+            "SAP_QUALITY": self.quality,
         }
 
 
