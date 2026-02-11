@@ -3797,7 +3797,8 @@ class TessLightCurve(LightCurve):
             "DEC_OBJ": self.meta.get("DEC"),
             "SAP_QUALITY": self.quality,
         }
-
+        #RAH - Added in SAP_QUALITY requirement here so that Kepler, K2, and TESS all have the quality data
+        #as a requirement and work appropratly in the generic reader.
 
 
         # Not every HLSP has centroid col/row information, so only pass this along if the data exists
