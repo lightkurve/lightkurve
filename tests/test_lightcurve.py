@@ -1041,13 +1041,13 @@ def test_to_fits():
     assert lc_new.flux_origin == 'lightkurve.LightCurve.to_fits()'
 
     #RAH - check that sap_quality was added to the lc data for KeplerLightCurve.read
-    assert 'sap_quality' is in lc_new.columns
+    assert 'sap_quality' in lc_new.columns
 
     #RAH - check quality added if using TessLightCurve.read
     extra_data =  {"MISSION": "TESS"}
     hdu_tess = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
     lc_new_tess =  TessLightCurve.read(hdu_tess)
-    assert 'quality' is in lc_new_tess.columns
+    assert 'quality' in lc_new_tess.columns
 
     #RAH - check that neither sap_quality or quality is output with generic reader
     hdu_generic = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
