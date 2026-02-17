@@ -3629,7 +3629,11 @@ class KeplerLightCurve(LightCurve):
         # Default to Kepler file format
         if kwargs.get("format") is None:
             kwargs["format"] = "kepler"
+    
+            
         return super().read(*args, **kwargs)
+         
+    
 
     def to_fits(
         self,

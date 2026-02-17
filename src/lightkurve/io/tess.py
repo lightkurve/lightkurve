@@ -4,6 +4,8 @@ from ..utils import TessQualityFlags
 
 from .generic import read_generic_lightcurve
 
+import numpy as np
+
 
 def read_tess_lightcurve(
     filename, flux_column="pdcsap_flux", quality_bitmask="default", time_format="btjd",
@@ -31,6 +33,10 @@ def read_tess_lightcurve(
         See the `~lightkurve.utils.TessQualityFlags` class for details on the bitmasks.
     """
     lc = read_generic_lightcurve(filename, flux_column=flux_column, time_format=time_format)
+
+    #RAH - To allow generic lightcurves to be read by TESS read we need to add this work around
+    if "quality" not in lc.columns:
+        lc['quality'] = np.zeros(len(lc['time']), dtype=int)
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns

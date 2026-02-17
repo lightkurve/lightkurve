@@ -4,6 +4,8 @@ from ..utils import KeplerQualityFlags
 
 from .generic import read_generic_lightcurve
 
+import numpy as np
+
 
 def read_kepler_lightcurve(
     filename, flux_column="pdcsap_flux", quality_bitmask="default"
@@ -38,6 +40,11 @@ def read_kepler_lightcurve(
         time_format="bkjd",
     )
 
+    #RAH - To allow generic lightcurves to be read by Kepler read we need to add this work around
+    if "sap_quality" not in lc.columns:
+        lc['sap_quality'] = np.zeros(len(lc['time']), dtype=int)
+        
+    
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns
     # that are Quantity objects, so for now we remove poor-quality data instead
