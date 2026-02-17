@@ -1034,11 +1034,26 @@ def test_to_fits():
     extra_data = {"MISSION": "Kepler"}
     hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
     assert (lc_new.flux == lc.flux).all()
-
+    
     hdu = lc.select_flux("sap_bkg").to_fits()
     lc_new = KeplerLightCurve.read(hdu)
     assert (lc_new.flux == lc.sap_bkg).all()
     assert lc_new.flux_origin == 'lightkurve.LightCurve.to_fits()'
+
+    #RAH - check that sap_quality was added to the lc data for KeplerLightCurve.read
+    assert 'sap_quality' is in lc_new.columns
+
+    #RAH - check quality added if using TessLightCurve.read
+    extra_data =  {"MISSION": "TESS"}
+    hdu_tess = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
+    lc_new_tess =  TessLightCurve.read(hdu_tess)
+    assert 'quality' is in lc_new_tess.columns
+
+    #RAH - check that neither sap_quality or quality is output with generic reader
+    hdu_generic = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
+    lc_generic = io.generic.read_generic_lightcurve(time_column="time", flux_column="flux")
+    assert 'quality' is not in lc_generic.columns
+    assert 'sap_quality' is not in lc_generic.columns
 
 
     hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
@@ -1050,6 +1065,8 @@ def test_to_fits():
     assert hdu[1].header["TTYPE2"] == "FLUX"
     assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
     assert lc_new.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
+
+    
 
     # Test aperture mask support in to_fits
     for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
