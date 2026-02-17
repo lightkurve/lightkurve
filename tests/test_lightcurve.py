@@ -1051,8 +1051,16 @@ def test_to_fits():
     assert 'quality' in lc_new_tess.columns
 
     #RAH - check that neither sap_quality or quality is output with generic reader
-    hdu_generic = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
-    lc_generic =  read_generic_lightcurve(filename=hdu_generic, time_column="time", flux_column="flux")
+    #Create the time values and specify the format
+    time_values = Time(np.linspace(2458000, 2458000 + 10, 100), format='jd')
+    #Create the flux and flux error values
+    flux_values = np.sin(time_values.value * 0.5) + 1000
+    flux_err_values = np.full_like(flux_values, 0.01)
+    #Specify the flux units
+    unit_flux = u.electron/u.second
+    my_lc = LightCurve(time=time_values, flux=flux_values * unit_flux, flux_err=flux_err_values * unit_flux)
+    hdu_generic = my_lc.to_fits()
+    lc_generic =  read_generic_lightcurve(filename=hdu_generic, time_column="time", flux_column="flux", flux_err_column="flux_err", time_format="jd")
     assert 'quality' not in lc_generic.columns
     assert 'sap_quality' not in lc_generic.columns
 
