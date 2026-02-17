@@ -1052,7 +1052,7 @@ def test_to_fits():
 
     #RAH - check that neither sap_quality or quality is output with generic reader
     hdu_generic = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits()
-    lc_generic =  read_generic_lightcurve(time_column="time", flux_column="flux")
+    lc_generic =  read_generic_lightcurve(filename=hdu_generic, time_column="time", flux_column="flux")
     assert 'quality' not in lc_generic.columns
     assert 'sap_quality' not in lc_generic.columns
 
