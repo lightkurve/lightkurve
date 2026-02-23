@@ -11,6 +11,7 @@
 - Convert flux and flux_err to Quantity objects when using ``select_flux`` [#1513]
 - Fixed bugs in ``FoldedLightCurve`` objects with normalized phase to support pickle / dill [#1529]
 - Capped pandas version at <3.0.0 for breaking changes [#1534]
+- Changed search so that it longer emits ERROR log message when the search result is empty [#1540]
 
 2.5.1  (2025-05-20)
 =====================
