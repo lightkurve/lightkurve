@@ -9,9 +9,10 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.signal import find_peaks as fp
 
 import astropy
-from astropy.table import Table
+from astropy.table import Table, QTable
 from astropy import units as u
 from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
@@ -501,6 +502,69 @@ class Periodogram(object):
 
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
+
+    def find_peaks(self, powerlimit=None):
+        """Lists in a quantity table (QTable) the largest peaks of a periodogram
+        in descending order, where for every peak; the prominence, the lower & upper
+        half width at half maximum (hwhm), and full width at half maximum (fwhm) of
+        this prominence, are calculated by the find_peaks SciPy signal function.
+        For more information, please check the following link to its documentation:
+        https://docs.scipy.org/doc//scipy/reference/generated/scipy.signal.find_peaks.html
+        
+        Additionally the last column of this QTable shows the ratio of a peak with
+        the top peak, where a deviation from neat fractions (like 2/1, 1/2, 3/2,
+        2/3, 4/3, 3/4, 5/3, 3/5, etc.) is an indication of another candidate.
+
+        Parameters
+        ----------
+        powerlimit : number or ndarray or sequence, optional
+            Required power of peaks. Either a number, None, an array matching x 
+            or a 2-element sequence of the former. The first element is always 
+            interpreted as the minimal power and the second, if supplied, as the 
+            maximal required power. By default or None, 5% of the periodogram's 
+            max_power value will be used as the number for the powerlimit.
+
+        Returns
+        -------
+        QTable : `astropy quantity table` object
+            Returns a QTable object extracted from the periodogram.
+        """
+        if self.default_view == 'period':
+            view = self.period
+            x_axis_label = 'periodicity'
+            power_format = '.1f'
+        elif self.default_view == 'frequency':
+            view = self.frequency
+            x_axis_label = 'frequency'
+            power_format = None
+        if powerlimit is None:
+            powerlimit = self.max_power.value/20
+        peaks, stats = fp(self.power,
+                          height = powerlimit,
+                          width = 1)
+        lhwhm_int_down = view[np.floor(stats["left_ips"]).astype(int)].value
+        lhwhm_int_up = view[np.ceil(stats["left_ips"]).astype(int)].value
+        lhwhm_int_remainder = stats["left_ips"] - np.floor(stats["left_ips"])
+        lhwhm_period = lhwhm_int_down + lhwhm_int_remainder * (lhwhm_int_up - lhwhm_int_down)
+        lhwhm = view[peaks].value - lhwhm_period
+        uhwhm_int_down = view[np.floor(stats["right_ips"]).astype(int)].value
+        uhwhm_int_up = view[np.ceil(stats["right_ips"]).astype(int)].value
+        uhwhm_int_remainder = stats["right_ips"] - np.floor(stats["right_ips"])
+        uhwhm_period = uhwhm_int_down + uhwhm_int_remainder * (uhwhm_int_up - uhwhm_int_down)
+        uhwhm = uhwhm_period - view[peaks].value
+        fwhm = uhwhm_period - lhwhm_period
+        result = QTable(data=[view[peaks].value, stats['peak_heights'], stats['prominences'], lhwhm, uhwhm, fwhm],
+                        names=[x_axis_label, 'power', 'prominence', 'lower_hwhm', 'upper_hwhm', 'fwhm'],
+                        units=[view.unit, self.power.unit, self.power.unit, view.unit, view.unit, view.unit])
+        result.sort('prominence', reverse=True)
+        result[x_axis_label+'_peak_top_peak_ratio'] = result[x_axis_label] / result[x_axis_label][0]
+        result['power'].info.format = power_format
+        result['prominence'].info.format = power_format
+        result['lower_hwhm'].info.format = '.5g'
+        result['upper_hwhm'].info.format = '.5g'
+        result['fwhm'].info.format = '.5g'
+        result[x_axis_label+'_peak_top_peak_ratio'].info.format = '.3f'
+        return result
 
     def show_properties(self):
         """Prints a summary of the non-callable attributes of the Periodogram object.
