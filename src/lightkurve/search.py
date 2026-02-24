@@ -994,13 +994,14 @@ def _search_products(
     # passed a radius value), because strict target name search does not apply.
     if filetype.lower() == "ffi" and radius is None:
         radius = 0.0001 * u.arcsec
+    # No campaign should be given for TPFs otherwise split K2 campaigns will be filtered out
     observations = _query_mast(
         target,
         radius=radius,
         project=mission,
         provenance_name=provenance_name,
         exptime=exptime,
-        sequence_number=campaign or sector,
+        sequence_number=(campaign if filetype != "Target Pixel" else None) or sector,
         **extra_query_criteria,
     )
     log.debug(
@@ -1286,6 +1287,13 @@ def _filter_products(
     if "kepler" in provenance_lower and campaign is None and sector is None:
         mask |= _mask_kepler_products(products, quarter=quarter, month=month)
 
+    # K2 data needs a special filter for split campaigns
+    mask &= ~np.array(
+        [prov.lower() == "k2" for prov in products["provenance_name"]]
+    )
+    if "k2" in provenance_lower and quarter is None and sector is None:
+        mask |= _mask_k2_products(products, campaign=campaign)
+
     # HLSP products need to be filtered by extension
     if filetype.lower() == "lightcurve":
         mask &= np.array(
@@ -1378,6 +1386,22 @@ def _mask_kepler_products(products, quarter=None, month=None):
 
     return mask
 
+def _mask_k2_products(products, campaign=None):
+    """Returns a mask flagging the K2 products that match the criteria."""
+    mask = np.array([proj.lower() == 'k2' for proj in products['provenance_name']])
+    if mask.sum() == 0:
+        return mask
+
+    # Identify campaign by the description.
+    if campaign is not None:
+        campaign_mask = np.zeros(len(products), dtype=bool)
+        for c in np.atleast_1d(campaign):
+            campaign_mask |= np.array(['c{:02d}'.format(c) in desc.lower().replace('-', '') or
+                                       'c{:03d}'.format(c) in desc.lower().replace('-', '')
+                                       for desc in products['description']])
+        mask &= campaign_mask
+
+    return mask
 
 def _mask_by_exptime(products, exptime):
     """Helper function to filter by exposure time."""
