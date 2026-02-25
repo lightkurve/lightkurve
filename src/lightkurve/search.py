@@ -948,7 +948,7 @@ def _search_products(
             )
             target = str(target)
         # see: https://archive.stsci.edu/k2/manuals/KSCI-19082-021.pdf
-        elif (target > 200000000) and (target < 252090718): 
+        elif (target > 200000000) and (target < 252090718):
             log.warning(
                 "Warning: {} may refer to a different K2 or TESS target. "
                 "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
@@ -962,7 +962,7 @@ def _search_products(
                 "".format(target)
             )
             return None
-            
+
         # astroquery 0.4.11 update breaks if passing an integer, so convert to string
         else:
             target = f"TIC {target}"
@@ -1009,7 +1009,8 @@ def _search_products(
         "".format(len(observations))
     )
     if len(observations) == 0:
-        raise SearchError('No data found for target "{}".'.format(target))
+        log.debug('No data found for target "{}".'.format(target))
+        return SearchResult(None)
 
     # Light curves and target pixel files
     if filetype.lower() != "ffi":
