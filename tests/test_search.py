@@ -148,6 +148,26 @@ def test_search_lightcurve(caplog):
 
 
 @pytest.mark.remote_data
+def test_search_lightcurve_with_small_tic(caplog):
+    """Ensure search by TIC with < 9 digits is done by exact match on target name.
+       For issue #1073 .
+    """
+    caplog.set_level("DEBUG")
+    tic = 74534430  # a TIC with < 9 digits
+    assert len(search_lightcurve(f"TIC {tic}")) > 0
+    # Ensure the log lines are absent, indicating the fallback cone search is not kicked in.
+    # The log lines for fallback cone search:
+    #   No observations found. Now performing a cone search instead.
+    #   Started querying MAST for observations within 0.0001 arcsec arcsec of objectname='TIC 74534430'.
+    assert "Started querying MAST for observations within" not in caplog.text, "Fallback cone search should not be used."
+
+    # Do a control: to ensure that the log line for fallback cone search does exist in the codes.
+    caplog.clear()
+    search_lightcurve(f"TIC 0")  # a non-existent TIC, the fallback cone search should kick in
+    assert "Started querying MAST for observations within" in caplog.text, "Fallback cone search expected."
+
+
+@pytest.mark.remote_data
 def test_search_tesscut():
     # Cutout by target name
     assert len(search_tesscut("pi Mensae", sector=1).table) == 1

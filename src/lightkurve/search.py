@@ -1183,7 +1183,7 @@ def _query_mast(
     # Was a TESS target ID passed?
     tess_match = re.match(r"^(tess|tic) ?(\d+)$", target_lower)
     if tess_match:
-        exact_target_name = f"{tess_match.group(2).zfill(9)}"
+        exact_target_name = f"{tess_match.group(2)}"  # for TESS, the id is not zero-padded in MAST
 
     if exact_target_name and radius is None:
         log.debug(
