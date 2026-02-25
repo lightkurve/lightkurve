@@ -96,7 +96,7 @@ class CBVCorrector(RegressionCorrector):
     """
 
     def __init__(self, lc, interpolate_cbvs=False, extrapolate_cbvs=False, do_not_load_cbvs=False,
-        cbv_dir=None):
+        cbv_dir=None, fast_cadence=False):
         """Constructor
 
         This constructor will retrieve all relevant CBVs from MAST and then
@@ -120,6 +120,8 @@ class CBVCorrector(RegressionCorrector):
         cbv_dir : str
             Path to specific directory holding TESS CBVs. If this is None, will query
             MAST by default.
+        fast_cadence : bool
+            If True, then the 20-s fast cadence CBV file will be loaded 
         """
         if not isinstance(lc, LightCurve):
             raise Exception('<lc> must be a LightCurve class')
@@ -129,6 +131,11 @@ class CBVCorrector(RegressionCorrector):
 
         if extrapolate_cbvs and (extrapolate_cbvs != interpolate_cbvs):
             raise Exception('interpolate_cbvs must be True if extrapolate_cbvs is True')
+        
+        # Check if the lightkurve has 20-s cadence.
+        if hasattr(lc, 'filename'):
+            if 'fast' in lc.filename:
+                fast_cadence = True
 
         # We do not want any NaNs
         lc = lc.remove_nans()
@@ -151,7 +158,7 @@ class CBVCorrector(RegressionCorrector):
                 # For TESS we load multiple CBV types
                 # Single-Scale
                 cbvs.append(load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
-                    camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='SingleScale'))
+                    camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='SingleScale', fast_cadence=fast_cadence))
             
                 # Multi-Scale
                 # Although there has always been 3 bands, there could be more,
@@ -162,7 +169,7 @@ class CBVCorrector(RegressionCorrector):
                     iBand += 1
                     cbvObj = load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
                         camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='MultiScale',
-                        band=iBand)
+                        band=iBand, fast_cadence=fast_cadence)
                     if (cbvObj.band == iBand):
                         cbvs.append(cbvObj)
                     else:
@@ -170,7 +177,7 @@ class CBVCorrector(RegressionCorrector):
             
                 # Spike
                 cbvs.append(load_tess_cbvs(cbv_dir=cbv_dir,sector=self.lc.sector,
-                    camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='Spike'))
+                    camera=self.lc.camera, ccd=self.lc.ccd, cbv_type='Spike', fast_cadence=fast_cadence))
             
             else:
                 raise ValueError('Unknown mission type')
@@ -1837,7 +1844,7 @@ def download_tess_cbvs(*args, **kwargs):
 
 
 def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
-        ccd=None, cbv_type='SingleScale', band=None):
+        ccd=None, cbv_type='SingleScale', band=None, fast_cadence=False):
     """Loads TESS cotrending basis vectors, either from a directory of 
     CBV files already saved locally if cbv_dir is passed, or else 
     will retrieve the relevant files programmatically from MAST. 
@@ -1863,6 +1870,8 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
         'SingleScale' or 'MultiScale' or 'Spike'
     band : int
         Multi-scale band number
+    fast_cadence : bool
+        'True' to get 20-s cadence CBVs. If False, defaults to the 2-min CBV file. 
 
     Returns
     -------
@@ -1934,7 +1943,10 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
 
         else:
             curlBaseUrl = 'https://archive.stsci.edu/missions/tess/download_scripts/sector/tesscurl_sector_'
-            curlEndUrl = '_cbv.sh'
+            if fast_cadence:
+                curlEndUrl = '_fast-cbv.sh'
+            else:
+                curlEndUrl = '_cbv.sh'
             curlUrl = curlBaseUrl + str(sector) + curlEndUrl
 
             # This is the string to search for in the curl script file
