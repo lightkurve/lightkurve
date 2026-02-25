@@ -275,9 +275,9 @@ class LightCurve(TimeSeries):
         Time values.  They can either be given directly as a
         `~astropy.time.Time` array or as any iterable that initializes the
         `~astropy.time.Time` class.
-    flux : `~astropy.units.Quantity` or iterable
+    flux : `~astropy.units.Quantity`, `~astropy.units.masked.MaskedQuantity`, or iterable
         Flux values for every time point.
-    flux_err : `~astropy.units.Quantity` or iterable
+    flux_err : `~astropy.units.Quantity`, `~astropy.units.masked.MaskedQuantity`, or iterable
         Uncertainty on each flux data point.
     **kwargs : dict
         Additional keyword arguments are passed to `~astropy.table.QTable`.
@@ -579,8 +579,14 @@ class LightCurve(TimeSeries):
         self["time"] = time
 
     @property
-    def flux(self) -> Quantity:
-        """Brightness values stored as an AstroPy `~astropy.units.Quantity` object."""
+    def flux(self):
+        """Brightness values stored as an AstroPy `~astropy.units.Quantity` object.
+
+        Note: In special circumstances, this may be an `~astropy.units.masked.MaskedQuantity`
+        object. Masked values are treated by lightkurve as missing data. Masked
+        data may be accessed via self.flux.unmasked, which returns the unmasked
+        Quantity object.
+        """
         return self["flux"]
 
     @flux.setter
@@ -588,8 +594,15 @@ class LightCurve(TimeSeries):
         self["flux"] = flux
 
     @property
-    def flux_err(self) -> Quantity:
-        """Brightness uncertainties stored as an AstroPy `~astropy.units.Quantity` object."""
+    def flux_err(self):
+        """Brightness uncertainties stored as an AstroPy `~astropy.units.Quantity` object.
+
+        
+        Note: In special circumstances, this may be an `~astropy.units.masked.MaskedQuantity`
+        object. Masked values are treated by lightkurve as missing data. Masked
+        data may be accessed via self.flux_err.unmasked, which returns the unmasked
+        Quantity object.
+        """
         return self["flux_err"]
 
     @flux_err.setter
