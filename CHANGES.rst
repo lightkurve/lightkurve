@@ -11,6 +11,7 @@
 - Convert flux and flux_err to Quantity objects when using ``select_flux`` [#1513]
 - Fixed bugs in ``FoldedLightCurve`` objects with normalized phase to support pickle / dill [#1529]
 - Capped pandas version at <3.0.0 for breaking changes [#1534]
+- Added ability to download 20-s CBV products for TESS [#1537]
 - Changed search so that it longer emits ERROR log message when the search result is empty [#1540]
 - Fixed search by exact match for TICs with fewer than 9 digits, avoiding the extra 
   fallback cone search [#1541]
