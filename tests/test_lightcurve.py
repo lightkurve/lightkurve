@@ -1031,7 +1031,7 @@ def test_to_fits():
     assert hdu[1].header["TTYPE1"] == "TIME"
     assert hdu[1].header["TTYPE2"] == "FLUX"
     assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
-    #RAH
+    
     extra_data = {"MISSION": "Kepler"}
     hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
     assert (lc_new.flux == lc.flux).all()
@@ -1041,16 +1041,16 @@ def test_to_fits():
     assert (lc_new.flux == lc.sap_bkg).all()
     assert lc_new.flux_origin == 'lightkurve.LightCurve.to_fits()'
 
-    #RAH - check that sap_quality was added to the lc data for KeplerLightCurve.read
+    
     assert 'sap_quality' in lc_new.columns
 
-    #RAH - check quality added if using TessLightCurve.read
+    
     extra_data =  {"MISSION": "TESS"}
     hdu_tess = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
     lc_new_tess =  TessLightCurve.read(hdu_tess)
     assert 'quality' in lc_new_tess.columns
 
-    #RAH - check that neither sap_quality or quality is output with generic reader
+    
     #Create the time values and specify the format
     time_values = Time(np.linspace(2458000, 2458000 + 10, 100), format='jd')
     #Create the flux and flux error values

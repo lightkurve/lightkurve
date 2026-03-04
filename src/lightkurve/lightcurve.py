@@ -2693,13 +2693,7 @@ class LightCurve(TimeSeries):
                             array=extra_data[kw],
                         )
                     )
-            #RAH - Edit this out as should not be part of general reader
-            #if "SAP_QUALITY" not in extra_data:
-            #    cols.append(
-            #        fits.Column(
-            #            name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
-            #        )
-            #    )
+            
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
@@ -3801,9 +3795,7 @@ class TessLightCurve(LightCurve):
             "DEC_OBJ": self.meta.get("DEC"),
             "SAP_QUALITY": self.quality,
         }
-        #RAH - Added in SAP_QUALITY requirement here so that Kepler, K2, and TESS all have the quality data
-        #as a requirement and work appropratly in the generic reader.
-
+        
 
         # Not every HLSP has centroid col/row information, so only pass this along if the data exists
         if hasattr(self, 'centroid_col'):
