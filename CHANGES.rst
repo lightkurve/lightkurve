@@ -15,6 +15,7 @@
 - Changed search so that it longer emits ERROR log message when the search result is empty [#1540]
 - Fixed search by exact match for TICs with fewer than 9 digits, avoiding the extra 
   fallback cone search [#1541]
+- Modified how SAP_QUALITY is treated when reading/writing TESS and Kepler data [#1538]
 
 2.5.1  (2025-05-20)
 =====================
