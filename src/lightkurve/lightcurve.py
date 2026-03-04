@@ -2693,12 +2693,7 @@ class LightCurve(TimeSeries):
                             array=extra_data[kw],
                         )
                     )
-            if "SAP_QUALITY" not in extra_data:
-                cols.append(
-                    fits.Column(
-                        name="SAP_QUALITY", format="J", array=np.zeros(len(self.flux))
-                    )
-                )
+            
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
             hdu.header["EXTNAME"] = "LIGHTCURVE"
@@ -3628,7 +3623,11 @@ class KeplerLightCurve(LightCurve):
         # Default to Kepler file format
         if kwargs.get("format") is None:
             kwargs["format"] = "kepler"
+    
+            
         return super().read(*args, **kwargs)
+         
+    
 
     def to_fits(
         self,
@@ -3783,6 +3782,7 @@ class TessLightCurve(LightCurve):
         hdu : astropy.io.fits
             Returns an astropy.io.fits object if path is None
         """
+        
         tess_specific_data = {
             "OBJECT": "{}".format(self.targetid),
             "MISSION": self.meta.get("MISSION"),
@@ -3793,9 +3793,9 @@ class TessLightCurve(LightCurve):
             "SECTOR": self.meta.get("SECTOR"),
             "TARGETID": self.meta.get("TARGETID"),
             "DEC_OBJ": self.meta.get("DEC"),
+            "SAP_QUALITY": self.quality,
         }
-
-
+        
 
         # Not every HLSP has centroid col/row information, so only pass this along if the data exists
         if hasattr(self, 'centroid_col'):
