@@ -11,7 +11,7 @@ import numpy as np
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
-from astropy.table import Row, Table, join
+from astropy.table import Row, Table, join, vstack
 from astropy.time import Time
 from astropy.utils import deprecated
 from memoization import cached
@@ -202,6 +202,23 @@ class SearchResult(object):
 
     def _repr_html_(self):
         return self.__repr__(html=True)
+
+    def __add__(self, other):
+        if other is None:
+            return self
+        if not isinstance(other, SearchResult):
+            raise TypeError("Can only add SearchResult objects.")
+        if self.table is None or len(self.table) == 0:
+            return other
+        if other.table is None or len(other.table) == 0:
+            return self
+        new_table = vstack([self.table, other.table])
+        return SearchResult(table=new_table)
+
+    def __radd__(self, other):
+        if other == 0 or other is None:
+            return self
+        return self.__add__(other)
 
     def __getitem__(self, key):
         """Implements indexing and slicing, e.g. SearchResult[2:5]."""
@@ -587,6 +604,16 @@ class SearchResult(object):
         return path
 
 
+def _is_list_like(obj):
+    """Returns True if the object is a list, tuple, or non-scalar SkyCoord."""
+    if isinstance(obj, (str, int)):
+        return False
+    if isinstance(obj, SkyCoord):
+        return not obj.isscalar
+    # Multi-valued SkyCoord objects are iterable, while scalar ones are not.
+    return hasattr(obj, "__iter__")
+
+
 @cached
 def search_targetpixelfile(
     target,
@@ -618,6 +645,7 @@ def search_targetpixelfile(
             * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
             * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
             * An `astropy.coordinates.SkyCoord` object.
+            * A list, tuple, or `numpy.ndarray` of any of the above.
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
@@ -690,6 +718,24 @@ def search_targetpixelfile(
 
         >>> search_targetpixelfile('Kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
+    if _is_list_like(target):
+        return sum(
+            search_targetpixelfile(
+                t,
+                radius=radius,
+                exptime=exptime,
+                cadence=cadence,
+                mission=mission,
+                author=author,
+                quarter=quarter,
+                month=month,
+                campaign=campaign,
+                sector=sector,
+                limit=limit,
+            )
+            for t in target
+        )
+
     try:
         return _search_products(
             target,
@@ -747,6 +793,7 @@ def search_lightcurve(
             * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
             * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
             * An `astropy.coordinates.SkyCoord` object.
+            * A list, tuple, or `numpy.ndarray` of any of the above.
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
@@ -829,6 +876,24 @@ def search_lightcurve(
 
         >>> search_lightcurve('Kepler-10', radius=100, quarter=4, exptime=1800).download_all()  # doctest: +SKIP
     """
+    if _is_list_like(target):
+        return sum(
+            search_lightcurve(
+                t,
+                radius=radius,
+                exptime=exptime,
+                cadence=cadence,
+                mission=mission,
+                author=author,
+                quarter=quarter,
+                month=month,
+                campaign=campaign,
+                sector=sector,
+                limit=limit,
+            )
+            for t in target
+        )
+
     try:
         return _search_products(
             target,
@@ -868,6 +933,7 @@ def search_tesscut(target, sector=None):
             * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
             * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
             * An `astropy.coordinates.SkyCoord` object.
+            * A list, tuple, or `numpy.ndarray` of any of the above.
     sector : int or list
         TESS Sector number. Default (None) will return all available sectors. A
         list of desired sectors can also be provided.
@@ -877,6 +943,9 @@ def search_tesscut(target, sector=None):
     result : :class:`SearchResult` object
         Object detailing the data products found.
     """
+    if _is_list_like(target):
+        return sum(search_tesscut(t, sector=sector) for t in target)
+
     try:
         return _search_products(target, filetype="ffi", mission="TESS", sector=sector)
     except SearchError as exc:
