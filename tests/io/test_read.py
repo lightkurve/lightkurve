@@ -221,6 +221,7 @@ def test_basic_ascii_io():
 
 @pytest.mark.memtest
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.parametrize("fits_path, iterations_warmup, run_iterations", [
     (TABBY_Q8, 40, 60),
     (TABBY_TPF, 40, 60),

@@ -16,6 +16,7 @@ except:
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh and astropy.stats.bls")
 def test_malformed_notebook_url():
     """Test if malformed notebook_urls raise proper exceptions."""
@@ -26,6 +27,7 @@ def test_malformed_notebook_url():
     assert "Empty host value" in exc.value.args[0]
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh and astropy.stats.bls")
 def test_graceful_exit_outside_notebook():
     """Test if running interact outside of a notebook does fails gracefully."""
@@ -36,6 +38,7 @@ def test_graceful_exit_outside_notebook():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh and astropy.stats.bls")
 def test_helper_functions():
     """Can we use all the functions in interact_bls?"""
@@ -73,6 +76,7 @@ def test_helper_functions():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_preprocess_lc():
     """Test to ensure the lightcurve is pre-processed before applying BLS for correctness and consistent output"""
     from lightkurve.interact_bls import _preprocess_lc_for_bls
@@ -98,6 +102,7 @@ def test_preprocess_lc():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh and astropy.stats.bls")
 def test_full_widget():
     """Test if we can run the widget with the keywords"""
@@ -110,6 +115,7 @@ def test_full_widget():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh and astropy.stats.bls")
 def test_tess_widget():
     """Test if we can run the widget with the keywords"""

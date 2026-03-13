@@ -25,6 +25,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.venv/
 
 # ipython notebooks
 .ipynb_checkpoints

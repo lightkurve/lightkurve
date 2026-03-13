@@ -1,0 +1,187 @@
+interactions:
+- request:
+    body: '-source=I/345/gaia2
+
+      -out.max=unlimited
+
+      -out=*
+
+      -c=288.92559181+42.53151405
+
+      -c.rs=32.0
+
+      -out.meta=huUD
+
+      -out.form=mini
+
+      -oc.form=d'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '125'
+      User-Agent:
+      - astroquery/0.4.11 Python/3.11.14 (Darwin) python-requests/2.32.5
+    method: POST
+    uri: https://vizier.cds.unistra.fr/viz-bin/votable
+  response:
+    body:
+      string: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<VOTABLE version=\"1.4\"
+        xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xmlns=\"http://www.ivoa.net/xml/VOTable/v1.3\"\n
+        \ xsi:schemaLocation=\"http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/v1.3\">\n
+        <DESCRIPTION>\n   VizieR Astronomical Server vizier.cds.unistra.fr\n    Date:
+        2026-03-13T11:19:51 [V7.5.6]\n   Explanations and Statistics of UCDs:\t\t\tSee
+        LINK below\n   In case of problem, please report to:\tcds-question@unistra.fr\n
+        </DESCRIPTION>\n<!-- VOTable description at http://www.ivoa.net/Documents/latest/VOT.html
+        -->\n<INFO name=\"service_protocol\" value=\"ASU\">  IVOID of the protocol
+        through which the data was retrieved</INFO>\n<INFO name=\"request_date\" value=\"2026-03-13T11:19:51\">
+        \ Query execution date</INFO>\n<INFO name=\"request\" value=\"https://vizier.cds.unistra.fr/viz-bin/votable?-oc.form=d&amp;-source=I/345/gaia2&amp;-out.max=unlimited&amp;-out=*&amp;-c=288.92559181+42.53151405&amp;-c.rs=32.0&amp;\">
+        \ Full request URL (POST)</INFO>\n<INFO name=\"contact\" value=\"cds-question@unistra.fr\">
+        \ Email or URL to contact publisher</INFO>\n<INFO name=\"server_software\"
+        value=\"VizieR/7.5.6\">  Software version</INFO>\n<INFO name=\"publisher\"
+        value=\"CDS\">  Data centre that produced the VOTable</INFO>\n<INFO name=\"header_format\"
+        value=\"mini\"/>\n<INFO name=\"header_format\" value=\"mini\"/>\n\n<RESOURCE
+        ID=\"yCat_1345\" name=\"I/345\" type=\"results\">\n  <DESCRIPTION>Gaia DR2
+        (Gaia Collaboration, 2018)</DESCRIPTION>  <INFO name=\"ivoid\" value=\"ivo://cds.vizier/i/345\">
+        \   IVOID of underlying data collection  </INFO>\n  <INFO name=\"data_ivoid\"
+        value=\"ivo://cds.vizier/i/345\">    IVOID of underlying data collection  </INFO>\n
+        \ <INFO name=\"creator\" value=\"Gaia collaboration\">    First author or
+        institution  </INFO>\n  <INFO name=\"cites\" value=\"bibcode:2018A&amp;A...616A...1G\">
+        \   Article or Data origin sources  </INFO>\n  <INFO name=\"journal\" value=\"A&amp;A\">
+        \   Journal name  </INFO>\n  <INFO name=\"original_date\" value=\"2018\">
+        \   Year of the article publication  </INFO>\n  <INFO name=\"reference_url\"
+        value=\"https://cdsarc.cds.unistra.fr/viz-bin/cat/I/345\">    Dataset landing
+        page  </INFO>\n  <INFO name=\"citation\" value=\"doi:10.26093/cds/vizier.1345\">
+        \   Dataset identifier that can be used for citation  </INFO>\n  <INFO name=\"publication_date\"
+        value=\"2023-12-19\">    Date of first publication in the data centre  </INFO>\n
+        \ <INFO name=\"rights_uri\" value=\"https://cds.unistra.fr/vizier-org/licences_vizier.html\">
+        \   Licence URI  </INFO>\n\n  <COOSYS ID=\"H_2015.500\" system=\"ICRS\" epoch=\"2015.500\"/>\n
+        \ <TABLE ID=\"I_345_gaia2\" name=\"I/345/gaia2\">\n    <DESCRIPTION>GaiaSource
+        DR2 data</DESCRIPTION>\n<!-- Gaia data release 2 (Gaia DR2). \\inputViz{gaiadr2.intro.htx}
+        (\\originalcolumnnames) -->\n\n    <!-- RowName: -c=${$poseq}&-c.rs=0.004
+        -->\n    <!-- Definitions of GROUPs and FIELDs -->\n    <FIELD name=\"RA_ICRS\"
+        ucd=\"POS_EQ_RA_MAIN\" ref=\"H_2015.500\" datatype=\"double\" width=\"15\"
+        precision=\"11\" unit=\"deg\">\n      <DESCRIPTION>Barycentric right ascension
+        (ICRS) at Ep=2015.5 (ra)</DESCRIPTION>\n    </FIELD>\n    <FIELD name=\"e_RA_ICRS\"
+        ucd=\"ERROR\" datatype=\"double\" width=\"7\" precision=\"4\" unit=\"mas\">\n
+        \     <DESCRIPTION>Standard error of right ascension (e_RA*cosDE) (ra_error)</DESCRIPTION>\n
+        \   </FIELD>\n    <FIELD name=\"DE_ICRS\" ucd=\"POS_EQ_DEC_MAIN\" ref=\"H_2015.500\"
+        datatype=\"double\" width=\"15\" precision=\"11\" unit=\"deg\">\n      <DESCRIPTION>Barycentric
+        declination (ICRS) at Ep=2015.5 (dec)</DESCRIPTION>\n    </FIELD>\n    <FIELD
+        name=\"e_DE_ICRS\" ucd=\"ERROR\" datatype=\"double\" width=\"7\" precision=\"4\"
+        unit=\"mas\">\n      <DESCRIPTION>Standard error of declination (dec_error)</DESCRIPTION>\n
+        \   </FIELD>\n    <FIELD name=\"Source\" ucd=\"ID_MAIN\" datatype=\"long\"
+        width=\"19\">\n      <DESCRIPTION>Unique source identifier (unique within
+        a particular Data Release) (source_id) (G2)</DESCRIPTION>\n    </FIELD>\n
+        \   <FIELD name=\"Plx\" ucd=\"POS_PARLX_TRIG\" datatype=\"double\" width=\"10\"
+        precision=\"4\" unit=\"mas\">\n      <DESCRIPTION>? Absolute stellar parallax
+        (parallax)</DESCRIPTION>\n      <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD
+        name=\"e_Plx\" ucd=\"ERROR\" datatype=\"float\" width=\"7\" precision=\"4\"
+        unit=\"mas\">\n      <DESCRIPTION>? Standard error of parallax (parallax_error)</DESCRIPTION>\n
+        \     <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"pmRA\" ucd=\"POS_EQ_PMRA\"
+        ref=\"H_2015.500\" datatype=\"double\" width=\"9\" precision=\"3\" unit=\"mas/yr\">\n
+        \     <DESCRIPTION>? Proper motion in right ascension direction (pmRA*cosDE)
+        (pmra) (3)</DESCRIPTION>\n      <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD
+        name=\"e_pmRA\" ucd=\"ERROR\" datatype=\"float\" width=\"6\" precision=\"3\"
+        unit=\"mas/yr\">\n      <DESCRIPTION>? Standard error of proper motion in
+        right ascension direction (pmra_error)</DESCRIPTION>\n      <VALUES null=\"NaN\"
+        />\n    </FIELD>\n    <FIELD name=\"pmDE\" ucd=\"POS_EQ_PMDEC\" ref=\"H_2015.500\"
+        datatype=\"double\" width=\"9\" precision=\"3\" unit=\"mas/yr\">\n      <DESCRIPTION>?
+        Proper motion in declination direction (pmdec) (4)</DESCRIPTION>\n      <VALUES
+        null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"e_pmDE\" ucd=\"ERROR\" datatype=\"float\"
+        width=\"6\" precision=\"3\" unit=\"mas/yr\">\n      <DESCRIPTION>? Standard
+        error of proper motion in declination direction (pmdec_error)</DESCRIPTION>\n
+        \     <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"Dup\" ucd=\"CODE_MISC\"
+        datatype=\"unsignedByte\" width=\"1\">\n      <DESCRIPTION>[0/1] Source with
+        duplicate sources (duplicated_source) (21)</DESCRIPTION>\n    </FIELD>\n    <FIELD
+        name=\"FG\" ucd=\"PHOT_FLUX_OPTICAL\" datatype=\"float\" width=\"11\" precision=\"E4\">\n
+        \     <DESCRIPTION>G-band mean flux (phot_g_mean_flux)</DESCRIPTION>\n    </FIELD>\n
+        \   <FIELD name=\"e_FG\" ucd=\"ERROR\" datatype=\"float\" width=\"11\" precision=\"E4\">\n
+        \     <DESCRIPTION>Error on G-band mean flux (phot_g_mean_flux_error)</DESCRIPTION>\n
+        \   </FIELD>\n    <FIELD name=\"Gmag\" ucd=\"PHOT_MAG_OPTICAL\" datatype=\"double\"
+        width=\"7\" precision=\"4\" unit=\"mag\">\n      <DESCRIPTION>G-band mean
+        magnitude (Vega) (phot_g_mean_mag) (23)</DESCRIPTION>\n    </FIELD>\n    <FIELD
+        name=\"e_Gmag\" ucd=\"ERROR\" datatype=\"double\" width=\"6\" precision=\"4\"
+        unit=\"mag\">\n      <DESCRIPTION>Standard error of G-band mean magnitude
+        (Vega) (added by CDS) (phot_g_mean_mag_error) (37)</DESCRIPTION>\n    </FIELD>\n
+        \   <FIELD name=\"FBP\" ucd=\"PHOT_FLUX_B\" datatype=\"float\" width=\"11\"
+        precision=\"E4\">\n      <DESCRIPTION>? Mean flux in the integrated BP band
+        (phot_bp_mean_flux)</DESCRIPTION>\n      <VALUES null=\"NaN\" />\n    </FIELD>\n
+        \   <FIELD name=\"e_FBP\" ucd=\"ERROR\" datatype=\"float\" width=\"11\" precision=\"E4\">\n
+        \     <DESCRIPTION>? Error on the integrated BP mean flux (phot_bp_mean_flux_error)
+        (25)</DESCRIPTION>\n      <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD
+        name=\"BPmag\" ucd=\"PHOT_MAG_B\" datatype=\"double\" width=\"7\" precision=\"4\"
+        unit=\"mag\">\n      <DESCRIPTION>? Integrated BP mean magnitude (Vega) (phot_bp_mean_mag)
+        (26)</DESCRIPTION>\n      <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD
+        name=\"e_BPmag\" ucd=\"ERROR\" datatype=\"double\" width=\"6\" precision=\"4\"
+        unit=\"mag\">\n      <DESCRIPTION>? Standard error of BP mean magnitude (Vega)
+        (added by CDS) (phot_bp_mean_mag_error) (37)</DESCRIPTION>\n      <VALUES
+        null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"FRP\" ucd=\"PHOT_FLUX_R\"
+        datatype=\"float\" width=\"11\" precision=\"E4\">\n      <DESCRIPTION>? Mean
+        flux in the integrated RP band (phot_rp_mean_flux)</DESCRIPTION>\n      <VALUES
+        null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"e_FRP\" ucd=\"ERROR\" datatype=\"float\"
+        width=\"11\" precision=\"E4\">\n      <DESCRIPTION>? Error on the integrated
+        RP mean flux (phot_rp_mean_flux_error) (28)</DESCRIPTION>\n      <VALUES null=\"NaN\"
+        />\n    </FIELD>\n    <FIELD name=\"RPmag\" ucd=\"PHOT_MAG_R\" datatype=\"double\"
+        width=\"7\" precision=\"4\" unit=\"mag\">\n      <DESCRIPTION>? Integrated
+        RP mean magnitude (Vega) (phot_rp_mean_mag) (29)</DESCRIPTION>\n      <VALUES
+        null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"e_RPmag\" ucd=\"ERROR\" datatype=\"double\"
+        width=\"6\" precision=\"4\" unit=\"mag\">\n      <DESCRIPTION>? Standard error
+        of RP mean magnitude (Vega) (added by CDS) (phot_rp_mean_mag_error) (37)</DESCRIPTION>\n
+        \     <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"BP-RP\" ucd=\"PHOT_CI_B-R\"
+        datatype=\"double\" width=\"7\" precision=\"4\" unit=\"mag\">\n      <DESCRIPTION>?
+        BP-RP colour (photBpMeanMag-photRMeanMag) (bp_rp)</DESCRIPTION>\n      <VALUES
+        null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"RV\" ucd=\"VELOC_BARYCENTER\"
+        datatype=\"double\" width=\"7\" precision=\"2\" unit=\"km/s\">\n      <DESCRIPTION>?
+        Spectroscopic radial velocity in the solar barycentric reference frame (radial_velocity)</DESCRIPTION>\n
+        \     <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"e_RV\" ucd=\"ERROR\"
+        datatype=\"float\" width=\"5\" precision=\"2\" unit=\"km/s\">\n      <DESCRIPTION>?
+        Radial velocity error (radial_velocity_error) (30)</DESCRIPTION>\n      <VALUES
+        null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"Teff\" ucd=\"PHYS_TEMP_EFFEC\"
+        datatype=\"double\" width=\"7\" precision=\"2\" unit=\"K\">\n      <DESCRIPTION>?
+        Stellar effective temperature (estimate from Apsis-Priam) (teff_val)</DESCRIPTION>\n
+        \     <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"AG\" ucd=\"PHOT_EXTINCTION_ISM\"
+        datatype=\"float\" width=\"7\" precision=\"4\" unit=\"mag\">\n      <DESCRIPTION>?
+        Estimate of extinction in the G band from Apsis-Priam (a_g_val)</DESCRIPTION>\n
+        \     <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"E(BP-RP)\"
+        ucd=\"PHOT_COLOR_EXCESS\" datatype=\"float\" width=\"7\" precision=\"4\" unit=\"mag\">\n
+        \     <DESCRIPTION>? Estimate of redenning E(BP-RP) from Apsis-Priam (e_bp_min_rp_val)</DESCRIPTION>\n
+        \     <VALUES null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"Rad\" ucd=\"PHYS_SIZE_RADIUS_GENERAL\"
+        datatype=\"float\" width=\"6\" precision=\"2\" unit=\"solRad\">\n      <DESCRIPTION>?
+        Estimate of radius from Apsis-FLAME (radius_val)</DESCRIPTION>\n      <VALUES
+        null=\"NaN\" />\n    </FIELD>\n    <FIELD name=\"Lum\" ucd=\"PHYS_LUMINOSITY_GENERAL\"
+        datatype=\"double\" width=\"9\" precision=\"3\" unit=\"solLum\">\n      <DESCRIPTION>?
+        Esimate of luminosity from Apsis-FLAME (lum_val)</DESCRIPTION>\n      <VALUES
+        null=\"NaN\" />\n    </FIELD>\n<DATA><TABLEDATA>\n<TR><TD>288.92504222139</TD><TD>0.5640</TD><TD>+42.53087381717</TD><TD>0.7354</TD><TD>2102696557968168064</TD><TD>0.0371</TD><TD>0.7248</TD><TD>-1.526</TD><TD>1.245</TD><TD>-11.060</TD><TD>1.500</TD><TD>0</TD><TD>1.8784e+02</TD><TD>1.2712e+00</TD><TD>20.0039</TD><TD>0.0073</TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>\n<TR><TD>288.92481710538</TD><TD>1.2316</TD><TD>+42.53035720862</TD><TD>1.6785</TD><TD>2102696557968165120</TD><TD>0.6193</TD><TD>2.0363</TD><TD>-3.355</TD><TD>1.997</TD><TD>-3.700</TD><TD>2.233</TD><TD>0</TD><TD>9.7861e+01</TD><TD>1.0497e+00</TD><TD>20.7118</TD><TD>0.0116</TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>\n<TR><TD>288.93293540979</TD><TD>0.7063</TD><TD>+42.53761523900</TD><TD>0.8526</TD><TD>2102696592327925120</TD><TD>1.1361</TD><TD>0.8746</TD><TD>-0.000</TD><TD>1.529</TD><TD>-2.771</TD><TD>1.697</TD><TD>0</TD><TD>1.2280e+02</TD><TD>1.1470e+00</TD><TD>20.4654</TD><TD>0.0101</TD><TD>6.1807e+01</TD><TD>1.1926e+01</TD><TD>20.8738</TD><TD>0.2095</TD><TD>1.5801e+02</TD><TD>7.2556e+00</TD><TD>19.2652</TD><TD>0.0499</TD><TD>1.6086</TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>\n<TR><TD>288.93099282666</TD><TD>0.2084</TD><TD>+42.52933964696</TD><TD>0.2881</TD><TD>2102696588036596608</TD><TD>0.6226</TD><TD>0.2765</TD><TD>-0.901</TD><TD>0.434</TD><TD>-7.564</TD><TD>0.606</TD><TD>0</TD><TD>4.2371e+02</TD><TD>1.2463e+00</TD><TD>19.1207</TD><TD>0.0032</TD><TD>1.2257e+02</TD><TD>6.0377e+00</TD><TD>20.1305</TD><TD>0.0535</TD><TD>5.4059e+02</TD><TD>1.3773e+01</TD><TD>17.9298</TD><TD>0.0277</TD><TD>2.2007</TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>\n<TR><TD>288.93095727926</TD><TD>0.0773</TD><TD>+42.52798833714</TD><TD>0.0977</TD><TD>2102696557973186816</TD><TD>0.9746</TD><TD>0.0955</TD><TD>-2.991</TD><TD>0.162</TD><TD>-24.296</TD><TD>0.193</TD><TD>0</TD><TD>1.7614e+03</TD><TD>1.6617e+00</TD><TD>17.5737</TD><TD>0.0010</TD><TD>6.5137e+02</TD><TD>9.3634e+00</TD><TD>18.3168</TD><TD>0.0156</TD><TD>1.6771e+03</TD><TD>8.9769e+00</TD><TD>16.7005</TD><TD>0.0058</TD><TD>1.6163</TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>\n<TR><TD>288.92553625918</TD><TD>3.4621</TD><TD>+42.53144562479</TD><TD>3.8004</TD><TD>2102696557973185536</TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD>1</TD><TD>6.0036e+02</TD><TD>7.2939e+00</TD><TD>18.7423</TD><TD>0.0132</TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>\n<TR><TD>288.92327549368</TD><TD>0.0434</TD><TD>+42.53491003297</TD><TD>0.0552</TD><TD>2102696592332924800</TD><TD>0.3292</TD><TD>0.0535</TD><TD>-7.150</TD><TD>0.091</TD><TD>-5.972</TD><TD>0.111</TD><TD>0</TD><TD>4.0842e+03</TD><TD>3.5529e+00</TD><TD>16.6606</TD><TD>0.0009</TD><TD>2.0345e+03</TD><TD>8.9776e+00</TD><TD>17.0802</TD><TD>0.0048</TD><TD>3.0106e+03</TD><TD>1.6799e+01</TD><TD>16.0653</TD><TD>0.0061</TD><TD>1.0149</TD><TD></TD><TD></TD><TD>5172.05</TD><TD>0.9860</TD><TD>0.4837</TD><TD></TD><TD></TD></TR>\n<TR><TD>288.92922304868</TD><TD>0.0239</TD><TD>+42.52916737122</TD><TD>0.0310</TD><TD>2102696557973186304</TD><TD>0.7442</TD><TD>0.0293</TD><TD>-1.691</TD><TD>0.051</TD><TD>-7.292</TD><TD>0.061</TD><TD>0</TD><TD>1.1711e+04</TD><TD>5.9356e+00</TD><TD>15.5169</TD><TD>0.0006</TD><TD>6.0837e+03</TD><TD>1.5042e+01</TD><TD>15.8910</TD><TD>0.0027</TD><TD>8.2639e+03</TD><TD>2.2250e+01</TD><TD>14.9690</TD><TD>0.0029</TD><TD>0.9220</TD><TD></TD><TD></TD><TD>5379.00</TD><TD>0.2088</TD><TD>0.1020</TD><TD>1.07</TD><TD>0.866</TD></TR>\n<TR><TD>288.92121936550</TD><TD>0.1218</TD><TD>+42.53758451042</TD><TD>0.1562</TD><TD>2102696656750458752</TD><TD>1.1870</TD><TD>0.1533</TD><TD>-0.401</TD><TD>0.254</TD><TD>-0.993</TD><TD>0.306</TD><TD>0</TD><TD>8.3957e+02</TD><TD>1.4948e+00</TD><TD>18.3782</TD><TD>0.0019</TD><TD>2.0189e+02</TD><TD>9.3041e+00</TD><TD>19.5886</TD><TD>0.0500</TD><TD>1.0028e+03</TD><TD>9.9619e+00</TD><TD>17.2589</TD><TD>0.0108</TD><TD>2.3297</TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD><TD></TD></TR>\n</TABLEDATA></DATA>\n<INFO
+        name=\"matches\" value=\"9\">matching records</INFO>\n  </TABLE>\n</RESOURCE>\n</VOTABLE>\n"
+    headers:
+      Access-Control-Allow-Headers:
+      - Origin, X-Requested-With, Content-Type, Accept
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - Keep-Alive
+      Content-Disposition:
+      - attachment; filename=vizier_votable.vot
+      Content-Type:
+      - application/x-votable+xml
+      Date:
+      - Fri, 13 Mar 2026 11:19:51 GMT
+      DocumentRef:
+      - VOTx1724889
+      Keep-Alive:
+      - timeout=5, max=100
+      Server:
+      - Apache/2.4.52 (Ubuntu)
+      Vary:
+      - Accept-Encoding
+      content-length:
+      - '14366'
+    status:
+      code: 200
+      message: OK
+version: 1
