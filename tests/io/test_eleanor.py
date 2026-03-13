@@ -11,6 +11,7 @@ from lightkurve.io.detect import detect_filetype
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_gsfc_eleanor_lite():
     """Can we read in GSFC-ELEANOR-LITE light curves?"""
     url = (
@@ -66,6 +67,7 @@ def test_vanilla_eleanor(url):
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_search_gsfc_eleanor_lite():
     """Can we search and download GSFC-ELEANOR-LITE light curves from MAST?"""
     search = search_lightcurve("TIC 336732616", author="GSFC-ELEANOR-LITE", sector=1)

@@ -10,6 +10,7 @@ from lightkurve.io.detect import detect_filetype
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.parametrize(
     "url, flux_err_colname_expected, qlp_low_precision_bitmask", [
         ("https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/qlp/s0011/0000/0002/7755/4109/hlsp_qlp_tess_ffi_s0011-0000000277554109_tess_v01_llc.fits",
@@ -50,6 +51,7 @@ def test_qlp(url, flux_err_colname_expected, qlp_low_precision_bitmask):
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_search_qlp():
     """Can we search and download QLP light curves from MAST?"""
     search = search_lightcurve("TIC 277554109", author="QLP", sector=11)

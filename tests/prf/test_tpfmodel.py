@@ -65,6 +65,7 @@ def test_backgroundprior():
 
 @pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
+@pytest.mark.vcr
 def test_tpf_model_simple():
     prf = SimpleKeplerPRF(channel=16, shape=[10, 10], column=15, row=15)
     model = TPFModel(prfmodel=prf)
@@ -73,6 +74,7 @@ def test_tpf_model_simple():
 
 @pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
+@pytest.mark.vcr
 def test_tpf_model():
     col, row, flux, bgflux = 1, 2, 3, 4
     shape = (7, 8)
@@ -121,6 +123,7 @@ def test_tpf_model():
 # Tagging the test below as `remote_data` because AppVeyor hangs on this test;
 # at present we don't understand why.
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_tpf_model_fitting():
     # Is the PRF photometry result consistent with simple aperture photometry?
     tpf_fn = os.path.join(TESTDATA, "ktwo201907706-c01-first-cadence.fits.gz")
@@ -156,6 +159,7 @@ def test_tpf_model_fitting():
 
 @pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
+@pytest.mark.vcr
 def test_empty_model():
     """Can we fit the background flux in a model without stars?"""
     shape = (4, 3)
@@ -169,6 +173,7 @@ def test_empty_model():
 
 @pytest.mark.skipif(NO_OKTOPUS, reason="tpfmodels require oktopus")
 @pytest.mark.remote_data  # PRF relies on calibration files on stsci.edu
+@pytest.mark.vcr
 def test_model_with_one_star():
     """Can we fit the background flux in a model with one star?"""
     channel = 42

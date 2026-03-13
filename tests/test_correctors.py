@@ -13,6 +13,7 @@ TABBY_REG = (
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_to_corrector():
     """Does the tpf.to_corrector('pld') convenience method work?"""
     from lightkurve import KeplerTargetPixelFile
@@ -23,6 +24,7 @@ def test_to_corrector():
     assert len(lc.flux) == len(tpf.time)
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_CBV_cadence():
     """Separate CBVs are obtained for 2-min and 20-s data products.
     Check that the relevant CBVs are found."""

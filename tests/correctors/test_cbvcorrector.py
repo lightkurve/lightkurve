@@ -197,6 +197,7 @@ def test_CotrendingBasisVectors_nonretrieval():
 
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_cbv_retrieval():
     """Tests reading in some CBVs from MAST
 
@@ -431,6 +432,7 @@ def test_CBVCorrector():
 
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_CBVCorrector_retrieval():
     """Tests CBVCorrector by retrieving some sample Kepler/TESS light curves
     and correcting them

@@ -16,6 +16,7 @@ import numpy as np
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_kepler_pld_corrector():
     tpf = search_targetpixelfile("K2-199")[0].download()
     pld = PLDCorrector(tpf)
@@ -35,6 +36,7 @@ def test_kepler_pld_corrector():
 
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_tess_pld_corrector():
     tpf = search_targetpixelfile("TOI 700")[0].download()
     pld = PLDCorrector(tpf)
@@ -54,6 +56,7 @@ def test_tess_pld_corrector():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_pld_aperture_mask():
     """Test for #523: does PLDCorrector.correct() accept separate apertures for
     PLD pixels?"""
@@ -71,6 +74,7 @@ def test_pld_aperture_mask():
 
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_pld_corrector():
     # download tpf data for a target
     k2_target = "EPIC247887989"
@@ -106,6 +110,7 @@ def test_pld_corrector():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_tpf_with_zero_flux_cadence():
     """Regression test for #873."""
     tpf = search_tesscut("TIC 123835353", sector=6).download(cutout_size=5)
@@ -114,6 +119,7 @@ def test_tpf_with_zero_flux_cadence():
 
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_tpf_with_allflux_err_NaN():
 
     #This test shows that a TPF with all flux_err values equal to NaN fails
@@ -140,6 +146,7 @@ def test_tpf_with_allflux_err_NaN():
         PLDCorrector(tpf).correct()
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_tpf_with_someflux_err_NaN():
 
     #This test shows that a TPF with some flux_err values equal to NaN 

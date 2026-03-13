@@ -10,6 +10,7 @@ from lightkurve.io.detect import detect_filetype
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_detect_pathos():
     """Can we detect the correct format for PATHOS files?"""
     url = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/pathos/s0008/hlsp_pathos_tess_lightcurve_tic-0093270923-s0008_tess_v1_llc.fits"
@@ -19,6 +20,7 @@ def test_detect_pathos():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_read_pathos():
     """Can we read PATHOS files?"""
     url = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/pathos/s0008/hlsp_pathos_tess_lightcurve_tic-0093270923-s0008_tess_v1_llc.fits"
@@ -44,6 +46,7 @@ def test_read_pathos():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_search_pathos():
     """Can we search and download a PATHOS light curve?"""
     search = search_lightcurve("TIC 93270923", author="PATHOS", sector=8)

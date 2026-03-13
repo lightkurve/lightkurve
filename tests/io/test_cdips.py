@@ -13,6 +13,7 @@ TEST_FIT_URL = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/cdip
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_detect_cdips():
     """Can we detect the correct format for CDIPS files?"""
     url = TEST_FIT_URL
@@ -22,6 +23,7 @@ def test_detect_cdips():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_read_cdips():
     """Can we read CDIPS files?"""
     url = TEST_FIT_URL
@@ -51,6 +53,7 @@ def test_read_cdips():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_search_cdips():
     """Can we search and download a cdips light curve?"""
     search = search_lightcurve(f"TIC {TEST_TIC_ID}", author="CDIPS")

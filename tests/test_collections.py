@@ -283,6 +283,7 @@ def test_tpfcollection_plot():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_stitch_repr():
     """Regression test for #884."""
     lc = search_lightcurve("Pi Men", mission="TESS", author="SPOC", sector=1).download()
