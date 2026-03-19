@@ -844,6 +844,7 @@ class LombScarglePeriodogram(Periodogram):
             )
 
         time = lc.time.copy()
+        flux = lc.flux.copy()
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
         nyquist = 0.5 * (1.0 / (np.median(np.diff(time.value)))) * (1 / cds.d)
@@ -912,6 +913,22 @@ class LombScarglePeriodogram(Periodogram):
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
 
+        # Slight tweaks to support nifty-ls implementation
+        if ls_method[:9] == 'fastnifty': # nifty-ls
+            try:
+                import nifty_ls
+                # If using nifty_ls, flux must be float64
+                flux = flux.value.astype('float64')*flux.unit
+            except ImportError:
+                oldmethod = ls_method
+                ls_method = {"fastnifty": "fast", "fastnifty_chi2": "fastchi2"}[ls_method]
+                log.warning(
+                    "nifty_ls is not available.\n"
+                    "Method has been changed from '{}' to '{}'.".format(
+                        oldmethod, ls_method
+                    )
+                )
+
         # Change to compatible ls method if sampling not even in frequency
         if not implementations.main._is_regular(frequency) and ls_method in [
             "fastchi2",
@@ -940,11 +957,11 @@ class LombScarglePeriodogram(Periodogram):
 
         if float(astropy.__version__[0]) >= 3:
             LS = LombScargle(
-                time, lc.flux, nterms=nterms, normalization="psd", **kwargs
+                time, flux, nterms=nterms, normalization="psd", **kwargs
             )
             power = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, lc.flux, nterms=nterms, **kwargs)
+            LS = LombScargle(time, flux, nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization="psd")
 
         if normalization == "psd":  # Power spectral density
