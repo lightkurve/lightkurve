@@ -248,6 +248,8 @@ class TessQualityFlags(QualityFlags):
     BadCalibrationExclude = 16384
     # Set in the sector 20 data release notes
     InsufficientTargets = 32768
+    RollingBandInAperture = 131072
+    RollingBandInMask = 262144
 
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
     # See https://outerspace.stsci.edu/display/TESS/2.0+-+Data+Product+Overview
@@ -260,7 +262,7 @@ class TessQualityFlags(QualityFlags):
         DEFAULT_BITMASK | ApertureCosmic | CollateralCosmic | Straylight | Straylight2
     )
     #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
-    HARDEST_BITMASK = 65535
+    HARDEST_BITMASK = 524287
 
     #: Dictionary which provides friendly names for the various bitmasks.
     OPTIONS = {
@@ -288,6 +290,8 @@ class TessQualityFlags(QualityFlags):
         8192: "Planet Search Exclude",
         16384: "Bad Calibration Exclude",
         32768: "Insufficient Targets for Error Correction Exclude",
+        131072: "Rolling band in optimal aperture",
+        262144: "Rolling band in full mask",
     }
 
 

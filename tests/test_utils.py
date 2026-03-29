@@ -96,6 +96,17 @@ def test_quality_flag_decoding_quantity_object():
     ) == [flags[3][1], flags[4][1], flags[5][1]]
 
 
+def test_tess_rolling_band_flags():
+    """Verify the new RollingBandInAperture and RollingBandInMask flags."""
+    assert TessQualityFlags.RollingBandInAperture == 131072
+    assert TessQualityFlags.RollingBandInMask == 262144
+    assert "Rolling band in optimal aperture" in TessQualityFlags.decode(131072)
+    assert "Rolling band in full mask" in TessQualityFlags.decode(262144)
+    # Check that they are included in HARDEST_BITMASK
+    assert (TessQualityFlags.HARDEST_BITMASK & TessQualityFlags.RollingBandInAperture) > 0
+    assert (TessQualityFlags.HARDEST_BITMASK & TessQualityFlags.RollingBandInMask) > 0
+
+
 def test_quality_mask():
     """Can we create a quality mask using KeplerQualityFlags?"""
     quality = np.array([0, 0, 1])
