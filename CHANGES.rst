@@ -17,6 +17,8 @@
   fallback cone search [#1541]
 - Modified how SAP_QUALITY is treated when reading/writing TESS and Kepler data [#1538]
 - Added ability to use nifty-ls for periodograms [#1550]
+- Fixed ``LightCurve.normalize()`` crash on masked flux arrays where ``np.nanmedian``
+  returned ``nan`` instead of computing over unmasked values [#1543]
 
 2.5.1  (2025-05-20)
 =====================
