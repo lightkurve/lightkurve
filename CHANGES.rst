@@ -1,4 +1,4 @@
-2.5.2dev  (unreleased)
+2.6.0 (2026-04-16)
 =====================
 - Patch for changes to astroquery 0.4.11. Search results using GAIA DR2 now case insensitive. Integer searches converted to string. [#1511]
 - Added Folded lightcurve reader to open data saved with ``lk.FoldedLightCurve.to_fits()`` [#1488]
@@ -10,7 +10,7 @@
 - When reading in data saved with to_fits, change meta.flux_origin to reflect origin [#1371]
 - Convert flux and flux_err to Quantity objects when using ``select_flux`` [#1513]
 - Fixed bugs in ``FoldedLightCurve`` objects with normalized phase to support pickle / dill [#1529]
-- Added support in ``read_generic_lightcurve()`` for FITS Standard reference time keywords like [M]JDREF
+- Added support in ``read_generic_lightcurve()`` for FITS Standard reference time keywords like [M]JDREF [#1535]
 - Capped pandas version at <3.0.0 for breaking changes [#1534]
 - Added ability to download 20-s CBV products for TESS [#1537]
 - Changed search so that it longer emits ERROR log message when the search result is empty [#1540]
