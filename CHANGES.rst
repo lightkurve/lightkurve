@@ -1,3 +1,6 @@
+2.6.1dev
+=====================
+
 2.6.0 (2026-04-16)
 =====================
 - Patch for changes to astroquery 0.4.11. Search results using GAIA DR2 now case insensitive. Integer searches converted to string. [#1511]
