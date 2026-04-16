@@ -19,6 +19,7 @@
 - Added ability to use nifty-ls for periodograms [#1550]
 - Fixed ``LightCurve.normalize()`` crash on masked flux arrays where ``np.nanmedian``
   returned ``nan`` instead of computing over unmasked values [#1543]
+- Added new tutorial for read_generic_lightcurve [#1542]
 
 2.5.1  (2025-05-20)
 =====================
