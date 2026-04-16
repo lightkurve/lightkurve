@@ -1250,7 +1250,10 @@ class LightCurve(TimeSeries):
             from zero.
         """
         validate_method(unit, ["unscaled", "percent", "ppt", "ppm"])
-        flux_data = np.ma.filled(self.flux, np.nan) if hasattr(self.flux, "filled") else np.asarray(self.flux)
+        if hasattr(self.flux, "mask") and hasattr(self.flux, "filled"):
+            flux_data = self.flux.filled(np.nan)
+        else:
+            flux_data = self.flux
         median_flux = np.nanmedian(flux_data)
         std_flux = np.nanstd(flux_data)
 
