@@ -23,6 +23,7 @@ K2_C08 = (
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.parametrize("path", [K2_C08])
 def test_remote_data(path):
     """Can we correct a simple K2 light curve?"""
@@ -229,6 +230,7 @@ def test_sff_tess_warning():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_sff_nan_centroids():
     """Regression test for #827: SFF failed if light curve contained
     NaNs in its `centroid_col` or `centroid_row` columns."""

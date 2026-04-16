@@ -10,6 +10,7 @@ from lightkurve.periodogram import SNRPeriodogram
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_asteroseismology():
     datalist = search_lightcurve("KIC11615890")
     data = datalist.download_all()

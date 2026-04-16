@@ -4,6 +4,7 @@ from lightkurve import search_lightcurve
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_search_everest():
     """Can we search and download an EVEREST light curve?"""
     search = search_lightcurve("GJ 9827", author="EVEREST", campaign=12)

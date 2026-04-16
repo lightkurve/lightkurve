@@ -9,6 +9,7 @@ from lightkurve import search_lightcurve
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_read_k2sff():
     """Can we read K2SFF files?"""
     url = "http://archive.stsci.edu/hlsps/k2sff/c16/212100000/00236/hlsp_k2sff_k2_lightcurve_212100236-c16_kepler_v1_llc.fits"
@@ -27,6 +28,7 @@ def test_read_k2sff():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_search_k2sff():
     """Can we search and download a K2SFF light curve?"""
     # Try an early campaign

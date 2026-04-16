@@ -172,6 +172,7 @@ def test_interact_functions():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 @pytest.mark.filterwarnings("ignore:Proper motion correction cannot be applied to the target")  # for TESSCut
 @pytest.mark.parametrize("tpf_class, tpf_file, aperture_mask", [
@@ -197,6 +198,7 @@ def test_interact_sky_functions(tpf_class, tpf_file, aperture_mask):
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions_case_no_target_coordinate():
     import bokeh
@@ -216,6 +218,7 @@ def test_interact_sky_functions_case_no_target_coordinate():
 
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_interact_sky_functions_add_nearby_tics():
     """Test the backend of interact_sky() that combine Nearby TIC report with Gaia result."""
     from lightkurve.interact import (
@@ -239,6 +242,7 @@ def test_interact_sky_functions_add_nearby_tics():
 
 
 @pytest.mark.remote_data
+# @pytest.mark.vcr (Skipped due to large cassette size)
 def test_interact_sky_functions_add_nearby_tics_weird_dtype():
     """Test the backend of interact_sky() that combine Nearby TIC report with Gaia result.
     Case the dtype from Gaia result dataframe is weird.
@@ -261,6 +265,7 @@ def test_interact_sky_functions_add_nearby_tics_weird_dtype():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions_case_nearby_tics_failed(monkeypatch):
     """Test to ensure in case Nearby TIC service from ExoFOP not available,

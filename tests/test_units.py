@@ -13,6 +13,7 @@ def test_custom_units():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_tasoc_ppm_units():
     """Regression test for #956."""
 

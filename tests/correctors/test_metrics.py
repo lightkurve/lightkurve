@@ -35,6 +35,7 @@ def test_overfit_metric_lombscargle():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_underfit_metric_neighbors():
     """Sanity checks for `underfit_metric_neighbors`."""
     # PDCSAP_FLUX has a very good score (>0.99) because it has been corrected

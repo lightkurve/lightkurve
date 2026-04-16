@@ -62,6 +62,8 @@ pytest-cov = ">=2.10.1"
 pytest-remotedata = ">=0.3.2"
 pytest-doctestplus = ">=0.8.0"
 pytest-xdist = ">=2.1.0"
+pytest-recording = ">=0.13.0"
+vcrpy = ">=6.0.0"
 jupyter = ">=1.0.0"
 Sphinx = [
     {version = ">=5.3.0", python = "<3.13"},

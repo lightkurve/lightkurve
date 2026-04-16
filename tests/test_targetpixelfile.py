@@ -48,6 +48,7 @@ asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_load_bad_file():
     """Test if a light curve can be opened without exception."""
     with pytest.raises(ValueError) as exc:
@@ -599,6 +600,7 @@ def test_interact():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_interact_sky():
     """Test the Jupyter notebook interact() widget."""
     for tpf in [
@@ -609,6 +611,7 @@ def test_interact_sky():
 
 
 @pytest.mark.remote_data  # get_model / get_prf_model relies on calibration files on stsci.edu
+@pytest.mark.vcr
 def test_get_models():
     """Can we obtain PRF and TPF models?"""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
@@ -626,6 +629,7 @@ def test_get_models():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_tess_simulation():
     """Can we read simulated TESS data?"""
     tpf = TessTargetPixelFile(TESS_SIM)
@@ -753,6 +757,7 @@ def test_aperture_photometry_nan():
 
 
 #@pytest.mark.remote_data
+#@pytest.mark.vcr
 @pytest.mark.skip  # At time of writing, the SkyBot API yields too many intermittent HTTP Errors
 def test_SSOs():
     # TESS test
@@ -810,6 +815,7 @@ def test_plot_pixels():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_missing_pipeline_mask():
     """Regression test for #791.
 

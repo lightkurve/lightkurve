@@ -151,6 +151,7 @@ def test_math_regression_925():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
     lc = KeplerLightCurveFile(path, flux_column="sap_flux", quality_bitmask=None)
@@ -178,6 +179,7 @@ def test_KeplerLightCurveFile(path, mission):
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.parametrize(
     "quality_bitmask", ["hardest", "hard", "default", None, 1, 100, 2096639]
 )
@@ -207,6 +209,7 @@ def test_TessLightCurveFile(quality_bitmask):
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.parametrize(
     "quality_bitmask, answer",
     [
@@ -524,6 +527,7 @@ def test_custom_lightcurve_file(path, mission):
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
     for lc in [KeplerLightCurve.read(TABBY_Q8), TessLightCurve.read(TESS_SIM)]:
@@ -544,6 +548,7 @@ def test_lightcurve_plots():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_lightcurve_scatter():
     """Sanity check to verify that lightcurve scatter plotting works"""
     lc = KeplerLightCurve.read(KEPLER10)
@@ -594,6 +599,7 @@ def test_cdpp():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_cdpp_tabby():
     """Compare the cdpp noise metric against the pipeline value."""
     lc = KeplerLightCurve.read(TABBY_Q8)
@@ -895,6 +901,7 @@ def duplicate_and_stitch(lc, num_copies):
 @pytest.mark.memtest
 @pytest.mark.skipif(bad_resource_module_imports, reason="Requires resource module, only available for Unix")
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.parametrize(
     "dict_of_bin_args",
     [  # variants for lc.bin() call, they all result in roughly the same number of bins.
@@ -1019,6 +1026,7 @@ def test_to_csv():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
     lc = KeplerLightCurve.read(TABBY_Q8)
@@ -1170,6 +1178,7 @@ def test_lightcurve_repr():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_lightcurvefile_repr():
     """Do __str__ and __repr__ work?"""
     lcf = KeplerLightCurve.read(TABBY_Q8)
@@ -1271,6 +1280,7 @@ def test_remove_outliers():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_properties(capfd):
     """Test if the describe function produces an output.
     The output is 624 characters at the moment, but we might add more properties."""
@@ -1548,6 +1558,7 @@ def test_bin_issue705():
 
 
 #@pytest.mark.remote_data
+#@pytest.mark.vcr
 @pytest.mark.skip  # At time of writing, the SkyBot API yields too many intermittent HTTP Errors
 def test_SSOs():
     # TESS test
@@ -1606,6 +1617,7 @@ def test_fold_v2():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_combine_kepler_tess():
     """Can we append or stitch a TESS light curve to a Kepler light curve?"""
     # KIC 11904151: Kepler-10
@@ -2135,6 +2147,7 @@ def test_pickle_basic():
 
 @pytest.mark.xfail  # https://github.com/astropy/astropy/issues/19040 (still works with `dill`)
 @pytest.mark.remote_data
+@pytest.mark.vcr
 @pytest.mark.parametrize("lc_url, lc_label", [
     (TABBY_Q8, "Kepler LC"),
     (K2_C08, "K2 LC"),
@@ -2147,6 +2160,7 @@ def test_pickle_mission_data(lc_url, lc_label):
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_search_neighbors():
     """The closest neighbor to Proxima Cen in Sector 11 is TIC 388852407."""
     lc = search_lightcurve("Proxima Cen", author="spoc", sector=11).download()

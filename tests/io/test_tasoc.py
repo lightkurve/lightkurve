@@ -15,6 +15,7 @@ TEST_FIT_URL = "https://mast.stsci.edu/api/v0.1/Download/file?uri=mast:HLSP/taso
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_detect_tasoc():
     """Can we detect the correct format for TASOC files?"""
     url = TEST_FIT_URL
@@ -24,6 +25,7 @@ def test_detect_tasoc():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_read_tasoc():
     """Can we read TASOC files?"""
     url = TEST_FIT_URL
@@ -37,6 +39,7 @@ def test_read_tasoc():
 
 
 @pytest.mark.remote_data
+@pytest.mark.vcr
 def test_search_tasoc():
     """Can we search and download a TASOC light curve?"""
     search = search_lightcurve(f"TIC {TEST_TIC_ID}", author="TASOC")
