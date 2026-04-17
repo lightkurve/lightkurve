@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.correctors.load_kepler_cbvs &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.correctors.CBVCorrector" href="lightkurve.correctors.CBVCorrector.html" />
     <link rel="prev" title="lightkurve.correctors.load_tess_cbvs" href="lightkurve.correctors.load_tess_cbvs.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,23 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.correctors.load_kepler_cbvs">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     load_kepler_cbvs()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,10 +1331,10 @@
               <div>
                 
   <section id="lightkurve-correctors-load-kepler-cbvs">
-<h1>lightkurve.correctors.load_kepler_cbvs<a class="headerlink" href="#lightkurve-correctors-load-kepler-cbvs" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.correctors.load_kepler_cbvs<a class="headerlink" href="#lightkurve-correctors-load-kepler-cbvs" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="lightkurve.correctors.load_kepler_cbvs">
-<span class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></span><span class="sig-name descname"><span class="pre">load_kepler_cbvs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cbv_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quarter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">campaign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/cbvcorrector.html#load_kepler_cbvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.load_kepler_cbvs" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></span><span class="sig-name descname"><span class="pre">load_kepler_cbvs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cbv_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quarter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">campaign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/cbvcorrector.html#load_kepler_cbvs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.load_kepler_cbvs" title="Link to this definition">¶</a></dt>
 <dd><p>Loads Kepler or K2 cotrending basis vectors, either from a local directory cbv_dir 
 or searches the public data archive at MAST &lt;<a class="reference external" href="https://archive.stsci.edu">https://archive.stsci.edu</a>&gt;.</p>
 <p>This function fetches the Cotrending Basis Vectors FITS HDU for the desired
@@ -1333,7 +1345,7 @@ KeplerCotrendingBasisVectors object</p>
 quarter/campaign.</p>
 <p>For Kepler this extracts the DR25 CBVs.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cbv_dir</strong><span class="classifier">str</span></dt><dd><p>Path to specific directory holding Kepler CBVs. If None, queries MAST.</p>
 </dd>
@@ -1347,7 +1359,7 @@ but not both.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
 <dt><strong>result</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerCotrendingBasisVectors</span></code> object</span></dt><dd></dd>
 </dl>
@@ -1356,7 +1368,7 @@ but not both.</p>
 <p class="rubric">Examples</p>
 <p>This example will read in the CBVs for Kepler quarter 8,
 and then extract the first 8 CBVs for module.output 16.4</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cbvs</span> <span class="o">=</span> <span class="n">load_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> 
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cbvs</span> <span class="o">=</span> <span class="n">load_kepler_cbvs</span><span class="p">(</span><span class="n">mission</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1404,7 +1416,7 @@ and then extract the first 8 CBVs for module.output 16.4</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

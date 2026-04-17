@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Verifying the location of a periodic signal in the pixel data &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="How to improve the signal-to-noise of a periodogram?" href="periodograms-optimizing-the-snr.html" />
     <link rel="prev" title="Measuring and removing a rotation period signal from a light curve" href="periodograms-measuring-a-rotation-period.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -260,9 +256,9 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/3-science-examples/periodograms-verifying-the-location-of-a-signal.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Verifying-the-location-of-a-periodic-signal-in-the-pixel-data">
-<h1>Verifying the location of a periodic signal in the pixel data<a class="headerlink" href="#Verifying-the-location-of-a-periodic-signal-in-the-pixel-data" title="Permalink to this headline">#</a></h1>
+<h1>Verifying the location of a periodic signal in the pixel data<a class="headerlink" href="#Verifying-the-location-of-a-periodic-signal-in-the-pixel-data" title="Link to this heading">¶</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Understand the causes of signal blending and aperture contamination in <em>Kepler</em> and <em>K2</em> data.</p></li>
@@ -271,12 +267,12 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">¶</a></h2>
 <p>This tutorial is part of a series on handling <em>Kepler</em> and <em>K2</em> data with Astropy and Lightkurve. To work through this tutorial, you should be familiar with downloading and handling both <strong>light curves</strong> and <strong>target pixel files</strong> with Lightkurve, and you should have experience working with <strong>periodograms</strong>. We’ll use light curves and periodograms to detect signal, and follow that up with detailed analysis on the pixel scale to pinpoint the signal’s source.</p>
 <p>Some useful terms to keep in mind when working with signal verification are <em>contamination</em> and <em>blending</em>. These terms are often used interchangeably. Here, we’ll use blending to refer to any scenario where flux from two or more targets become visible in one target’s aperture. We use contamination to refer, more specifically, to the signal that erroneously enters the aperture.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
 <p>We’ll use <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to handle arrays for aperture masks, and <a class="reference external" href="https://matplotlib.org">Matplotlib</a> for visualizing data.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -291,17 +287,17 @@
 </div>
 </section>
 <section id="1.-Background">
-<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">#</a></h2>
+<h2>1. Background<a class="headerlink" href="#1.-Background" title="Link to this heading">¶</a></h2>
 <p>The <em>Kepler</em> space telescope observed with 4x4 arcsecond square pixels. This means that if two stars are within the same <em>Kepler</em> pixel, it is difficult to identify which is the source of an observed signal. Fortunately, these coincidences are unlikely. But the <em>Kepler</em> mission observed areas close to the Galactic plane, and both <em>Kepler</em> and <em>K2</em> observed stellar clusters, all of which are visually crowded regions. Due to crowding, there are still many cases where the true source of a signal is
 unclear.</p>
 <p>The process of signal verification begins with a light curve: first, we must detect our signal. In the case of potential exoplanet transits, these will be evident in the light curve; for other phenomena, including binarity and stellar variability, we might need a periodogram to pick up on the signal. To make sure our transits really do belong to a planet, or if there’s any uncertainty about the source of a stellar signal (such as, is the star in a crowded region? Is there a bright star nearby?
 Are we seeing multiple signals?), we need to look at the target pixel files, which will give us a more complete picture, and help us identify nearby contaminating sources.</p>
 </section>
 <section id="2.-Pixel-Level-Analysis">
-<h2>2. Pixel Level Analysis<a class="headerlink" href="#2.-Pixel-Level-Analysis" title="Permalink to this headline">#</a></h2>
+<h2>2. Pixel Level Analysis<a class="headerlink" href="#2.-Pixel-Level-Analysis" title="Link to this heading">¶</a></h2>
 <p>The most basic method of signal verification is to look at the pixels. In this section, we’ll use tools included in Lightkurve to examine light curves and periodograms in individual pixels and help us identify the source of a signal.</p>
 <section id="2.1-Initial-analysis">
-<h3>2.1 Initial analysis<a class="headerlink" href="#2.1-Initial-analysis" title="Permalink to this headline">#</a></h3>
+<h3>2.1 Initial analysis<a class="headerlink" href="#2.1-Initial-analysis" title="Link to this heading">¶</a></h3>
 <p>KIC 2435971 is a star of <a class="reference external" href="https://arxiv.org/pdf/1102.0342">Kepler magnitude</a> Kp = 14.7, with a massive signal. It’s not impossible that this signal comes from the star, but KIC 2435971 is in the field of open cluster NGC 6791, which means it’s subject to a higher level of crowding than much of the <em>Kepler</em> field. This could be a case of contamination; to be absolutely certain, we’re going to use this star for our signal verification exercise. Let’s begin by downloading a light curve; then we
 can produce a Lomb-Scargle Periodogram to search for repeating signals.</p>
 <div class="nbinput nblast docutils container">
@@ -332,7 +328,7 @@ can produce a Lomb-Scargle Periodogram to search for repeating signals.</p>
 <p>These high-amplitude, narrow peaks in the periodogram suggests a compact binary star.</p>
 </section>
 <section id="2.2-Pixel-level-analysis">
-<h3>2.2 Pixel-level analysis<a class="headerlink" href="#2.2-Pixel-level-analysis" title="Permalink to this headline">#</a></h3>
+<h3>2.2 Pixel-level analysis<a class="headerlink" href="#2.2-Pixel-level-analysis" title="Link to this heading">¶</a></h3>
 <p>Often, the identification of a much brighter target in the frame is enough to confirm contamination. Let’s begin by looking at the target pixel file (TPF) we’re going to be working with:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -416,7 +412,7 @@ it, and the placement of the pipeline aperture reflects this.</p>
 exclude all of this signal, as it has such a high amplitude and contaminates so many of these pixels.</p>
 </section>
 <section id="2.3-Identifying-a-contaminant">
-<h3>2.3 Identifying a contaminant<a class="headerlink" href="#2.3-Identifying-a-contaminant" title="Permalink to this headline">#</a></h3>
+<h3>2.3 Identifying a contaminant<a class="headerlink" href="#2.3-Identifying-a-contaminant" title="Link to this heading">¶</a></h3>
 <p>For this exercise, we’re going to switch to a different star. KIC 7024511 was flagged as a <em>Kepler</em> Object of Interest (KOI) in Quarter 6 of the mission, and given the designation KOI 311. This means that it’s a potential exoplanet host, based on transits detected. Let’s have a look at one quarter of data:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -471,7 +467,7 @@ decrease. We can look at the TPF using <code class="docutils literal notranslate
 <div class="output_area rendered_html docutils container">
 SearchResult containing 5 data products.
 
-<table id="table12984279248">
+<table id="table13210678032">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 11</td><td>2012</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr007024511</td><td>0.0</td></tr>
@@ -502,14 +498,14 @@ SearchResult containing 5 data products.
 </section>
 </section>
 <section id="3.-Advanced:-Difference-Imaging">
-<h2>3. Advanced: Difference Imaging<a class="headerlink" href="#3.-Advanced:-Difference-Imaging" title="Permalink to this headline">#</a></h2>
+<h2>3. Advanced: Difference Imaging<a class="headerlink" href="#3.-Advanced:-Difference-Imaging" title="Link to this heading">¶</a></h2>
 <p>The focus of most <em>Kepler</em> and <em>K2</em> signal verification research has been in validating exoplanets. Often, this is done by measuring and tracking image centroids. A centroid is the weighted average along both axes of the image, which measures the point where most flux is concentrated. If a true transit is observed, the centroid of the image will shift in time with it (<a class="reference external" href="https://iopscience.iop.org/article/10.1088/2041-8205/713/2/L103/pdf">Batalha et al., 2010</a>). Another technique, and the focus
 of this section, is difference imaging (<a class="reference external" href="https://iopscience.iop.org/article/10.1086/671767/pdf">Bryson et al., 2013</a>). Difference imaging has been used to validate signals from exocomets (<a class="reference external" href="https://arxiv.org/pdf/1708.06069.pdf">Rappaport et al., 2018</a>), flaring stars (<a class="reference external" href="https://iopscience.iop.org/article/10.3847/1538-4357/aa8ea2/pdf">Yang et al., 2017</a>), and binary systems (<a class="reference external" href="https://arxiv.org/pdf/1705.00621.pdf">Colman et al., 2017</a>).</p>
 <p>For vetting exoplanet candidates, difference imaging begins with a selection of flux measurements, both in- and out-of-phase with the transit. Using the frames from TPF images, we take an average of each collection of frames and subtract the in-phase fluxes from the out-of-phase fluxes, resulting in a <em>difference image</em>. We can then measure the centroid of the difference image, which will move outside of the optimal aperture if the star is contaminated. We can also visually identify the pixel
 where the variable flux is “brightest.”</p>
 <p>We’re going to work through a basic case here, which is applicable to a broad variety of stellar signals. For any periodic and quasi-sinusoidal signal, difference imaging works by selecting flux frames at timestamps around the maxima and minima of the signal, which is equivalent to working in- and out-of-phase with a transit. The result is a pixel image where the brightest pixels are those where the periodic signal is strongest.</p>
 <section id="3.1-Determining-the-signal-period">
-<h3>3.1 Determining the signal period<a class="headerlink" href="#3.1-Determining-the-signal-period" title="Permalink to this headline">#</a></h3>
+<h3>3.1 Determining the signal period<a class="headerlink" href="#3.1-Determining-the-signal-period" title="Link to this heading">¶</a></h3>
 <p>Let’s go back to KIC 2435971. We’re going to use the TPF we downloaded above for difference imaging; as it’s a pixel-level method, we can only use one quarter or campaign of <em>Kepler</em> data at a time. But for difference imaging to work well, we need as much data as possible to extract the period for differencing, so we’ll use the stitched light curve we prepared earlier. We’ve already downloaded the data above, so let’s remind ourselves of what the periodogram looks like:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -548,7 +544,7 @@ Period: 0.136 d
 </div>
 </section>
 <section id="3.2-Determining-the-maximum-and-minimum-phase-times">
-<h3>3.2 Determining the maximum and minimum phase times<a class="headerlink" href="#3.2-Determining-the-maximum-and-minimum-phase-times" title="Permalink to this headline">#</a></h3>
+<h3>3.2 Determining the maximum and minimum phase times<a class="headerlink" href="#3.2-Determining-the-maximum-and-minimum-phase-times" title="Link to this heading">¶</a></h3>
 <p>To find our maxima and minima, we’re going to start by phase-folding the light curve. This will help us identify the maxima and minima of the periodic signal.</p>
 <p>Note that when we phase-fold the curve below, we use the <code class="docutils literal notranslate"><span class="pre">epoch_time</span></code> argument to shift the phase curve’s zero position. This helps us pick out the maxima and minima of the phase curve more clearly; however, it’s a matter of trial and error to choose a suitable epoch time for any given target. In many cases, it will suffice not to set the argument at all. An alternative to experimenting with the epoch time is appending the phased light curve to itself, which guarantees at least one clear
 maximum and one clear minimum. This is a better method for an automated difference imaging pipeline, but is more complicated to implement.</p>
@@ -623,7 +619,7 @@ WARNING: TimeDeltaMissingUnitWarning: Numerical value without unit or explicit f
 </div>
 </section>
 <section id="3.3-Computing-the-difference-image">
-<h3>3.3 Computing the difference image<a class="headerlink" href="#3.3-Computing-the-difference-image" title="Permalink to this headline">#</a></h3>
+<h3>3.3 Computing the difference image<a class="headerlink" href="#3.3-Computing-the-difference-image" title="Link to this heading">¶</a></h3>
 <p>Now that we have identified the maximum and minimum phase timestamps to use, we can calculate our difference image! We’re also going to calculate an average of the whole quarter, and we can use Matplotlib to display them side by side for clear comparison. Note that we’re also flipping the images, so that they have the same orientation as the Lightkurve TPF plots.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
@@ -661,12 +657,12 @@ where it’s strongest; this is particularly evident in the case of KIC 2435971.
 </section>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">¶</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-15</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
@@ -918,7 +914,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

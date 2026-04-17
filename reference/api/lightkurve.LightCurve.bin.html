@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.LightCurve.bin &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.LightCurve.fill_gaps" href="lightkurve.LightCurve.fill_gaps.html" />
     <link rel="prev" title="lightkurve.LightCurve.copy" href="lightkurve.LightCurve.copy.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,23 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.LightCurve.bin">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     LightCurve.bin()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,34 +1331,34 @@
               <div>
                 
   <section id="lightkurve-lightcurve-bin">
-<h1>lightkurve.LightCurve.bin<a class="headerlink" href="#lightkurve-lightcurve-bin" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.LightCurve.bin<a class="headerlink" href="#lightkurve-lightcurve-bin" title="Link to this heading">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.LightCurve.bin">
-<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.bin" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">LightCurve.</span></span><span class="sig-name descname"><span class="pre">bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_bin_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/lightcurve.html#LightCurve.bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.LightCurve.bin" title="Link to this definition">¶</a></dt>
 <dd><p>Bins a lightcurve in equally-spaced bins in time.</p>
 <p>If the original light curve contains flux uncertainties (<code class="docutils literal notranslate"><span class="pre">flux_err</span></code>),
 the binned lightcurve will report the root-mean-square error.
 If no uncertainties are included, the binned curve will return the
 standard deviation of the data.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.TimeDelta.html#astropy.time.TimeDelta" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDelta</span></code></a>, optional</span></dt><dd><p>The time interval for the binned time series - this is either a scalar
+<dt><strong>time_bin_size</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a> or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.TimeDelta.html#astropy.time.TimeDelta" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeDelta</span></code></a>, optional</span></dt><dd><p>The time interval for the binned time series - this is either a scalar
 value (in which case all time bins will be assumed to have the same
 duration) or as an array of values (in which case each time bin can
 have a different duration). If this argument is provided,
 <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> should not be provided.
 (Default: 0.5 days; default unit: days.)</p>
 </dd>
-<dt><strong>time_bin_start</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The start time for the binned time series - this can be either given
-directly as a <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that
-initializes the <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can also be a scalar
+<dt><strong>time_bin_start</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The start time for the binned time series - this can be either given
+directly as a <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that
+initializes the <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can also be a scalar
 value if <code class="docutils literal notranslate"><span class="pre">time_bin_size</span></code> is provided. Defaults to the first
 time in the sampled time series.</p>
 </dd>
-<dt><strong>time_bin_end</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The times of the end of each bin - this can be either given directly as
-a <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that initializes the
-<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can only be given if <code class="docutils literal notranslate"><span class="pre">time_bin_start</span></code>
+<dt><strong>time_bin_end</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> or iterable, optional</span></dt><dd><p>The times of the end of each bin - this can be either given directly as
+a <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> array or as any iterable that initializes the
+<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> class. This can only be given if <code class="docutils literal notranslate"><span class="pre">time_bin_start</span></code>
 is an array of values. If <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> is a scalar, time bins are
 assumed to be contiguous, such that the end of each bin is the start
 of the next one, and <code class="docutils literal notranslate"><span class="pre">time_bin_end</span></code> gives the end time for the last
@@ -1368,7 +1380,7 @@ to accommodate the input time series length.
 If it is an iterable of ints, it specifies the indices of the bin edges.
 If a string, it must be one of  ‘blocks’, ‘knuth’, ‘scott’ or ‘freedman’
 defining a method of automatically determining an optimal bin size.
-See <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.stats.histogram.html#astropy.stats.histogram" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">histogram</span></code></a> for a description of each method.
+See <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.stats.histogram.html#astropy.stats.histogram" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">histogram</span></code></a> for a description of each method.
 Note that ‘blocks’ is not a useful method for regularly sampled data.</p>
 </dd>
 <dt><strong>binsize</strong><span class="classifier">int</span></dt><dd><p>In Lightkurve v1.x, the default behavior of <a class="reference internal" href="#lightkurve.LightCurve.bin" title="lightkurve.LightCurve.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin()</span></code></a> was to create
@@ -1384,7 +1396,7 @@ data points.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
 <dt><strong>binned_lc</strong><span class="classifier"><a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt><dd><p>A new light curve which has been binned.</p>
 </dd>
@@ -1436,7 +1448,7 @@ data points.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

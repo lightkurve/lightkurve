@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.SearchResult.download_all &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.SearchResult.mission" href="lightkurve.SearchResult.mission.html" />
     <link rel="prev" title="lightkurve.SearchResult.download" href="lightkurve.SearchResult.download.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,23 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.SearchResult.download_all">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     SearchResult.download_all()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,15 +1331,15 @@
               <div>
                 
   <section id="lightkurve-searchresult-download-all">
-<h1>lightkurve.SearchResult.download_all<a class="headerlink" href="#lightkurve-searchresult-download-all" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.SearchResult.download_all<a class="headerlink" href="#lightkurve-searchresult-download-all" title="Link to this heading">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.SearchResult.download_all">
-<span class="sig-prename descclassname"><span class="pre">SearchResult.</span></span><span class="sig-name descname"><span class="pre">download_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality_bitmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#SearchResult.download_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.SearchResult.download_all" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">SearchResult.</span></span><span class="sig-name descname"><span class="pre">download_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality_bitmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutout_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#SearchResult.download_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.SearchResult.download_all" title="Link to this definition">¶</a></dt>
 <dd><p>Download and open all data products in the search result.</p>
 <p>This method will return a <a class="reference internal" href="lightkurve.TargetPixelFileCollection.html#lightkurve.TargetPixelFileCollection" title="lightkurve.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a> or
 <a class="reference internal" href="lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a>.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>quality_bitmask</strong><span class="classifier">str or int, optional</span></dt><dd><p>Bitmask (integer) which identifies the quality flag bitmask that should
 be used to mask out bad cadences. If a string is passed, it has the
@@ -1345,7 +1357,7 @@ This mask is not recommended.</p></li>
 <p>See the <a class="reference internal" href="lightkurve.KeplerQualityFlags.html#lightkurve.KeplerQualityFlags" title="lightkurve.utils.KeplerQualityFlags"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code></a> or <a class="reference internal" href="lightkurve.TessQualityFlags.html#lightkurve.TessQualityFlags" title="lightkurve.utils.TessQualityFlags"><code class="xref py py-class docutils literal notranslate"><span class="pre">TessQualityFlags</span></code></a> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>download_dir</strong><span class="classifier">str, optional</span></dt><dd><p>Location where the data files will be stored.
-If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> is passed, the value from <code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_dir</span></code> configuration parameter is used,
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> is passed, the value from <code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_dir</span></code> configuration parameter is used,
 with “~/.lightkurve/cache” as the default.</p>
 <p>See <a class="reference internal" href="lightkurve.config.get_cache_dir.html#lightkurve.config.get_cache_dir" title="lightkurve.config.get_cache_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cache_dir()</span></code></a> for details.</p>
 </dd>
@@ -1359,7 +1371,7 @@ Typically ‘pdcsap_flux’ or ‘sap_flux’.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
 <dt><strong>collection</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Collection</span></code> object</span></dt><dd><p>Returns a <a class="reference internal" href="lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a> or
 <a class="reference internal" href="lightkurve.TargetPixelFileCollection.html#lightkurve.TargetPixelFileCollection" title="lightkurve.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a>,
@@ -1367,7 +1379,7 @@ containing all entries in the products table</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt>HTTPError</dt><dd><p>If the TESSCut service times out (i.e. returns HTTP status 504).</p>
 </dd>
@@ -1421,7 +1433,7 @@ containing all entries in the products table</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

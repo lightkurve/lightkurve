@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>How to save a LightCurve in FITS format? &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Instrumental Noise in Kepler and K2 #1: Data Gaps and Quality Flags" href="2-2-kepler-noise-1-data-gaps-and-quality-flags.html" />
     <link rel="prev" title="How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?" href="2-1-cutting-out-tpfs.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -191,13 +187,13 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-1-saving-a-light-curve.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-save-a-LightCurve-in-FITS-format?">
-<h1>How to save a LightCurve in FITS format?<a class="headerlink" href="#How-to-save-a-LightCurve-in-FITS-format?" title="Permalink to this headline">#</a></h1>
+<h1>How to save a LightCurve in FITS format?<a class="headerlink" href="#How-to-save-a-LightCurve-in-FITS-format?" title="Link to this heading">¶</a></h1>
 <p>Once you have detrended or altered a lightcurve in some way, you may want to save it as a FITS file. This allows you to easily share the file with your collaborators or submit your lightcurves as a <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines.html">MAST High Level Science Product</a> (HLSP). Lightkurve provides a <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.LightCurve.to_fits.html">to_fits()</a> method which will easily convert your
 <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.LightCurve.html">LightCurve</a> object into a fits file.</p>
 <p>Below is a brief demostration showing how <code class="docutils literal notranslate"><span class="pre">to_fits()</span></code> works.</p>
 <p>Note: if you are considering contributing a HLSP you may want to read the <a class="reference external" href="https://outerspace.stsci.edu/display/MASTDOCS/HLSP+How-To+Guide">guidelines</a> for contributing fits files. These include which fits headers are required/suggested for your HLSP to be accepted.</p>
 <section id="Example:-editing-and-writing-a-lightcurve">
-<h2>Example: editing and writing a lightcurve<a class="headerlink" href="#Example:-editing-and-writing-a-lightcurve" title="Permalink to this headline">#</a></h2>
+<h2>Example: editing and writing a lightcurve<a class="headerlink" href="#Example:-editing-and-writing-a-lightcurve" title="Link to this heading">¶</a></h2>
 <p>First we’ll obtain a random Kepler lightcurve from MAST.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -279,7 +275,7 @@ astropy.io.fits.hdu.hdulist.HDUList
 Filename: demo-lightcurve.fits
 No.    Name      Ver    Type      Cards   Dimensions   Format
   0  PRIMARY       1 PrimaryHDU      26   ()
-  1  LIGHTCURVE    1 BinTableHDU     28   4133R x 7C   [D, E, E, J, K, D, D]
+  1  LIGHTCURVE    1 BinTableHDU     28   4133R x 7C   [D, E, E, J, J, D, D]
 </pre></div></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">hdu</span></code> is a set of astropy.io.fits objects, which is what we would expect. Lets take a look at the header of the first extension.</p>
@@ -305,24 +301,24 @@ NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
 ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2025-05-21&#39;         / file creation date.
+DATE    = &#39;2026-04-16&#39;         / file creation date.
 CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
 TELESCOP= &#39;KEPLER  &#39;           / telescope
 INSTRUME= &#39;Kepler Photometer&#39;  / detector type
 OBJECT  = &#39;757076  &#39;           / string version of target id
-KEPLERID=               757076 / unique Kepler target identifier
-CHANNEL =                   56 / CCD channel
 RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinates
 RA_OBJ  =            291.03872 / [deg] right ascension
 DEC_OBJ =             36.59813 / [deg] declination
 EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.5.2dev&#39;
+PROCVER = &#39;2.6.0   &#39;
 MISSION = &#39;Kepler  &#39;
+KEPLERID=               757076
+CHANNEL =                   56
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;DJGhDJFhDJFhDJFh&#39;   / HDU checksum updated 2025-05-21T10:02:44
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2025-05-21T10:02:44
+CHECKSUM= &#39;5iQoAgNn6gNnAgNn&#39;   / HDU checksum updated 2026-04-16T21:00:30
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2026-04-16T21:00:30
 </pre></div></div>
 </div>
 <p>Looks like it has all the correct information about the target. What about the second extension?</p>
@@ -343,7 +339,7 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2025-05-21T1
 XTENSION= &#39;BINTABLE&#39;           / binary table extension
 BITPIX  =                    8 / array data type
 NAXIS   =                    2 / number of array dimensions
-NAXIS1  =                   44 / length of dimension 1
+NAXIS1  =                   40 / length of dimension 1
 NAXIS2  =                 4133 / length of dimension 2
 PCOUNT  =                    0 / number of group parameters
 GCOUNT  =                    1 / number of groups
@@ -360,14 +356,14 @@ TUNIT3  = &#39;electron / s&#39;
 TTYPE4  = &#39;CADENCENO&#39;
 TFORM4  = &#39;J       &#39;
 TTYPE5  = &#39;SAP_QUALITY&#39;
-TFORM5  = &#39;K       &#39;
+TFORM5  = &#39;J       &#39;
 TTYPE6  = &#39;MOM_CENTR1&#39;
 TFORM6  = &#39;D       &#39;
 TTYPE7  = &#39;MOM_CENTR2&#39;
 TFORM7  = &#39;D       &#39;
 EXTNAME = &#39;LIGHTCURVE&#39;
-CHECKSUM= &#39;W7e6Z4b3W4b3W4b3&#39;   / HDU checksum updated 2025-05-21T10:02:44
-DATASUM = &#39;390244549&#39;          / data unit checksum updated 2025-05-21T10:02:44
+CHECKSUM= &#39;W6e5W6b5W6b5W6b5&#39;   / HDU checksum updated 2026-04-16T21:00:30
+DATASUM = &#39;390244549&#39;          / data unit checksum updated 2026-04-16T21:00:30
 </pre></div></div>
 </div>
 <p>This extension has 7 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code>, <code class="docutils literal notranslate"><span class="pre">SAP_QUALITY</span></code>, <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>, <code class="docutils literal notranslate"><span class="pre">MOM_CENTR1</span></code>, and <code class="docutils literal notranslate"><span class="pre">MOM_CENTR2</span></code>. What if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
@@ -413,27 +409,27 @@ NEXTEND =                    2 / number of standard extensions
 EXTNAME = &#39;PRIMARY &#39;           / name of extension
 EXTVER  =                    1 / extension version number (not format version)
 ORIGIN  = &#39;Unofficial data product&#39; / institution responsible for file
-DATE    = &#39;2025-05-21&#39;         / file creation date.
+DATE    = &#39;2026-04-16&#39;         / file creation date.
 CREATOR = &#39;lightkurve.LightCurve.to_fits()&#39; / pipeline job and program used t
 TELESCOP= &#39;KEPLER  &#39;           / telescope
 INSTRUME= &#39;Kepler Photometer&#39;  / detector type
 OBJECT  = &#39;757076  &#39;           / string version of target id
-KEPLERID=               757076 / unique Kepler target identifier
-CHANNEL =                   56 / CCD channel
 RADESYS = &#39;ICRS    &#39;           / reference frame of celestial coordinates
 RA_OBJ  =            291.03872 / [deg] right ascension
 DEC_OBJ =             36.59813 / [deg] declination
 EQUINOX =                 2000 / equinox of celestial coordinate system
-PROCVER = &#39;2.5.2dev&#39;
+PROCVER = &#39;2.6.0   &#39;
+MISSION = &#39;Kepler  &#39;
 HLSPLEAD= &#39;Kepler/K2 GO office&#39;
 HLSPNAME= &#39;TUTORIAL&#39;
 CITATION= &#39;HEDGES2018&#39;
-MISSION = &#39;Kepler  &#39;
+KEPLERID=               757076
+CHANNEL =                   56
 DATE-OBS= &#39;8730-10-27T17:53:34.165&#39;
 QUARTER =                    3
 CAMPAIGN=
-CHECKSUM= &#39;Z7aAg5a5Z5aAd5a5&#39;   / HDU checksum updated 2025-05-21T10:02:44
-DATASUM = &#39;0       &#39;           / data unit checksum updated 2025-05-21T10:02:44
+CHECKSUM= &#39;WSkBWSiAWSiAWSiA&#39;   / HDU checksum updated 2026-04-16T21:00:30
+DATASUM = &#39;0       &#39;           / data unit checksum updated 2026-04-16T21:00:30
 </pre></div></div>
 </div>
 <p>Now our new keywords are included in the primary header! What about if we want to add more <strong>data columns</strong> to our fits file? We can simply add data columns in the same way. Let’s add the data quality to our fits file.</p>
@@ -497,7 +493,7 @@ ColDefs(
     name = &#39;FLUX_ERR&#39;; format = &#39;E&#39;; unit = &#39;electron / s&#39;
     name = &#39;CADENCENO&#39;; format = &#39;J&#39;
     name = &#39;DEMO_COLUMN&#39;; format = &#39;D&#39;
-    name = &#39;SAP_QUALITY&#39;; format = &#39;K&#39;
+    name = &#39;SAP_QUALITY&#39;; format = &#39;J&#39;
     name = &#39;MOM_CENTR1&#39;; format = &#39;D&#39;
     name = &#39;MOM_CENTR2&#39;; format = &#39;D&#39;
 )
@@ -548,7 +544,7 @@ ColDefs(
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

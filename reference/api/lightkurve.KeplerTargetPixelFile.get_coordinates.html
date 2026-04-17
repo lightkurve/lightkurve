@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.KeplerTargetPixelFile.get_coordinates &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.KeplerTargetPixelFile.to_lightcurve" href="lightkurve.KeplerTargetPixelFile.to_lightcurve.html" />
     <link rel="prev" title="lightkurve.KeplerTargetPixelFile.wcs" href="lightkurve.KeplerTargetPixelFile.wcs.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,23 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.KeplerTargetPixelFile.get_coordinates">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     KeplerTargetPixelFile.get_coordinates()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,22 +1331,22 @@
               <div>
                 
   <section id="lightkurve-keplertargetpixelfile-get-coordinates">
-<h1>lightkurve.KeplerTargetPixelFile.get_coordinates<a class="headerlink" href="#lightkurve-keplertargetpixelfile-get-coordinates" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.KeplerTargetPixelFile.get_coordinates<a class="headerlink" href="#lightkurve-keplertargetpixelfile-get-coordinates" title="Link to this heading">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.KeplerTargetPixelFile.get_coordinates">
-<span class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></span><span class="sig-name descname"><span class="pre">get_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cadence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.get_coordinates" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></span><span class="sig-name descname"><span class="pre">get_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cadence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.get_coordinates" title="Link to this definition">¶</a></dt>
 <dd><p>Returns two 3D arrays of RA and Dec values in decimal degrees.</p>
 <p>If cadence number is given, returns 2D arrays for that cadence. If
 cadence is ‘all’ returns one RA, Dec value for each pixel in every cadence.
 Uses the WCS solution and the POS_CORR data from TPF header.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cadence</strong><span class="classifier">‘all’ or int</span></dt><dd><p>Which cadences to return the RA Dec coordinates for.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>ra</strong><span class="classifier">numpy array, same shape as tpf.flux[cadence]</span></dt><dd><p>Array containing RA values for every pixel, for every cadence.</p>
 </dd>
@@ -1388,7 +1400,7 @@ Uses the WCS solution and the POS_CORR data from TPF header.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

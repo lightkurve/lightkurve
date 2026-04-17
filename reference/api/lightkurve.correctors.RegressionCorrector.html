@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.correctors.RegressionCorrector &#8212; Lightkurve </title>
     
@@ -20,16 +19,15 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -37,7 +35,7 @@
     <link rel="next" title="lightkurve.correctors.RegressionCorrector.correct" href="lightkurve.correctors.RegressionCorrector.correct.html" />
     <link rel="prev" title="lightkurve.correctors.SFFCorrector.diagnose_arclength" href="lightkurve.correctors.SFFCorrector.diagnose_arclength.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -64,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -531,6 +529,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -558,11 +561,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1298,9 +1296,34 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.correctors.RegressionCorrector">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     RegressionCorrector
+    </span>
+   </code>
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#lightkurve.correctors.RegressionCorrector.__init__">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       RegressionCorrector.__init__()
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1321,10 +1344,10 @@
               <div>
                 
   <section id="lightkurve-correctors-regressioncorrector">
-<h1>lightkurve.correctors.RegressionCorrector<a class="headerlink" href="#lightkurve-correctors-regressioncorrector" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.correctors.RegressionCorrector<a class="headerlink" href="#lightkurve-correctors-regressioncorrector" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lightkurve.correctors.RegressionCorrector">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></span><span class="sig-name descname"><span class="pre">RegressionCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/regressioncorrector.html#RegressionCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.RegressionCorrector" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></span><span class="sig-name descname"><span class="pre">RegressionCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/regressioncorrector.html#RegressionCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.RegressionCorrector" title="Link to this definition">¶</a></dt>
 <dd><p>Remove noise using linear regression against a <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a>.</p>
 <div class="math notranslate nohighlight">
 \[\newcommand{\y}{\mathbf{y}}
@@ -1355,7 +1378,7 @@ the matrix equation:</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\covw^{-1} = (X^\\top \cov^{-1} X + \\boldsymbol\sigma^{-2}_\w I)\end{split}\]</div>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
 <dt><strong>lc</strong><span class="classifier"><a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt><dd><p>The light curve that needs to be corrected.</p>
 </dd>
@@ -1364,7 +1387,7 @@ the matrix equation:</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.correctors.RegressionCorrector.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/regressioncorrector.html#RegressionCorrector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.RegressionCorrector.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/regressioncorrector.html#RegressionCorrector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.RegressionCorrector.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Constructor method.</p>
 <p>The constructor shall:</p>
 <ul class="simple">
@@ -1375,11 +1398,7 @@ target pixel files, engineering data).</p></li>
 </dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.RegressionCorrector.__init__" title="lightkurve.correctors.RegressionCorrector.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(lc)</p></td>
 <td><p>Constructor method.</p></td>
@@ -1402,11 +1421,7 @@ target pixel files, engineering data).</p></li>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask</span></code></p></td>
 <td><p></p></td>
@@ -1467,7 +1482,7 @@ target pixel files, engineering data).</p></li>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

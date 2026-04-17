@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Downloading data &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <script src="../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="lightkurve.search_targetpixelfile" href="api/lightkurve.search_targetpixelfile.html" />
     <link rel="prev" title="API" href="index.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="api/lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1349,23 +1347,18 @@
               <div>
                 
   <section id="downloading-data">
-<span id="api-search"></span><h1>Downloading data<a class="headerlink" href="#downloading-data" title="Permalink to this headline">#</a></h1>
+<span id="api-search"></span><h1>Downloading data<a class="headerlink" href="#downloading-data" title="Link to this heading">¶</a></h1>
 <section id="searching-the-kepler-tess-archive">
-<h2>Searching the Kepler &amp; TESS archive<a class="headerlink" href="#searching-the-kepler-tess-archive" title="Permalink to this headline">#</a></h2>
+<h2>Searching the Kepler &amp; TESS archive<a class="headerlink" href="#searching-the-kepler-tess-archive" title="Link to this heading">¶</a></h2>
 <p>Lightkurve provides three functions which make it easy to search and download
 TESS and Kepler data products from the public data archive at MAST.</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.search_targetpixelfile.html#lightkurve.search_targetpixelfile" title="lightkurve.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code></a>(target[, radius, ...])</p></td>
 <td><p>Search the <a class="reference external" href="https://archive.stsci.edu">MAST data archive</a> for target pixel files.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.search_lightcurve.html#lightkurve.search_lightcurve" title="lightkurve.search_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurve</span></code></a>(target[, radius, exptime, ...])</p></td>
-<td><p><p>Search the <a class="reference external" href="https://archive.stsci.edu">MAST data archive</a> for light curves.</p>
-</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.search_tesscut.html#lightkurve.search_tesscut" title="lightkurve.search_tesscut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_tesscut</span></code></a>(target[, sector])</p></td>
 <td><p>Search the <a class="reference external" href="https://mast.stsci.edu/tesscut/">MAST TESSCut service</a> for a region of sky that is available as a TESS Full Frame Image cutout.</p></td>
@@ -1374,14 +1367,10 @@ TESS and Kepler data products from the public data archive at MAST.</p>
 </table>
 </section>
 <section id="downloading-data-products">
-<h2>Downloading data products<a class="headerlink" href="#downloading-data-products" title="Permalink to this headline">#</a></h2>
+<h2>Downloading data products<a class="headerlink" href="#downloading-data-products" title="Link to this heading">¶</a></h2>
 <p>The search functions listed above return a <a class="reference internal" href="api/lightkurve.SearchResult.html#lightkurve.SearchResult" title="lightkurve.SearchResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult</span></code></a> object,
 which provides an easy way to select and download data.</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.SearchResult.html#lightkurve.SearchResult" title="lightkurve.SearchResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult</span></code></a>([table])</p></td>
 <td><p>Container for the results returned by the search functions.</p></td>
@@ -1396,16 +1385,12 @@ which provides an easy way to select and download data.</p>
 </table>
 </section>
 <section id="filtering-search-results">
-<h2>Filtering search results<a class="headerlink" href="#filtering-search-results" title="Permalink to this headline">#</a></h2>
+<h2>Filtering search results<a class="headerlink" href="#filtering-search-results" title="Link to this heading">¶</a></h2>
 <p>The <a class="reference internal" href="api/lightkurve.SearchResult.html#lightkurve.SearchResult" title="lightkurve.SearchResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult</span></code></a> object provides convenient access to the essential metadata,
 which enables the search results to be filtered.
 For example, a search result can be filtered by exposure time using
 <code class="docutils literal notranslate"><span class="pre">result</span> <span class="pre">=</span> <span class="pre">result[result.exptime.value</span> <span class="pre">&lt;</span> <span class="pre">100]</span></code>.</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.SearchResult.mission.html#lightkurve.SearchResult.mission" title="lightkurve.SearchResult.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.mission</span></code></a></p></td>
 <td><p>Kepler quarter or TESS sector names for each data product found.</p></td>
@@ -1432,19 +1417,15 @@ For example, a search result can be filtered by exposure time using
 <td><p>Declination coordinate for each data product found.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.SearchResult.table.html#lightkurve.SearchResult.table" title="lightkurve.SearchResult.table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.table</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> containing the full search results returned by the MAST API.</p></td>
+<td><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> containing the full search results returned by the MAST API.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="customizing-search-results-display">
-<h2>Customizing search results display<a class="headerlink" href="#customizing-search-results-display" title="Permalink to this headline">#</a></h2>
+<h2>Customizing search results display<a class="headerlink" href="#customizing-search-results-display" title="Link to this heading">¶</a></h2>
 <p>Users can optionally include a list of extra columns in the default display of <a class="reference internal" href="api/lightkurve.SearchResult.html#lightkurve.SearchResult" title="lightkurve.SearchResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult</span></code></a> objects.</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.SearchResult.display_extra_columns.html#lightkurve.SearchResult.display_extra_columns" title="lightkurve.SearchResult.display_extra_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.display_extra_columns</span></code></a></p></td>
 <td><p>A list of extra columns to be included in the default display of the search result.</p></td>
@@ -1453,18 +1434,14 @@ For example, a search result can be filtered by exposure time using
 </table>
 </section>
 <section id="data-products-collection">
-<h2>Data products collection<a class="headerlink" href="#data-products-collection" title="Permalink to this headline">#</a></h2>
+<h2>Data products collection<a class="headerlink" href="#data-products-collection" title="Link to this heading">¶</a></h2>
 <p><a class="reference internal" href="api/lightkurve.SearchResult.download_all.html#lightkurve.SearchResult.download_all" title="lightkurve.SearchResult.download_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.download_all</span></code></a> returns a <a class="reference internal" href="api/lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a> or a
 <a class="reference internal" href="api/lightkurve.TargetPixelFileCollection.html#lightkurve.TargetPixelFileCollection" title="lightkurve.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a> object. They contain the data products, along with some convenience functions.</p>
 <p>A collection can also be further filtered using standard Python list syntax,
-and a subset of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> syntax.
+and a subset of <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a> syntax.
 For example, a collection can be filtered by TESS sectors using
 <code class="docutils literal notranslate"><span class="pre">lcc[(lcc.sector</span> <span class="pre">&gt;=</span> <span class="pre">13)</span> <span class="pre">&amp;</span> <span class="pre">(lcc.sector</span> <span class="pre">&lt;=</span> <span class="pre">19)]</span></code>.</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a>(lightcurves)</p></td>
 <td><p>Class to hold a collection of LightCurve objects.</p></td>
@@ -1551,7 +1528,7 @@ For example, a collection can be filtered by TESS sectors using
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

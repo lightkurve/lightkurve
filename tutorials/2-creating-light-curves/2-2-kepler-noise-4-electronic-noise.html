@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Instrumental Noise in Kepler and K2 #4: Electronic Noise &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="How to identify time-variable background noise (“rolling bands”)?" href="2-2-identifying-rolling-band.html" />
     <link rel="prev" title="Instrumental Noise in Kepler and K2 #3: Seasonal and Detector Effects" href="2-2-kepler-noise-3-seasonal-and-detector-effects.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -231,9 +227,9 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-2-kepler-noise-4-electronic-noise.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Instrumental-Noise-in-Kepler-and-K2-#4:-Electronic-Noise">
-<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #4: Electronic Noise<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#4:-Electronic-Noise" title="Permalink to this headline">#</a></h1>
+<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #4: Electronic Noise<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#4:-Electronic-Noise" title="Link to this heading">¶</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
 <p>By the end of this tutorial, you will be able to:</p>
 <ul class="simple">
 <li><p>Explain electronic crosstalk and how it manifests in <em>Kepler</em> data.</p></li>
@@ -242,11 +238,11 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">¶</a></h2>
 <p>This tutorial is the fourth part of a series on identifying instrumental and systematic sources of noise in <em>Kepler</em> and <em>K2</em> data. The first three tutorials in this series are suggested (but not necessary) reading for working through this one. Assumed knowledge for this tutorial is a working familiarity with <em>Kepler</em> light curve files, target pixel files, and their associated metadata.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
 <p>We’ll use <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to handle arrays for aperture masks, and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> to help with some plotting.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -262,11 +258,11 @@
 <hr class="docutils" />
 </section>
 <section id="1.-Background">
-<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">#</a></h2>
+<h2>1. Background<a class="headerlink" href="#1.-Background" title="Link to this heading">¶</a></h2>
 <p>The <em>Kepler</em> space telescope operated as a <em>photometer</em>: using charge-coupled devices (CCDs), <em>Kepler</em> collected photons and processed these as flux measurements. The detector array consisted of 25 modules, and 94.6 million pixels. With an instrument of this size, electronic noise issues are inevitable. In this tutorial, we’ll look at three major sources of electronic noise that occurred throughout both the <em>Kepler</em> and <em>K2</em> missions.</p>
 </section>
 <section id="2.-Crosstalk">
-<h2>2. Crosstalk<a class="headerlink" href="#2.-Crosstalk" title="Permalink to this headline">#</a></h2>
+<h2>2. Crosstalk<a class="headerlink" href="#2.-Crosstalk" title="Link to this heading">¶</a></h2>
 <p>Crosstalk refers to the phenomenon where an electronic signal from one channel of a device is transferred to another channel and causes noise. In <em>Kepler</em> and <em>K2</em> data, this often manifests as signal from one (usually bright) target appearing elsewhere on the detector. This is known as “video crosstalk,” and only has a significant effect when it occurs on the same module, due to the shielding between modules (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument
 Handbook</a> Section 6.3). <em>Kepler</em> crosstalk can also occur between the CCD modules and the Fine Guidance Sensors (FGS), and between either of these and the onboard clock. However, these kinds of crosstalk are well understood and corrected by the pipeline before data delivery. If you are interested in reading more about these types of crosstalk, they’re covered in
 Sections 6.2 and 6.4 of the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>.</p>
@@ -316,7 +312,7 @@ Warning: 25% (854/3384) of the cadences will be ignored due to the quality mask 
 <p>You can also check for yourself that the crosstalk source is unrelated to the galaxy by using Lightkurve’s <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.KeplerTargetPixelFile.interact.html">interact()</a> function offline and noting that the spreads of the two sources on the detector differ independently.</p>
 </section>
 <section id="3.-Rolling-Bands">
-<h2>3. Rolling Bands<a class="headerlink" href="#3.-Rolling-Bands" title="Permalink to this headline">#</a></h2>
+<h2>3. Rolling Bands<a class="headerlink" href="#3.-Rolling-Bands" title="Link to this heading">¶</a></h2>
 <p>The <em>Kepler</em> detector electronics have a high-frequency noise feature due to circuit self-resonance in the GHz range, which is aliased to lower frequencies by the pixel sampling rate for detector readout. These aliases lead to changing temperatures and pixel sensitivities on the focal plane, which appear as horizontal stripes in motion across on the detector. For a more technical exploration of this phenomenon, see Section 6.7 of the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument
 Handbook</a>.</p>
 <p>Let’s have a look at an example of rolling bands in <em>K2</em> data (as documented <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues/160">here</a>). This star, EPIC 211741417, has a rolling band passing across its aperture, beginning around 3306 BKJD (Barycentric <em>Kepler</em> Julian Date) days. First we’ll download some data, and see if the rolling bands are visible in a cadence taken from before the rolling band passes (left), and after it passes (right). We’ll also make sure the images have the same color
@@ -376,7 +372,7 @@ scale, so we can make a fair comparison.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;matplotlib.collections.PolyCollection at 0x32c86caf0&gt;
+&lt;matplotlib.collections.FillBetweenPolyCollection at 0x318c02e10&gt;
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -410,7 +406,7 @@ scale, so we can make a fair comparison.</p>
 tutorial</a> on checking for rolling bands in <em>Kepler</em> data.</p>
 </section>
 <section id="4.-Cosmic-Rays-and-Sudden-Pixel-Sensitivity-Dropout">
-<h2>4. Cosmic Rays and Sudden Pixel Sensitivity Dropout<a class="headerlink" href="#4.-Cosmic-Rays-and-Sudden-Pixel-Sensitivity-Dropout" title="Permalink to this headline">#</a></h2>
+<h2>4. Cosmic Rays and Sudden Pixel Sensitivity Dropout<a class="headerlink" href="#4.-Cosmic-Rays-and-Sudden-Pixel-Sensitivity-Dropout" title="Link to this heading">¶</a></h2>
 <p>In the first tutorial in this series, we covered cosmic rays as single-cadence quality events. We saw that when a cosmic ray hits a pixel on the detector, it can momentarily increase that pixel’s flux reading by injecting noise in between readouts. However, there are multiple other consequences of cosmic rays on the detector that occurred over the course of the <em>Kepler</em> and <em>K2</em> missions.</p>
 <p>Sudden Pixel Sensitivity Dropout (SPSD) occurs when a cosmic ray <em>reduces</em> the sensitivity of a group of pixels where it lands. SPSD events are categorized as medium-term and long-term (or permanent) damage. In medium-term events, the effected pixels will gradually return to their pre-SPSD sensitivity. Long-term damage would require <a class="reference external" href="https://en.wikipedia.org/wiki/Annealing_(metallurgy)">annealing</a> to fix, which could not be done on the <em>Kepler</em> telescope, and as such is materially equivalent
 to permanent damage. Pixels affected by long-term or permanent damage retained their decreased sensitivity throughout the mission. For further reading, see the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.9.</p>
@@ -478,12 +474,12 @@ to permanent damage. Pixels affected by long-term or permanent damage retained t
 </div>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">¶</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-29</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -735,7 +731,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

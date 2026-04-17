@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.periodogram.Periodogram.smooth &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.periodogram.Periodogram.to_seismology" href="lightkurve.periodogram.Periodogram.to_seismology.html" />
     <link rel="prev" title="lightkurve.periodogram.Periodogram.show_properties" href="lightkurve.periodogram.Periodogram.show_properties.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,23 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.periodogram.Periodogram.smooth">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     Periodogram.smooth()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,17 +1331,17 @@
               <div>
                 
   <section id="lightkurve-periodogram-periodogram-smooth">
-<h1>lightkurve.periodogram.Periodogram.smooth<a class="headerlink" href="#lightkurve-periodogram-periodogram-smooth" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.periodogram.Periodogram.smooth<a class="headerlink" href="#lightkurve-periodogram-periodogram-smooth" title="Link to this heading">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.periodogram.Periodogram.smooth">
-<span class="sig-prename descclassname"><span class="pre">Periodogram.</span></span><span class="sig-name descname"><span class="pre">smooth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'boxkernel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/periodogram.html#Periodogram.smooth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.periodogram.Periodogram.smooth" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">Periodogram.</span></span><span class="sig-name descname"><span class="pre">smooth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'boxkernel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/periodogram.html#Periodogram.smooth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.periodogram.Periodogram.smooth" title="Link to this definition">¶</a></dt>
 <dd><p>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</p>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is set to ‘boxkernel’, this method will smooth the power
 spectrum by convolving with a numpy Box1DKernel with a width of
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_width</span></code>, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span> <span class="pre">width</span></code> is in units of frequency.
 This is best for filtering out noise while maintaining seismic mode
 peaks. This method requires the Periodogram to have an evenly spaced
-grid of frequencies. A <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised if this is
+grid of frequencies. A <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised if this is
 not the case.</p>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is set to ‘logmedian’, it smooths the power spectrum using
 a moving median which moves across the power spectrum in a steps of</p>
@@ -1354,7 +1366,7 @@ power has a mean value of unity.  (note the signal-to-noise power is
 really the signal plus noise divided by the noise and hence should be
 unity in the absence of any signal)</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>method</strong><span class="classifier">str, one of ‘boxkernel’ or ‘logmedian’</span></dt><dd><p>The smoothing method to use. Defaults to ‘boxkernel’.</p>
 </dd>
@@ -1365,7 +1377,7 @@ in log10(frequency) space.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
 <dt><strong>smoothed_pg</strong><span class="classifier"><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt><dd><p>Returns a new <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object in which the power spectrum
 has been smoothed.</p>
@@ -1418,7 +1430,7 @@ has been smoothed.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

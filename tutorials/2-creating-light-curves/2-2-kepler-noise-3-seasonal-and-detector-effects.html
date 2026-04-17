@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Instrumental Noise in Kepler and K2 #3: Seasonal and Detector Effects &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Instrumental Noise in Kepler and K2 #4: Electronic Noise" href="2-2-kepler-noise-4-electronic-noise.html" />
     <link rel="prev" title="Instrumental Noise in Kepler and K2 #2: Spurious Signals and Time Sampling Effects" href="2-2-kepler-noise-2-spurious-signals-and-time-sampling-effects.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -231,9 +227,9 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-2-kepler-noise-3-seasonal-and-detector-effects.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Instrumental-Noise-in-Kepler-and-K2-#3:-Seasonal-and-Detector-Effects">
-<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #3: Seasonal and Detector Effects<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#3:-Seasonal-and-Detector-Effects" title="Permalink to this headline">#</a></h1>
+<h1>Instrumental Noise in <em>Kepler</em> and <em>K2</em> #3: Seasonal and Detector Effects<a class="headerlink" href="#Instrumental-Noise-in-Kepler-and-K2-#3:-Seasonal-and-Detector-Effects" title="Link to this heading">¶</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Be able to identify changes in data collection and processing caused by the <em>Kepler</em> mission’s seasonal cycles.</p></li>
@@ -242,11 +238,11 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">¶</a></h2>
 <p>This notebook is the third part of a series on identifying instrumental and systematic sources of noise in <em>Kepler</em> and <em>K2</em> data. The first two tutorials in this series are suggested (but not necessary) reading for working through this one. Assumed knowledge for this tutorial is a working familiarity with <em>Kepler</em> light curve files, target pixel files, and their associated metadata, as well as a basic understanding of the transit method for detecting exoplants.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
 <p>We’ll use <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> for downloading and handling <em>Kepler</em> data throughout this tutorial. We’ll also use <a class="reference external" href="https://numpy.org/">NumPy</a> to handle arrays for aperture masks, and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> to help with some plotting.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -263,12 +259,12 @@
 <hr class="docutils" />
 </section>
 <section id="1.-Background">
-<h2>1. Background<a class="headerlink" href="#1.-Background" title="Permalink to this headline">#</a></h2>
+<h2>1. Background<a class="headerlink" href="#1.-Background" title="Link to this heading">¶</a></h2>
 <p>The <em>Kepler</em> telescope observed the same area of sky for four years, rotating every three months and dividing the mission into 18 observing quarters. This meant that the same star would fall on four different modules — and different pixels — throughout the mission.</p>
 <p>In this tutorial, we’ll explore three types of systematic effects caused by features of the detector, including those which are influenced by seasonal rotation. We will not cover any effects of the onboard electronics, nor the electronic response to external events, such as cosmic rays. These will be covered in the fourth and final tutorial in this series on instrumental noise.</p>
 </section>
 <section id="2.-Differential-Velocity-Aberration-and-Image-Motion">
-<h2>2. Differential Velocity Aberration and Image Motion<a class="headerlink" href="#2.-Differential-Velocity-Aberration-and-Image-Motion" title="Permalink to this headline">#</a></h2>
+<h2>2. Differential Velocity Aberration and Image Motion<a class="headerlink" href="#2.-Differential-Velocity-Aberration-and-Image-Motion" title="Link to this heading">¶</a></h2>
 <p>In this section, we’ll look at the changes in a star’s position on two different scales: between quarters, and within one quarter.</p>
 <p>Throughout the four-year nominal <em>Kepler</em> mission, differential velocity aberration (DVA) was the main cause of changes in stellar positions (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 3.9). To understand DVA, first imagine the <em>Kepler</em> telescope travelling through space. We can draw a “velocity vector” in the direction of the telescope’s motion. We can draw similar
 vectors from every point on the focal plane, which represent lines of sight. The angle between the velocity vector and any given line of sight varies across the detector. Because the velocity vector changed each quarter during the <em>Kepler</em> mission, the effective diameter of <em>Kepler’s</em> field of view changed by 6 arcseconds every year of the mission. This effect is on order 100 times greater than the effects of pointing instability; it leads to low frequency noise, which can be removed by light
@@ -335,7 +331,7 @@ several 100ths of a pixel per quarter.</p>
 </div>
 </section>
 <section id="3.-Quarter-Boundary-Discontinuities">
-<h2>3. Quarter Boundary Discontinuities<a class="headerlink" href="#3.-Quarter-Boundary-Discontinuities" title="Permalink to this headline">#</a></h2>
+<h2>3. Quarter Boundary Discontinuities<a class="headerlink" href="#3.-Quarter-Boundary-Discontinuities" title="Link to this heading">¶</a></h2>
 <p>When a star was observed by new pixels in a new quarter, it was also subject to a different pixel response function (PRF). Because of this, the data processing pipeline also changed its optimal aperture, used to select pixels for aperture photometry.</p>
 <p>For most stars, these changes were not drastic. Additionally, incorrect optimal apertures in the early mission were corrected in later data releases (<a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/Data_Characteristics.pdf">Kepler Data Characteristics Handbook</a>, Section 5.7, and <a class="reference external" href="https://iopscience.iop.org/article/10.1088/1538-3873/128/970/124501/pdf">Smith et al., 2016</a>), reducing many disparities between quarters. However, some stars retain
 a degree of variation across their optimal apertures, particularly those in crowded fields.</p>
@@ -425,7 +421,7 @@ Quarter 17 standard deviation: 9.2e-04
 <p>In SAP and PDCSAP data, quarter boundary discontinuities are mostly present in stars in crowded fields. However, when performing custom aperture photometry, it’s useful to be aware of this phenomenon and factor it into your choice of aperture and/or light curve corrections procedure.</p>
 </section>
 <section id="4.-Ghosts-and-Scattered-Light">
-<h2>4. Ghosts and Scattered Light<a class="headerlink" href="#4.-Ghosts-and-Scattered-Light" title="Permalink to this headline">#</a></h2>
+<h2>4. Ghosts and Scattered Light<a class="headerlink" href="#4.-Ghosts-and-Scattered-Light" title="Link to this heading">¶</a></h2>
 <p>Moving away from seasonal effects now, the final phenomenon we’ll look at in this tutorial is a natural consequence of the construction of the <em>Kepler</em> telescope, as documented in the <a class="reference external" href="https://archive.stsci.edu/files/live/sites/mast/files/home/missions-and-data/kepler/_documents/KSCI-19033-002-instrument-hb.pdf">Kepler Instrument Handbook</a>, Section 3.10. Scattered light on the detector results from bright stars which lie near the aluminium masking at the edges of modules, or between
 charge-coupled device (CCD) chips. As this scattering occurs in the vicinity of these bright stars, it is less likely to affect photometry beyond regular contamination, and the more diffuse it is, the less impact it has.</p>
 <p>Ghost images are the result of reflections on the CCDs. One well-documented <em>Kepler</em> ghost is the Schmidt Corrector Ghost, which causes stars to be reflected around the telescope’s optical axis. However, these reflections are low magnitude. The type of ghost you’re more likely to encounter is reflected light from very bright stars, bouncing off the field flattener lens and returning diffusely to the CCDs. The Schmidt Corrector and the field flattener are described in Sections 3.2.2 and 3.2.3 of
@@ -521,12 +517,12 @@ aperture and in background pixels.</p>
 </div>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">¶</a></h2>
 <p><strong>Author:</strong> <a class="reference external" href="http://orcid.org/0000-0001-8196-516X">Isabel Colman</a> (<code class="docutils literal notranslate"><span class="pre">isabel.colman&#64;sydney.edu.au</span></code>)</p>
 <p><strong>Updated on:</strong> 2020-09-29</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or <code class="docutils literal notranslate"><span class="pre">astropy</span></code> for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
@@ -778,7 +774,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.KeplerTargetPixelFile.query_solar_system_objects &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.KeplerTargetPixelFile.plot" href="lightkurve.KeplerTargetPixelFile.plot.html" />
     <link rel="prev" title="lightkurve.KeplerTargetPixelFile.estimate_centroids" href="lightkurve.KeplerTargetPixelFile.estimate_centroids.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,23 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.KeplerTargetPixelFile.query_solar_system_objects">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     KeplerTargetPixelFile.query_solar_system_objects()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,10 +1331,10 @@
               <div>
                 
   <section id="lightkurve-keplertargetpixelfile-query-solar-system-objects">
-<h1>lightkurve.KeplerTargetPixelFile.query_solar_system_objects<a class="headerlink" href="#lightkurve-keplertargetpixelfile-query-solar-system-objects" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.KeplerTargetPixelFile.query_solar_system_objects<a class="headerlink" href="#lightkurve-keplertargetpixelfile-query-solar-system-objects" title="Link to this heading">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.KeplerTargetPixelFile.query_solar_system_objects">
-<span class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></span><span class="sig-name descname"><span class="pre">query_solar_system_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cadence_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'outliers'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.query_solar_system_objects" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></span><span class="sig-name descname"><span class="pre">query_solar_system_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cadence_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'outliers'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.query_solar_system_objects" title="Link to this definition">¶</a></dt>
 <dd><p>Returns a list of asteroids or comets which affected the target pixel files.</p>
 <p>Light curves of stars or galaxies are frequently affected by solar
 system bodies (e.g. asteroids, comets, planets).  These objects can move
@@ -1339,7 +1351,7 @@ vicinity of the target during the span of the light curve.</p>
 which returns a list of asteroids/comets/planets given a location, time,
 and search cone.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>cadence_mask</strong><span class="classifier">str, or boolean array with length of self.time</span></dt><dd><p>mask in time to select which frames or points should be searched for SSOs.
 Default “outliers” will search for SSOs at points that are <code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code> from the mean.
@@ -1352,8 +1364,8 @@ all pixels in the TPF.</p>
 <dt><strong>sigma</strong><span class="classifier">optional, float</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask</span></code> is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">&quot;outlier&quot;</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code> will be used to identify
 outliers.</p>
 </dd>
-<dt><strong>cache</strong><span class="classifier">optional, bool</span></dt><dd><p>If True will cache the search result in the astropy cache. Set to False
-to request the search again.</p>
+<dt><strong>cache</strong><span class="classifier">optional, bool or “update”</span></dt><dd><p>If True will cache the search result in the astropy cache. Set to False
+to request the search again or “update” to update files in the astropy cache</p>
 </dd>
 <dt><strong>return_mask: optional, bool</strong></dt><dd><p>If True will return a boolean mask in time alongside the result</p>
 </dd>
@@ -1361,7 +1373,7 @@ to request the search again.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>result</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>DataFrame containing the list objects in frames that were identified to contain
 SSOs.</p>
@@ -1381,11 +1393,11 @@ and search for specific times by passing <code class="xref py py-obj docutils li
 </ul>
 <p class="rubric">Examples</p>
 <p>Find if there are SSOs affecting the target pixel file for the given time frame:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df_sso</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">query_solar_system_objects</span><span class="p">(</span><span class="n">cadence_mask</span><span class="o">=</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;=</span> <span class="mf">2014.1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="mf">2014.9</span><span class="p">))</span>  
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df_sso</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">query_solar_system_objects</span><span class="p">(</span><span class="n">cadence_mask</span><span class="o">=</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;=</span> <span class="mf">2014.1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">value</span> <span class="o">&lt;=</span> <span class="mf">2014.9</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Find if there are SSOs affecting the target pixel file for all times, but it will be much slower:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df_sso</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">query_solar_system_objects</span><span class="p">(</span><span class="n">cadence_mask</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>  
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df_sso</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">query_solar_system_objects</span><span class="p">(</span><span class="n">cadence_mask</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1433,7 +1445,7 @@ and search for specific times by passing <code class="xref py py-obj docutils li
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

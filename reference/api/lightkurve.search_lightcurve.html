@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.search_lightcurve &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.search_tesscut" href="lightkurve.search_tesscut.html" />
     <link rel="prev" title="lightkurve.search_targetpixelfile" href="lightkurve.search_targetpixelfile.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,23 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.search_lightcurve">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     search_lightcurve()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,31 +1331,31 @@
               <div>
                 
   <section id="lightkurve-search-lightcurve">
-<h1>lightkurve.search_lightcurve<a class="headerlink" href="#lightkurve-search-lightcurve" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.search_lightcurve<a class="headerlink" href="#lightkurve-search-lightcurve" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="lightkurve.search_lightcurve">
-<span class="sig-prename descclassname"><span class="pre">lightkurve.</span></span><span class="sig-name descname"><span class="pre">search_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('Kepler',</span> <span class="pre">'K2',</span> <span class="pre">'TESS')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quarter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">campaign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#search_lightcurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.search_lightcurve" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">lightkurve.</span></span><span class="sig-name descname"><span class="pre">search_lightcurve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exptime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cadence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('Kepler',</span> <span class="pre">'K2',</span> <span class="pre">'TESS')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quarter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">campaign</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#search_lightcurve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.search_lightcurve" title="Link to this definition">¶</a></dt>
 <dd><p>Search the <a class="reference external" href="https://archive.stsci.edu">MAST data archive</a> for light curves.</p>
 <p>This function fetches a data table that lists the Light Curve Files
 that fall within a region of sky centered around the position of <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>
 and within a cone of a given <code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code>. If no value is provided for <code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code>,
 only a single target will be returned.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>target</strong><span class="classifier">str, int, or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object</span></dt><dd><p>Target around which to search. Valid inputs include:</p>
+<dt><strong>target</strong><span class="classifier">str, int, or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object</span></dt><dd><p>Target around which to search. Valid inputs include:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The name of the object as a string, e.g. “Kepler-10”.</p></li>
 <li><p>The KIC or EPIC identifier as an integer, e.g. 11904151.</p></li>
 <li><p>A coordinate string in decimal format, e.g. “285.67942179 +50.24130576”.</p></li>
 <li><p>A coordinate string in sexagesimal format, e.g. “19:02:43.1 +50:14:28.7”.</p></li>
-<li><p>An <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object.</p></li>
+<li><p>An <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object.</p></li>
 </ul>
 </div></blockquote>
 </dd>
-<dt><strong>radius</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Conesearch radius.  If a float is given it will be assumed to be in
-units of arcseconds.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then we default to 0.0001 arcsec.</p>
+<dt><strong>radius</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Conesearch radius.  If a float is given it will be assumed to be in
+units of arcseconds.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then we default to 0.0001 arcsec.</p>
 </dd>
 <dt><strong>exptime</strong><span class="classifier">‘long’, ‘short’, ‘fast’, or float</span></dt><dd><p>‘long’ selects 10-min and 30-min cadence products;
 ‘short’ selects 1-min and 2-min products;
@@ -1374,7 +1386,7 @@ By default all months will be returned.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl>
 <dt><strong>result</strong><span class="classifier"><a class="reference internal" href="lightkurve.SearchResult.html#lightkurve.SearchResult" title="lightkurve.SearchResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchResult</span></code></a> object</span></dt><dd><p>Object detailing the data products found.</p>
 </dd>
@@ -1386,9 +1398,9 @@ By default all months will be returned.</p>
 query and download data. Before instantiating a <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object or
 downloading any science products, we can identify potential desired targets with
 <a class="reference internal" href="#lightkurve.search_lightcurve" title="lightkurve.search_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurve</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">lightkurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_lightcurve</span>  
-<span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">)</span>  
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>  
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">lightkurve</span><span class="w"> </span><span class="kn">import</span> <span class="n">search_lightcurve</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The above code will query mast for lightcurve files available for the known
@@ -1397,32 +1409,32 @@ data products. Because Kepler-10 was observed in multiple quarters and sectors
 by both Kepler and TESS, the search will return many dozen results.
 If we want to narrow down the search to only return Kepler light curves
 in long cadence, we can use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>   
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>  
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>That is better, we now see 15 light curves corresponding to 15 Kepler quarters.
 If we want to download a <a class="reference internal" href="lightkurve.LightCurveCollection.html#lightkurve.LightCurveCollection" title="lightkurve.collections.LightCurveCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code></a> object containing all
 15 observations, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>  
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>or we can specify the downloaded products by selecting a specific row using
 rectangular brackets, for example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_result</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>The above line of code will only search and download Quarter 2 data and
 create a <a class="reference internal" href="lightkurve.LightCurve.html#lightkurve.LightCurve" title="lightkurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object called lc.</p>
 <p>We can also pass a radius into <a class="reference internal" href="#lightkurve.search_lightcurve" title="lightkurve.search_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurve</span></code></a> to perform a cone search:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>  
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This will display a table containing all targets within 100 arcseconds of
 Kepler-10 and in Quarter 4.  We can then download a
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFile</span></code> containing all these
 light curves using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>  
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">exptime</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1470,7 +1482,7 @@ light curves using:</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

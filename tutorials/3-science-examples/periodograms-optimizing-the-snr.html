@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>How to improve the signal-to-noise of a periodogram? &#8212; Lightkurve </title>
     
@@ -20,17 +19,16 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -38,7 +36,7 @@
     <link rel="next" title="How to estimate a star’s mass and radius using asteroseismology" href="asteroseismology-estimating-mass-and-radius.html" />
     <link rel="prev" title="Verifying the location of a periodic signal in the pixel data" href="periodograms-verifying-the-location-of-a-signal.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +63,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -201,7 +199,7 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/3-science-examples/periodograms-optimizing-the-snr.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-improve-the-signal-to-noise-of-a-periodogram?">
-<h1>How to improve the signal-to-noise of a periodogram?<a class="headerlink" href="#How-to-improve-the-signal-to-noise-of-a-periodogram?" title="Permalink to this headline">#</a></h1>
+<h1>How to improve the signal-to-noise of a periodogram?<a class="headerlink" href="#How-to-improve-the-signal-to-noise-of-a-periodogram?" title="Link to this heading">¶</a></h1>
 <p>Asteroseismology is the study of stellar oscillations. To see them, we usually want to transfer from the <em>time domain</em> that light curves are in to the <em>frequency domain</em>. We can do that with methods such as Fourier Transforms or Lomb-Scargle Periodograms.</p>
 <p><em>Lightkurve</em> has built in methods for working with data in the frequency domain in the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve.html">LombScarglePeriodogram</a> class.</p>
 <p>Below we demonstrate some of these functionalities. In particular, we will demonstrate how one may optimize the signal-to-noise of a periodogram by varying the detrending, varying the aperture mask, or combining data from multiple observing periods.</p>
@@ -298,7 +296,7 @@ linear interpolation of the nearest neighbours. This creates an almost perfectly
 </div>
 </div>
 <section id="1.-Varying-the-SFF-Motion-Correction">
-<h2>1. Varying the SFF Motion Correction<a class="headerlink" href="#1.-Varying-the-SFF-Motion-Correction" title="Permalink to this headline">#</a></h2>
+<h2>1. Varying the SFF Motion Correction<a class="headerlink" href="#1.-Varying-the-SFF-Motion-Correction" title="Link to this heading">¶</a></h2>
 <p>Unfortunately there is some ringing going on…there is a periodicity in the data due to the K2 motion. We can see below when we plot the data in “Period” space instead of “Frequency” space there is a significant periodicity at ~ 6 hours.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -385,7 +383,7 @@ linear interpolation of the nearest neighbours. This creates an almost perfectly
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-100%|█████████████████████████████████████████████| 3/3 [00:09&lt;00:00,  3.31s/it]
+100%|████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:11&lt;00:00,  3.73s/it]
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -398,7 +396,7 @@ linear interpolation of the nearest neighbours. This creates an almost perfectly
 <p>It looks like there is a significant effect on the oscillation modes as we vary the window size. When using K2 data for detecting these oscillations it is important to understand and mitigate the effects of detrending to ensure the modes have the highest possible signal to noise ratio.</p>
 </section>
 <section id="2.-Varying-the-aperture-mask-size">
-<h2>2. Varying the aperture mask size<a class="headerlink" href="#2.-Varying-the-aperture-mask-size" title="Permalink to this headline">#</a></h2>
+<h2>2. Varying the aperture mask size<a class="headerlink" href="#2.-Varying-the-aperture-mask-size" title="Link to this heading">¶</a></h2>
 <p>We can also easily change the aperture size. If the aperture is too small, increasing the aperture size should allow us to include more of the target flux. If there is a contaminant nearby, decreasing the aperture may increase our singal to noise.</p>
 <p>Below we create two alternative apertures for the target. In this case we’ll create contiguous apertures where pixels have a value greater than 50 and 2<span class="math notranslate nohighlight">\(\;\sigma\)</span> above the median, respectively.</p>
 <div class="nbinput nblast docutils container">
@@ -497,7 +495,7 @@ linear interpolation of the nearest neighbours. This creates an almost perfectly
 <p>By increasing our aperture size and including more pixels here we have increased the signal to noise of the oscillation modes of this red giant.</p>
 </section>
 <section id="3.-Using-data-from-multiple-campaigns">
-<h2>3. Using data from multiple campaigns<a class="headerlink" href="#3.-Using-data-from-multiple-campaigns" title="Permalink to this headline">#</a></h2>
+<h2>3. Using data from multiple campaigns<a class="headerlink" href="#3.-Using-data-from-multiple-campaigns" title="Link to this heading">¶</a></h2>
 <p>Finally, this target was actually observed twice by K2, once in April 2015 in Campaign 5 and once in December 2017 in Campaign 16. We can get both of these data sets and compare the results.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
@@ -587,7 +585,7 @@ linear interpolation of the nearest neighbours. This creates an almost perfectly
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Visualizing periodic signals using a river plot &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Creating periodograms and identifying significant peaks" href="periodograms-creating-periodograms.html" />
     <link rel="prev" title="Machine learning style preprocessing with lightkurve" href="exoplanets-machine-learning-preprocessing.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -226,9 +222,9 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/3-science-examples/exoplanets-visualizing-periodic-signals-using-a-river-plot.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Visualizing-periodic-signals-using-a-river-plot">
-<h1>Visualizing periodic signals using a river plot<a class="headerlink" href="#Visualizing-periodic-signals-using-a-river-plot" title="Permalink to this headline">#</a></h1>
+<h1>Visualizing periodic signals using a river plot<a class="headerlink" href="#Visualizing-periodic-signals-using-a-river-plot" title="Link to this heading">¶</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Understand what a river plot is.</p></li>
@@ -237,13 +233,13 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">¶</a></h2>
 <p>A “river plot” is a method to visualize periodic signals that vary over time. It is created by breaking a light curve into segments of equal length, such as the period of a planet orbiting a star, and displaying the segments side by side to allow the flux values to be compared. This allows you to examine how an entire light curve varies relative to a fixed period. It is similar to a “<a class="reference external" href="https://en.wikipedia.org/wiki/Waterfall_plot">waterfall plot</a>” which is used to similarly analyze time
 variation in spectra.</p>
 <p>This tutorial demonstrates how to create a river plot using <a class="reference external" href="https://lightkurve.github.io/lightkurve">Lightkurve</a>.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
 <p>This tutorial requires the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> package, which uses <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -257,7 +253,7 @@ variation in spectra.</p>
 <hr class="docutils" />
 </section>
 <section id="1.-When-is-a-River-Plot-Useful?">
-<h2>1. When is a River Plot Useful?<a class="headerlink" href="#1.-When-is-a-River-Plot-Useful?" title="Permalink to this headline">#</a></h2>
+<h2>1. When is a River Plot Useful?<a class="headerlink" href="#1.-When-is-a-River-Plot-Useful?" title="Link to this heading">¶</a></h2>
 <p>When we are looking for periodic signals in a light curve, sometimes it can be useful to see how they evolve over time. You can do this using the Lightkurve method <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.FoldedLightCurve.plot_river.html#lightkurve.FoldedLightCurve.plot_river">plot_river</a> on a <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/foldedlightcurve.html">FoldedLightCurve</a> object.</p>
 <p>We start by downloading some example data. We’ll use the target KIC 6185476, which is also known as KOI-227. This object exhibits strong transit timing variations (TTVs), that is, the transit time of the planet candidate changes over time. This happens when the orbit of a planet is not precisely periodic due to, for example, the presence of multiple moving stars or planets in the system.</p>
 <p>We can use Lightkurve’s <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_lightcurve.html">search_lightcurve</a> function to get all of the available light curves from MAST and stitch them together.</p>
@@ -323,7 +319,7 @@ variation in spectra.</p>
 <p>It looks like there is a concentration of points that are around phase of <code class="docutils literal notranslate"><span class="pre">0</span></code>, but they don’t seem to line up nicely. This is caused by the transit of the planet occurring slightly before or after you would predict using a constant period. Cases of planets with meaningful TTVs are well suited for further analysis using a river plot.</p>
 </section>
 <section id="2.-Creating-a-River-Plot">
-<h2>2. Creating a River Plot<a class="headerlink" href="#2.-Creating-a-River-Plot" title="Permalink to this headline">#</a></h2>
+<h2>2. Creating a River Plot<a class="headerlink" href="#2.-Creating-a-River-Plot" title="Link to this heading">¶</a></h2>
 <p>We can use the <code class="docutils literal notranslate"><span class="pre">plot_river</span></code> method to plot the light curve in a more legible way. This must be performed on a folded <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -359,7 +355,7 @@ variation in spectra.</p>
 </div>
 </section>
 <section id="3.-Changing-the-Scale-to-Standard-Deviation">
-<h2>3. Changing the Scale to Standard Deviation<a class="headerlink" href="#3.-Changing-the-Scale-to-Standard-Deviation" title="Permalink to this headline">#</a></h2>
+<h2>3. Changing the Scale to Standard Deviation<a class="headerlink" href="#3.-Changing-the-Scale-to-Standard-Deviation" title="Link to this heading">¶</a></h2>
 <p>Finally, we can also use <code class="docutils literal notranslate"><span class="pre">plot_river</span></code> to look at the folded light curve in terms of standard deviation. This is useful when looking for signals that are of high significance.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -379,12 +375,12 @@ variation in spectra.</p>
 <p>We see in the above river plot that there is a signal around phase of <code class="docutils literal notranslate"><span class="pre">0</span></code> (our planet candidate) that has a clear deviation from the mean, showing that it is a significant detection.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">¶</a></h2>
 <p><strong>Authors:</strong> Christina Hedges (<a class="reference external" href="mailto:christinalouisehedges&#37;&#52;&#48;gmail&#46;com">christinalouisehedges<span>&#64;</span>gmail<span>&#46;</span>com</a>), Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>)</p>
 <p><strong>Updated On:</strong> 2020-09-29</p>
 </section>
 <section id="Citing-Lightkurve-and-its-Dependencies">
-<h2>Citing Lightkurve and its Dependencies<a class="headerlink" href="#Citing-Lightkurve-and-its-Dependencies" title="Permalink to this headline">#</a></h2>
+<h2>Citing Lightkurve and its Dependencies<a class="headerlink" href="#Citing-Lightkurve-and-its-Dependencies" title="Link to this heading">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies for published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -636,7 +632,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

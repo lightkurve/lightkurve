@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Removing noise from K2 and TESS light curves using Pixel Level Decorrelation (PLDCorrector) &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Removing noise from K2 light curves using Self Flat Fielding (SFFCorrector)" href="2-3-k2-sffcorrector.html" />
     <link rel="prev" title="Removing scattered light from TESS light curves using linear regression (RegressionCorrector)" href="2-3-removing-scattered-light-using-regressioncorrector.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -269,9 +265,9 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-3-k2-pldcorrector.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Removing-noise-from-K2-and-TESS-light-curves-using-Pixel-Level-Decorrelation-(PLDCorrector)">
-<h1>Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-K2-and-TESS-light-curves-using-Pixel-Level-Decorrelation-(PLDCorrector)" title="Permalink to this headline">#</a></h1>
+<h1>Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-K2-and-TESS-light-curves-using-Pixel-Level-Decorrelation-(PLDCorrector)" title="Link to this heading">¶</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Understand how to apply the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector</a> tool to remove instrumental noise from <em>K2</em> and <em>TESS</em> light curves.</p></li>
@@ -280,7 +276,7 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">¶</a></h2>
 <p>The <a class="reference external" href="https://archive.stsci.edu/k2">K2</a> and <a class="reference external" href="https://archive.stsci.edu/tess">TESS</a> missions both provide high-precision photometry for thousands of exoplanet candidates. However, observations by both telescopes can be muddled by instrumental systematic trends, making exoplanet detection or stellar characterization difficult.</p>
 <p>Pixel Level Decorrelation (PLD) is a method that has primarily been used to remove systematic trends introduced by small spacecraft motions during observations, and has been shown to be successful at improving the precision of data taken by the <em>Spitzer</em> space telescope (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2015ApJ...805..132D/abstract">Deming et al. 2015</a>) and the <em>K2</em> mission (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2016AJ....152..100L/abstract">Luger et al. 2016</a>;
 <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2018AJ....156...99L/abstract">2018</a>). PLD works by identifying a set of trends in the pixels surrounding the target star, and performing linear regression to create a combination of these trends that effectively models the systematic noise introduced by spacecraft motion. This noise model is then subtracted from the uncorrected light curve.</p>
@@ -290,7 +286,7 @@ best implement PLD. The PLDCorrector is a special case of the Lightkurve <a clas
 <p>Before reading this tutorial, it is recommended to first familiarize yourself with using target pixel file (TPF) products and light curve products with Lightkurve.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
 <p>We only need to import the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> package for this tutorial, which in turn uses <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -304,7 +300,7 @@ best implement PLD. The PLDCorrector is a special case of the Lightkurve <a clas
 <hr class="docutils" />
 </section>
 <section id="1.-Applying-PLD-to-a-K2-Light-Curve">
-<h2>1. Applying PLD to a <em>K2</em> Light Curve<a class="headerlink" href="#1.-Applying-PLD-to-a-K2-Light-Curve" title="Permalink to this headline">#</a></h2>
+<h2>1. Applying PLD to a <em>K2</em> Light Curve<a class="headerlink" href="#1.-Applying-PLD-to-a-K2-Light-Curve" title="Link to this heading">¶</a></h2>
 <p>The dominant source of noise in <em>K2</em> data is created by the motion of the <em>Kepler</em> spacecraft due to periodic thruster firings. This causes stars to drift across different pixels on the detector, which have varied sensitivity. There are two classes of sensitivity variation on a charge-couped device (CCD) detector — variation between pixels (inter-pixel) and variation within each pixel (intra-pixel). Both inter- and intra-pixel sensitivity variations are present on the <em>Kepler</em> detector, which
 ultimately causes different flux levels to be detected as the target’s Point Spread Function (PSF) drifts across the variations, introducing the systematic trends.</p>
 <p>The <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector</a> uses information from nearby pixels to create a noise model, so we need to use the <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/targetpixelfile.py#L94">TargetPixelFile</a> data product (for more information, see the tutorial on using <em>Kepler</em> target pixel file products). We can use the
@@ -412,14 +408,14 @@ PLDCorrector (ID: EPIC 212779596)
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Uncorrected CDPP = 2928 ppm
-Corrected CDPP = 106 ppm
+Corrected CDPP = 105 ppm
 </pre></div></div>
 </div>
 <p>By this metric, the photometric precision improved by more than a factor of 25 after applying PLD.</p>
 <p>Another important trait of PLD is that long-term variability trends in the light curve are preserved. In this example, we can see the stellar rotation of K2-199 as the sinusoidal signal left in the light curve after correction. This is done by fitting a polynomial spline model to the light curve while simultaneously fitting the noise model, because the uncorrected observation is a combination of the signals.</p>
 </section>
 <section id="2.-Diagnosing-the-Success-of-the-Correction">
-<h2>2. Diagnosing the Success of the Correction<a class="headerlink" href="#2.-Diagnosing-the-Success-of-the-Correction" title="Permalink to this headline">#</a></h2>
+<h2>2. Diagnosing the Success of the Correction<a class="headerlink" href="#2.-Diagnosing-the-Success-of-the-Correction" title="Link to this heading">¶</a></h2>
 <p>The success of PLD depends on a number of factors including the brightness of the object, the choice of pixels used to create the light curve and the noise model, and whether or not there exists a correlation between the instrumental noise and the astrophysical signals. For these reasons, it is important to carefully review the correct operation of the algorithm each time you use it, and tune the optional parameters of the algorithm if necessary.</p>
 <p>The most convenient way to diagnose the performance of PLD is to use the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.SFFCorrector.diagnose.html#lightkurve.correctors.SFFCorrector.diagnose">diagnose()</a> method, which generates a set of diagnostic plots which we will explain below the graph.</p>
 <div class="nbinput docutils container">
@@ -466,10 +462,10 @@ indicates that the inverse of the mask is marked in this plot, that is, the excl
 <p>You can alter the <code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code> and <code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code> by passing them as optional arguments to the <code class="docutils literal notranslate"><span class="pre">correct()</span></code> method we used earlier. For more information about these masks, and how to use them effectively, please see the full list of optional parameters and FAQ at the end of this tutorial.</p>
 </section>
 <section id="3.-How-to-Avoid-Overfitting-Exoplanet-Transits">
-<h2>3. How to Avoid Overfitting Exoplanet Transits<a class="headerlink" href="#3.-How-to-Avoid-Overfitting-Exoplanet-Transits" title="Permalink to this headline">#</a></h2>
+<h2>3. How to Avoid Overfitting Exoplanet Transits<a class="headerlink" href="#3.-How-to-Avoid-Overfitting-Exoplanet-Transits" title="Link to this heading">¶</a></h2>
 <p>In the example above, it looks like PLD did a great job of removing the instrumental noise introduced by the <em>K2</em> detector drift, but the bottom panel of the diagnostic plot seems to indicate that we’ve falsely labeled in-transit data points as outliers. To alleviate this, we can introduce the <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code>.</p>
 <section id="3.1-Overfitting">
-<h3>3.1 Overfitting<a class="headerlink" href="#3.1-Overfitting" title="Permalink to this headline">#</a></h3>
+<h3>3.1 Overfitting<a class="headerlink" href="#3.1-Overfitting" title="Link to this heading">¶</a></h3>
 <p>It’s necessary to mask out transits and flares when fitting the spline. The spline term fits a polynomial to the long-term trend of the light curve, and the highest likelihood solution generally follows the median of the corrected light curve. The presence of transits or flares can pull the median of the light curve down or up, respectively, causing the spline to deviate from the underlying stellar trend.</p>
 <p>In practice, this causes transits to be partially “fit out” by the spline, reducing their depth and giving an incorrect estimate of the planet’s radius.</p>
 <p>You can use a custom <code class="docutils literal notranslate"><span class="pre">cadence_mask</span></code> by creating a Boolean array with one value per cadence, where <code class="docutils literal notranslate"><span class="pre">True</span></code> indicates a cadence you wish to include and <code class="docutils literal notranslate"><span class="pre">False</span></code> means that the cadence is masked out.</p>
@@ -542,7 +538,7 @@ indicates that the inverse of the mask is marked in this plot, that is, the excl
 </section>
 </section>
 <section id="4.-Applying-PLD-to-a-TESS-Light-Curve">
-<h2>4. Applying PLD to a <em>TESS</em> Light Curve<a class="headerlink" href="#4.-Applying-PLD-to-a-TESS-Light-Curve" title="Permalink to this headline">#</a></h2>
+<h2>4. Applying PLD to a <em>TESS</em> Light Curve<a class="headerlink" href="#4.-Applying-PLD-to-a-TESS-Light-Curve" title="Link to this heading">¶</a></h2>
 <p><em>TESS</em> has multiple observing modes. For example, there are two-minute cadence observations, which were retrieved for specific targeted objects, and there are 30-minute cadence Full Frame Images (FFIs), which capture the entire <em>TESS</em> field of view.</p>
 <p>In this example, we will examine a target using the FFI observation. The <em>TESS</em> FFIs are dominated by the scattered light background signal on the <em>TESS</em> detector, which creates high-amplitude, periodic variation. This background can make planet detection difficult, but it can be removed using PLD.</p>
 <p>To access FFI data, we will use the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESScut</a> tool on the Mikulski Archive for Space Telescopes (MAST), developed by <a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et al. 2019</a>. Lightkurve has a built-in search method for creating cutouts called <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_tesscut.html">search_tesscut</a>, which uses the same syntax as the
@@ -563,7 +559,7 @@ indicates that the inverse of the mask is marked in this plot, that is, the excl
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table13531977424">
+<table id="table6257648592">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 10</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>WR40</td><td>0.0</td></tr>
@@ -642,11 +638,11 @@ SearchResult containing 1 data products.
 </div>
 </section>
 <section id="5.-Tuning-PLDCorrector-Using-Optional-Parameters">
-<h2>5. Tuning <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> Using Optional Parameters<a class="headerlink" href="#5.-Tuning-PLDCorrector-Using-Optional-Parameters" title="Permalink to this headline">#</a></h2>
+<h2>5. Tuning <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> Using Optional Parameters<a class="headerlink" href="#5.-Tuning-PLDCorrector-Using-Optional-Parameters" title="Link to this heading">¶</a></h2>
 <p>In this section, we explore the optional parameters available when using the PLD method.</p>
 <p>These keywords can be used to influence the performance of PLD. The PLD design matrix is constructed from three distinct submatrices, shown below with their corresponding keywords: * <strong>``background_model``</strong> * <code class="docutils literal notranslate"><span class="pre">background_aperture_mask</span></code> * <strong>``pixel_series``</strong> * <code class="docutils literal notranslate"><span class="pre">pld_order</span></code> * <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> * <code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code> * <strong>``spline``</strong> * <code class="docutils literal notranslate"><span class="pre">spline_n_knots</span></code> * <code class="docutils literal notranslate"><span class="pre">spline_degree</span></code> * <code class="docutils literal notranslate"><span class="pre">restore_trend</span></code></p>
 <section id="5.1-Definitions-of-all-additional-parameters">
-<h3>5.1 Definitions of all additional parameters<a class="headerlink" href="#5.1-Definitions-of-all-additional-parameters" title="Permalink to this headline">#</a></h3>
+<h3>5.1 Definitions of all additional parameters<a class="headerlink" href="#5.1-Definitions-of-all-additional-parameters" title="Link to this heading">¶</a></h3>
 <p>Full descriptions of each of these keywords can be found below.</p>
 <p><strong>``pld_order``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): * The order of Pixel Level Decorrelation to be performed. First order (<code class="docutils literal notranslate"><span class="pre">n=1</span></code>) uses only the pixel fluxes to construct the design matrix. Higher order populates the design matrix with columns constructed from the products of pixel fluxes. Default 3 for <em>K2</em> and 1 for <em>TESS</em>.</p>
 <p><strong>``pca_components``</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code> or tuple of <code class="docutils literal notranslate"><span class="pre">int</span></code>): * Number of terms added to the design matrix for each order of PLD pixel fluxes. Increasing this value may provide higher precision at the expense of slower speed and/or overfitting. If performing PLD with <code class="docutils literal notranslate"><span class="pre">pld_order</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">pca_components</span></code> can be a tuple containing the number of terms for each order of PLD. If a single <code class="docutils literal notranslate"><span class="pre">int</span></code> is passed, the same number of terms will be used for each order. If zero is passed, Principle Component Analysis
@@ -667,7 +663,7 @@ SearchResult containing 1 data products.
 </section>
 </section>
 <section id="6.-Frequently-Asked-Questions">
-<h2>6. Frequently Asked Questions<a class="headerlink" href="#6.-Frequently-Asked-Questions" title="Permalink to this headline">#</a></h2>
+<h2>6. Frequently Asked Questions<a class="headerlink" href="#6.-Frequently-Asked-Questions" title="Link to this heading">¶</a></h2>
 <p><strong>How should I select the pixels to use?</strong></p>
 <p>As shown earlier, there are three aperture masks used in the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>.</p>
 <ul class="simple">
@@ -685,12 +681,12 @@ vectors by performing Principle Component Analysis (PCA). This is done automatic
 raise a singular matrix error.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">¶</a></h2>
 <p><strong>Authors</strong>: Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>), Geert Barentsen</p>
 <p><strong>Updated</strong>: September 29, 2020</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies in your published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
@@ -942,7 +938,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

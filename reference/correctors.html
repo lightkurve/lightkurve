@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Correcting systematics &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <script src="../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="lightkurve.correctors.load_tess_cbvs" href="api/lightkurve.correctors.load_tess_cbvs.html" />
     <link rel="prev" title="lightkurve.seismology.Seismology.interact_echelle" href="api/lightkurve.seismology.Seismology.interact_echelle.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="api/lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="api/lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="api/lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1351,7 +1349,7 @@
               <div>
                 
   <section id="correcting-systematics">
-<span id="api-correctors"></span><h1>Correcting systematics<a class="headerlink" href="#correcting-systematics" title="Permalink to this headline">#</a></h1>
+<span id="api-correctors"></span><h1>Correcting systematics<a class="headerlink" href="#correcting-systematics" title="Link to this heading">¶</a></h1>
 <p>Telescope data is always affected by noise contributed by the instrument.
 The <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors</span></code> sub-package provides classes which offer
 different strategies to remove such noise.
@@ -1362,12 +1360,8 @@ of column vectors which are known to correlate with additive noise components.</
 by providing the user with pre-configured <a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> objects which are
 known to be effective at removing different types of noise.</p>
 <section id="cotrending-basis-vectors-cbv">
-<h2>Cotrending Basis Vectors (CBV)<a class="headerlink" href="#cotrending-basis-vectors-cbv" title="Permalink to this headline">#</a></h2>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h2>Cotrending Basis Vectors (CBV)<a class="headerlink" href="#cotrending-basis-vectors-cbv" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.load_tess_cbvs.html#lightkurve.correctors.load_tess_cbvs" title="lightkurve.correctors.load_tess_cbvs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_tess_cbvs</span></code></a>([cbv_dir, sector, camera, ...])</p></td>
 <td><p>Loads TESS cotrending basis vectors, either from a directory of  CBV files already saved locally if cbv_dir is passed, or else  will retrieve the relevant files programmatically from MAST.</p></td>
@@ -1388,12 +1382,8 @@ known to be effective at removing different types of noise.</p>
 </table>
 </section>
 <section id="pixel-level-decorrelation-pld">
-<h2>Pixel Level Decorrelation (PLD)<a class="headerlink" href="#pixel-level-decorrelation-pld" title="Permalink to this headline">#</a></h2>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h2>Pixel Level Decorrelation (PLD)<a class="headerlink" href="#pixel-level-decorrelation-pld" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>(tpf[, aperture_mask])</p></td>
 <td><p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p></td>
@@ -1411,12 +1401,8 @@ known to be effective at removing different types of noise.</p>
 </table>
 </section>
 <section id="self-flat-fielding-sff">
-<h2>Self Flat Fielding (SFF)<a class="headerlink" href="#self-flat-fielding-sff" title="Permalink to this headline">#</a></h2>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h2>Self Flat Fielding (SFF)<a class="headerlink" href="#self-flat-fielding-sff" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lc)</p></td>
 <td><p>Special case of <a class="reference internal" href="api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a> where the <a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> includes the target's centroid positions.</p></td>
@@ -1434,12 +1420,8 @@ known to be effective at removing different types of noise.</p>
 </table>
 </section>
 <section id="regression-corrector">
-<h2>Regression Corrector<a class="headerlink" href="#regression-corrector" title="Permalink to this headline">#</a></h2>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h2>Regression Corrector<a class="headerlink" href="#regression-corrector" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a>(lc)</p></td>
 <td><p>Remove noise using linear regression against a <a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a>.</p></td>
@@ -1454,12 +1436,8 @@ known to be effective at removing different types of noise.</p>
 </table>
 </section>
 <section id="creating-a-design-matrix">
-<h2>Creating a design matrix<a class="headerlink" href="#creating-a-design-matrix" title="Permalink to this headline">#</a></h2>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<h2>Creating a design matrix<a class="headerlink" href="#creating-a-design-matrix" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a>(df[, columns, name, prior_mu, ...])</p></td>
 <td><p>A matrix of column vectors for use in linear regression.</p></td>
@@ -1476,17 +1454,13 @@ known to be effective at removing different types of noise.</p>
 </tbody>
 </table>
 <p>A DesignMatrix has the following attributes:</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.X.html#lightkurve.correctors.DesignMatrix.X" title="lightkurve.correctors.DesignMatrix.X"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix.X</span></code></a></p></td>
 <td><p>Design matrix &quot;X&quot; to be used in RegressionCorrector objects</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.rank.html#lightkurve.correctors.DesignMatrix.rank" title="lightkurve.correctors.DesignMatrix.rank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix.rank</span></code></a></p></td>
-<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v2.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
+<td><p>Matrix rank computed using <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.matrix_rank.html#numpy.linalg.matrix_rank" title="(in NumPy v2.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.linalg.matrix_rank</span></code></a>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.shape.html#lightkurve.correctors.DesignMatrix.shape" title="lightkurve.correctors.DesignMatrix.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix.shape</span></code></a></p></td>
 <td><p>Tuple specifying the shape of the matrix as (n_rows, n_columns).</p></td>
@@ -1497,11 +1471,7 @@ known to be effective at removing different types of noise.</p>
 </tbody>
 </table>
 <p>A DesignMatrix supports the following operations:</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.append_constant.html#lightkurve.correctors.DesignMatrix.append_constant" title="lightkurve.correctors.DesignMatrix.append_constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix.append_constant</span></code></a>([prior_mu, ...])</p></td>
 <td><p>Returns a new <a class="reference internal" href="api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> with a column of ones appended.</p></td>
@@ -1535,11 +1505,7 @@ known to be effective at removing different types of noise.</p>
 </tr>
 </tbody>
 </table>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="api/lightkurve.correctors.corrector.Corrector.html#lightkurve.correctors.corrector.Corrector" title="lightkurve.correctors.corrector.Corrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">corrector.Corrector</span></code></a>(original_lc)</p></td>
 <td><p>Abstract base class documenting the required structure of classes designed to remove systematic noise from light curves.</p></td>
@@ -1596,7 +1562,7 @@ known to be effective at removing different types of noise.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.correctors.PLDCorrector &#8212; Lightkurve </title>
     
@@ -20,16 +19,15 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -37,7 +35,7 @@
     <link rel="next" title="lightkurve.correctors.PLDCorrector.correct" href="lightkurve.correctors.PLDCorrector.correct.html" />
     <link rel="prev" title="lightkurve.correctors.CBVCorrector.diagnose" href="lightkurve.correctors.CBVCorrector.diagnose.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -64,7 +62,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -531,6 +529,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -558,11 +561,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1298,9 +1296,34 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.correctors.PLDCorrector">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     PLDCorrector
+    </span>
+   </code>
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#lightkurve.correctors.PLDCorrector.__init__">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       PLDCorrector.__init__()
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1321,10 +1344,10 @@
               <div>
                 
   <section id="lightkurve-correctors-pldcorrector">
-<h1>lightkurve.correctors.PLDCorrector<a class="headerlink" href="#lightkurve-correctors-pldcorrector" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.correctors.PLDCorrector<a class="headerlink" href="#lightkurve-correctors-pldcorrector" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lightkurve.correctors.PLDCorrector">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></span><span class="sig-name descname"><span class="pre">PLDCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tpf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aperture_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/pldcorrector.html#PLDCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.PLDCorrector" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.correctors.</span></span><span class="sig-name descname"><span class="pre">PLDCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tpf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aperture_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/pldcorrector.html#PLDCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.PLDCorrector" title="Link to this definition">¶</a></dt>
 <dd><p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p>
 <p>Special case of <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a> where the <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> is
 composed of background-corrected pixel time series.</p>
@@ -1366,37 +1389,41 @@ To solve for the PLD model, we need to minimize the difference squared</p>
 <p>The design matrix also contains columns representing a spline in time
 design to capture the intrinsic, long-term variability of the target.</p>
 <p class="rubric">References</p>
-<dl class="citation">
-<dt class="label" id="r333fd99d762c-1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Deming et al. (2015), ads:2015ApJ…805..132D.
+<div role="list" class="citation-list">
+<div class="citation" id="r333fd99d762c-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Deming et al. (2015), ads:2015ApJ…805..132D.
 (arXiv:1411.7404)</p>
-</dd>
-<dt class="label" id="r333fd99d762c-2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>Luger et al. (2016), ads:2016AJ….152..100L
+</div>
+<div class="citation" id="r333fd99d762c-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>Luger et al. (2016), ads:2016AJ….152..100L
 (arXiv:1607.00524)</p>
-</dd>
-<dt class="label" id="r333fd99d762c-3"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
-<dd><p>Luger et al. (2018), ads:2018AJ….156…99L
+</div>
+<div class="citation" id="r333fd99d762c-3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Luger et al. (2018), ads:2018AJ….156…99L
 (arXiv:1702.05488)</p>
-</dd>
-<dt class="label" id="r333fd99d762c-4"><span class="brackets"><a class="fn-backref" href="#id4">4</a></span></dt>
-<dd><p>EVEREST pipeline webpage, <a class="reference external" href="https://rodluger.github.io/everest">https://rodluger.github.io/everest</a></p>
-</dd>
-</dl>
+</div>
+<div class="citation" id="r333fd99d762c-4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>EVEREST pipeline webpage, <a class="reference external" href="https://rodluger.github.io/everest">https://rodluger.github.io/everest</a></p>
+</div>
+</div>
 <p class="rubric">Examples</p>
 <p>Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">lightkurve</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lk</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;GJ9827&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">corrector</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_corrector</span><span class="p">(</span><span class="s1">&#39;pld&#39;</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;GJ9827&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">corrector</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_corrector</span><span class="p">(</span><span class="s1">&#39;pld&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>However, the above example will over-fit the small transits!
 It is necessary to mask the transits using <code class="xref py py-obj docutils literal notranslate"><span class="pre">corrector.correct(cadence_mask=...)</span></code>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.correctors.PLDCorrector.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tpf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aperture_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/pldcorrector.html#PLDCorrector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tpf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aperture_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/correctors/pldcorrector.html#PLDCorrector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.__init__" title="Link to this definition">¶</a></dt>
 <dd><p>Constructor method.</p>
 <p>The constructor shall:</p>
 <ul class="simple">
@@ -1407,11 +1434,7 @@ target pixel files, engineering data).</p></li>
 </dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.PLDCorrector.__init__" title="lightkurve.correctors.PLDCorrector.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(tpf[, aperture_mask])</p></td>
 <td><p>Constructor method.</p></td>
@@ -1440,11 +1463,7 @@ target pixel files, engineering data).</p></li>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadence_mask</span></code></p></td>
 <td><p></p></td>
@@ -1505,7 +1524,7 @@ target pixel files, engineering data).</p></li>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

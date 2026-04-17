@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>How to open a light curve in Excel? &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Creating your own light curves using custom aperture photometry" href="../2-creating-light-curves/2-1-custom-aperture-photometry.html" />
     <link rel="prev" title="Interactively inspecting Target Pixel Files" href="interactively-inspecting-data.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -211,9 +207,9 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/1-getting-started/how-to-open-a-lightcurve-in-excel.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-open-a-light-curve-in-Excel?">
-<h1>How to open a light curve in Excel?<a class="headerlink" href="#How-to-open-a-light-curve-in-Excel?" title="Permalink to this headline">#</a></h1>
+<h1>How to open a light curve in Excel?<a class="headerlink" href="#How-to-open-a-light-curve-in-Excel?" title="Link to this heading">¶</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Learn how to search and download TESS light curves.</p></li>
@@ -223,7 +219,7 @@
 <p>This tutorial is aimed at first time users who may not have used <em>Lightkurve</em> before.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
 <p>First we must install and import the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> package. We can do this as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -245,7 +241,7 @@
 </div>
 </section>
 <section id="1.-Downloading-a-TESS-light-curve">
-<h2>1. Downloading a TESS light curve<a class="headerlink" href="#1.-Downloading-a-TESS-light-curve" title="Permalink to this headline">#</a></h2>
+<h2>1. Downloading a TESS light curve<a class="headerlink" href="#1.-Downloading-a-TESS-light-curve" title="Link to this heading">¶</a></h2>
 <p>The light curves of stars created by the TESS mission are stored at the <a class="reference external" href="https://archive.stsci.edu/tess/">Mikulksi Archive for Space Telescopes</a> (MAST) archive, along with metadata about the observations, such as which CCD channel was used at each time.</p>
 <p><em>Lightkurve’s</em> built-in tools allow us to search for light curve files in the archive, and download them and their metadata. In this example, we will start by downloading one sector of TESS data for a star named V1357 Cyg, also known as <a class="reference external" href="https://en.wikipedia.org/wiki/Cygnus_X-1">Cygnus X-1</a>. V1357 Cyg is a galactic X-ray source in the constellation Cygnus.</p>
 <p>Using Lightkurve’s <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_lightcurve.html">search_lightcurve</a> function, we can find an itemized list of light curves produced by different data analysis pipelines:</p>
@@ -285,7 +281,7 @@ SearchResult containing 3 data products.
 </div>
 </section>
 <section id="2.-Plotting-a-light-curve">
-<h2>2. Plotting a light curve<a class="headerlink" href="#2.-Plotting-a-light-curve" title="Permalink to this headline">#</a></h2>
+<h2>2. Plotting a light curve<a class="headerlink" href="#2.-Plotting-a-light-curve" title="Link to this heading">¶</a></h2>
 <p>Before loading the light curve data into Excel, it can be useful to have a quick look at the data using <em>Lightkurve’s</em> <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.LightCurve.plot.html">plot</a> function:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -304,7 +300,7 @@ SearchResult containing 3 data products.
 </div>
 </section>
 <section id="3.-Download-the-light-curve-as-an-Excel-spreadsheet">
-<h2>3. Download the light curve as an Excel spreadsheet<a class="headerlink" href="#3.-Download-the-light-curve-as-an-Excel-spreadsheet" title="Permalink to this headline">#</a></h2>
+<h2>3. Download the light curve as an Excel spreadsheet<a class="headerlink" href="#3.-Download-the-light-curve-as-an-Excel-spreadsheet" title="Link to this heading">¶</a></h2>
 <p>If you are new to Python, you may feel more comfortable inspecting and analyzing a light curve in Excel than in Python. That is fine! We can save the light curve data as an Excel spreadsheet named “V1357Cyg.xlsx” as follows:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
@@ -371,7 +367,7 @@ SearchResult containing 3 data products.
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

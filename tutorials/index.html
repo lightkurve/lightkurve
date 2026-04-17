@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Tutorials &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <script src="../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="What are LightCurve objects?" href="1-getting-started/what-are-lightcurve-objects.html" />
     <link rel="prev" title="Quickstart" href="../quickstart.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -194,6 +192,11 @@
      2.3. Removing instrumental noise
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#using-the-generic-read-write-fits-functionality">
+     2.4. Using the generic read/write fits functionality
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -245,15 +248,15 @@
               <div>
                 
   <section id="tutorials">
-<span id="id1"></span><h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">#</a></h1>
+<span id="id1"></span><h1>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading">¶</a></h1>
 <section id="getting-started-with-lightkurve">
-<h2>1. Getting started with Lightkurve<a class="headerlink" href="#getting-started-with-lightkurve" title="Permalink to this headline">#</a></h2>
+<h2>1. Getting started with Lightkurve<a class="headerlink" href="#getting-started-with-lightkurve" title="Link to this heading">¶</a></h2>
 <p>The first set of tutorials covers the basics of using Lightkurve.
 This includes getting to grips with the basic Lightkurve objects
 and how to load and work with data products from the Kepler, K2, and TESS missions.
 For a complete listing of all classes and methods, please consult the <a class="reference external" href="../reference/index.html">API docs</a>.</p>
 <section id="lightkurve-objects">
-<h3>1.1. Lightkurve objects<a class="headerlink" href="#lightkurve-objects" title="Permalink to this headline">#</a></h3>
+<h3>1.1. Lightkurve objects<a class="headerlink" href="#lightkurve-objects" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="1-getting-started/what-are-lightcurve-objects.html">What are <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects?</a></li>
@@ -263,7 +266,7 @@ For a complete listing of all classes and methods, please consult the <a class="
 </div>
 </section>
 <section id="working-with-kepler-tess-data-products">
-<h3>1.2. Working with Kepler &amp; TESS data products<a class="headerlink" href="#working-with-kepler-tess-data-products" title="Permalink to this headline">#</a></h3>
+<h3>1.2. Working with Kepler &amp; TESS data products<a class="headerlink" href="#working-with-kepler-tess-data-products" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="1-getting-started/searching-for-data-products.html">Searching &amp; downloading <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> data</a></li>
@@ -277,12 +280,12 @@ For a complete listing of all classes and methods, please consult the <a class="
 </section>
 </section>
 <section id="creating-and-correcting-light-curves">
-<h2>2. Creating and correcting light curves<a class="headerlink" href="#creating-and-correcting-light-curves" title="Permalink to this headline">#</a></h2>
+<h2>2. Creating and correcting light curves<a class="headerlink" href="#creating-and-correcting-light-curves" title="Link to this heading">¶</a></h2>
 <p>The second section focuses on the various ways in which light curves
 can be extracted from the pixel data, and on the removal of instrument noise
 (often referred to as <em>systematics</em>) from those light curves.</p>
 <section id="creating-light-curves">
-<h3>2.1. Creating light curves<a class="headerlink" href="#creating-light-curves" title="Permalink to this headline">#</a></h3>
+<h3>2.1. Creating light curves<a class="headerlink" href="#creating-light-curves" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-1-custom-aperture-photometry.html">Creating your own light curves using custom aperture photometry</a></li>
@@ -293,7 +296,7 @@ can be extracted from the pixel data, and on the removal of instrument noise
 </div>
 </section>
 <section id="identifying-instrumental-noise">
-<h3>2.2. Identifying instrumental noise<a class="headerlink" href="#identifying-instrumental-noise" title="Permalink to this headline">#</a></h3>
+<h3>2.2. Identifying instrumental noise<a class="headerlink" href="#identifying-instrumental-noise" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-2-kepler-noise-1-data-gaps-and-quality-flags.html">Instrumental Noise in <em>Kepler</em> and <em>K2</em> #1: Data Gaps and Quality Flags</a></li>
@@ -306,7 +309,7 @@ can be extracted from the pixel data, and on the removal of instrument noise
 </div>
 </section>
 <section id="removing-instrumental-noise">
-<h3>2.3. Removing instrumental noise<a class="headerlink" href="#removing-instrumental-noise" title="Permalink to this headline">#</a></h3>
+<h3>2.3. Removing instrumental noise<a class="headerlink" href="#removing-instrumental-noise" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-3-how-to-use-cbvcorrector.html">Removing noise from Kepler, K2, and TESS light curves using Cotrending Basis Vectors (<code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code>)</a></li>
@@ -316,13 +319,21 @@ can be extracted from the pixel data, and on the removal of instrument noise
 </ul>
 </div>
 </section>
+<section id="using-the-generic-read-write-fits-functionality">
+<h3>2.4. Using the generic read/write fits functionality<a class="headerlink" href="#using-the-generic-read-write-fits-functionality" title="Link to this heading">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="2-creating-light-curves/2-4-using_the_to_fits_and_read_generic_lightcurve_function.html">Using the to_fits and read_generic_lightcurve functions</a></li>
+</ul>
+</div>
+</section>
 </section>
 <section id="science-examples">
-<h2>3. Science examples<a class="headerlink" href="#science-examples" title="Permalink to this headline">#</a></h2>
+<h2>3. Science examples<a class="headerlink" href="#science-examples" title="Link to this heading">¶</a></h2>
 <p>In the final section we demonstrate scientific data analysis tasks which astronomers
 commonly apply to time series data.</p>
 <section id="exoplanet-examples">
-<h3>3.1. Exoplanet examples<a class="headerlink" href="#exoplanet-examples" title="Permalink to this headline">#</a></h3>
+<h3>3.1. Exoplanet examples<a class="headerlink" href="#exoplanet-examples" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="3-science-examples/exoplanets-identifying-transiting-planet-signals.html">Identifying transiting exoplanet signals in a light curve</a></li>
@@ -334,7 +345,7 @@ commonly apply to time series data.</p>
 </div>
 </section>
 <section id="rotation-rates-and-periodic-signals">
-<h3>3.2. Rotation rates and periodic signals<a class="headerlink" href="#rotation-rates-and-periodic-signals" title="Permalink to this headline">#</a></h3>
+<h3>3.2. Rotation rates and periodic signals<a class="headerlink" href="#rotation-rates-and-periodic-signals" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="3-science-examples/periodograms-creating-periodograms.html">Creating periodograms and identifying significant peaks</a></li>
@@ -345,7 +356,7 @@ commonly apply to time series data.</p>
 </div>
 </section>
 <section id="asteroseismology-examples">
-<h3>3.3. Asteroseismology examples<a class="headerlink" href="#asteroseismology-examples" title="Permalink to this headline">#</a></h3>
+<h3>3.3. Asteroseismology examples<a class="headerlink" href="#asteroseismology-examples" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="3-science-examples/asteroseismology-estimating-mass-and-radius.html">How to estimate a star’s mass and radius using asteroseismology</a></li>
@@ -354,7 +365,7 @@ commonly apply to time series data.</p>
 </div>
 </section>
 <section id="other-examples">
-<h3>3.4. Other examples<a class="headerlink" href="#other-examples" title="Permalink to this headline">#</a></h3>
+<h3>3.4. Other examples<a class="headerlink" href="#other-examples" title="Link to this heading">¶</a></h3>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="3-science-examples/other-supernova-lightcurve.html">How to make a supernova lightcurve?</a></li>
@@ -405,7 +416,7 @@ commonly apply to time series data.</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

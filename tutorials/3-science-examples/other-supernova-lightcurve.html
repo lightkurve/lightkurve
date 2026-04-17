@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>How to make a supernova lightcurve? &#8212; Lightkurve </title>
     
@@ -20,17 +19,16 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -38,7 +36,7 @@
     <link rel="next" title="API" href="../../reference/index.html" />
     <link rel="prev" title="How to understand and manipulate the periodogram of an oscillating star" href="asteroseismology-oscillating-star-periodogram.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +63,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -181,7 +179,7 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/3-science-examples/other-supernova-lightcurve.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-make-a-supernova-lightcurve?">
-<h1>How to make a supernova lightcurve?<a class="headerlink" href="#How-to-make-a-supernova-lightcurve?" title="Permalink to this headline">#</a></h1>
+<h1>How to make a supernova lightcurve?<a class="headerlink" href="#How-to-make-a-supernova-lightcurve?" title="Link to this heading">¶</a></h1>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to extract a lightcurve of transient phenomena, including supernovae. Supernovae data analysis presents a few unique challenges compared to data analysis of isolated point sources. We can anticipate some of the common limitations of the Kepler pipeline-processed lightcurves, which make no attempt to hone-in on supernovae. For example, the supernova resides in a host galaxy which may itself be time variable due to, <em>e.g.</em>, active galactic nuclei (AGN). Common detrending
 methods, such as “Self Flat Fielding” (<a class="reference external" href="https://archive.stsci.edu/prepds/k2sff/">SFF</a>) assume that centroid shifts are due entirely to undesired motion of the spacecraft, while transients induce bona-fide astrophysical centroid motion as the postage-stamp photocenter gets weighted towards the increasingly luminous transient’s photocenter.</p>
 <p>In this tutorial we will custom-make a custom supernova lightcurve with these simple steps:</p>
@@ -429,7 +427,7 @@ it looks like the flux drops off significantly in the first and last columns.</p
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

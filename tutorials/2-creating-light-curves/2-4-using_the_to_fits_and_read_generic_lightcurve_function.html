@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Using the to_fits and read_generic_lightcurve functions &#8212; Lightkurve </title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Identifying transiting exoplanet signals in a light curve" href="../3-science-examples/exoplanets-identifying-transiting-planet-signals.html" />
+    <link rel="prev" title="Removing noise from K2 light curves using Self Flat Fielding (SFFCorrector)" href="2-3-k2-sffcorrector.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en">
+    
+
+    <!-- Google Analytics -->
+    
+<script async="" src="https://www.google-analytics.com/analytics.js"></script>
+<script>
+                        window.ga = window.ga || function () {
+                            (ga.q = ga.q || []).push(arguments) };
+                        ga.l = +new Date;
+                        ga('create', 'UA-69171-9', 'auto');
+                        ga('set', 'anonymizeIp', true);
+                        ga('send', 'pageview');
+                    </script>
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">Lightkurve v2.6</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../whats-new-v2.html">
+  What's new?
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../quickstart.html">
+  Quickstart
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../reference/index.html">
+  API
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../about/index.html">
+  About Lightkurve
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../development/index.html">
+  Developing for Lightkurve
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Learning-Goals">
+   Learning Goals
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Introduction">
+   Introduction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#1:-Creating-our-lightcurve-data-and-our-LightCurve-Object">
+   1: Creating our lightcurve data and our LightCurve Object
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#2:-Saving-the-LightCurve-Object-as-a-FITS-file">
+   2: Saving the LightCurve Object as a FITS file
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#3:-Reading-in-a-FITS-file">
+   3: Reading in a FITS file
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div style="float:right; margin-bottom:1em;">
+    <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/2-creating-light-curves/2-4-using_the_to_fits_and_read_generic_lightcurve_function.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
+    <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-4-using_the_to_fits_and_read_generic_lightcurve_function.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
+</div>
+<br style="clear:both;"><section id="Using-the-to_fits-and-read_generic_lightcurve-functions">
+<h1>Using the to_fits and read_generic_lightcurve functions<a class="headerlink" href="#Using-the-to_fits-and-read_generic_lightcurve-functions" title="Link to this heading">¶</a></h1>
+<section id="Learning-Goals">
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
+<p>By the end of this tutorial you will:</p>
+<ul class="simple">
+<li><p>Learn how to create a <a class="reference external" href="https://lightkurve.github.io/lightkurve/tutorials/1-getting-started/what-are-lightcurve-objects.html">LightCurve object</a>.</p></li>
+<li><p>Save the LightCurve object as a fits file using the <code class="docutils literal notranslate"><span class="pre">`to_fits</span></code> &lt;<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.LightCurve.to_fits.html?highlight=to_fits#lightkurve.LightCurve.to_fits">https://lightkurve.github.io/lightkurve/reference/api/lightkurve.LightCurve.to_fits.html?highlight=to_fits#lightkurve.LightCurve.to_fits</a>&gt;`__ function.</p></li>
+<li><p>Read in the same FITs file using the <code class="docutils literal notranslate"><span class="pre">`read_generic_lightcurve</span></code> &lt;<a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/f8e8c16ba5135b8811d908bb919815b93dcce2bd/src/lightkurve/io/generic.py#L20-L31">https://github.com/lightkurve/lightkurve/blob/f8e8c16ba5135b8811d908bb919815b93dcce2bd/src/lightkurve/io/generic.py#L20-L31</a>&gt;`__ function.</p></li>
+</ul>
+</section>
+<section id="Introduction">
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">¶</a></h2>
+<p>The intent of the tutorial is to illustrate how one might use data from any mission (not just Kepler, K2, or TESS) and analize it within Lightkurve.</p>
+</section>
+<section id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
+<p>This tutorial requires:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a></p></li>
+<li><p><a class="reference external" href="https://matplotlib.org/">Matplotlib</a></p></li>
+<li><p><a class="reference external" href="https://numpy.org/">numpy</a></p></li>
+<li><p>astropy <a class="reference external" href="https://docs.astropy.org/en/stable/time/index.html">time</a> and <a class="reference external" href="https://docs.astropy.org/en/latest/units/index.html">units</a></p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">lightkurve</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lk</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.time</span><span class="w"> </span><span class="kn">import</span> <span class="n">Time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">astropy.units</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">u</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="1:-Creating-our-lightcurve-data-and-our-LightCurve-Object">
+<h2>1: Creating our lightcurve data and our LightCurve Object<a class="headerlink" href="#1:-Creating-our-lightcurve-data-and-our-LightCurve-Object" title="Link to this heading">¶</a></h2>
+<p>First we will create some fake lightcurve data to use as an example and convert this into a LightCurve Object. You could also download a LightCurve Object via using <code class="docutils literal notranslate"><span class="pre">`search_lightcurve</span></code> &lt;<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve#lightkurve.search_lightcurve">https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve#lightkurve.search_lightcurve</a>&gt;`__ and
+<code class="docutils literal notranslate"><span class="pre">`download()</span></code> &lt;<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.SearchResult.download.html?highlight=download#lightkurve.SearchResult.download">https://lightkurve.github.io/lightkurve/reference/api/lightkurve.SearchResult.download.html?highlight=download#lightkurve.SearchResult.download</a>&gt;`__ if you wish, but for now we will create our simple data set.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Create the time values and specify the format</span>
+<span class="n">time_values</span> <span class="o">=</span> <span class="n">Time</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2458000</span><span class="p">,</span> <span class="mi">2458000</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;jd&#39;</span><span class="p">)</span>
+
+<span class="c1">#Create the flux and flux error values</span>
+<span class="n">flux_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">time_values</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1000</span>
+<span class="n">flux_err_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">flux_values</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1">#Specify the flux units</span>
+<span class="n">unit_flux</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">electron</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">second</span>
+</pre></div>
+</div>
+</div>
+<p>Using this data set we then use the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> function to create our object and look at the data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Create the LightCurve object and look</span>
+<span class="n">my_lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time_values</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux_values</span> <span class="o">*</span> <span class="n">unit_flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="n">flux_err_values</span> <span class="o">*</span> <span class="n">unit_flux</span><span class="p">)</span>
+<span class="n">my_lc</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div><i>LightCurve length=100</i>
+<table id="table6047903536" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
+<thead><tr><th></th><th>electron / s</th><th>electron / s</th></tr></thead>
+<thead><tr><th>Time</th><th>float64</th><th>float32</th></tr></thead>
+<tr><td>2458000.0</td><td>1000.4536549054471</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.101010101</td><td>1000.4080866165767</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.202020202</td><td>1000.3614776178835</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.303030303</td><td>1000.3139467722524</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.404040404</td><td>1000.2656152941383</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.505050505</td><td>1000.2166064391281</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.606060606</td><td>1000.1670451904844</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.707070707</td><td>1000.1170579401942</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.8080808083</td><td>1000.066772166409</td><td>0.009999999776482582</td></tr>
+<tr><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>2458009.1919191917</td><td>1000.8324444376836</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.292929293</td><td>1000.859356363695</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.393939394</td><td>1000.8840767435362</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.494949495</td><td>1000.9065425349794</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.595959596</td><td>1000.9266964453594</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.696969697</td><td>1000.9444870778121</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.797979798</td><td>1000.9598690624119</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.898989899</td><td>1000.9728031716038</td><td>0.009999999776482582</td></tr>
+<tr><td>2458010.0</td><td>1000.9832564206663</td><td>0.009999999776482582</td></tr>
+</table></div></div>
+</div>
+<p>We can now access the column values directly as an attribute of the object.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_lc</span><span class="o">.</span><span class="n">flux</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$[1000.4537,~1000.4081,~1000.3615,~1000.3139,~1000.2656,~1000.2166,~1000.167,~1000.1171,~1000.0668,~1000.0163,~999.96582,~999.91541,~999.86521,~999.81536,~999.76598,~999.7172,~999.66914,~999.62192,~999.57566,~999.53049,~999.48652,~999.44385,~999.4026,~999.36288,~999.32478,~999.28841,~999.25384,~999.22119,~999.19051,~999.1619,~999.13543,~999.11117,~999.08917,~999.06949,~999.05219,~999.0373,~999.02487,~999.01492,~999.00749,~999.00259,~999.00023,~999.00042,~999.00316,~999.00845,~999.01626,~999.02658,~999.03938,~999.05463,~999.0723,~999.09233,~999.11467,~999.13927,~999.16607,~999.19499,~999.22597,~999.25892,~999.29376,~999.3304,~999.36875,~999.40871,~999.45018,~999.49305,~999.53721,~999.58255,~999.62896,~999.67631,~999.72449,~999.77337,~999.82283,~999.87274,~999.92297,~999.97341,~1000.0239,~1000.0743,~1000.1246,~1000.1745,~1000.224,~1000.2729,~1000.3211,~1000.3685,~1000.415,~1000.4604,~1000.5046,~1000.5476,~1000.5891,~1000.6292,~1000.6676,~1000.7043,~1000.7393,~1000.7723,~1000.8034,~1000.8324,~1000.8594,~1000.8841,~1000.9065,~1000.9267,~1000.9445,~1000.9599,~1000.9728,~1000.9833] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
+</div>
+<p>We can also plot the data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Axes: xlabel=&#39;Time [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-4-using_the_to_fits_and_read_generic_lightcurve_function_9_1.png" src="../../_images/tutorials_2-creating-light-curves_2-4-using_the_to_fits_and_read_generic_lightcurve_function_9_1.png" />
+</div>
+</div>
+<p>Additional meta data or keyword arguments may be added via a dictionary as part of <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> function.</p>
+<p>For example we could define the mission and the telescope we obtained the data from via the following:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TELESCOP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;MY_FAKE_TELESCOPE&quot;</span>
+<span class="n">my_lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;MISSION&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;MY_FAKE_MISSION&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">my_lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TELESCOP&#39;</span><span class="p">],</span> <span class="n">my_lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;MISSION&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+MY_FAKE_TELESCOPE MY_FAKE_MISSION
+</pre></div></div>
+</div>
+</section>
+<section id="2:-Saving-the-LightCurve-Object-as-a-FITS-file">
+<h2>2: Saving the LightCurve Object as a FITS file<a class="headerlink" href="#2:-Saving-the-LightCurve-Object-as-a-FITS-file" title="Link to this heading">¶</a></h2>
+<p>We can now convert our object into a FITS file using the <code class="docutils literal notranslate"><span class="pre">to_fits</span></code> function. For this we simply need to state the file name and path. Be sure to state if you want your file to be overwritten or not using either False or True.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">output_filename</span> <span class="o">=</span> <span class="s1">&#39;./my_custom_lightcurve.fits&#39;</span>
+<span class="n">my_lc</span><span class="o">.</span><span class="n">to_fits</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="sa">f</span><span class="s2">&quot;LightCurve saved to </span><span class="si">{</span><span class="n">output_filename</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;LightCurve saved to ./my_custom_lightcurve.fits&#39;
+</pre></div></div>
+</div>
+<p>Note we can also add information to our fits file using an extra_data dictionary. Defined extra keywords or columns would then be included in the FITS file. Keywords would be stroed in the primary header and np.array data as columns in the 1st extension. As an example let’s add an “ORIGIN” keyword which will indicate where got our data from.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">extra_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ORIGIN&quot;</span><span class="p">:</span> <span class="s2">&quot;Tutorial&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>We can then overwrite our old file and add this so when we read it in, it will be there.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_lc</span><span class="o">.</span><span class="n">to_fits</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x1687bb440&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x16890c2f0&gt;]
+</pre></div></div>
+</div>
+</section>
+<section id="3:-Reading-in-a-FITS-file">
+<h2>3: Reading in a FITS file<a class="headerlink" href="#3:-Reading-in-a-FITS-file" title="Link to this heading">¶</a></h2>
+<p>We can now use the <code class="docutils literal notranslate"><span class="pre">read_generic_lightcurve</span></code> funtion to read in our FITS file as a LightCurve Object. To do this we must specify the file and the relevent columns for our data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">read_generic_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;./my_custom_lightcurve.fits&#39;</span><span class="p">,</span> <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">flux_column</span><span class="o">=</span><span class="s2">&quot;flux&quot;</span><span class="p">,</span> <span class="n">flux_err_column</span><span class="o">=</span><span class="s2">&quot;flux_err&quot;</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;jd&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can now query the object as done previously.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div><i>LightCurve length=100 LABEL=&quot;None&quot; FLUX_ORIGIN=lightkurve.LightCurve.to_fits()</i>
+<table id="table6048616176" class="table-striped table-bordered table-condensed">
+<thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
+<thead><tr><th></th><th>electron / s</th><th>electron / s</th></tr></thead>
+<thead><tr><th>Time</th><th>float32</th><th>float32</th></tr></thead>
+<tr><td>2458000.0</td><td>1000.4536743164062</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.101010101</td><td>1000.4080810546875</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.202020202</td><td>1000.3614501953125</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.303030303</td><td>1000.31396484375</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.404040404</td><td>1000.265625</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.505050505</td><td>1000.2166137695312</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.606060606</td><td>1000.1670532226562</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.707070707</td><td>1000.1170654296875</td><td>0.009999999776482582</td></tr>
+<tr><td>2458000.8080808083</td><td>1000.0667724609375</td><td>0.009999999776482582</td></tr>
+<tr><td>...</td><td>...</td><td>...</td></tr>
+<tr><td>2458009.1919191917</td><td>1000.8324584960938</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.292929293</td><td>1000.859375</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.393939394</td><td>1000.8840942382812</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.494949495</td><td>1000.9065551757812</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.595959596</td><td>1000.9266967773438</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.696969697</td><td>1000.9444580078125</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.797979798</td><td>1000.9598388671875</td><td>0.009999999776482582</td></tr>
+<tr><td>2458009.898989899</td><td>1000.9727783203125</td><td>0.009999999776482582</td></tr>
+<tr><td>2458010.0</td><td>1000.9832763671875</td><td>0.009999999776482582</td></tr>
+</table></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span><span class="o">.</span><span class="n">flux</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$[1000.4537,~1000.4081,~1000.3615,~1000.314,~1000.2656,~1000.2166,~1000.1671,~1000.1171,~1000.0668,~1000.0163,~999.96582,~999.91541,~999.86523,~999.81537,~999.76599,~999.71722,~999.66913,~999.62195,~999.57568,~999.53052,~999.48651,~999.44385,~999.40259,~999.36285,~999.32477,~999.28839,~999.25385,~999.22119,~999.19049,~999.16193,~999.13544,~999.11115,~999.08917,~999.06952,~999.05219,~999.03729,~999.02484,~999.01489,~999.00751,~999.00256,~999.00024,~999.00043,~999.00317,~999.00842,~999.01624,~999.02655,~999.03937,~999.05463,~999.07233,~999.09235,~999.11469,~999.13928,~999.16608,~999.19501,~999.22595,~999.25891,~999.29376,~999.33038,~999.36877,~999.40869,~999.4502,~999.49304,~999.53723,~999.58258,~999.62897,~999.67633,~999.72449,~999.77338,~999.82281,~999.87274,~999.92297,~999.97339,~1000.0239,~1000.0743,~1000.1246,~1000.1745,~1000.224,~1000.2729,~1000.3212,~1000.3685,~1000.415,~1000.4604,~1000.5046,~1000.5475,~1000.5891,~1000.6292,~1000.6676,~1000.7043,~1000.7393,~1000.7723,~1000.8034,~1000.8325,~1000.8594,~1000.8841,~1000.9066,~1000.9267,~1000.9445,~1000.9598,~1000.9728,~1000.9833] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Axes: xlabel=&#39;Time [JD]&#39;, ylabel=&#39;Flux [$\\mathrm{e^{-}\\,s^{-1}}$]&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_2-creating-light-curves_2-4-using_the_to_fits_and_read_generic_lightcurve_function_23_1.png" src="../../_images/tutorials_2-creating-light-curves_2-4-using_the_to_fits_and_read_generic_lightcurve_function_23_1.png" />
+</div>
+</div>
+<p>We can even check the meta data to make sure our telescope, mission, and origin information was saved correctly.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span><span class="o">.</span><span class="n">meta</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;EXTNAME&#39;: &#39;PRIMARY&#39;,
+ &#39;CHECKSUM&#39;: &#39;AaAiBX9ZAaAfAU7Z&#39;,
+ &#39;DATASUM&#39;: &#39;0&#39;,
+ &#39;SIMPLE&#39;: True,
+ &#39;BITPIX&#39;: 8,
+ &#39;NAXIS&#39;: 0,
+ &#39;EXTEND&#39;: True,
+ &#39;NEXTEND&#39;: 2,
+ &#39;EXTVER&#39;: 1,
+ &#39;ORIGIN&#39;: &#39;Tutorial&#39;,
+ &#39;DATE&#39;: &#39;2026-03-04&#39;,
+ &#39;CREATOR&#39;: &#39;lightkurve.LightCurve.to_fits()&#39;,
+ &#39;TELESCOP&#39;: &#39;MY_FAKE_TELESCOPE&#39;,
+ &#39;INSTRUME&#39;: None,
+ &#39;OBJECT&#39;: None,
+ &#39;RADESYS&#39;: &#39;ICRS&#39;,
+ &#39;RA_OBJ&#39;: None,
+ &#39;DEC_OBJ&#39;: None,
+ &#39;EQUINOX&#39;: 2000.0,
+ &#39;PROCVER&#39;: &#39;2.5.2dev&#39;,
+ &#39;MISSION&#39;: &#39;MY_FAKE_MISSION&#39;,
+ &#39;LABEL&#39;: None,
+ &#39;RA&#39;: None,
+ &#39;DEC&#39;: None,
+ &#39;FILENAME&#39;: &#39;./my_custom_lightcurve.fits&#39;,
+ &#39;FLUX_ORIGIN&#39;: &#39;lightkurve.LightCurve.to_fits()&#39;}
+</pre></div></div>
+</div>
+<p>We now know how to create a LightCurve Object, save it as a FITS file, and read in a FITS file as a LightCurve Object.</p>
+</section>
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="2-3-k2-sffcorrector.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Removing noise from K2 light curves using Self Flat Fielding (<code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code>)</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../3-science-examples/exoplanets-identifying-transiting-planet-signals.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Identifying transiting exoplanet signals in a light curve</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright Lightkurve developers.<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

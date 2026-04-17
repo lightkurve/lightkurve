@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Developing for Lightkurve &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
+    <script src="../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Vision of the Lightkurve project" href="vision.html" />
     <link rel="prev" title="Other software" href="../about/other_software.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -236,10 +234,10 @@
               <div>
                 
   <section id="developing-for-lightkurve">
-<span id="development"></span><h1>Developing for Lightkurve<a class="headerlink" href="#developing-for-lightkurve" title="Permalink to this headline">#</a></h1>
+<span id="development"></span><h1>Developing for Lightkurve<a class="headerlink" href="#developing-for-lightkurve" title="Link to this heading">¶</a></h1>
 <p>Lightkurve is an open-source, community driven package. We strongly encourage users to contribute and develop new features for Lightkurve. These pages first discuss the vision of Lightkurve, and then how to contribute Pull Requests on github for new features. These pages also discuss how to compile our documentation (including this page!) and how we release a new version of Lightkurve. Use the menu bar on the left to scroll through the docs or click below.</p>
 <section id="developer-documentation">
-<h2>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">#</a></h2>
+<h2>Developer documentation<a class="headerlink" href="#developer-documentation" title="Link to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="vision.html">Vision of the Lightkurve project</a></li>
@@ -252,7 +250,7 @@
 </section>
 </section>
 <section id="setting-up-a-development-environment">
-<h1>Setting up a Development Environment<a class="headerlink" href="#setting-up-a-development-environment" title="Permalink to this headline">#</a></h1>
+<h1>Setting up a Development Environment<a class="headerlink" href="#setting-up-a-development-environment" title="Link to this heading">¶</a></h1>
 <p>To set up a development environment for Lightkurve you can follow the steps below.</p>
 <p>The first step is to create a copy of Lightkurve’s GitHub repository by logging into GitHub, browsing to
 <a class="reference external" href="https://github.com/lightkurve/lightkurve">https://github.com/lightkurve/lightkurve</a>,
@@ -261,15 +259,17 @@ and clicking the <code class="docutils literal notranslate"><span class="pre">Fo
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git
 </pre></div>
 </div>
-<p>Lightkurve uses the <a class="reference external" href="https://python-poetry.org/">poetry</a> package to create an isolated development
+<p id="install-dev-env">Lightkurve uses the <a class="reference external" href="https://python-poetry.org/">poetry</a> package to create an isolated development
 environment which you can use to modify and test changes to the source code without interfering with
 your existing Python environment.</p>
 <p>You can set up the environment as follows:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>lightkurve
-$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>poetry
+$<span class="w"> </span>curl<span class="w"> </span>-sSL<span class="w"> </span>https://install.python-poetry.org<span class="w"> </span><span class="p">|</span><span class="w"> </span>python<span class="w"> </span>-
 $<span class="w"> </span>poetry<span class="w"> </span>install
 </pre></div>
 </div>
+<p>Refer to <a class="reference external" href="https://python-poetry.org/docs/#installation">poetry documentation</a> for
+poetry installation options, in addition to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">curl</span></code> used in the above example.</p>
 <p>A key advantage of the development environment is that any changes you make to the Lightkurve source
 code will be reflected right away, i.e., there is no need to re-install Lightkurve or the environment
 after every change.</p>
@@ -364,7 +364,7 @@ upstream<span class="w">    </span>https://github.com/lightkurve/lightkurve.git<
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

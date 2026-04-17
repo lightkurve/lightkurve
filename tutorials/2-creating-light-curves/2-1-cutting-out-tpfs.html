@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs? &#8212; Lightkurve </title>
     
@@ -20,17 +19,16 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -38,7 +36,7 @@
     <link rel="next" title="How to save a LightCurve in FITS format?" href="2-1-saving-a-light-curve.html" />
     <link rel="prev" title="Combining multiple quarters of Kepler data" href="2-1-combining-multiple-quarters.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +63,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -191,7 +189,7 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-1-cutting-out-tpfs.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="How-to-cut-out-Target-Pixel-Files-from-Kepler-Superstamps-or-TESS-FFIs?">
-<h1>How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?<a class="headerlink" href="#How-to-cut-out-Target-Pixel-Files-from-Kepler-Superstamps-or-TESS-FFIs?" title="Permalink to this headline">#</a></h1>
+<h1>How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?<a class="headerlink" href="#How-to-cut-out-Target-Pixel-Files-from-Kepler-Superstamps-or-TESS-FFIs?" title="Link to this heading">¶</a></h1>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to cut Target Pixel Files (TPFs) out of a series of standard astronomical images, such as <a class="reference external" href="https://archive.stsci.edu/prepds/k2superstamp/">K2 Superstamp Mosaics</a> or TESS <a class="reference external" href="https://heasarc.gsfc.nasa.gov/docs/tess/data-products.html#full-frame-images">Full-Frame-Images (FFIs)</a>. This brief tutorial will demonstrate how.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -219,7 +217,7 @@
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table13233011584">
+<table id="table6261748944">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 14</td><td>2019</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>HAT-P-11</td><td>0.0</td></tr>
@@ -452,7 +450,7 @@ background sources can be examined using <a class="reference external" href="htt
 </div>
 <p>Nice!</p>
 <section id="Cut-out-Target-Pixel-Files-from-local-Kepler-Superstamps-or-native-TESS-FFIs">
-<h2>Cut out Target Pixel Files from local Kepler Superstamps or native TESS FFIs<a class="headerlink" href="#Cut-out-Target-Pixel-Files-from-local-Kepler-Superstamps-or-native-TESS-FFIs" title="Permalink to this headline">#</a></h2>
+<h2>Cut out Target Pixel Files from local Kepler Superstamps or native TESS FFIs<a class="headerlink" href="#Cut-out-Target-Pixel-Files-from-local-Kepler-Superstamps-or-native-TESS-FFIs" title="Link to this heading">¶</a></h2>
 <p>It’s also possible to manually construct TPFs from the native TESS FFIs or Kepler superstamps if you have the individual fits files saved locally.</p>
 <p>Let’s assume you have downloaded a set of raw TESS FFIs to a local directory called <code class="docutils literal notranslate"><span class="pre">data</span></code>. <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> will assume that the files are given in <em>time order</em>. So you have to sort the filenames first with <code class="docutils literal notranslate"><span class="pre">glob</span></code>:</p>
 <div class="nbinput nblast docutils container">
@@ -526,7 +524,7 @@ background sources can be examined using <a class="reference external" href="htt
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

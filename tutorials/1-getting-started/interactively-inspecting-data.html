@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Interactively inspecting Target Pixel Files &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="How to open a light curve in Excel?" href="how-to-open-a-lightcurve-in-excel.html" />
     <link rel="prev" title="Plotting Target Pixel Files with Lightkurve" href="plotting-target-pixel-files.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -246,9 +242,9 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/1-getting-started/interactively-inspecting-data.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Interactively-inspecting-Target-Pixel-Files">
-<h1>Interactively inspecting Target Pixel Files<a class="headerlink" href="#Interactively-inspecting-Target-Pixel-Files" title="Permalink to this headline">#</a></h1>
+<h1>Interactively inspecting Target Pixel Files<a class="headerlink" href="#Interactively-inspecting-Target-Pixel-Files" title="Link to this heading">¶</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Permalink to this headline">#</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Be able to inspect target pixel files and create custom light curves using the <code class="docutils literal notranslate"><span class="pre">interact()</span></code> tool.</p></li>
@@ -258,11 +254,11 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">¶</a></h2>
 <p><a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> has three interactive tools which make it possible to perform quick inspections and analyses of target pixel files and light curves. These functions use the <a class="reference external" href="https://docs.bokeh.org/en/latest/index.html">Bokeh</a> library to create widgets within a Jupyter notebook. In this tutorial, we provide examples for how to best use the interactive tools in Lightkurve.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">#</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
 <p>The features demonstrated in this tutorial require only the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> package.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -276,7 +272,7 @@
 <hr class="docutils" />
 </section>
 <section id="1.-Inspecting-Target-Pixel-Files-with-interact()">
-<h2>1. Inspecting Target Pixel Files with <code class="docutils literal notranslate"><span class="pre">interact()</span></code><a class="headerlink" href="#1.-Inspecting-Target-Pixel-Files-with-interact()" title="Permalink to this headline">#</a></h2>
+<h2>1. Inspecting Target Pixel Files with <code class="docutils literal notranslate"><span class="pre">interact()</span></code><a class="headerlink" href="#1.-Inspecting-Target-Pixel-Files-with-interact()" title="Link to this heading">¶</a></h2>
 <p>Using interact should be as convenient as downloading a <em>Kepler</em> or <em>TESS</em> target pixel file (TPF) and running the method <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/targetpixelfile.py#L1284">.interact()</a>. This method can only be run in a Jupyter notebook.</p>
 <p><code class="docutils literal notranslate"><span class="pre">.interact()</span></code> offers instantaneous interactive selection of the pixel mask, and instantaneous generation of the resulting light curve. You can click on individual pixels and the aperture photometry seamlessly updates. The mask can be defined with either individual clicking of pixels, or clicking and dragging a box over a rectangular set of pixels. <em>De</em>selection of individual pixels works by re-clicking a pixel that you wish to take away from your mask. Finally, you can save your mask and
 light curve as a FITS file by clicking on the <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Lightcurve</span></code> button.</p>
@@ -327,7 +323,7 @@ light curve as a FITS file by clicking on the <code class="docutils literal notr
 <p>You can see that the <em>Kepler</em> pointing is remarkably stable over this <em>Kepler</em> Quarter of 89 days. The value of interact arises from its ability to discern the spatial origin of signals. In this case, an eclipsing binary occupies the pixels towards the top of the postage stamp image. The target of interest occupies the pixels in the middle. The optimal aperture mask should avoid pixels near the top in order to mitigate an artificial planet signal.</p>
 </section>
 <section id="2.-Identifying-Stars-in-Target-Pixel-Files-with-interact_sky()">
-<h2>2. Identifying Stars in Target Pixel Files with <code class="docutils literal notranslate"><span class="pre">interact_sky()</span></code><a class="headerlink" href="#2.-Identifying-Stars-in-Target-Pixel-Files-with-interact_sky()" title="Permalink to this headline">#</a></h2>
+<h2>2. Identifying Stars in Target Pixel Files with <code class="docutils literal notranslate"><span class="pre">interact_sky()</span></code><a class="headerlink" href="#2.-Identifying-Stars-in-Target-Pixel-Files-with-interact_sky()" title="Link to this heading">¶</a></h2>
 <p>Lightkurve has an additional tool to interactively inspect target pixel files — <code class="docutils literal notranslate"><span class="pre">.interact_sky</span></code>. This method brings up a single frame of the target pixel file with targets identified by Gaia marked by red circles. The size of the circle scales with the magnitude of the target, where brighter sources are larger and fainter sources are smaller. Using your cursor, you can hover over the red circles to display useful information from Gaia, including its Gaia ID, G band magnitude, and coordinates.</p>
 <img alt="interact_sky_overview" src="../../_images/interact_sky_overview.gif" />
 <p>Like <code class="docutils literal notranslate"><span class="pre">.interact</span></code> in section 1, <a class="reference external" href="https://github.com/lightkurve/lightkurve/blob/eb9d3902bf3c2772aade6f4423cfa013394d5af8/src/lightkurve/targetpixelfile.py#L1383">.interact_sky</a> allows you to change the screen stretch, giving you more control over the image display.</p>
@@ -336,14 +332,14 @@ light curve as a FITS file by clicking on the <code class="docutils literal notr
 <img alt="interact_sky zoom" src="../../_images/interact_sky_zoom.gif" />
 </section>
 <section id="3.-Searching-for-Transiting-Planets-in-Light-Curves-with-interact_bls()">
-<h2>3. Searching for Transiting Planets in Light Curves with <code class="docutils literal notranslate"><span class="pre">interact_bls()</span></code><a class="headerlink" href="#3.-Searching-for-Transiting-Planets-in-Light-Curves-with-interact_bls()" title="Permalink to this headline">#</a></h2>
+<h2>3. Searching for Transiting Planets in Light Curves with <code class="docutils literal notranslate"><span class="pre">interact_bls()</span></code><a class="headerlink" href="#3.-Searching-for-Transiting-Planets-in-Light-Curves-with-interact_bls()" title="Link to this heading">¶</a></h2>
 <p>There is also an interactive tool for <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects called <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.LightCurve.interact_bls.html">.interact_bls</a>. BLS, or Box Least Squares, is a method for identifying transit signals in a light curve. For more information about how to use BLS to find transiting planets in <em>Kepler</em>/<em>K2</em> or <em>TESS</em> light curves, please see the companion tutorial on identifying transiting planet signals in a <em>Kepler</em> light curve.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">.interact_bls</span></code> method allows you to identify periodic transit signals in light curves by manually selecting the period and duration of the signal.</p>
 <img alt="interact_bls" src="../../_images/interact_bls.gif" />
 <p>The light curve in the top right panel is phase-folded with the highest power period. When you zoom in on a region of period space in the BLS periodogram, it will automatically update the phase plot with the new period-at-max-power. Changing the duration using the slider in the bottom left will also update the BLS periodogram and phase-folded light curve. Finally, the parameters of the BLS model can be found in the bottom right panel.</p>
 </section>
 <section id="4.-Troubleshooting-Interactive-Tools">
-<h2>4. Troubleshooting Interactive Tools<a class="headerlink" href="#4.-Troubleshooting-Interactive-Tools" title="Permalink to this headline">#</a></h2>
+<h2>4. Troubleshooting Interactive Tools<a class="headerlink" href="#4.-Troubleshooting-Interactive-Tools" title="Link to this heading">¶</a></h2>
 <p>There are a few known limitations of the interactive tools. First, they only work in a Jupyter notebook. Second, you must either run the interactive functions from the default Jupyter notebook address “localhost:8888,” <strong>or tell the function the name of the notebook server</strong>, for example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">notebook_url</span><span class="o">=</span><span class="s1">&#39;localhost:8893&#39;</span><span class="p">)</span>
 </pre></div>
@@ -362,12 +358,12 @@ kwarg, or slicing of your input TPF like so:</p>
 <p>We’d like to thank the developers of <a class="reference external" href="https://bokeh.pydata.org/en/latest/">Bokeh</a>, upon which our interactive tools rely.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Permalink to this headline">#</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">¶</a></h2>
 <p><strong>Authors</strong>: Michael Gully-Santiago (<a class="reference external" href="mailto:igully&#37;&#52;&#48;gmail&#46;com">igully<span>&#64;</span>gmail<span>&#46;</span>com</a>), Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>)</p>
 <p><strong>Updated</strong>: September 29, 2020</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Permalink to this headline">#</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies in your published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
@@ -619,7 +615,7 @@ archivePrefix = "arXiv",
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

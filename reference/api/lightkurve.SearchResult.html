@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.SearchResult &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.SearchResult.download" href="lightkurve.SearchResult.download.html" />
     <link rel="prev" title="lightkurve.search_tesscut" href="lightkurve.search_tesscut.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,34 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.SearchResult">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     SearchResult
+    </span>
+   </code>
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#lightkurve.SearchResult.__init__">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       SearchResult.__init__()
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,18 +1342,18 @@
               <div>
                 
   <section id="lightkurve-searchresult">
-<h1>lightkurve.SearchResult<a class="headerlink" href="#lightkurve-searchresult" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.SearchResult<a class="headerlink" href="#lightkurve-searchresult" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lightkurve.SearchResult">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.</span></span><span class="sig-name descname"><span class="pre">SearchResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#SearchResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.SearchResult" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lightkurve.</span></span><span class="sig-name descname"><span class="pre">SearchResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#SearchResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.SearchResult" title="Link to this definition">¶</a></dt>
 <dd><p>Container for the results returned by the search functions.</p>
 <p>The purpose of this class is to provide a convenient way to inspect and
 download products that have been identified using one of the data search
 functions.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>Astropy table returned by a join of the astroquery <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.query_criteria()</span></code>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>Astropy table returned by a join of the astroquery <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.query_criteria()</span></code>
 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.get_product_list()</span></code> methods.</p>
 </dd>
 </dl>
@@ -1338,15 +1361,11 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.SearchResult.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#SearchResult.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.SearchResult.__init__" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/lightkurve/search.html#SearchResult.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lightkurve.SearchResult.__init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.SearchResult.__init__" title="lightkurve.SearchResult.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([table])</p></td>
 <td><p></p></td>
@@ -1360,11 +1379,7 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
-<table class="autosummary longtable table autosummary">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
+<table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.author.html#lightkurve.SearchResult.author" title="lightkurve.SearchResult.author"><code class="xref py py-obj docutils literal notranslate"><span class="pre">author</span></code></a></p></td>
 <td><p>Pipeline name for each data product found.</p></td>
@@ -1391,7 +1406,7 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 <td><p>Right Ascension coordinate for each data product found.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.SearchResult.table.html#lightkurve.SearchResult.table" title="lightkurve.SearchResult.table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">table</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v7.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> containing the full search results returned by the MAST API.</p></td>
+<td><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v7.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> containing the full search results returned by the MAST API.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.SearchResult.target_name.html#lightkurve.SearchResult.target_name" title="lightkurve.SearchResult.target_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_name</span></code></a></p></td>
 <td><p>Target name for each data product found.</p></td>
@@ -1449,7 +1464,7 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

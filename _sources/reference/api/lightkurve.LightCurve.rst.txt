@@ -72,6 +72,7 @@
       ~LightCurve.scatter
       ~LightCurve.search_neighbors
       ~LightCurve.select_flux
+      ~LightCurve.setdefault
       ~LightCurve.show_in_browser
       ~LightCurve.show_in_notebook
       ~LightCurve.show_properties

@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>lightkurve.KeplerTargetPixelFile.interact &#8212; Lightkurve </title>
     
@@ -20,22 +19,21 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="lightkurve.KeplerTargetPixelFile.interact_sky" href="lightkurve.KeplerTargetPixelFile.interact_sky.html" />
     <link rel="prev" title="lightkurve.KeplerTargetPixelFile.to_fits" href="lightkurve.KeplerTargetPixelFile.to_fits.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -62,7 +60,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -529,6 +527,11 @@
     </a>
    </li>
    <li class="toctree-l2">
+    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
+     lightkurve.FoldedLightCurve.bin
+    </a>
+   </li>
+   <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.odd_mask.html">
      lightkurve.FoldedLightCurve.odd_mask
     </a>
@@ -556,11 +559,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="lightkurve.FoldedLightCurve.plot_river.html">
      lightkurve.FoldedLightCurve.plot_river
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="lightkurve.FoldedLightCurve.bin.html">
-     lightkurve.FoldedLightCurve.bin
     </a>
    </li>
   </ul>
@@ -1296,9 +1294,23 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lightkurve.KeplerTargetPixelFile.interact">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     KeplerTargetPixelFile.interact()
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -1319,10 +1331,10 @@
               <div>
                 
   <section id="lightkurve-keplertargetpixelfile-interact">
-<h1>lightkurve.KeplerTargetPixelFile.interact<a class="headerlink" href="#lightkurve-keplertargetpixelfile-interact" title="Permalink to this headline">#</a></h1>
+<h1>lightkurve.KeplerTargetPixelFile.interact<a class="headerlink" href="#lightkurve-keplertargetpixelfile-interact" title="Link to this heading">¶</a></h1>
 <dl class="py method">
 <dt class="sig sig-object py" id="lightkurve.KeplerTargetPixelFile.interact">
-<span class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></span><span class="sig-name descname"><span class="pre">interact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cadences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aperture_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exported_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.interact" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">KeplerTargetPixelFile.</span></span><span class="sig-name descname"><span class="pre">interact</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cadences</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aperture_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exported_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.KeplerTargetPixelFile.interact" title="Link to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <a class="reference internal" href="lightkurve.KeplerTargetPixelFile.to_lightcurve.html#lightkurve.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></a> method,
@@ -1333,7 +1345,7 @@ This dependency can be installed using e.g. <code class="xref py py-obj docutils
 Notebook, and tends to be too slow when more than ~30,000 cadences
 are contained in the TPF (e.g. short cadence data).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>notebook_url</strong><span class="classifier">str</span></dt><dd><p>Location of the Jupyter notebook page (default: “localhost:8888”)
 When showing Bokeh applications, the Bokeh server must be
@@ -1350,7 +1362,7 @@ be defined appropriately automatically.</p>
 <dt><strong>max_cadences</strong><span class="classifier">int</span></dt><dd><p>Print an error message if the number of cadences shown is larger than
 this value. This limit helps keep browsers from becoming unresponsive.</p>
 </dd>
-<dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘threshold’, ‘default’, or ‘all’</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
+<dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘threshold’, ‘default’, or ‘all’</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used.
 If None or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
@@ -1382,15 +1394,15 @@ lightcurve flux values.</p>
 <p class="rubric">Examples</p>
 <p>To select an aperture mask for V827 Tau:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">lightkurve</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lk</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;V827 Tau&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;V827 Tau&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s2">&quot;K2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>To see the full y-axis dynamic range of your lightcurve and normalize
 the lightcurve after each pixel selection:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ylim_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>  
-<span class="gp">&gt;&gt;&gt; </span><span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>  
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">ylim_func</span><span class="o">=</span><span class="n">ylim_func</span><span class="p">,</span> <span class="n">transform_func</span><span class="o">=</span><span class="n">transform_func</span><span class="p">)</span>  
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ylim_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">transform_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">ylim_func</span><span class="o">=</span><span class="n">ylim_func</span><span class="p">,</span> <span class="n">transform_func</span><span class="o">=</span><span class="n">transform_func</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1438,7 +1450,7 @@ the lightcurve after each pixel selection:</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     

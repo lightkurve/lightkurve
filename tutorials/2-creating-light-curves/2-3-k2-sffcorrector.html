@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Removing noise from K2 light curves using Self Flat Fielding (SFFCorrector) &#8212; Lightkurve </title>
     
@@ -20,25 +19,22 @@
   <link rel="preload" as="font" type="font/woff2" crossorigin
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Identifying transiting exoplanet signals in a light curve" href="../3-science-examples/exoplanets-identifying-transiting-planet-signals.html" />
+    <link rel="next" title="Using the to_fits and read_generic_lightcurve functions" href="2-4-using_the_to_fits_and_read_generic_lightcurve_function.html" />
     <link rel="prev" title="Removing noise from K2 and TESS light curves using Pixel Level Decorrelation (PLDCorrector)" href="2-3-k2-pldcorrector.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -65,7 +61,7 @@
     
     
 <a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.5</p>
+<p class="title">Lightkurve v2.6</p>
 </a>
 
     
@@ -181,7 +177,7 @@
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/2-creating-light-curves/2-3-k2-sffcorrector.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Removing-noise-from-K2-light-curves-using-Self-Flat-Fielding-(SFFCorrector)">
-<h1>Removing noise from K2 light curves using Self Flat Fielding (<code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-K2-light-curves-using-Self-Flat-Fielding-(SFFCorrector)" title="Permalink to this headline">#</a></h1>
+<h1>Removing noise from K2 light curves using Self Flat Fielding (<code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code>)<a class="headerlink" href="#Removing-noise-from-K2-light-curves-using-Self-Flat-Fielding-(SFFCorrector)" title="Link to this heading">¶</a></h1>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to remove the spacecraft motion noise from K2 data. Targets in K2 data move over multiple pixels during the exposure due to thruster firings. This can be corrected using the Self Flat Fielding method (SFF), which you can read more about <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector">here</a>.</p>
 <p>This tutorial demonstrates how you can apply the method on your light curves Using <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code>.</p>
 <p>Let’s start by downloading a K2 light curve of an exoplanet host star.</p>
@@ -293,10 +289,10 @@
             <p class="prev-next-title">Removing noise from <em>K2</em> and <em>TESS</em> light curves using Pixel Level Decorrelation (<code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>)</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../3-science-examples/exoplanets-identifying-transiting-planet-signals.html" title="next page">
+    <a class='right-next' id="next-link" href="2-4-using_the_to_fits_and_read_generic_lightcurve_function.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Identifying transiting exoplanet signals in a light curve</p>
+        <p class="prev-next-title">Using the to_fits and read_generic_lightcurve functions</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
@@ -321,7 +317,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
 </p>
     </div>
     
