@@ -14,12 +14,14 @@ from astropy.io import ascii
 from astropy.table import Row, Table, join
 from astropy.time import Time
 from astropy.utils import deprecated
+from astroquery.mast import Observations, TesscutClass
+from astroquery.exceptions import NoResultsWarning, ResolverError
 from memoization import cached
 from requests import HTTPError
 
 from . import PACKAGEDIR, conf, config
 from .collections import LightCurveCollection, TargetPixelFileCollection
-from .io import read
+from .io import read, read_lc_collection, read_tpf_collection
 from .targetpixelfile import TargetPixelFile
 from .utils import (
     LightkurveDeprecationWarning,
@@ -113,6 +115,28 @@ class SearchResult(object):
     See :ref:`configuration <api.config>` for more information.
     """
 
+    _use_cloud_uri = False
+    """If set to True, use an S3 URI rather than download a search result.
+    It can be configured in a few different ways:
+
+    1. in the user's ``lightkurve.cfg`` file::
+
+        [search]
+        # The extra comma at the end is needed for a single extra column
+        search_result_use_cloud_uri = True
+
+    2. at run time::
+
+        import lightkurve as lk
+        lk.conf.search_result_use_cloud_uri = True
+
+    3. for a specific `SearchResult` object instance::
+
+        result.use_cloud_uri = True
+
+    See :ref:`configuration <api.config>` for more information.
+    """
+
     def __init__(self, table=None):
         if table is None:
             self.table = Table()
@@ -122,6 +146,10 @@ class SearchResult(object):
                 self._add_columns()
                 self._sort_table()
         self.display_extra_columns = conf.search_result_display_extra_columns
+        self._use_cloud_uri = conf.search_result_use_cloud_uri
+        if self._use_cloud_uri:
+            # Enable cloud dataset if ``_use_cloud_uri`` is set to True
+            Observations.enable_cloud_dataset()
 
     def _sort_table(self):
         """Sort the table of search results by distance, author, and filename.
@@ -270,6 +298,93 @@ class SearchResult(object):
     def distance(self):
         """Distance from the search position for each data product found."""
         return self.table["distance"].quantity
+    
+    @property
+    def use_cloud_uri(self):
+        """Whether to use an S3 URI rather than download a search result."""
+        return self._use_cloud_uri
+
+    @use_cloud_uri.setter
+    def use_cloud_uri(self, value):
+        """Setter to enable cloud dataset if ``_use_cloud_uri`` is set to True"""
+        self._use_cloud_uri = value
+        if value:
+            Observations.enable_cloud_dataset()
+        
+    def _get_uris(
+        self, table, quality_bitmask="default", **kwargs
+    ):
+        """Private method that returns a list of cloud URIs for products in a table."""
+        # Filter out any FFI cutouts
+        if any("FFI Cutout" in row for row in table['description']):
+            warnings.warn(
+                ## TODO: Add more info to how user can get FFI Cutouts
+                "Cannot retrieve cloud URIs for FFI cutouts.", LightkurveWarning
+            )
+            table = table[["FFI Cutout" not in row for row in table['description']]]
+
+        # Warn user if there are no URIs to retrieve
+        if len(table) == 0:
+            warnings.warn(
+                "Cannot retrieve cloud URIs for an empty search result.", LightkurveWarning
+            )
+            return None
+
+        # Get cloud URIs with Astroquery
+        log.debug("Retrieving AWS S3 URI(s).")
+        uris = Observations.get_cloud_uris(table)
+        # Filter out None values for products that don't exist on the cloud
+        existing = [uri for uri in uris if uri is not None]
+        
+        # Warn user if no URIs are successfully returned
+        if len(existing) == 0:
+            warnings.warn(
+                # TODO: Add instructions for how to switch
+                "No products exist on the AWS S3 cloud.", LightkurveWarning
+            )
+        
+        return existing
+            
+    def get_cloud_uris(
+        self, quality_bitmask="default", **kwargs
+    ):
+        """Get the S3 cloud URIs for data products in a search result.
+
+        Parameters
+        ----------
+        quality_bitmask : str or int, optional
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored
+                * "default": cadences with severe quality issues will be ignored
+                * "hard": more conservative choice of flags to ignore
+                  This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags <lightkurve.utils.KeplerQualityFlags>` or :class:`TessQualityFlags <lightkurve.utils.TessQualityFlags>` class for details on the bitmasks.
+        kwargs : dict, optional
+            Extra keyword arguments passed on to the file format reader function.
+
+        Returns
+        -------
+        collection : `~lightkurve.collections.Collection` object
+            Returns a `~lightkurve.LightCurveCollection` or
+            `~lightkurve.TargetPixelFileCollection`,
+            containing all entries in the products table
+
+        Raises
+        ------
+        HTTPError
+            If the TESSCut service times out (i.e. returns HTTP status 504).
+        SearchError
+            If any other error occurs.
+        """
+        return self._get_uris(self.table, 
+                              quality_bitmask=quality_bitmask,
+                              **kwargs)
 
     def _download_one(
         self, table, quality_bitmask, download_dir, cutout_size, **kwargs
@@ -279,9 +394,6 @@ class SearchResult(object):
 
         Always returns a `TargetPixelFile` or `LightCurve` object.
         """
-        # Make sure astroquery uses the same level of verbosity
-        logging.getLogger("astropy").setLevel(log.getEffectiveLevel())
-
         if download_dir is None:
             download_dir = self._default_download_dir()
 
@@ -412,27 +524,44 @@ class SearchResult(object):
             If any other error occurs.
 
         """
+        multiple_warning = ("Warning: {} products in search result. "
+                            "A URI will only be retrieved the first product. "
+                            "Please use `download_all()` or specify additional "
+                            "criteria (e.g. quarter, campaign, or sector) "
+                            "to limit your search.".format(len(self.table)))
+        
+        if self.use_cloud_uri:
+            warnings.warn(
+                "Lightkurve is currently configured to read products with cloud URIs rather than download data products. "
+                "To change this, set the `use_cloud_uri` configuration parameter using the methods "
+                "described :ref:`here <api.config>`", 
+                LightkurveWarning
+            )
+            if len(self.table) != 1:
+                warnings.warn(multiple_warning, LightkurveWarning)
+    
+            uri = self._get_uris(
+                table=self.table[:1],
+                quality_bitmask=quality_bitmask,
+                **kwargs
+            )
+            prod = read(uri[0], quality_bitmask=quality_bitmask, **kwargs) if uri else None
+            return prod
+        
         if len(self.table) == 0:
             warnings.warn(
                 "Cannot download from an empty search result.", LightkurveWarning
             )
             return None
         if len(self.table) != 1:
-            warnings.warn(
-                "Warning: {} files available to download. "
-                "Only the first file has been downloaded. "
-                "Please use `download_all()` or specify additional "
-                "criteria (e.g. quarter, campaign, or sector) "
-                "to limit your search.".format(len(self.table)),
-                LightkurveWarning,
-            )
+            warnings.warn(multiple_warning, LightkurveWarning)
 
         return self._download_one(
             table=self.table[:1],
             quality_bitmask=quality_bitmask,
             download_dir=download_dir,
             cutout_size=cutout_size,
-            **kwargs,
+            **kwargs
         )
 
     @suppress_stdout
@@ -488,6 +617,25 @@ class SearchResult(object):
         SearchError
             If any other error occurs.
         """
+        if self.use_cloud_uri:
+            warnings.warn(
+                "Lightkurve is currently configured to return cloud URIs rather than download data products. "
+                "To change this, set the `use_cloud_uri` configuration parameter using the methods "
+                "described :ref:`here <api.config>`", 
+                LightkurveWarning
+            )
+            uris = self._get_uris(
+                table=self.table,
+                quality_bitmask=quality_bitmask,
+                **kwargs
+            )
+            if not uris:
+                return None
+            if 'curve' in self.table[0]['description'].lower():
+                return read_lc_collection(uris, quality_bitmask=quality_bitmask, **kwargs)
+            else:
+                return read_tpf_collection(uris, quality_bitmask=quality_bitmask, **kwargs)
+        
         if len(self.table) == 0:
             warnings.warn(
                 "Cannot download from an empty search result.", LightkurveWarning
@@ -503,7 +651,7 @@ class SearchResult(object):
                     quality_bitmask=quality_bitmask,
                     download_dir=download_dir,
                     cutout_size=cutout_size,
-                    **kwargs,
+                    **kwargs
                 )
             )
         if isinstance(products[0], TargetPixelFile):
@@ -531,8 +679,6 @@ class SearchResult(object):
         path : str
             Path to locally downloaded cutout file
         """
-        from astroquery.mast import TesscutClass
-
         coords = _resolve_object(target)
 
         # Set cutout_size defaults
@@ -1014,8 +1160,6 @@ def _search_products(
 
     # Light curves and target pixel files
     if filetype.lower() != "ffi":
-        from astroquery.mast import Observations
-
         products = Observations.get_product_list(observations)
         result = join(
             observations,
@@ -1149,10 +1293,6 @@ def _query_mast(
     obs : astropy.Table
         Table detailing the available observations on MAST.
     """
-    # Local astroquery import because the package is not used elsewhere
-    from astroquery.exceptions import NoResultsWarning, ResolverError
-    from astroquery.mast import Observations
-
     # If passed a SkyCoord, convert it to an "ra, dec" string for MAST
     if isinstance(target, SkyCoord):
         target = "{}, {}".format(target.ra.deg, target.dec.deg)
