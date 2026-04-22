@@ -43,6 +43,19 @@
     <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){ dataLayer.push(arguments); }
+                gtag('consent', 'default', {
+                    'ad_storage': 'denied',
+                    'ad_user_data': 'denied',
+                    'ad_personalization': 'denied',
+                    'analytics_storage': 'denied'
+                });
+                gtag('js', new Date());
+                gtag('config', 'UA-69171-9');
+            </script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/3-science-examples/exoplanets-recover-first-tess-candidate';</script>
@@ -440,7 +453,7 @@
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table6198124496">
+<table id="table13049326416">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 01</td><td>2018</td><td><a href='https://heasarc.gsfc.nasa.gov/docs/tess/data-handling.html'>SPOC</a></td><td>120</td><td>261136679</td><td>0.0</td></tr>
@@ -598,7 +611,7 @@ TessTargetPixelFile(TICID: 261136679)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x171947110&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x171981710&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x169e59250&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1716a3a90&gt;]
+[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x309d47890&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x309d81e90&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x108ea0c10&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x309c8d150&gt;]
 </pre></div></div>
 </div>
 <p>You can access each extension and the data inside it in the same way you’d use <a class="reference external" href="https://docs.astropy.org/en/stable/io/fits/">astropy.io.fits</a>. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using</p>

@@ -43,6 +43,19 @@
     <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){ dataLayer.push(arguments); }
+                gtag('consent', 'default', {
+                    'ad_storage': 'denied',
+                    'ad_user_data': 'denied',
+                    'ad_personalization': 'denied',
+                    'analytics_storage': 'denied'
+                });
+                gtag('js', new Date());
+                gtag('config', 'UA-69171-9');
+            </script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/2-creating-light-curves/2-3-how-to-use-cbvcorrector';</script>
@@ -546,7 +559,7 @@ reference</a>.</p>
 <p>At first sight, this looks like a good correction. Both the Single-Scale and Spike basis vectors are being utilized to fit out as much of the signal as possible. The corrected light curve is indeed flatter. But this was essentially an unrestricted least-squares correction and we may have <em>over-fitted</em>. The very strong lips right at the beginning of each orbit is probably a chance correlation between the star’s inherent stellar variability and the thermal settling systematic that is common in
 Kepler and TESS lightcurves. Let’s look at the CBVCorrector goodness metrics to determine if this is the case.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note: this cell will be slow to run</span>
@@ -560,8 +573,7 @@ Kepler and TESS lightcurves. Let’s look at the CBVCorrector goodness metrics t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.7115922984913308
-Under fitting Metric: 0.9697057245444944
+Over fitting Metric: 0.7123518503044495
 </pre></div></div>
 </div>
 <p>The first time you run the under-fitting goodness metric it will download the SPOC SAP light curves of targets in the neighborhood around the target under study in order to estimate the residual systematics (they are stored in the CBVCorrector object for subsequent computations). A goodness metric of 0.8 or above is generally considered good. In this case, it looks like we over-fitted (over-fitting metric = 0.71). Even though the corrected light curve looks better, our metric is telling us we
@@ -571,7 +583,7 @@ probably injected signals into our lightcurve and we should not trust this reall
 <h2>Using the Goodness Metrics to Optimize the Fit<a class="headerlink" href="#Using-the-Goodness-Metrics-to-Optimize-the-Fit" title="Link to this heading">#</a></h2>
 <p>We will start by performing a scan of the over- and under-fit goodness metrics as a function of the L2-Norm regularization term, alpha.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbvCorrector</span><span class="o">.</span><span class="n">goodness_metric_scan_plot</span><span class="p">(</span><span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="n">cbv_indices</span><span class="p">);</span>
@@ -587,7 +599,7 @@ probably injected signals into our lightcurve and we should not trust this reall
 </div>
 <p>This scan also plots the last used alpha parameter as a vertical black line (alpha=1e-4 in our case). We are clearly not optimizing this fit for both over- and under-fitting. Let’s use the <code class="docutils literal notranslate"><span class="pre">correct</span></code> numerical optimizer to try to optimize the fit.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbvCorrector</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="n">cbv_indices</span><span class="p">);</span>
@@ -601,9 +613,9 @@ probably injected signals into our lightcurve and we should not trust this reall
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996581348505883
-Optimized Under-fitting metric: 0.8235713296673602
-Optimized Alpha: 9.792e+03
+Optimized Over-fitting metric: 0.9996566787964412
+Optimized Under-fitting metric: 0.8235711805082385
+Optimized Alpha: 9.640e+03
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -623,7 +635,7 @@ Optimized Alpha: 9.792e+03
 <p>Much better! We see the thermal settling systematic is still being removed, but the stellar variabity is better preserved. Note that the optimizer did not set the alpha parameter at exactly the red and blue curve intersection point. The default target goodness scores is 0.8 or above, which is fulfilled at alpha=1.45e-1. If we want to optimize the fit even more, by perhaps ensuring we are not over-fitting at all, then we can adjust the target over and under scores to emphasize which metric we are
 more interested in. Below we more greatly emphasize improving the over-fitting metric by setting the target to 0.9.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbvCorrector</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span>
@@ -640,9 +652,9 @@ more interested in. Below we more greatly emphasize improving the over-fitting m
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Optimized Over-fitting metric: 0.9996549757305626
-Optimized Under-fitting metric: 0.8235712157819325
-Optimized Alpha: 9.676e+03
+Optimized Over-fitting metric: 0.9996528005184675
+Optimized Under-fitting metric: 0.8235709911208746
+Optimized Alpha: 9.443e+03
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -665,7 +677,7 @@ Optimized Alpha: 9.676e+03
 <h2>No Single Best Answer Example<a class="headerlink" href="#No-Single-Best-Answer-Example" title="Link to this heading">#</a></h2>
 <p>Let’s now look at another example, this time where there is no clear single best answer. Again, we will use the Single-Scale and Spike basis vectors for the correction and begin with low regularization.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurve</span><span class="p">(</span><span class="s1">&#39;TIC 38574307&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="s1">&#39;SPOC&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">flux_column</span><span class="o">=</span><span class="s1">&#39;sap_flux&#39;</span><span class="p">)</span>
@@ -686,7 +698,7 @@ Optimized Alpha: 9.676e+03
 </div>
 <p>At first sight, this looks good. The long term trends have been removed and the periodic noisy bits have been removed with the spike basis vectors. But did we really do a good job?</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Over fitting Metric: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cbvCorrector</span><span class="o">.</span><span class="n">over_fitting_metric</span><span class="p">()))</span>
@@ -700,20 +712,193 @@ Optimized Alpha: 9.676e+03
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Over fitting Metric: 0.26255265902778535
-Under fitting Metric: 0.9995801211972846
+Over fitting Metric: 0.2617079411722498
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_35_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_35_1.png" />
-</div>
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">TimeoutError</span>                              Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[12], line 2</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">Over fitting Metric: </span><span class="ansi-bold" style="color: rgb(175,95,135)">{}</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(98,98,98)">.</span>format(cbvCorrector<span style="color: rgb(98,98,98)">.</span>over_fitting_metric()))
+<span class="ansi-green-fg">----&gt; 2</span> <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">Under fitting Metric: </span><span class="ansi-bold" style="color: rgb(175,95,135)">{}</span><span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(98,98,98)">.</span>format(<span class="ansi-yellow-bg">cbvCorrector</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">under_fitting_metric</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>))
+<span class="ansi-green-intense-fg ansi-bold">      3</span> cbvCorrector<span style="color: rgb(98,98,98)">.</span>goodness_metric_scan_plot(cbv_type<span style="color: rgb(98,98,98)">=</span>cbv_type, cbv_indices<span style="color: rgb(98,98,98)">=</span>cbv_indices);
+
+File <span class="ansi-green-fg">~/tessgi/dev/lightkurve/lkmain-docs/lightkurve/src/lightkurve/correctors/cbvcorrector.py:623</span>, in <span class="ansi-cyan-fg">CBVCorrector.under_fitting_metric</span><span class="ansi-blue-fg">(self, radius, min_targets, max_targets)</span>
+<span class="ansi-green-intense-fg ansi-bold">    621</span> <span class="ansi-bold" style="color: rgb(0,135,0)">while</span> (continue_searching):
+<span class="ansi-green-intense-fg ansi-bold">    622</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">--&gt; 623</span>         metric <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">underfit_metric_neighbors</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">corrected_lc</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span>
+<span class="ansi-green-intense-fg ansi-bold">    624</span> <span class="ansi-yellow-bg">                    </span><span class="ansi-yellow-bg">dynamic_search_radius</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">min_targets</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">max_targets</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span>
+<span class="ansi-green-intense-fg ansi-bold">    625</span> <span class="ansi-yellow-bg">                    </span><span class="ansi-yellow-bg">interpolate</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">extrapolate</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    626</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">except</span> MinTargetsError:
+<span class="ansi-green-intense-fg ansi-bold">    627</span>         <span style="color: rgb(95,135,135)"># Too few targets found, try increasing search radius</span>
+<span class="ansi-green-intense-fg ansi-bold">    628</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> (dynamic_search_radius <span style="color: rgb(98,98,98)">&gt;</span> max_search_radius):
+<span class="ansi-green-intense-fg ansi-bold">    629</span>             <span style="color: rgb(95,135,135)"># Hit the edge of the CCD, we have to give up</span>
+
+File <span class="ansi-green-fg">~/tessgi/dev/lightkurve/lkmain-docs/lightkurve/src/lightkurve/correctors/metrics.py:184</span>, in <span class="ansi-cyan-fg">underfit_metric_neighbors</span><span class="ansi-blue-fg">(corrected_lc, radius, min_targets, max_targets, interpolate, extrapolate, quality_bitmask)</span>
+<span class="ansi-green-intense-fg ansi-bold">    181</span> corrected_lc_flux <span style="color: rgb(98,98,98)">=</span> corrected_lc<span style="color: rgb(98,98,98)">.</span>flux<span style="color: rgb(98,98,98)">.</span>value
+<span class="ansi-green-intense-fg ansi-bold">    183</span> <span style="color: rgb(95,135,135)"># Download and pre-process neighboring light curves</span>
+<span class="ansi-green-fg">--&gt; 184</span> lc_neighborhood, lc_neighborhood_flux <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">_download_and_preprocess_neighbors</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">    185</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">corrected_lc</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">corrected_lc</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    186</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    187</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">min_targets</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">min_targets</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    188</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">max_targets</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">max_targets</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    189</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">interpolate</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">interpolate</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    190</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">extrapolate</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">extrapolate</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    191</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">flux_column</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">sap_flux</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    192</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">quality_bitmask</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">quality_bitmask</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    193</span> <span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    195</span> <span style="color: rgb(95,135,135)"># Create fluxMatrix. The last entry is the target under study</span>
+<span class="ansi-green-intense-fg ansi-bold">    196</span> <span style="color: rgb(95,135,135)"># Check that all neighboring targets have similar shape</span>
+<span class="ansi-green-intense-fg ansi-bold">    197</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> np<span style="color: rgb(98,98,98)">.</span>all([<span style="color: rgb(0,135,0)">len</span>(lc_neighborhood_flux[<span style="color: rgb(98,98,98)">0</span>]) <span style="color: rgb(98,98,98)">==</span> <span style="color: rgb(0,135,0)">len</span>(l) <span class="ansi-bold" style="color: rgb(0,135,0)">for</span> l <span class="ansi-bold" style="color: rgb(175,0,255)">in</span> lc_neighborhood_flux]):
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/memoization/caching/plain_cache.py:42</span>, in <span class="ansi-cyan-fg">get_caching_wrapper.&lt;locals&gt;.wrapper</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     40</span> <span class="ansi-bold" style="color: rgb(0,135,0)">with</span> lock:
+<span class="ansi-green-intense-fg ansi-bold">     41</span>     misses <span style="color: rgb(98,98,98)">+</span><span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(98,98,98)">1</span>
+<span class="ansi-green-fg">---&gt; 42</span> result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">user_function</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     43</span> cache[key] <span style="color: rgb(98,98,98)">=</span> values_toolkit<span style="color: rgb(98,98,98)">.</span>make_cache_value(result, ttl)
+<span class="ansi-green-intense-fg ansi-bold">     44</span> key_argument_map[key] <span style="color: rgb(98,98,98)">=</span> (args, kwargs)
+
+File <span class="ansi-green-fg">~/tessgi/dev/lightkurve/lkmain-docs/lightkurve/src/lightkurve/correctors/metrics.py:327</span>, in <span class="ansi-cyan-fg">_download_and_preprocess_neighbors</span><span class="ansi-blue-fg">(corrected_lc, radius, min_targets, max_targets, interpolate, extrapolate, author, flux_column, quality_bitmask)</span>
+<span class="ansi-green-intense-fg ansi-bold">    324</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> extrapolate <span class="ansi-bold" style="color: rgb(175,0,255)">and</span> (extrapolate <span style="color: rgb(98,98,98)">!=</span> interpolate):
+<span class="ansi-green-intense-fg ansi-bold">    325</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">Exception</span>(<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">interpolate must be True if extrapolate is True</span><span style="color: rgb(175,0,0)">&#39;</span>)
+<span class="ansi-green-fg">--&gt; 327</span> search <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">corrected_lc</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">search_neighbors</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">    328</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">limit</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">max_targets</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">author</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">author</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    329</span> <span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    330</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">len</span>(search) <span style="color: rgb(98,98,98)">&lt;</span> min_targets:
+<span class="ansi-green-intense-fg ansi-bold">    331</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> MinTargetsError(
+<span class="ansi-green-intense-fg ansi-bold">    332</span>         <span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Unable to find at least </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>min_targets<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)"> neighbors within </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>radius<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)"> arcseconds radius.</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    333</span>     )
+
+File <span class="ansi-green-fg">~/tessgi/dev/lightkurve/lkmain-docs/lightkurve/src/lightkurve/lightcurve.py:3098</span>, in <span class="ansi-cyan-fg">LightCurve.search_neighbors</span><span class="ansi-blue-fg">(self, limit, radius, **search_criteria)</span>
+<span class="ansi-green-intense-fg ansi-bold">   3093</span> <span style="color: rgb(95,135,135)"># Note: we increase `limit` by one below to account for the fact that the</span>
+<span class="ansi-green-intense-fg ansi-bold">   3094</span> <span style="color: rgb(95,135,135)"># current light curve will be returned by the search operation</span>
+<span class="ansi-green-intense-fg ansi-bold">   3095</span> log<span style="color: rgb(98,98,98)">.</span>info(
+<span class="ansi-green-intense-fg ansi-bold">   3096</span>     <span style="color: rgb(175,0,0)">f</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Started searching for up to </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>limit<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)"> neighbors within </span><span class="ansi-bold" style="color: rgb(175,95,135)">{</span>radius<span class="ansi-bold" style="color: rgb(175,95,135)">}</span><span style="color: rgb(175,0,0)"> arcseconds.</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">   3097</span> )
+<span class="ansi-green-fg">-&gt; 3098</span> result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">search_lightcurve</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">   3099</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">f</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,95,135)">{</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">ra</span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,95,135)">{</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">dec</span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,95,135)">}</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">limit</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">limit</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">+</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">1</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">search_criteria</span>
+<span class="ansi-green-intense-fg ansi-bold">   3100</span> <span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   3102</span> <span style="color: rgb(95,135,135)"># Filter by distance &gt; 0 to avoid returning the current light curve</span>
+<span class="ansi-green-intense-fg ansi-bold">   3103</span> result <span style="color: rgb(98,98,98)">=</span> result[result<span style="color: rgb(98,98,98)">.</span>distance <span style="color: rgb(98,98,98)">&gt;</span> <span style="color: rgb(98,98,98)">0</span>]
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/memoization/caching/plain_cache.py:42</span>, in <span class="ansi-cyan-fg">get_caching_wrapper.&lt;locals&gt;.wrapper</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     40</span> <span class="ansi-bold" style="color: rgb(0,135,0)">with</span> lock:
+<span class="ansi-green-intense-fg ansi-bold">     41</span>     misses <span style="color: rgb(98,98,98)">+</span><span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(98,98,98)">1</span>
+<span class="ansi-green-fg">---&gt; 42</span> result <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">user_function</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     43</span> cache[key] <span style="color: rgb(98,98,98)">=</span> values_toolkit<span style="color: rgb(98,98,98)">.</span>make_cache_value(result, ttl)
+<span class="ansi-green-intense-fg ansi-bold">     44</span> key_argument_map[key] <span style="color: rgb(98,98,98)">=</span> (args, kwargs)
+
+File <span class="ansi-green-fg">~/tessgi/dev/lightkurve/lkmain-docs/lightkurve/src/lightkurve/search.py:833</span>, in <span class="ansi-cyan-fg">search_lightcurve</span><span class="ansi-blue-fg">(target, radius, exptime, cadence, mission, author, quarter, month, campaign, sector, limit)</span>
+<span class="ansi-green-intense-fg ansi-bold">    733</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;Search the `MAST data archive &lt;https://archive.stsci.edu&gt;`_ for light curves.</span>
+<span class="ansi-green-intense-fg ansi-bold">    734</span>
+<span class="ansi-green-intense-fg ansi-bold">    735</span> <span style="color: rgb(175,0,0)">This function fetches a data table that lists the Light Curve Files</span>
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-intense-fg ansi-bold">    830</span> <span style="color: rgb(175,0,0)">    &gt;&gt;&gt; search_lightcurve(&#39;Kepler-10&#39;, radius=100, quarter=4, exptime=1800).download_all()  # doctest: +SKIP</span>
+<span class="ansi-green-intense-fg ansi-bold">    831</span> <span style="color: rgb(175,0,0)">&#34;&#34;&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">    832</span> <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">--&gt; 833</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">_search_products</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">    834</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">target</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    835</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    836</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">filetype</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">Lightcurve</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    837</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">exptime</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">exptime</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">or</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">cadence</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    838</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">mission</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">mission</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    839</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">provenance_name</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">author</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    840</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">quarter</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">quarter</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    841</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">month</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">month</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    842</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">campaign</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">campaign</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    843</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">sector</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">sector</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    844</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">limit</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">limit</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    845</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    846</span> <span class="ansi-bold" style="color: rgb(0,135,0)">except</span> SearchError <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> exc:
+<span class="ansi-green-intense-fg ansi-bold">    847</span>     log<span style="color: rgb(98,98,98)">.</span>error(exc)
+
+File <span class="ansi-green-fg">~/tessgi/dev/lightkurve/lkmain-docs/lightkurve/src/lightkurve/search.py:997</span>, in <span class="ansi-cyan-fg">_search_products</span><span class="ansi-blue-fg">(target, radius, filetype, mission, provenance_name, exptime, quarter, month, campaign, sector, limit, **extra_query_criteria)</span>
+<span class="ansi-green-intense-fg ansi-bold">    995</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> filetype<span style="color: rgb(98,98,98)">.</span>lower() <span style="color: rgb(98,98,98)">==</span> <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">ffi</span><span style="color: rgb(175,0,0)">&#34;</span> <span class="ansi-bold" style="color: rgb(175,0,255)">and</span> radius <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
+<span class="ansi-green-intense-fg ansi-bold">    996</span>     radius <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(98,98,98)">0.0001</span> <span style="color: rgb(98,98,98)">*</span> u<span style="color: rgb(98,98,98)">.</span>arcsec
+<span class="ansi-green-fg">--&gt; 997</span> observations <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">_query_mast</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-intense-fg ansi-bold">    998</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">target</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    999</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">radius</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1000</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">project</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">mission</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1001</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">provenance_name</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">provenance_name</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1002</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">exptime</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">exptime</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1003</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">sequence_number</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">campaign</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg ansi-bold" style="color: rgb(175,0,255)">or</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">sector</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1004</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">extra_query_criteria</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">   1005</span> <span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1006</span> log<span style="color: rgb(98,98,98)">.</span>debug(
+<span class="ansi-green-intense-fg ansi-bold">   1007</span>     <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">MAST found </span><span class="ansi-bold" style="color: rgb(175,95,135)">{}</span><span style="color: rgb(175,0,0)"> observations. </span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">   1008</span>     <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Now querying MAST for the corresponding data products.</span><span style="color: rgb(175,0,0)">&#34;</span>
+<span class="ansi-green-intense-fg ansi-bold">   1009</span>     <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(98,98,98)">.</span>format(<span style="color: rgb(0,135,0)">len</span>(observations))
+<span class="ansi-green-intense-fg ansi-bold">   1010</span> )
+<span class="ansi-green-intense-fg ansi-bold">   1011</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> <span style="color: rgb(0,135,0)">len</span>(observations) <span style="color: rgb(98,98,98)">==</span> <span style="color: rgb(98,98,98)">0</span>:
+
+File <span class="ansi-green-fg">~/tessgi/dev/lightkurve/lkmain-docs/lightkurve/src/lightkurve/search.py:1225</span>, in <span class="ansi-cyan-fg">_query_mast</span><span class="ansi-blue-fg">(target, radius, project, provenance_name, exptime, sequence_number, **extra_query_criteria)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1223</span>     warnings<span style="color: rgb(98,98,98)">.</span>filterwarnings(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">ignore</span><span style="color: rgb(175,0,0)">&#34;</span>, category<span style="color: rgb(98,98,98)">=</span>NoResultsWarning)
+<span class="ansi-green-intense-fg ansi-bold">   1224</span>     warnings<span style="color: rgb(98,98,98)">.</span>filterwarnings(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">ignore</span><span style="color: rgb(175,0,0)">&#34;</span>, message<span style="color: rgb(98,98,98)">=</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">t_exptime is continuous</span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-fg">-&gt; 1225</span>     obs <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">Observations</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">query_criteria</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">objectname</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">target</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">query_criteria</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1226</span> obs<span style="color: rgb(98,98,98)">.</span>sort(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">distance</span><span style="color: rgb(175,0,0)">&#34;</span>)
+<span class="ansi-green-intense-fg ansi-bold">   1227</span> <span style="color: rgb(95,135,135)"># We use `exptime` as an alias for `t_exptime`</span>
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/astroquery/utils/class_or_instance.py:25</span>, in <span class="ansi-cyan-fg">class_or_instance.__get__.&lt;locals&gt;.f</span><span class="ansi-blue-fg">(*args, **kwds)</span>
+<span class="ansi-green-intense-fg ansi-bold">     23</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span style="color: rgb(0,0,255)">f</span>(<span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwds):
+<span class="ansi-green-intense-fg ansi-bold">     24</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> obj <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg">---&gt; 25</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">fn</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">obj</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwds</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     26</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-intense-fg ansi-bold">     27</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>fn(<span style="color: rgb(0,135,0)">cls</span>, <span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwds)
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/astroquery/utils/process_asyncs.py:28</span>, in <span class="ansi-cyan-fg">async_to_sync.&lt;locals&gt;.create_method.&lt;locals&gt;.newmethod</span><span class="ansi-blue-fg">(self, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     24</span> <span style="color: rgb(175,0,255)">@class_or_instance</span>
+<span class="ansi-green-intense-fg ansi-bold">     25</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span style="color: rgb(0,0,255)">newmethod</span>(<span style="color: rgb(0,135,0)">self</span>, <span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs):
+<span class="ansi-green-intense-fg ansi-bold">     26</span>     verbose <span style="color: rgb(98,98,98)">=</span> kwargs<span style="color: rgb(98,98,98)">.</span>pop(<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">verbose</span><span style="color: rgb(175,0,0)">&#39;</span>, <span class="ansi-bold" style="color: rgb(0,135,0)">False</span>)
+<span class="ansi-green-fg">---&gt; 28</span>     response <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">getattr</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">async_method_name</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     29</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> kwargs<span style="color: rgb(98,98,98)">.</span>get(<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">get_query_payload</span><span style="color: rgb(175,0,0)">&#39;</span>) <span class="ansi-bold" style="color: rgb(175,0,255)">or</span> kwargs<span style="color: rgb(98,98,98)">.</span>get(<span style="color: rgb(175,0,0)">&#39;</span><span style="color: rgb(175,0,0)">field_help</span><span style="color: rgb(175,0,0)">&#39;</span>):
+<span class="ansi-green-intense-fg ansi-bold">     30</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> response
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/astroquery/utils/class_or_instance.py:25</span>, in <span class="ansi-cyan-fg">class_or_instance.__get__.&lt;locals&gt;.f</span><span class="ansi-blue-fg">(*args, **kwds)</span>
+<span class="ansi-green-intense-fg ansi-bold">     23</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span style="color: rgb(0,0,255)">f</span>(<span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwds):
+<span class="ansi-green-intense-fg ansi-bold">     24</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> obj <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg">---&gt; 25</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">fn</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">obj</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwds</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     26</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-intense-fg ansi-bold">     27</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>fn(<span style="color: rgb(0,135,0)">cls</span>, <span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwds)
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/astroquery/mast/observations.py:339</span>, in <span class="ansi-cyan-fg">ObservationsClass.query_criteria_async</span><span class="ansi-blue-fg">(self, pagesize, page, resolver, **criteria)</span>
+<span class="ansi-green-intense-fg ansi-bold">    335</span>     service <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>_caom_filtered
+<span class="ansi-green-intense-fg ansi-bold">    336</span>     params <span style="color: rgb(98,98,98)">=</span> {<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">columns</span><span style="color: rgb(175,0,0)">&#34;</span>: <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">*</span><span style="color: rgb(175,0,0)">&#34;</span>,
+<span class="ansi-green-intense-fg ansi-bold">    337</span>               <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">filters</span><span style="color: rgb(175,0,0)">&#34;</span>: mashup_filters}
+<span class="ansi-green-fg">--&gt; 339</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_portal_api_connection</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">service_request_async</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">service</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">params</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">pagesize</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">pagesize</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">page</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">page</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/astroquery/utils/class_or_instance.py:25</span>, in <span class="ansi-cyan-fg">class_or_instance.__get__.&lt;locals&gt;.f</span><span class="ansi-blue-fg">(*args, **kwds)</span>
+<span class="ansi-green-intense-fg ansi-bold">     23</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span><span style="color: rgb(188,188,188)"> </span><span style="color: rgb(0,0,255)">f</span>(<span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwds):
+<span class="ansi-green-intense-fg ansi-bold">     24</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> obj <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(175,0,255)">not</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>:
+<span class="ansi-green-fg">---&gt; 25</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">fn</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">obj</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwds</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     26</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-intense-fg ansi-bold">     27</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>fn(<span style="color: rgb(0,135,0)">cls</span>, <span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwds)
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/astroquery/mast/discovery_portal.py:364</span>, in <span class="ansi-cyan-fg">PortalAPI.service_request_async</span><span class="ansi-blue-fg">(self, service, params, pagesize, page, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">    361</span>     mashup_request[prop] <span style="color: rgb(98,98,98)">=</span> value
+<span class="ansi-green-intense-fg ansi-bold">    363</span> req_string <span style="color: rgb(98,98,98)">=</span> _prepare_service_request_string(mashup_request)
+<span class="ansi-green-fg">--&gt; 364</span> response <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">_request</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">POST</span><span class="ansi-yellow-bg" style="color: rgb(175,0,0)">&#34;</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(0,135,0)">self</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">MAST_REQUEST_URL</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">data</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">req_string</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">headers</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">headers</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">    365</span> <span class="ansi-yellow-bg">                         </span><span class="ansi-yellow-bg">retrieve_all</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">=</span><span class="ansi-yellow-bg">retrieve_all</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    367</span> <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> response
+
+File <span class="ansi-green-fg">~/miniforge3/envs/lk-dev/lib/python3.11/site-packages/astroquery/mast/discovery_portal.py:188</span>, in <span class="ansi-cyan-fg">PortalAPI._request</span><span class="ansi-blue-fg">(self, method, url, params, data, headers, files, stream, auth, retrieve_all)</span>
+<span class="ansi-green-intense-fg ansi-bold">    183</span> response <span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">super</span>(PortalAPI, <span style="color: rgb(0,135,0)">self</span>)<span style="color: rgb(98,98,98)">.</span>_request(method, url, params<span style="color: rgb(98,98,98)">=</span>params, data<span style="color: rgb(98,98,98)">=</span>data,
+<span class="ansi-green-intense-fg ansi-bold">    184</span>                                            headers<span style="color: rgb(98,98,98)">=</span>headers, files<span style="color: rgb(98,98,98)">=</span>files, cache<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">False</span>,
+<span class="ansi-green-intense-fg ansi-bold">    185</span>                                            stream<span style="color: rgb(98,98,98)">=</span>stream, auth<span style="color: rgb(98,98,98)">=</span>auth)
+<span class="ansi-green-intense-fg ansi-bold">    187</span> <span class="ansi-bold" style="color: rgb(0,135,0)">if</span> (time<span style="color: rgb(98,98,98)">.</span>time() <span style="color: rgb(98,98,98)">-</span> start_time) <span style="color: rgb(98,98,98)">&gt;</span><span style="color: rgb(98,98,98)">=</span> <span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>TIMEOUT:
+<span class="ansi-green-fg">--&gt; 188</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">raise</span> <span class="ansi-bold" style="color: rgb(215,95,95)">TimeoutError</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Timeout limit of </span><span class="ansi-bold" style="color: rgb(175,95,135)">{}</span><span style="color: rgb(175,0,0)"> exceeded.</span><span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(98,98,98)">.</span>format(<span style="color: rgb(0,135,0)">self</span><span style="color: rgb(98,98,98)">.</span>TIMEOUT))
+<span class="ansi-green-intense-fg ansi-bold">    190</span> <span style="color: rgb(95,135,135)"># Raising error based on HTTP status if necessary</span>
+<span class="ansi-green-intense-fg ansi-bold">    191</span> response<span style="color: rgb(98,98,98)">.</span>raise_for_status()
+
+<span class="ansi-red-fg">TimeoutError</span>: Timeout limit of 600 exceeded.
+</pre></div></div>
 </div>
 <p>Hmm… The over-fitting goodness metric says we are severely over-fitting. Not only that, there appears to not be an Alpha parameter that brings both goodness metrics above 0.8. And yet, the fit looks really good. What’s going on here? Let’s zoom in on the correction.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pltAxis</span> <span class="o">=</span> <span class="n">cbvCorrector</span><span class="o">.</span><span class="n">diagnose</span><span class="p">()</span>
@@ -724,17 +909,10 @@ Under fitting Metric: 0.9995801211972846
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_37_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_37_0.png" />
-</div>
-</div>
 <p>We see in the top plot that the <em>SingleScale</em> correction has comperable noise to the <em>original</em> light curve. This means the correction is injecting high frequency noise at comperable amplitude to the original signal. We have indeed over-fitted! The goodness metrics perform a <em>broad-band</em> analysis of over- and under-fitting. Even though our eyes did not see the high frequency noise injection, the goodness metrics did. So, what should be done? It depends on what you are trying to investigate. If
 you are only looking at the low frequency signals in the data then perhaps you don’t care about the high frequency noise injection. If you really do care about the high frequency signals then you should increase the Alpha parameter, or set the target goodness scores as we do below (target_over_score=0.8, target_under_score=0.5).</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Optimize the fit but overemphasize the importance of not over-fitting.</span>
@@ -747,32 +925,8 @@ you are only looking at the low frequency signals in the data then perhaps you d
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Optimized Over-fitting metric: 0.7982707993272561
-Optimized Under-fitting metric: 0.46682962342566253
-Optimized Alpha: 3.287e+00
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_39_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_39_1.png" />
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_39_2.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_39_2.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Again, zoom in to see the detail</span>
@@ -784,13 +938,6 @@ Optimized Alpha: 3.287e+00
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_40_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_40_0.png" />
-</div>
-</div>
 <p>We see now that the high frequency noise injection is small compared to the original amplitudes in the lightkurve. We barely removed any of the systematics and are now under-fitting, but that might be the best we can do if we want to ensure low noise injection.</p>
 </section>
 <section id="...Or-Can-We-Still-Do-Better?">
@@ -798,8 +945,8 @@ Optimized Alpha: 3.287e+00
 <p>Perhaps we are using the incorrect CBVs for this target. Below is a tuned multi-step fit where we first fit the multi-scale Band 2 CBVs then the Spike CBVs. The multi-scale band 2 CBVs contain intermediate frequency systematic signals. They should not inject high frequency noise. We also utilize the <code class="docutils literal notranslate"><span class="pre">correct_elasticnet</span></code> corrector, which allows us to add in a L1-Norm term (Lasso Regularization). L1-Norm helps snap some basis vector fit coefficients to zero and can result in a more stable, less
 noisy fit. The result is a much better compromise between over- and under-fitting. The spikes are not well removed but increasing the weight on the Spike CBV removal results in over-fitting. We can also try the multi-scale band 3 CBVs, which contain high frequency systematics, but the over-fitting metric indicates using them results in even greater over-fitting. The resultant is now much better than what we achieved above but more tuning and optimization could possibly get us even closer to an
 ideal fit.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fit to the Multi-Scale Band 2 CBVs with ElasticNet to add in a L1-Norm (Lasso) term</span>
@@ -819,22 +966,8 @@ ideal fit.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_44_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_44_0.png" />
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_44_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_44_1.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute the final goodness metrics compared to the original lightcurve.</span>
@@ -854,29 +987,13 @@ ideal fit.</p>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Over-fitting Metric: 0.6137269903227573
-Under-fitting Metric: 0.8830315929531055
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_45_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_45_1.png" />
-</div>
-</div>
 <p>So, which CBVs are best to use? There is no one single answer, but generally speaking, the Multi-Scale Basis vectors are more versatile. The trade-off is there are also more of them, which means more degrees of freedom in your fit. More degrees of freedom can result in more over-fitting without proper regularization. It is recommened the user tries different combinations of CBVs and use objective metrics to decide which fit is the best for their particular needs.</p>
 </section>
 <section id="Using-the-Goodness-Metrics-and-CBVCorrector-with-other-Design-Matrices">
 <h2>Using the Goodness Metrics and CBVCorrector with other Design Matrices<a class="headerlink" href="#Using-the-Goodness-Metrics-and-CBVCorrector-with-other-Design-Matrices" title="Link to this heading">#</a></h2>
 <p>The Goodness Metrics and CBVCorrector can also be used in conjunction with other external design matrices. Let’s work on a famous planet example to show how the CBVCorrector can be utilized to imporove the generated light curve. We will begin by using <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_tesscut.html#lightkurve.search_tesscut">search_tesscut</a> to extract an FFI light curve for HAT-P 11 and then create a DesignMatrix using the background pixels.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># HAT-P 11b</span>
@@ -895,8 +1012,8 @@ Under-fitting Metric: 0.8830315929531055
 </div>
 <p>The <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix">DesignMatrix</a> <code class="docutils literal notranslate"><span class="pre">dm</span></code> now contains the common trends in the background pixels in the data. We will first try to fit the pixel-based design matrix using an unrestricted least-squares fit (I.e. a very weak regularization by setting alpha to a small number). We tell CBVCorrector to only use the external design matrix with <code class="docutils literal notranslate"><span class="pre">ext_dm=</span></code>. When we generate the
 CBVCorrector object the CBVs will be downloaded, but the CBVs are for 2-minute cadence and not the 30-minute FFIs. We therefore use the <code class="docutils literal notranslate"><span class="pre">interpolate_cbvs=True</span></code> option to tell the CBVCorrector to interpolate the CBVs to the light curve cadence.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate the CBVCorrector object and interpolate the downloaded CBVs to the light curve cadence</span>
@@ -910,25 +1027,9 @@ CBVCorrector object the CBVs will be downloaded, but the CBVs are for 2-minute c
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Over-fitting metric: 0.0802232292573576
-CDPP: 230.75800281758416 ppm
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_51_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_51_1.png" />
-</div>
-</div>
 <p>The least-squares fit did remove the background flux trend and at first sight the resultant might look good, but the over-fitting goodness metric is <code class="docutils literal notranslate"><span class="pre">0.08</span></code>. That’s not very good! It looks like we are dramatically over-fitting. We can see this in the bottom plot where the corrected curve has more high-frequency noise than the original. Let’s now add in the multi-scale basis vectors and see if we can do better. Note that we are joint fitting the CBVs and the external pixel-derived design matrix.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbv_type</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MultiScale.1&#39;</span><span class="p">,</span> <span class="s1">&#39;MultiScale.2&#39;</span><span class="p">,</span> <span class="s1">&#39;MultiScale.3&#39;</span><span class="p">,</span><span class="s1">&#39;Spike&#39;</span><span class="p">]</span>
@@ -941,36 +1042,13 @@ CDPP: 230.75800281758416 ppm
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Over-fitting metric: 0.3216260423338224
-CDPP: 55.83742644265488 ppm
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_53_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_53_1.png" />
-</div>
-</div>
 <p>That looks a lot better! Could we do a bit better by adding in a regularization term? Let’s do a goodness metric scan.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cbvcorrector</span><span class="o">.</span><span class="n">goodness_metric_scan_plot</span><span class="p">(</span><span class="n">cbv_type</span><span class="o">=</span><span class="n">cbv_type</span><span class="p">,</span> <span class="n">cbv_indices</span><span class="o">=</span><span class="n">cbv_indices</span><span class="p">,</span> <span class="n">ext_dm</span><span class="o">=</span><span class="n">dm</span><span class="p">);</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_55_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_55_0.png" />
 </div>
 </div>
 <p>There are a couple observations to make here.</p>
@@ -979,8 +1057,8 @@ optimization (by setting target_under_score=-1).</p>
 <p>We see the over-fitting metric is not a simple function of the regularization factor <em>alpha</em>. This can happen due to the interaction of the various basis vectors during fitting when regularization is applied. We see a minima (most over-fitting) at about alpha=1e-1. Once alpha moves above this value we begin to over-constrain the fit which results in gradually less removal of systematics. The under-fitting metric should be an indicator that we are going too far constraining the fit, and indeed,
 we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.</p>
 <p>We will now try to optimize the fit and account for these two issues by 1) setting the bounds on the alpha parameter (<code class="docutils literal notranslate"><span class="pre">alpha_bounds=[1e-6,</span> <span class="pre">1e-2]</span></code>) and 2) disregarding the under-fitting metric (<code class="docutils literal notranslate"><span class="pre">target_under_score=-1</span></code>).</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Optimize the fit but ignore the under-fitting metric and set bounds on the alpha parameter.</span>
@@ -990,26 +1068,9 @@ we do see the under-fitting metric degrades slightly beginning at alpha=1e-1.</p
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Optimized Over-fitting metric: 0.3479509391689286
-Optimized Alpha: 9.265e-04
-CDPP: 69.42097541121124 ppm
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_57_1.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_57_1.png" />
-</div>
-</div>
 <p>This is looking like a pretty good light curve. However, the <a class="reference external" href="https://arxiv.org/pdf/1208.0595">CDPP</a> increased a little as we optimized the over-fitting metric. Which correction to use may depend on your application. Since we are interested in the transiting planet, we will choose the corrected light curve with the lowest CDPP. Below we compare the light curve between just using the pixel-derived design matrix to also adding in the CBVs as a joint, regularized fit.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
@@ -1018,13 +1079,6 @@ CDPP: 69.42097541121124 ppm
 <span class="n">corrected_lc_joint_fit</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Joint Fit Corrected; CDPP=</span><span class="si">{0:.1f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">corrected_lc_joint_fit</span><span class="o">.</span><span class="n">estimate_cdpp</span><span class="p">()),</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Comparison Between original and final corrected lightcurve&#39;</span><span class="p">);</span>
 </pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_59_0.png" src="../../_images/tutorials_2-creating-light-curves_2-3-how-to-use-cbvcorrector_59_0.png" />
 </div>
 </div>
 <p>The superiority of the bottom curve is blatantly obvious. We can clearly see HAT-P 11b on it’s 4.9 day period orbit. Our over-fitting metric settled at about 0.35 indicating we might still be over-fitting and should keep that in mind. However the low CDPP indicates the over-fitting is probably not over transit time-scales.</p>
@@ -1065,7 +1119,7 @@ methods. Writing such an optimzer is left as an exercise to the reader and to be
 <p>The main <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.CBVCorrector.correct.html#lightkurve.correctors.CBVCorrector.correct">CBVCorrector.correct*</a> methods utilize a similar prior for all design matrix vectors as is typically used in L1-Norm and L2-Norm regularization. However you can perform fine tuning to the correction using more sophisticated priors. After performing a fit with one of the <code class="docutils literal notranslate"><span class="pre">CBVCorrector.correct*</span></code> methods,
 <code class="docutils literal notranslate"><span class="pre">CBVCorrector.design_matrix_collection</span></code> will have the priors set. One can then manually adjust the priors and use <code class="docutils literal notranslate"><span class="pre">CBVCorrector.correct_regressioncorrector</span></code> to perform the standard <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.correctors.RegressionCorrector.correct.html#lightkurve.correctors.RegressionCorrector.correct">RegressionCorrector.correct</a> correction. An illustration is below:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1) Perform an initial optimization with a L2-Norm regularization</span>
@@ -1086,8 +1140,8 @@ methods. Writing such an optimzer is left as an exercise to the reader and to be
 <h3>NaNs, Units and Normalization<a class="headerlink" href="#NaNs,-Units-and-Normalization" title="Link to this heading">#</a></h3>
 <p>NaNs are removed from the light curve when used to generate the <code class="docutils literal notranslate"><span class="pre">CBVCorrector</span></code> object and is stored in <code class="docutils literal notranslate"><span class="pre">CBVCorrector.lc</span></code>.</p>
 <p>The CBVCorrector performs its corrections in absolute flux units (typically electrons per second). The returned corrected light curve <code class="docutils literal notranslate"><span class="pre">corrected_lc</span></code> is also in absolute units and the median flux of the light curve is preserved.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;LC unit: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cbvCorrector</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
@@ -1095,18 +1149,9 @@ methods. Writing such an optimzer is left as an exercise to the reader and to be
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-LC unit: electron / s
-Corrected LC unit: electron / s
-</pre></div></div>
-</div>
 <p>The goodness metrics are computed using median normalized units in order to properly calibrate the metric to be between 0.0 and 1.0 for all light curves. The normalization is as follows:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">normalized_lc</span> <span class="o">=</span> <span class="n">cbvCorrector</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
@@ -1114,14 +1159,6 @@ Corrected LC unit: electron / s
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Normalized Light curve units: </span><span class="si">{}</span><span class="s1"> (i.e astropy.units.dimensionless_unscaled)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">normalized_lc</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Normalized Light curve units:  (i.e astropy.units.dimensionless_unscaled)
-</pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:

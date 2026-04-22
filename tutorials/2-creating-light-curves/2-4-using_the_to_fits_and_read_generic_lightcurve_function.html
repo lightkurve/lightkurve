@@ -43,6 +43,19 @@
     <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){ dataLayer.push(arguments); }
+                gtag('consent', 'default', {
+                    'ad_storage': 'denied',
+                    'ad_user_data': 'denied',
+                    'ad_personalization': 'denied',
+                    'analytics_storage': 'denied'
+                });
+                gtag('js', new Date());
+                gtag('config', 'UA-69171-9');
+            </script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/2-creating-light-curves/2-4-using_the_to_fits_and_read_generic_lightcurve_function';</script>
@@ -428,7 +441,7 @@
 <li><p>astropy <a class="reference external" href="https://docs.astropy.org/en/stable/time/index.html">time</a> and <a class="reference external" href="https://docs.astropy.org/en/latest/units/index.html">units</a></p></li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
@@ -448,7 +461,7 @@
 <p>First we will create some fake lightcurve data to use as an example and convert this into a LightCurve Object. You could also download a LightCurve Object via using <code class="docutils literal notranslate"><span class="pre">`search_lightcurve</span></code> &lt;<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve#lightkurve.search_lightcurve">https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_lightcurve.html?highlight=search_lightcurve#lightkurve.search_lightcurve</a>&gt;`__ and
 <code class="docutils literal notranslate"><span class="pre">`download()</span></code> &lt;<a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.SearchResult.download.html?highlight=download#lightkurve.SearchResult.download">https://lightkurve.github.io/lightkurve/reference/api/lightkurve.SearchResult.download.html?highlight=download#lightkurve.SearchResult.download</a>&gt;`__ if you wish, but for now we will create our simple data set.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Create the time values and specify the format</span>
@@ -465,7 +478,7 @@
 </div>
 <p>Using this data set we then use the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> function to create our object and look at the data.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Create the LightCurve object and look</span>
@@ -475,12 +488,12 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=100</i>
-<table id="table4416237776" class="table-striped table-bordered table-condensed">
+<table id="table6047903536" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th></tr></thead>
 <thead><tr><th>Time</th><th>float64</th><th>float32</th></tr></thead>
@@ -507,7 +520,7 @@
 </div>
 <p>We can now access the column values directly as an attribute of the object.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_lc</span><span class="o">.</span><span class="n">flux</span>
@@ -515,7 +528,7 @@
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -524,7 +537,7 @@ $[1000.4537,~1000.4081,~1000.3615,~1000.3139,~1000.2656,~1000.2166,~1000.167,~10
 </div>
 <p>We can also plot the data.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -532,7 +545,7 @@ $[1000.4537,~1000.4081,~1000.3615,~1000.3139,~1000.2656,~1000.2166,~1000.167,~10
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -550,7 +563,7 @@ $[1000.4537,~1000.4081,~1000.3615,~1000.3139,~1000.2656,~1000.2166,~1000.167,~10
 <p>Additional meta data or keyword arguments may be added via a dictionary as part of <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> function.</p>
 <p>For example we could define the mission and the telescope we obtained the data from via the following:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_lc</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TELESCOP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;MY_FAKE_TELESCOPE&quot;</span>
@@ -572,7 +585,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 <h2>2: Saving the LightCurve Object as a FITS file<a class="headerlink" href="#2:-Saving-the-LightCurve-Object-as-a-FITS-file" title="Link to this heading">#</a></h2>
 <p>We can now convert our object into a FITS file using the <code class="docutils literal notranslate"><span class="pre">to_fits</span></code> function. For this we simply need to state the file name and path. Be sure to state if you want your file to be overwritten or not using either False or True.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">output_filename</span> <span class="o">=</span> <span class="s1">&#39;./my_custom_lightcurve.fits&#39;</span>
@@ -582,7 +595,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -592,7 +605,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 </div>
 <p>Note we can also add information to our fits file using an extra_data dictionary. Defined extra keywords or columns would then be included in the FITS file. Keywords would be stroed in the primary header and np.array data as columns in the 1st extension. As an example let’s add an “ORIGIN” keyword which will indicate where got our data from.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">extra_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ORIGIN&quot;</span><span class="p">:</span> <span class="s2">&quot;Tutorial&quot;</span><span class="p">}</span>
@@ -601,7 +614,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 </div>
 <p>We can then overwrite our old file and add this so when we read it in, it will be there.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">my_lc</span><span class="o">.</span><span class="n">to_fits</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_data</span><span class="p">)</span>
@@ -609,12 +622,12 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x177a99550&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x177b7c250&gt;]
+[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x1687bb440&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x16890c2f0&gt;]
 </pre></div></div>
 </div>
 </section>
@@ -622,7 +635,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 <h2>3: Reading in a FITS file<a class="headerlink" href="#3:-Reading-in-a-FITS-file" title="Link to this heading">#</a></h2>
 <p>We can now use the <code class="docutils literal notranslate"><span class="pre">read_generic_lightcurve</span></code> funtion to read in our FITS file as a LightCurve Object. To do this we must specify the file and the relevent columns for our data.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">read_generic_lightcurve</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;./my_custom_lightcurve.fits&#39;</span><span class="p">,</span> <span class="n">time_column</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">flux_column</span><span class="o">=</span><span class="s2">&quot;flux&quot;</span><span class="p">,</span> <span class="n">flux_err_column</span><span class="o">=</span><span class="s2">&quot;flux_err&quot;</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="s2">&quot;jd&quot;</span><span class="p">)</span>
@@ -631,7 +644,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 </div>
 <p>We can now query the object as done previously.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span>
@@ -639,12 +652,12 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>LightCurve length=100 LABEL=&quot;None&quot; FLUX_ORIGIN=lightkurve.LightCurve.to_fits()</i>
-<table id="table6302684560" class="table-striped table-bordered table-condensed">
+<table id="table6048616176" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th></tr></thead>
 <thead><tr><th>Time</th><th>float32</th><th>float32</th></tr></thead>
@@ -670,7 +683,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 </table></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span><span class="o">.</span><span class="n">flux</span>
@@ -678,7 +691,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -686,7 +699,7 @@ MY_FAKE_TELESCOPE MY_FAKE_MISSION
 $[1000.4537,~1000.4081,~1000.3615,~1000.314,~1000.2656,~1000.2166,~1000.1671,~1000.1171,~1000.0668,~1000.0163,~999.96582,~999.91541,~999.86523,~999.81537,~999.76599,~999.71722,~999.66913,~999.62195,~999.57568,~999.53052,~999.48651,~999.44385,~999.40259,~999.36285,~999.32477,~999.28839,~999.25385,~999.22119,~999.19049,~999.16193,~999.13544,~999.11115,~999.08917,~999.06952,~999.05219,~999.03729,~999.02484,~999.01489,~999.00751,~999.00256,~999.00024,~999.00043,~999.00317,~999.00842,~999.01624,~999.02655,~999.03937,~999.05463,~999.07233,~999.09235,~999.11469,~999.13928,~999.16608,~999.19501,~999.22595,~999.25891,~999.29376,~999.33038,~999.36877,~999.40869,~999.4502,~999.49304,~999.53723,~999.58258,~999.62897,~999.67633,~999.72449,~999.77338,~999.82281,~999.87274,~999.92297,~999.97339,~1000.0239,~1000.0743,~1000.1246,~1000.1745,~1000.224,~1000.2729,~1000.3212,~1000.3685,~1000.415,~1000.4604,~1000.5046,~1000.5475,~1000.5891,~1000.6292,~1000.6676,~1000.7043,~1000.7393,~1000.7723,~1000.8034,~1000.8325,~1000.8594,~1000.8841,~1000.9066,~1000.9267,~1000.9445,~1000.9598,~1000.9728,~1000.9833] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
@@ -694,7 +707,7 @@ $[1000.4537,~1000.4081,~1000.3615,~1000.314,~1000.2656,~1000.2166,~1000.1671,~10
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -711,7 +724,7 @@ $[1000.4537,~1000.4081,~1000.3615,~1000.314,~1000.2656,~1000.2166,~1000.1671,~10
 </div>
 <p>We can even check the meta data to make sure our telescope, mission, and origin information was saved correctly.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">read_lc</span><span class="o">.</span><span class="n">meta</span>
@@ -719,13 +732,13 @@ $[1000.4537,~1000.4081,~1000.3615,~1000.314,~1000.2656,~1000.2166,~1000.1671,~10
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 {&#39;EXTNAME&#39;: &#39;PRIMARY&#39;,
- &#39;CHECKSUM&#39;: &#39;AnO6BkM4AkM4AkM4&#39;,
+ &#39;CHECKSUM&#39;: &#39;AaAiBX9ZAaAfAU7Z&#39;,
  &#39;DATASUM&#39;: &#39;0&#39;,
  &#39;SIMPLE&#39;: True,
  &#39;BITPIX&#39;: 8,
@@ -734,7 +747,7 @@ $[1000.4537,~1000.4081,~1000.3615,~1000.314,~1000.2656,~1000.2166,~1000.1671,~10
  &#39;NEXTEND&#39;: 2,
  &#39;EXTVER&#39;: 1,
  &#39;ORIGIN&#39;: &#39;Tutorial&#39;,
- &#39;DATE&#39;: &#39;2026-04-21&#39;,
+ &#39;DATE&#39;: &#39;2026-03-04&#39;,
  &#39;CREATOR&#39;: &#39;lightkurve.LightCurve.to_fits()&#39;,
  &#39;TELESCOP&#39;: &#39;MY_FAKE_TELESCOPE&#39;,
  &#39;INSTRUME&#39;: None,
@@ -743,7 +756,7 @@ $[1000.4537,~1000.4081,~1000.3615,~1000.314,~1000.2656,~1000.2166,~1000.1671,~10
  &#39;RA_OBJ&#39;: None,
  &#39;DEC_OBJ&#39;: None,
  &#39;EQUINOX&#39;: 2000.0,
- &#39;PROCVER&#39;: &#39;2.6.0&#39;,
+ &#39;PROCVER&#39;: &#39;2.5.2dev&#39;,
  &#39;MISSION&#39;: &#39;MY_FAKE_MISSION&#39;,
  &#39;LABEL&#39;: None,
  &#39;RA&#39;: None,
