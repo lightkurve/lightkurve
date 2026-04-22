@@ -1,268 +1,412 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+
+<html lang="en" data-content_root="../../" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Searching &amp; downloading Kepler, K2, and TESS data &#8212; Lightkurve </title>
-    
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
 
-    
-  <link rel="stylesheet"
-    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=05a62d9f" />
-    
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=f82422d1"></script>
+    <script src="../../_static/documentation_options.js?v=ae39cb24"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/1-getting-started/searching-for-data-products';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Using Light Curve Files with Lightkurve" href="using-light-curve-file-products.html" />
     <link rel="prev" title="What are Periodogram objects?" href="what-are-periodogram-objects.html" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="en">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.6" />
+  
     
-
-    <!-- Google Analytics -->
-    
-<script async="" src="https://www.google-analytics.com/analytics.js"></script>
-<script>
-                        window.ga = window.ga || function () {
-                            (ga.q = ga.q || []).push(arguments) };
-                        ga.l = +new Date;
-                        ga('create', 'UA-69171-9', 'auto');
-                        ga('set', 'anonymizeIp', true);
-                        ga('send', 'pageview');
-                    </script>
-
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
-    
-    <div class="container-fluid" id="banner"></div>
-
-    
-    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
-
-  <div id="navbar-start">
-    
-    
-<a class="navbar-brand" href="../../index.html">
-<p class="title">Lightkurve v2.6</p>
-</a>
-
-    
-  </div>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
 
   
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
-    <div id="navbar-center" class="mr-auto">
-      
-      <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../whats-new-v2.html">
-  What's new?
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../quickstart.html">
-  Quickstart
- </a>
-</li>
-
-<li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="../index.html">
-  Tutorials
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../reference/index.html">
-  API
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../about/index.html">
-  About Lightkurve
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../../development/index.html">
-  Developing for Lightkurve
- </a>
-</li>
-
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
     
-</ul>
-      </div>
-      
-    </div>
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-    <div id="navbar-end">
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-        <li class="nav-item">
-          <a class="nav-link" href="https://github.com/lightkurve/lightkurve" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label></a>
-        </li>
-      </ul>
-      </div>
-      
-    </div>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Lightkurve </p>
+  
+</a></div>
+    
   </div>
-</div>
-    </nav>
+  
+  <div class="col-lg-9 navbar-header-items">
     
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
+    What's new?
+  </a>
+</li>
 
-    <div class="container-xl">
-      <div class="row">
-          
-            
-            <div class="col-12 col-md-1 col-xl-2 bd-sidebar no-sidebar"></div>
-            
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about/index.html">
+    About Lightkurve
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Developing for Lightkurve
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
           
-          <div class="d-none d-xl-block col-xl-2 bd-toc">
-            
-              
-              <div class="toc-item">
-                
-<div class="tocsection onthispage mt-5 pt-1 pb-3">
-    <i class="fas fa-list"></i> On this page
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
-<nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Learning-Goals">
-   Learning Goals
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Introduction">
-   Introduction
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Imports">
-   Imports
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#1.-What-Data-Products-are-Available?">
-   1. What Data Products are Available?
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#2.-Searching-for-Light-Curves">
-   2. Searching for Light Curves
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#2.1-Downloading-a-single-light-curve">
-     2.1 Downloading a single light curve
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#2.2-Downloading-a-collection-of-light-curves">
-     2.2 Downloading a collection of light curves
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#3.-Searching-for-Target-Pixel-Files">
-   3. Searching for Target Pixel Files
-  </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#3.1-Downloading-a-single-target-pixel-file">
-     3.1 Downloading a single target pixel file
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#3.2-Downloading-a-collection-of-target-pixel-files">
-     3.2 Downloading a collection of target pixel files
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts">
-   4. Searching for
-   <em>
-    TESS
-   </em>
-   Full Frame Image (FFI) Cutouts
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#5.-Performing-a-Cone-Search">
-   5. Performing a Cone Search
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#About-this-Notebook">
-   About this Notebook
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">
-   Citing Lightkurve and Astropy
-  </a>
- </li>
-</ul>
+    </header>
+  
 
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats-new-v2.html">
+    What's new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference/index.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../about/index.html">
+    About Lightkurve
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Developing for Lightkurve
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/lightkurve/lightkurve" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Searching &amp; downloading <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> data</span></li>
+  </ul>
 </nav>
-              </div>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
               
-              <div class="toc-item">
+              
+              
                 
-              </div>
-              
-            
-          </div>
-          
-
-          
-          
-            
-          
-          <main class="col-12 col-md-11 col-xl-8 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
-              
-              <div>
-                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <div style="float:right; margin-bottom:1em;">
     <a href="https://github.com/lightkurve/lightkurve/raw/main/docs/source/tutorials/1-getting-started/searching-for-data-products.ipynb"><img src="https://img.shields.io/badge/Notebook-Download-130654?logo=Jupyter&labelColor=fafafa"></a>
     <a href="https://timeseries.science.stsci.edu/hub/user-redirect/git-pull?repo=https%3A%2F%2Fgithub.com%2Flightkurve%2Flightkurve&urlpath=lab%2Ftree%2Flightkurve%2Fdocs%2Fsource%2Ftutorials/1-getting-started/searching-for-data-products.ipynb&branch=main"><img src="https://img.shields.io/badge/Notebook-Open%20in%20TIKE-130654?logo=Jupyter&labelColor=fafafa"></a>
 </div>
 <br style="clear:both;"><section id="Searching-&amp;-downloading-Kepler,-K2,-and-TESS-data">
-<h1>Searching &amp; downloading <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> data<a class="headerlink" href="#Searching-&-downloading-Kepler,-K2,-and-TESS-data" title="Link to this heading">¶</a></h1>
+<h1>Searching &amp; downloading <em>Kepler</em>, <em>K2</em>, and <em>TESS</em> data<a class="headerlink" href="#Searching-&-downloading-Kepler,-K2,-and-TESS-data" title="Link to this heading">#</a></h1>
 <section id="Learning-Goals">
-<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">¶</a></h2>
+<h2>Learning Goals<a class="headerlink" href="#Learning-Goals" title="Link to this heading">#</a></h2>
 <p>By the end of this tutorial, you will:</p>
 <ul class="simple">
 <li><p>Understand the data products available to query and download.</p></li>
@@ -272,12 +416,12 @@
 </ul>
 </section>
 <section id="Introduction">
-<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">¶</a></h2>
+<h2>Introduction<a class="headerlink" href="#Introduction" title="Link to this heading">#</a></h2>
 <p>The <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> Python package has functions to search for and download observations from <em>Kepler</em>/<em>K2</em> and <em>TESS</em>. These tools are built to make accessing space telescope data clear and straightforward, with intuitive method and keyword names.</p>
 <p>This tutorial outlines what data products are available to query with Lightkurve, and gives examples of how to use the functions to search for and download space telescope observations.</p>
 </section>
 <section id="Imports">
-<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">¶</a></h2>
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">#</a></h2>
 <p>This tutorial requires the <a class="reference external" href="https://lightkurve.github.io/lightkurve/index.html">Lightkurve</a> package, which uses <a class="reference external" href="https://matplotlib.org/">Matplotlib</a> for plotting.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
@@ -292,7 +436,7 @@
 <hr class="docutils" />
 </section>
 <section id="1.-What-Data-Products-are-Available?">
-<h2>1. What Data Products are Available?<a class="headerlink" href="#1.-What-Data-Products-are-Available?" title="Link to this heading">¶</a></h2>
+<h2>1. What Data Products are Available?<a class="headerlink" href="#1.-What-Data-Products-are-Available?" title="Link to this heading">#</a></h2>
 <p><em>Kepler</em>/<em>K2</em> and <em>TESS</em> data products are stored on the Mikulski Archive for Space Telescopes (MAST) in two main forms:</p>
 <ul class="simple">
 <li><p><strong>Light curve products</strong>: tables containing the measured flux at each observation time.</p></li>
@@ -306,7 +450,7 @@
 <p>Lightkurve allows you to query and download each of these data products. The following sections contain examples of how to use the search functions in Lightkurve.</p>
 </section>
 <section id="2.-Searching-for-Light-Curves">
-<h2>2. Searching for Light Curves<a class="headerlink" href="#2.-Searching-for-Light-Curves" title="Link to this heading">¶</a></h2>
+<h2>2. Searching for Light Curves<a class="headerlink" href="#2.-Searching-for-Light-Curves" title="Link to this heading">#</a></h2>
 <p>Lightkurve uses <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/">Astroquery</a> to search for data products. Astroquery allows searches based on a target’s coordinates, catalog ID number, or name.</p>
 <p>This is passed into the search function using the <code class="docutils literal notranslate"><span class="pre">target</span></code> keyword, and all valid inputs for identifying a target include:</p>
 <ul class="simple">
@@ -334,7 +478,7 @@
 <div class="output_area rendered_html docutils container">
 SearchResult containing 18 data products.
 
-<table id="table6288115600">
+<table id="table5024211856">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
@@ -374,7 +518,7 @@ SearchResult containing 18 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6287986512">
+<table id="table6141258384">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 01</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
@@ -478,13 +622,18 @@ sort_order
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6103184144">
+<table id="table6142791952">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
 </table></div>
 </div>
-<p>You can also narrow down the list of observations when you make the search using the following mission-specific keywords: * <em>Kepler</em>: <code class="docutils literal notranslate"><span class="pre">quarter</span></code> * <em>K2</em>: <code class="docutils literal notranslate"><span class="pre">campaign</span></code> * <em>TESS</em>: <code class="docutils literal notranslate"><span class="pre">sector</span></code></p>
+<p>You can also narrow down the list of observations when you make the search using the following mission-specific keywords:</p>
+<ul class="simple">
+<li><p><em>Kepler</em>: <code class="docutils literal notranslate"><span class="pre">quarter</span></code></p></li>
+<li><p><em>K2</em>: <code class="docutils literal notranslate"><span class="pre">campaign</span></code></p></li>
+<li><p><em>TESS</em>: <code class="docutils literal notranslate"><span class="pre">sector</span></code></p></li>
+</ul>
 <p>Let’s perform the search for KIC 3733346 again, this time specifying that we only want data from <em>Kepler</em> Quarter 2.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -502,14 +651,14 @@ SearchResult containing 1 data products.
 <div class="output_area rendered_html docutils container">
 SearchResult containing 1 data products.
 
-<table id="table6109266000">
+<table id="table6143084112">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>Kepler Quarter 02</td><td>2009</td><td><a href='https://archive.stsci.edu/kepler/data_products.html'>Kepler</a></td><td>1800</td><td>kplr003733346</td><td>0.0</td></tr>
 </table></div>
 </div>
 <section id="2.1-Downloading-a-single-light-curve">
-<h3>2.1 Downloading a single light curve<a class="headerlink" href="#2.1-Downloading-a-single-light-curve" title="Link to this heading">¶</a></h3>
+<h3>2.1 Downloading a single light curve<a class="headerlink" href="#2.1-Downloading-a-single-light-curve" title="Link to this heading">#</a></h3>
 <p>A light curve can be downloaded by calling <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.SearchResult.download.html">.download()</a>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
@@ -526,7 +675,7 @@ SearchResult containing 1 data products.
 </div>
 <div class="output_area rendered_html docutils container">
 <div><i>KeplerLightCurve length=4075 LABEL=&quot;KIC 3733346&quot; QUARTER=2 AUTHOR=Kepler FLUX_ORIGIN=pdcsap_flux</i>
-<table id="table6288558736" class="table-striped table-bordered table-condensed">
+<table id="table6141282768" class="table-striped table-bordered table-condensed">
 <thead><tr><th>time</th><th>flux</th><th>flux_err</th><th>quality</th><th>timecorr</th><th>centroid_col</th><th>centroid_row</th><th>cadenceno</th><th>sap_flux</th><th>sap_flux_err</th><th>sap_bkg</th><th>sap_bkg_err</th><th>pdcsap_flux</th><th>pdcsap_flux_err</th><th>sap_quality</th><th>psf_centr1</th><th>psf_centr1_err</th><th>psf_centr2</th><th>psf_centr2_err</th><th>mom_centr1</th><th>mom_centr1_err</th><th>mom_centr2</th><th>mom_centr2_err</th><th>pos_corr1</th><th>pos_corr2</th></tr></thead>
 <thead><tr><th></th><th>electron / s</th><th>electron / s</th><th></th><th>d</th><th>pix</th><th>pix</th><th></th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th>electron / s</th><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>pix</th></tr></thead>
 <thead><tr><th>Time</th><th>float32</th><th>float32</th><th>int32</th><th>float32</th><th>float64</th><th>float64</th><th>int32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>float32</th><th>int32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float64</th><th>float32</th><th>float32</th><th>float32</th></tr></thead>
@@ -569,7 +718,7 @@ SearchResult containing 1 data products.
 </div>
 </section>
 <section id="2.2-Downloading-a-collection-of-light-curves">
-<h3>2.2 Downloading a collection of light curves<a class="headerlink" href="#2.2-Downloading-a-collection-of-light-curves" title="Link to this heading">¶</a></h3>
+<h3>2.2 Downloading a collection of light curves<a class="headerlink" href="#2.2-Downloading-a-collection-of-light-curves" title="Link to this heading">#</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">SearchResult</span></code> object also has a <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.SearchResult.download_all.html">download_all</a> method, allowing you to download multiple light curves. This returns a <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code>, a convenient container for <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -635,7 +784,7 @@ LightCurveCollection of 5 objects:
 </section>
 </section>
 <section id="3.-Searching-for-Target-Pixel-Files">
-<h2>3. Searching for Target Pixel Files<a class="headerlink" href="#3.-Searching-for-Target-Pixel-Files" title="Link to this heading">¶</a></h2>
+<h2>3. Searching for Target Pixel Files<a class="headerlink" href="#3.-Searching-for-Target-Pixel-Files" title="Link to this heading">#</a></h2>
 <p>The other primary data product used by Lightkurve is the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/targetpixelfile.html">TargetPixelFile</a>, or TPF. A TPF is a stack of images containing the flux in each pixel at each cadence.</p>
 <p>Similar to the approach above, we can use the <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_targetpixelfile.html">search_targetpixelfile</a> method to identify available observations.</p>
 <div class="nbinput docutils container">
@@ -654,7 +803,7 @@ LightCurveCollection of 5 objects:
 <div class="output_area rendered_html docutils container">
 SearchResult containing 2 data products.
 
-<table id="table6290564240">
+<table id="table5027463888">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>K2 Campaign 06</td><td>2015</td><td><a href='https://archive.stsci.edu/k2/data_products.html'>K2</a></td><td>1800</td><td>ktwo212779596</td><td>0.0</td></tr>
@@ -663,7 +812,7 @@ SearchResult containing 2 data products.
 </div>
 <p>This returns a table which contains the same information as a light curve search result.</p>
 <section id="3.1-Downloading-a-single-target-pixel-file">
-<h3>3.1 Downloading a single target pixel file<a class="headerlink" href="#3.1-Downloading-a-single-target-pixel-file" title="Link to this heading">¶</a></h3>
+<h3>3.1 Downloading a single target pixel file<a class="headerlink" href="#3.1-Downloading-a-single-target-pixel-file" title="Link to this heading">#</a></h3>
 <p>When you call <code class="docutils literal notranslate"><span class="pre">download</span></code> on a search result containing more than one entry, it will download only the first entry in the search result. Lightkurve will raise a friendly warning to let you know when this occurs.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
@@ -678,7 +827,7 @@ SearchResult containing 2 data products.
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-/Users/tapritc2/tessgi/dev/lightkurve/lightkurve/src/lightkurve/search.py:421: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
+/Users/tapritc2/tessgi/dev/lightkurve/lkmain-docs/lightkurve/src/lightkurve/search.py:421: LightkurveWarning: Warning: 2 files available to download. Only the first file has been downloaded. Please use `download_all()` or specify additional criteria (e.g. quarter, campaign, or sector) to limit your search.
   warnings.warn(
 </pre></div></div>
 </div>
@@ -718,7 +867,7 @@ SearchResult containing 2 data products.
 <p>For more information about using and plotting TPFs, please see the tutorials on using <em>Kepler</em> target pixel file products with Lightkurve and plotting <em>Kepler</em> target pixel file products with Lightkurve.</p>
 </section>
 <section id="3.2-Downloading-a-collection-of-target-pixel-files">
-<h3>3.2 Downloading a collection of target pixel files<a class="headerlink" href="#3.2-Downloading-a-collection-of-target-pixel-files" title="Link to this heading">¶</a></h3>
+<h3>3.2 Downloading a collection of target pixel files<a class="headerlink" href="#3.2-Downloading-a-collection-of-target-pixel-files" title="Link to this heading">#</a></h3>
 <p>As with the lightcurve collection introduced in Section 2.2, you can also download multiple TPFs at a time using the <code class="docutils literal notranslate"><span class="pre">download_all</span></code> method, which returns a <code class="docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
@@ -759,7 +908,7 @@ TargetPixelFileCollection of 2 objects:
 </section>
 </section>
 <section id="4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts">
-<h2>4. Searching for <em>TESS</em> Full Frame Image (FFI) Cutouts<a class="headerlink" href="#4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts" title="Link to this heading">¶</a></h2>
+<h2>4. Searching for <em>TESS</em> Full Frame Image (FFI) Cutouts<a class="headerlink" href="#4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts" title="Link to this heading">#</a></h2>
 <p>It is also possible to download targets observed in the <em>TESS</em> Full Frame Images (FFIs) using Lightkurve. This is done using <a class="reference external" href="https://lightkurve.github.io/lightkurve/reference/api/lightkurve.search_tesscut.html">search_tesscut</a>, which utilizes the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESSCut</a> tool (<a class="reference external" href="https://ui.adsabs.harvard.edu/abs/2019ascl.soft05007B/abstract">Brasseur et. al 2019</a>).</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
@@ -777,7 +926,7 @@ TargetPixelFileCollection of 2 objects:
 <div class="output_area rendered_html docutils container">
 SearchResult containing 25 data products.
 
-<table id="table6306833616">
+<table id="table12960773392">
 <thead><tr><th>#</th><th>mission</th><th>year</th><th>author</th><th>exptime</th><th>target_name</th><th>distance</th></tr></thead>
 <thead><tr><th></th><th></th><th></th><th></th><th>s</th><th></th><th>arcsec</th></tr></thead>
 <tr><td>0</td><td>TESS Sector 04</td><td>2018</td><td><a href='https://mast.stsci.edu/tesscut/'>TESScut</a></td><td>1426</td><td>Pi Men</td><td>0.0</td></tr>
@@ -826,7 +975,7 @@ SearchResult containing 25 data products.
 </div>
 </section>
 <section id="5.-Performing-a-Cone-Search">
-<h2>5. Performing a Cone Search<a class="headerlink" href="#5.-Performing-a-Cone-Search" title="Link to this heading">¶</a></h2>
+<h2>5. Performing a Cone Search<a class="headerlink" href="#5.-Performing-a-Cone-Search" title="Link to this heading">#</a></h2>
 <p>If you are interested in identifying a number of nearby targets, you can perform a cone search, which will return all available targets within a cone of a specfied radius on the sky. The radius can be either a <code class="docutils literal notranslate"><span class="pre">float</span></code> or an <a class="reference external" href="https://docs.astropy.org/en/stable/units/">astropy.units.Quantity</a> object. If a float is given, it will be assumed to be in units of arcseconds. If <code class="docutils literal notranslate"><span class="pre">None</span></code> then we default to 0.0001 arcsec.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
@@ -855,12 +1004,12 @@ SearchResult containing 3 data products.
 <p>The <code class="docutils literal notranslate"><span class="pre">distance</span></code> column describes the distance on the sky in arcseconds from the target or coordinates passed into the search.</p>
 </section>
 <section id="About-this-Notebook">
-<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">¶</a></h2>
+<h2>About this Notebook<a class="headerlink" href="#About-this-Notebook" title="Link to this heading">#</a></h2>
 <p><strong>Authors</strong>: Nicholas Saunders (<a class="reference external" href="mailto:nksaun&#37;&#52;&#48;hawaii&#46;edu">nksaun<span>&#64;</span>hawaii<span>&#46;</span>edu</a>)</p>
 <p><strong>Updated</strong>: September 28, 2020</p>
 </section>
 <section id="Citing-Lightkurve-and-Astropy">
-<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">¶</a></h2>
+<h2>Citing Lightkurve and Astropy<a class="headerlink" href="#Citing-Lightkurve-and-Astropy" title="Link to this heading">#</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> or its dependencies in your published research, please cite the authors. Click the buttons below to copy BibTeX entries to your clipboard.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
@@ -1072,51 +1221,137 @@ archivePrefix = "arXiv",
 </section>
 
 
-              </div>
+                </article>
               
               
-              <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="what-are-periodogram-objects.html" title="previous page">
-        <i class="fas fa-angle-left"></i>
-        <div class="prev-next-info">
-            <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">What are <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects?</p>
-        </div>
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="what-are-periodogram-objects.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">What are <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects?</p>
+      </div>
     </a>
-    <a class='right-next' id="next-link" href="using-light-curve-file-products.html" title="next page">
-    <div class="prev-next-info">
+    <a class="right-next"
+       href="using-light-curve-file-products.html"
+       title="next page">
+      <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
         <p class="prev-next-title">Using Light Curve Files with Lightkurve</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
+                </footer>
               
-          </main>
-          
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
-      </div>
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Learning-Goals">Learning Goals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#1.-What-Data-Products-are-Available?">1. What Data Products are Available?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#2.-Searching-for-Light-Curves">2. Searching for Light Curves</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#2.1-Downloading-a-single-light-curve">2.1 Downloading a single light curve</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#2.2-Downloading-a-collection-of-light-curves">2.2 Downloading a collection of light curves</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#3.-Searching-for-Target-Pixel-Files">3. Searching for Target Pixel Files</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.1-Downloading-a-single-target-pixel-file">3.1 Downloading a single target pixel file</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#3.2-Downloading-a-collection-of-target-pixel-files">3.2 Downloading a collection of target pixel files</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#4.-Searching-for-TESS-Full-Frame-Image-(FFI)-Cutouts">4. Searching for <em>TESS</em> Full Frame Image (FFI) Cutouts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#5.-Performing-a-Cone-Search">5. Performing a Cone Search</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#About-this-Notebook">About this Notebook</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Citing-Lightkurve-and-Astropy">Citing Lightkurve and Astropy</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/tutorials/1-getting-started/searching-for-data-products.ipynb.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
     </div>
+  </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-<footer class="footer mt-5 mt-md-0">
-  <div class="container">
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
     
-    <div class="footer-item">
-      <p class="copyright">
-    &copy; Copyright Lightkurve developers.<br>
-</p>
+      © Copyright Lightkurve developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
     </div>
-    
-    <div class="footer-item">
-      <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br>
-</p>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
+</p></div>
+      
     </div>
-    
-  </div>
-</footer>
+  
+</div>
+
+  </footer>
   </body>
 </html>

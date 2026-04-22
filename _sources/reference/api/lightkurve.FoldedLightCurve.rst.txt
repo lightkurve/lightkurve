@@ -33,6 +33,7 @@
       ~FoldedLightCurve.filled
       ~FoldedLightCurve.flatten
       ~FoldedLightCurve.fold
+      ~FoldedLightCurve.from_df
       ~FoldedLightCurve.from_pandas
       ~FoldedLightCurve.from_stingray
       ~FoldedLightCurve.from_timeseries
@@ -80,6 +81,7 @@
       ~FoldedLightCurve.tail
       ~FoldedLightCurve.to_corrector
       ~FoldedLightCurve.to_csv
+      ~FoldedLightCurve.to_df
       ~FoldedLightCurve.to_excel
       ~FoldedLightCurve.to_fits
       ~FoldedLightCurve.to_pandas

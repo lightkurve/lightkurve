@@ -81,12 +81,12 @@ can be extracted from the pixel data, and on the removal of instrument noise
     2-creating-light-curves/2-3-k2-pldcorrector.ipynb
     2-creating-light-curves/2-3-k2-sffcorrector.ipynb
 
-2.4. Using the generic read/write fits functionality
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2.4. Using the generic read/write functionality
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
-    
+
     2-creating-light-curves/2-4-using_the_to_fits_and_read_generic_lightcurve_function.ipynb
 
 3. Science examples
