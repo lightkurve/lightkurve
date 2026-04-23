@@ -1,5 +1,6 @@
 2.6.1dev
 =====================
+- Update search URL for query_solar_system_objects
 
 2.6.0 (2026-04-16)
 =====================

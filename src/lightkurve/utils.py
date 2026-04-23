@@ -742,7 +742,8 @@ def _query_solar_system_objects(
     elif location.lower() == "tess":
         location = "C57"
 
-    url = "http://vo.imcce.fr/webservices/skybot/skybotconesearch_query.php?"
+    #url = "http://vo.imcce.fr/webservices/skybot/skybotconesearch_query.php?"
+    url = "https://ssp.imcce.fr/webservices/skybot/api/conesearch.php?"
     url += "-mime=text&"
     url += "-ra={}&".format(ra)
     url += "-dec={}&".format(dec)
