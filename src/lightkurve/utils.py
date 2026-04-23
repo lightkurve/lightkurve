@@ -776,6 +776,7 @@ def _query_solar_system_objects(
                 df = pd.concat([df, res])
     if df is not None:
         df.reset_index(drop=True)
+        df = df.groupby('Name', as_index=False).first() # Only keep unique results
     return df
 
 
