@@ -280,6 +280,33 @@ def test_searchresult():
 
 
 @pytest.mark.remote_data
+def test_searchresult_sort_order():
+    # Ensure the boundary cases of TESS sectors 99, 100, etc. are sorted chronologically
+    # the condition: 1) the same year, and 2) has 2-digit sectors (99) and 3-digit sectors (100, 101, etc.)
+    # https://github.com/lightkurve/lightkurve/issues/1557
+
+    def to_mission_exptime(sr):
+        return [f'{r["mission"]} | {r["exptime"]:.0f}' for r in sr.table]
+
+    # restrict TESS sectors to have predictable output
+    sr = lk.search_lightcurve("TIC15445551", mission="TESS", author="SPOC", sector=[37, 99, 100, 101])
+
+    expected = [
+        "TESS Sector 37 | 20",
+        "TESS Sector 37 | 120",
+        "TESS Sector 99 | 20",
+        "TESS Sector 99 | 120",
+        "TESS Sector 100 | 20",
+        "TESS Sector 100 | 120",
+        "TESS Sector 101 | 20",
+        "TESS Sector 101 | 120",
+    ]
+
+    actual = to_mission_exptime(sr)
+    assert_array_equal(actual, expected)
+
+
+@pytest.mark.remote_data
 def test_month():
     # In short cadence, if we specify both quarter and month
     sr = search_targetpixelfile("KIC 11904151", quarter=11, month=1, cadence="short")
