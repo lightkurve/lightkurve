@@ -1250,8 +1250,12 @@ class LightCurve(TimeSeries):
             from zero.
         """
         validate_method(unit, ["unscaled", "percent", "ppt", "ppm"])
-        median_flux = np.nanmedian(self.flux)
-        std_flux = np.nanstd(self.flux)
+        if hasattr(self.flux, "mask"):
+            median_flux = np.ma.median(self.flux)
+            std_flux = np.ma.std(self.flux)
+        else:
+            median_flux = np.nanmedian(self.flux)
+            std_flux = np.nanstd(self.flux)
 
         # If the median flux is within half a standard deviation from zero, the
         # light curve is likely zero-centered and normalization makes no sense.
