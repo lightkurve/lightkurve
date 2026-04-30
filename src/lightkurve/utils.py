@@ -597,6 +597,36 @@ def validate_method(method, supported_methods):
     )
 
 
+# Pseudo-inverse of the 3x3 quadratic-centroid design matrix
+# (Vakili & Hogg 2016, arXiv:1610.05873). Columns of A are the basis
+# functions [1, x, y, x^2, x*y, y^2] evaluated at each of the nine pixel
+# offsets in the 3x3 patch (Eqn 20 of V&H):
+#
+#   A = [[1, -1, -1, 1,  1, 1],
+#        [1,  0, -1, 0,  0, 1],
+#        [1,  1, -1, 1, -1, 1],
+#        [1, -1,  0, 1,  0, 0],
+#        [1,  0,  0, 0,  0, 0],
+#        [1,  1,  0, 1,  0, 0],
+#        [1, -1,  1, 1, -1, 1],
+#        [1,  0,  1, 0,  0, 1],
+#        [1,  1,  1, 1,  1, 1]]
+#
+# Given Z = (z_1, ..., z_9) -- the row-major-flattened patch -- the
+# least-squares fit coefficients X = (a, b, c, d, e, f) are
+# X = APRIME @ Z (Eqn 21 of V&H), with APRIME = (A.T @ A)^-1 @ A.T.
+# Hardcoded here.
+_APRIME = np.array(
+    [[-1 / 9,  2 / 9, -1 / 9,  2 / 9,  5 / 9,  2 / 9, -1 / 9,  2 / 9, -1 / 9],  # a
+     [-1 / 6,      0,  1 / 6, -1 / 6,      0,  1 / 6, -1 / 6,      0,  1 / 6],  # b (x)
+     [-1 / 6, -1 / 6, -1 / 6,      0,      0,      0,  1 / 6,  1 / 6,  1 / 6],  # c (y)
+     [ 1 / 6, -1 / 3,  1 / 6,  1 / 6, -1 / 3,  1 / 6,  1 / 6, -1 / 3,  1 / 6],  # d (x^2)
+     [ 1 / 4,      0, -1 / 4,      0,      0,      0, -1 / 4,      0,  1 / 4],  # e (x*y)
+     [ 1 / 6,  1 / 6,  1 / 6, -1 / 3, -1 / 3, -1 / 3,  1 / 6,  1 / 6,  1 / 6]], # f (y^2)
+    dtype=float,
+)
+
+
 def centroid_quadratic(data, mask=None):
     """Computes the quadratic estimate of the centroid in a 2d-array.
 
@@ -635,15 +665,16 @@ def centroid_quadratic(data, mask=None):
         # proactively convert int to float once and for all.
         data = data.astype(float)
 
-    # Step 1: identify the patch of 3x3 pixels (z_)
-    # that is centered on the brightest pixel (xx, yy)
+    # Step 1: identify the brightest in-aperture pixel. Setting masked
+    # pixels (and NaNs) to -inf. See Issue #1401 for the all-negative-flux
+    # case this protects.
     if mask is not None:
-        # mask handling.
-        # Issue 1401 demonstrates that using 'data' to find the max will break when all flux is negative
-        # set masked pixels NaN (instead of 0) to resolve it.
-        data = data.copy()
-        data[~mask] = np.nan
-    arg_data_max = np.nanargmax(data)
+        # Cast -inf to `data`'s dtype to avoid f64 promotion of f32 data.
+        neg_inf = data.dtype.type(-np.inf)
+        eligible = np.where(mask & ~np.isnan(data), data, neg_inf)
+        arg_data_max = np.argmax(eligible)
+    else:
+        arg_data_max = np.nanargmax(data)
     yy, xx = np.unravel_index(arg_data_max, data.shape)
     # Make sure the 3x3 patch does not leave the TPF bounds
     if yy < 1:
@@ -656,40 +687,20 @@ def centroid_quadratic(data, mask=None):
         xx = data.shape[1] - 2
 
     z_ = data[yy - 1 : yy + 2, xx - 1 : xx + 2]
-    if np.any(np.isnan(z_)):
-        # handle edge case the 3X3 patch has NaN
-        # Need some finite value for NaN pixels for the
-        # quadratic fit below: use the mean of the 3x3 patch
-        # to reduce the skew
-        z_ = z_.copy()
-        z_[np.isnan(z_)] = np.nanmean(z_)
-
-    # Next, we will fit the coefficients of the bivariate quadratic with the
-    # help of a design matrix (A) as defined by Eqn 20 in Vakili & Hogg
-    # (arxiv:1610.05873). The design matrix contains a
-    # column of ones followed by pixel coordinates: x, y, x**2, xy, y**2.
-    A = np.array(
-        [
-            [1, -1, -1, 1, 1, 1],
-            [1, 0, -1, 0, 0, 1],
-            [1, 1, -1, 1, -1, 1],
-            [1, -1, 0, 1, 0, 0],
-            [1, 0, 0, 0, 0, 0],
-            [1, 1, 0, 1, 0, 0],
-            [1, -1, 1, 1, -1, 1],
-            [1, 0, 1, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1],
-        ]
-    )
-    # We also pre-compute $(A^t A)^-1 A^t$, cf. Eqn 21 in Vakili & Hogg.
-    At = A.transpose()
-    # In Python 3 this can become `Aprime = np.linalg.inv(At @ A) @ At`
-    Aprime = np.matmul(np.linalg.inv(np.matmul(At, A)), At)
+    # handle edge case the 3x3 patch contains NaN or out-of-aperture
+    # pixels. Need some finite value for those positions for the
+    # quadratic fit below: use the mean of the remaining 3x3 patch
+    # pixels to reduce the skew
+    excluded_pixels = np.isnan(z_)
+    if mask is not None:
+        excluded_pixels = excluded_pixels | ~mask[yy - 1 : yy + 2, xx - 1 : xx + 2]
+    if excluded_pixels.any():
+        fill = z_[~excluded_pixels].mean()
+        z_ = np.where(excluded_pixels, fill, z_)
 
     # Step 2: fit the polynomial $P = a + bx + cy + dx^2 + exy + fy^2$
-    # following Equation 21 in Vakili & Hogg.
-    # In Python 3 this can become `Aprime @ z_.flatten()`
-    a, b, c, d, e, f = np.matmul(Aprime, z_.flatten())
+    # using the precomputed pseudo-inverse (cf. Eqn 21 in Vakili & Hogg).
+    a, b, c, d, e, f = np.dot(_APRIME, z_.ravel())
 
     # Step 3: analytically find the function maximum,
     # following https://en.wikipedia.org/wiki/Quadratic_function

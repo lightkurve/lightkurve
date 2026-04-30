@@ -172,11 +172,15 @@ a_mask[0:2, :] = False
 @pytest.mark.parametrize("data_dtype, mask", [
     (float, None),
     (float, a_mask),
+    (np.float32, None),
+    (np.float32, a_mask),
     (int, None),
     (int, a_mask),
     ])
 def test_centroid_quadratic_robustness(data_dtype, mask):
     """Test quadratic centroids in edge cases; regression test for #610, etc."""
+    is_float = np.issubdtype(np.dtype(data_dtype), np.floating)
+
     # Brightest pixel in upper left
     data = np.zeros((5, 5), dtype=data_dtype)
     data[0, 0] = 1
@@ -196,7 +200,7 @@ def test_centroid_quadratic_robustness(data_dtype, mask):
     assert np.isfinite(col) & np.isfinite(row)
 
     # Data contains a NaN
-    if data_dtype is float:  # NaN only applicable to float
+    if is_float:  # NaN only applicable to float
         data = np.zeros((5, 5), dtype=data_dtype)
         data[0, 0] = np.nan
         data[-1, -1] = 10
@@ -204,7 +208,7 @@ def test_centroid_quadratic_robustness(data_dtype, mask):
         assert np.isfinite(col) & np.isfinite(row)
 
     # has NaN in the identified 3x3 patch
-    if data_dtype is float:  # NaN only applicable to float
+    if is_float:  # NaN only applicable to float
         data = np.zeros((5, 5), dtype=data_dtype)
         data[3, 2] = 10
         data[3, 3] = np.nan
@@ -224,6 +228,14 @@ def test_centroid_quadratic_robustness(data_dtype, mask):
         data[2, 1] = 10  # the row above is masked
         col, row = centroid_quadratic(data, mask=mask)
         assert np.isfinite(col) & np.isfinite(row)
+
+
+def test_centroid_quadratic_all_nan_aperture():
+    data = np.full((5, 5), np.nan, dtype=float)
+    mask = np.full((5, 5), True, dtype=bool)
+    col, row = centroid_quadratic(data, mask=mask)
+    assert np.isnan(col)
+    assert np.isnan(row)
 
 
 def test_show_citation_instructions():
