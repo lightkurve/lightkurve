@@ -231,6 +231,14 @@ def test_centroid_quadratic_robustness(data_dtype, mask):
 
 
 def test_centroid_quadratic_all_nan_aperture():
+    """All-NaN data inside the aperture should return (NaN, NaN), not raise.
+
+    Regression test: np.nanargmax previously raised
+    ValueError("All-NaN slice encountered") for this input, killing
+    any surrounding centroid loop. The function should instead return
+    NaN -- matching the docstring contract that NaN is returned 'if the
+    fit failed'.
+    """
     data = np.full((5, 5), np.nan, dtype=float)
     mask = np.full((5, 5), True, dtype=bool)
     col, row = centroid_quadratic(data, mask=mask)

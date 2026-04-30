@@ -665,9 +665,11 @@ def centroid_quadratic(data, mask=None):
         # proactively convert int to float once and for all.
         data = data.astype(float)
 
-    # Step 1: identify the brightest in-aperture pixel. Setting masked
-    # pixels (and NaNs) to -inf. See Issue #1401 for the all-negative-flux
-    # case this protects.
+    # Step 1: identify the brightest in-aperture pixel. When a mask is
+    # given we set out-of-aperture and NaN positions to -inf so a plain
+    # argmax skips them; without a mask we fall back to nanargmax. See
+    # Issue #1401 for the all-negative-flux case the -inf substitution
+    # protects.
     if mask is not None:
         # Cast -inf to `data`'s dtype to avoid f64 promotion of f32 data.
         neg_inf = data.dtype.type(-np.inf)
