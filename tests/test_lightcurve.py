@@ -942,6 +942,26 @@ def test_normalize():
     assert len(warn_record) == 0
     assert lc.meta["NORMALIZED"]
 
+    # Issue #1505: normalize() must handle MaskedColumn flux without
+    # collapsing to nan. np.nanmedian on a MaskedColumn returns nan because
+    # numpy's partition step ignores the mask before nan-skipping runs.
+    t = Time([2458000.0 + i * 0.02 for i in range(6)], format="jd", scale="tdb")
+    masked_lc = LightCurve(time=t)
+    masked_lc["flux"] = MaskedColumn(
+        data=[1.00, 1.01, np.nan, 1.02, np.nan, 1.03],
+        mask=[False, False, True, False, True, False],
+        fill_value=np.nan,
+    )
+    masked_lc["flux_err"] = masked_lc["flux"]
+    normalized = masked_lc.normalize()
+    # Median of unmasked values [1.00, 1.01, 1.02, 1.03] is 1.015, so the
+    # normalised median should be 1.0 (not nan, which is the bug).
+    assert_allclose(np.nanmedian(normalized.flux), 1.0, atol=1e-6)
+    expected = np.array([1.00, 1.01, np.nan, 1.02, np.nan, 1.03]) / 1.015
+    assert_allclose(
+        np.ma.filled(normalized.flux, np.nan), expected, atol=1e-6, equal_nan=True
+    )
+
 
 def test_invalid_normalize():
     """Normalization makes no sense if the light curve is negative,
