@@ -138,7 +138,12 @@ class SearchResult(object):
         self.table["sort_order"] = [
             sort_priority.get(author, 9) for author in self.table["author"]
         ]
-        self.table.sort(["distance", "sort_order", "author", "year", "exptime", "mission",])
+
+        # Columns "year", "sequence_number", "mission" together maintain chronological sub-order.
+        # We need all three columns because:
+        # - year + mission would fail for TESS sectors 99 and 100 (both in yr 2026, 100 would be ahead)
+        # - year + sequence_number would fail for Kepler (which has no value for sequence_number)
+        self.table.sort(["distance", "sort_order", "author", "year", "sequence_number", "mission", "exptime"])
 
 
     def _add_columns(self):
