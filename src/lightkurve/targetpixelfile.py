@@ -955,7 +955,7 @@ class TargetPixelFile(object):
         the solar system objects (name, brightness, time) that passed in the
         vicinity of the target during the span of the light curve.
 
-        This method queries the `SkyBot API <http://vo.imcce.fr/webservices/skybot/>`_,
+        This method queries the `SkyBot API <https://ssp.imcce.fr/webservices/skybot/>`_,
         which returns a list of asteroids/comets/planets given a location, time,
         and search cone.
 

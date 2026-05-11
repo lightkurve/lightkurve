@@ -731,11 +731,14 @@ def _query_solar_system_objects(
     -------
     result : `pandas.DataFrame`
         DataFrame containing the list of known solar system objects at the
-        requested time and location.
+        requested time and location. Note a unique line in the table is created for 
+        each timestamp in which an object is present.
     """
     # We import pandas locally, because it takes quite a bit of time to import,
     # and it is only required for this specific feature.
     import pandas as pd
+    from pandas.errors import EmptyDataError
+    from urllib.error import HTTPError
 
     if (location.lower() == "kepler") or (location.lower() == "k2"):
         location = "C55"
@@ -753,14 +756,23 @@ def _query_solar_system_objects(
     times = np.atleast_1d(times)
     for time in tqdm(times, desc="Querying for SSOs", disable=~show_progress):
         url_queried = url + "EPOCH={}".format(time)
-        response = download_file(url_queried, cache=cache, show_progress=show_progress)
+        for attempt in range(5):
+            try:
+                response = download_file(url_queried, cache=cache, show_progress=show_progress)
+                break
+            except HTTPError:
+                print(f"HTTP error (Attempt {attempt+1} of 5). Trying again...")
+
         if open(response).read(10) == "# Flag: -1":  # error code detected?
             raise IOError(
                 "SkyBot Solar System query failed.\n"
                 "URL used:\n" + url_queried + "\n"
                 "Response received:\n" + open(response).read()
             )
-        res = pd.read_csv(response, delimiter="|", skiprows=2)
+        try:
+            res = pd.read_csv(response, delimiter="|", skiprows=2)
+        except EmptyDataError: 
+            res = []
         if len(res) > 0:
             res["epoch"] = time
             res.rename(
@@ -775,7 +787,6 @@ def _query_solar_system_objects(
                 df = pd.concat([df, res])
     if df is not None:
         df.reset_index(drop=True)
-        df = df.groupby('Name', as_index=False).first() # Only keep unique results
     return df
 
 
