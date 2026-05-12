@@ -22,6 +22,7 @@ from astropy.visualization import (
     LinearStretch,
 )
 from astropy.time import Time
+import time
 
 
 log = logging.getLogger(__name__)
@@ -761,7 +762,8 @@ def _query_solar_system_objects(
                 response = download_file(url_queried, cache=cache, show_progress=show_progress)
                 break
             except HTTPError:
-                print(f"HTTP error (Attempt {attempt+1} of 5). Trying again...")
+                log.info(f"HTTP error (Attempt {attempt+1} of 5). Trying again...")
+                time.sleep(1)
 
         if open(response).read(10) == "# Flag: -1":  # error code detected?
             raise IOError(
