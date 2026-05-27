@@ -2,6 +2,7 @@
 =====================
 - Update search URL for query_solar_system_objects [#1556]
 - Fixed search result sort order for the cases involving TESS sectors 99 and 100, etc. [#1558]
+- Fixed CBV plotting with pandas 3 and removed the pandas <3.0 dependency cap.
 
 2.6.0 (2026-04-16)
 =====================
