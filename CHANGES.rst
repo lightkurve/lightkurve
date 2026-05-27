@@ -1,5 +1,6 @@
 2.6.1dev
 =====================
+- Update search URL for query_solar_system_objects
 - Fixed search result sort order for the cases involving TESS sectors 99 and 100, etc. [#1558]
 
 2.6.0 (2026-04-16)
