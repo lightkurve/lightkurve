@@ -1,4 +1,5 @@
 import collections
+import gc
 import os
 import tempfile
 import warnings
@@ -45,6 +46,37 @@ TESS_SIM = (
     "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits"
 )
 asteroid_TPF = get_pkg_data_filename("data/asteroid_test.fits")
+
+
+def test_tpf_close_releases_opened_file():
+    """TargetPixelFile.close() should release the FITS file handle it opened."""
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    opened_file = tpf.hdu._file
+    assert not opened_file.closed
+
+    tpf.close()
+
+    assert opened_file.closed
+
+
+def test_tpf_context_manager_closes_opened_file():
+    """TargetPixelFile should close its opened FITS file when leaving a context."""
+    with KeplerTargetPixelFile(filename_tpf_all_zeros) as tpf:
+        opened_file = tpf.hdu._file
+        assert not opened_file.closed
+
+    assert opened_file.closed
+
+
+def test_tpf_del_closes_owned_hdu():
+    """Owned FITS handles should not be left for Astropy to warn about at GC."""
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    opened_file = tpf.hdu._file
+
+    del tpf
+    gc.collect()
+
+    assert opened_file.closed
 
 
 @pytest.mark.remote_data
