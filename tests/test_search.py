@@ -92,6 +92,7 @@ def test_search_split_campaigns():
     K2 Campaigns 9, 10, and 11 were split into two halves for various technical
     reasons (C91=C9a, C92=C9b, C101=C10a, C102=C10b, C111=C11a, C112=C11b).
     We expect most targets from those campaigns to return two TPFs.
+    But split campaigns should be queried separately too.
     """
     campaigns = [9, 10, 11]
     ids = ["EPIC 228162462", "EPIC 228726301", "EPIC 202975993"]
@@ -99,6 +100,12 @@ def test_search_split_campaigns():
         search = search_targetpixelfile(idx, campaign=c, cadence="long").table
         assert len(search) == 2
 
+    campaigns = [[91, 92], [101, 102], [111, 112]]
+    ids = ["EPIC 228162462", "EPIC 228726301", "EPIC 202975993"]
+    for subc, idx in zip(campaigns, ids):
+        for c in subc:
+            search = search_targetpixelfile(idx, campaign=c, cadence="long").table
+            assert len(search) == 1
 
 @pytest.mark.remote_data
 def test_search_lightcurve(caplog):
