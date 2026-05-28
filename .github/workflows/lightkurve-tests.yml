@@ -10,6 +10,10 @@
 # 7) pytest on Windows, Python 3.9.
 # 8) pytest on OSX, Python 3.9.
 # 9) flake8 syntax check.
+#
+# Each job caches the Poetry tool venv (./poetry) and the in-project
+# project venv (./.venv) keyed on the OS, Python version, and the
+# pyproject.toml hash, so reruns reuse the resolved dependencies.
 
 name: Lightkurve-tests
 
@@ -26,6 +30,8 @@ jobs:
   # Run unit tests on Linux
   pytest-linux:
     runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_IN_PROJECT: "true"
     strategy:
       matrix:
         name: ["3.9-remote-data", "3.9-memtest", "3.10", "3.11", "3.12", "3.13"]
@@ -54,12 +60,22 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache Poetry tool venv and project venv
+      uses: actions/cache@v4
+      with:
+        path: |
+          ./poetry
+          ./.venv
+        key: poetry-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          poetry-${{ runner.os }}-py${{ matrix.python-version }}-
     - name: Install dependencies
       run: |
-        mkdir poetry
-        python -m venv ./poetry
-        ./poetry/bin/python -m pip install --upgrade pip
-        ./poetry/bin/pip install poetry==2.2.1
+        if [ ! -x ./poetry/bin/poetry ]; then
+          python -m venv ./poetry
+          ./poetry/bin/python -m pip install --upgrade pip
+          ./poetry/bin/pip install poetry==2.2.1
+        fi
         ./poetry/bin/poetry install --with dev
     - name: Test with ${{ matrix.pytest-command }}
       run: |
@@ -68,6 +84,8 @@ jobs:
   # Run unit tests on Windows
   pytest-windows:
     runs-on: windows-latest
+    env:
+      POETRY_VIRTUALENVS_IN_PROJECT: "true"
     strategy:
       matrix:
         name: [3.9]
@@ -78,13 +96,25 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache Poetry tool venv and project venv
+      uses: actions/cache@v4
+      with:
+        path: |
+          ./poetry
+          ./.venv
+        key: poetry-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          poetry-${{ runner.os }}-py${{ matrix.python-version }}-
     - name: Install dependencies
       run: |
-        mkdir poetry
-        python -m venv poetry
-        .\poetry\Scripts\activate.ps1
-        python -m pip install --upgrade pip
-        python -m pip install poetry
+        if (-Not (Test-Path .\poetry\Scripts\python.exe)) {
+          python -m venv poetry
+          .\poetry\Scripts\activate.ps1
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+        } else {
+          .\poetry\Scripts\activate.ps1
+        }
         poetry install --with dev
     - name: Test with pytest
       run: |
@@ -94,6 +124,8 @@ jobs:
   # Run unit tests on Mac OSX
   pytest-osx:
     runs-on: macos-latest
+    env:
+      POETRY_VIRTUALENVS_IN_PROJECT: "true"
     strategy:
       matrix:
         python-version: [3.9]
@@ -103,12 +135,22 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache Poetry tool venv and project venv
+      uses: actions/cache@v4
+      with:
+        path: |
+          ./poetry
+          ./.venv
+        key: poetry-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          poetry-${{ runner.os }}-py${{ matrix.python-version }}-
     - name: Install dependencies
       run: |
-        mkdir poetry
-        python -m venv ./poetry
-        ./poetry/bin/python -m pip install --upgrade pip
-        ./poetry/bin/pip install poetry==2.2.1
+        if [ ! -x ./poetry/bin/poetry ]; then
+          python -m venv ./poetry
+          ./poetry/bin/python -m pip install --upgrade pip
+          ./poetry/bin/pip install poetry==2.2.1
+        fi
         ./poetry/bin/poetry install --with dev
     - name: Test with pytest
       run: |
@@ -117,6 +159,8 @@ jobs:
   # Use the `flake8` tool to check for syntax errors
   flake8-linter:
     runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_IN_PROJECT: "true"
     strategy:
       matrix:
         python-version: [3.9]
@@ -126,12 +170,22 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache Poetry tool venv and project venv
+      uses: actions/cache@v4
+      with:
+        path: |
+          ./poetry
+          ./.venv
+        key: poetry-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          poetry-${{ runner.os }}-py${{ matrix.python-version }}-
     - name: Install flake8
       run: |
-        mkdir poetry
-        python -m venv ./poetry
-        ./poetry/bin/python -m pip install --upgrade pip
-        ./poetry/bin/pip install poetry==2.2.1
+        if [ ! -x ./poetry/bin/poetry ]; then
+          python -m venv ./poetry
+          ./poetry/bin/python -m pip install --upgrade pip
+          ./poetry/bin/pip install poetry==2.2.1
+        fi
         ./poetry/bin/poetry install --with dev
     - name: Lint with flake8
       run: |
