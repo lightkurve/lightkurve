@@ -170,7 +170,7 @@ class LightCurveCollection(Collection):
         will be removed soon."""
         return LightCurveCollection([lc.SAP_FLUX for lc in self])
 
-    def stitch(self, corrector_func=lambda x: x.normalize()):
+    def stitch(self, corrector_func=lambda x: x.normalize(), sort_by='time'):
         """Stitch all light curves in the collection into a single `LightCurve`.
 
         Any function passed to `corrector_func` will be applied to each light curve
@@ -183,6 +183,9 @@ class LightCurveCollection(Collection):
             Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
             This function is applied to each light curve in the collection
             prior to stitching. The default is to normalize each light curve.
+        sort_by : str or list of str
+            The key(s) to order the stitched light curves by. If None, the collection
+            list will not be sorted. The default key is time.
 
         Returns
         -------
@@ -225,7 +228,12 @@ class LightCurveCollection(Collection):
             ]
 
         # Need `join_type='inner'` until AstroPy supports masked Quantities
-        return vstack(lcs, join_type="inner", metadata_conflicts="silent")
+        stitched_lc = vstack(lcs, join_type="inner", metadata_conflicts="silent")
+
+        if sort_by is not None:
+            stitched_lc.sort(sort_by)
+
+        return stitched_lc
 
     def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
         """Plots all light curves in the collection on a single plot.
