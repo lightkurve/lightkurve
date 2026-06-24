@@ -22,7 +22,7 @@ Building documentation
 
 Building the *lightkurve* documentation requires `sphinx` and a few extra packages. We recommend using `poetry` to install the development dependencies::
 
-    $ poetry install
+    $ poetry install --with dev
 
 To make a clean directory for the docs use::
 
@@ -57,11 +57,11 @@ you can upload the documentation to the web server using::
         $ conda install --channel=conda-forge pandoc
 
 .. note::
-    
+
     To build the docs on a Mac you may have to install the Xcode Command Line Tools, which you can do using::
 
         $ xcode-select --install
-    
+
 
 
 
