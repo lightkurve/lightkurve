@@ -45,7 +45,19 @@ bokeh = ">=2.3.2"
 memoization = { version = ">=0.3.1", python = ">=3.8,<4.0" }
 scikit-learn = ">=0.24.0"
 s3fs = ">=2024.6.1"
+nifty-ls = { version = ">=1.0", optional = true }
 
+# Run-time optional dependency.
+# - use the old [tool.poetry.extras] instead of the recommended [project.optional-dependencies]
+#   because the rest of the file uses the old [tool.poetry] format
+# Install through:
+# poetry install --extras "nifty-ls"
+# pip install lightkurve[nifty-ls]
+[tool.poetry.extras]
+nifty-ls = ["nifty-ls"]
+
+# Dev-time optional dependency. Install through:
+# poetry install --with dev
 [tool.poetry.group.dev]
 optional = true
 

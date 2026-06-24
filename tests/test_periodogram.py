@@ -3,7 +3,7 @@ import sys
 import pytest
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy.testing import assert_almost_equal, assert_array_equal
+from numpy.testing import assert_almost_equal, assert_array_equal, assert_equal
 
 from astropy import units as u
 from astropy.time import Time
@@ -12,6 +12,12 @@ from astropy.utils.masked import Masked
 from lightkurve.lightcurve import LightCurve
 from lightkurve.periodogram import Periodogram
 from lightkurve.utils import LightkurveWarning
+
+HAS_NIFTY_LS = True
+try:
+    import nifty_ls
+except:
+    HAS_NIFTY_LS = False
 
 
 def test_periodogram_basics():
@@ -449,3 +455,61 @@ def test_masked_flux_nans():
     pg = lc.to_periodogram()
     assert not np.isnan(pg.power).all()
     assert (pg.power == 0).all()
+
+
+def create_beta_lyr_like_lc(dtype=np.float64):
+    # simulate a Beta Lyrae like LC, with 2 min per cycle
+    t = np.arange(0, 30, 0.1)
+    f = np.array(np.sin(t * 2 + np.pi / 2) + np.sin(t) + 1, dtype=dtype)
+
+    return LightCurve(time=Time(t + 2457000, format="jd"), flux=f).normalize()
+
+
+@pytest.mark.parametrize("flux_dtype, ls_method, nterms, expected_period", [
+    (np.float64, "fast", 1, np.pi),
+    (np.float64, "fastchi2", 2, np.pi * 2),
+    (np.float64, "fastnifty", 1, np.pi),
+    (np.float64, "fastnifty_chi2", 2, np.pi * 2),
+    # ensure flux in float32 (with time in float64) works for nifty-ls [#1549]
+    (np.float32, "fastnifty", 1, np.pi),
+    (np.float32, "fastnifty_chi2", 2, np.pi * 2),
+])
+def test_ls_method_basics(flux_dtype, ls_method, nterms, expected_period):
+    """Sanity test for various ``ls_method`` options"""
+    if "nifty" in ls_method and not HAS_NIFTY_LS:
+        pytest.skip("skipped because nifty-ls is not installed")
+
+    lc = create_beta_lyr_like_lc(dtype=flux_dtype)
+    pg = lc.to_periodogram(method="ls", ls_method=ls_method, nterms=nterms)
+
+    # the period of the default frequency grid is very rough
+    assert_almost_equal(pg.period_at_max_power.to(u.d).value, expected_period, decimal=1)
+    # test #1567
+    assert_equal(pg.nterms, nterms)
+
+
+@pytest.mark.parametrize("ls_method, nterms, expected_period", [
+    ("fast", 1, np.pi),
+    ("fastchi2", 2, np.pi * 2),
+    ("fastnifty", 1, np.pi),
+    ("fastnifty_chi2", 2, np.pi * 2),
+])
+def test_ls_method_uneven_freq_grid(ls_method, nterms, expected_period):
+    """Sanity test for various LS Periodogram for case with uneven frequency grid."""
+    if "nifty" in ls_method and not HAS_NIFTY_LS:
+        pytest.skip("skipped because nifty-ls is not installed")
+
+    # lightkurve is expected to automatically switch to methods that support uneven frequency grid
+    expected_method = "slow" if "chi2" not in ls_method else "chi2"
+
+    lc = create_beta_lyr_like_lc()
+    # uneven frequency grid (from a even period grid)
+    freq_grid = 1 / (np.arange(1, 10, 0.01) * u.d)
+    pg = lc.to_periodogram(method="ls", ls_method=ls_method, nterms=nterms, frequency=freq_grid)
+
+    # the period of the default frequency grid is very rough
+    assert_almost_equal(pg.period_at_max_power.to(u.d).value, expected_period, decimal=1)
+    # test #1567
+    assert_equal(pg.nterms, nterms)
+    # automatically switched to slow method
+    assert_equal(pg.ls_method, expected_method)
