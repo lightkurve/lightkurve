@@ -4,6 +4,7 @@
 - Fixed search result sort order for the cases involving TESS sectors 99 and 100, etc. [#1558]
 - Fixed nifty-ls support for cases a) ``fastnifty_chi2`` with ``nterms > 1``, b) non-even
   frequency grid [#1568]
+- Added basic tests for ``ls_methods`` in ``Periodogram``, ``nifty-ls`` support and made ``nifty_ls`` an explicit optional dependency [#1576]
 
 2.6.0 (2026-04-16)
 =====================
