@@ -60,7 +60,7 @@ jobs:
         python -m venv ./poetry
         ./poetry/bin/python -m pip install --upgrade pip
         ./poetry/bin/pip install poetry==2.2.1
-        ./poetry/bin/poetry install --with dev
+        ./poetry/bin/poetry install --with dev --extras "nifty-ls"
     - name: Test with ${{ matrix.pytest-command }}
       run: |
         ${{ matrix.pytest-command }}
@@ -85,6 +85,7 @@ jobs:
         .\poetry\Scripts\activate.ps1
         python -m pip install --upgrade pip
         python -m pip install poetry
+        # for Windows, no `--extras "nifty-ls"` because nifty-ls has no Windows binary wheel
         poetry install --with dev
     - name: Test with pytest
       run: |
@@ -109,7 +110,7 @@ jobs:
         python -m venv ./poetry
         ./poetry/bin/python -m pip install --upgrade pip
         ./poetry/bin/pip install poetry==2.2.1
-        ./poetry/bin/poetry install --with dev
+        ./poetry/bin/poetry install --with dev --extras "nifty-ls"
     - name: Test with pytest
       run: |
         ./poetry/bin/poetry run pytest
