@@ -54,7 +54,9 @@ You can set up the environment as follows:
 
     $ cd lightkurve
     $ curl -sSL https://install.python-poetry.org | python -
-    $ poetry install
+    # add "--with dev" to include packages useful for development, e.g., pytest
+    $ poetry install --with dev
+
 
 Refer to `poetry documentation <https://python-poetry.org/docs/#installation>`_ for
 poetry installation options, in addition to the `curl` used in the above example.
