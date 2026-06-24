@@ -933,9 +933,11 @@ class LombScarglePeriodogram(Periodogram):
         if not implementations.main._is_regular(frequency) and ls_method in [
             "fastchi2",
             "fast",
+            "fastnifty_chi2",
+            "fastnifty",
         ]:
             oldmethod = ls_method
-            ls_method = {"fastchi2": "chi2", "fast": "slow"}[ls_method]
+            ls_method = {"fastchi2": "chi2", "fast": "slow", "fastnifty_chi2": "chi2", "fastnifty": "slow"}[ls_method]
             log.warning(
                 "The requested periodogram is not evenly sampled in frequency.\n"
                 "Method has been changed from '{}' to '{}' to allow for this.".format(
@@ -943,11 +945,11 @@ class LombScarglePeriodogram(Periodogram):
                 )
             )
 
-        if (nterms > 1) and (ls_method not in ["fastchi2", "chi2"]):
+        if (nterms > 1) and (ls_method not in ["fastchi2", "chi2", "fastnifty_chi2"]):
             warnings.warn(
                 "Building a Lomb Scargle Periodogram using the `slow` method. "
                 "`nterms` has been set to >1, however this is not supported under the `{}` method. "
-                "To run with higher nterms, set `ls_method` to either 'fastchi2', or 'chi2'. "
+                "To run with higher nterms, set `ls_method` to either 'fastchi2', 'chi2', or 'fastnifty_chi2. "
                 "Please refer to the `astropy.timeseries.periodogram.LombScargle` documentation.".format(
                     ls_method
                 ),
