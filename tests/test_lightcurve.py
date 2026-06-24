@@ -8,6 +8,7 @@ from astropy.time import Time, TimeDelta
 from astropy.timeseries import aggregate_downsample
 
 import matplotlib.pyplot as plt
+import astropy
 import numpy as np
 
 from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
@@ -23,7 +24,7 @@ from lightkurve.targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFil
 from lightkurve.utils import LightkurveWarning, LightkurveDeprecationWarning, LightkurveError
 from lightkurve.search import search_lightcurve
 from lightkurve.collections import LightCurveCollection
-from lightkurve.io.generic import read_generic_lightcurve 
+from lightkurve.io.generic import read_generic_lightcurve
 
 from .test_targetpixelfile import TABBY_TPF
 
@@ -1031,26 +1032,26 @@ def test_to_fits():
     assert hdu[1].header["TTYPE1"] == "TIME"
     assert hdu[1].header["TTYPE2"] == "FLUX"
     assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
-    
+
     extra_data = {"MISSION": "Kepler"}
     hdu = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
     assert (lc_new.flux == lc.flux).all()
-    
+
     hdu = lc.select_flux("sap_bkg").to_fits()
     lc_new = KeplerLightCurve.read(hdu)
     assert (lc_new.flux == lc.sap_bkg).all()
     assert lc_new.flux_origin == 'lightkurve.LightCurve.to_fits()'
 
-    
+
     assert 'sap_quality' in lc_new.columns
 
-    
+
     extra_data =  {"MISSION": "TESS"}
     hdu_tess = LightCurve(time=[0, 1, 2, 3, 4], flux=[1, 1, 1, 1, 1]).to_fits(**extra_data)
     lc_new_tess =  TessLightCurve.read(hdu_tess)
     assert 'quality' in lc_new_tess.columns
 
-    
+
     #Create the time values and specify the format
     time_values = Time(np.linspace(2458000, 2458000 + 10, 100), format='jd')
     #Create the flux and flux error values
@@ -1075,7 +1076,7 @@ def test_to_fits():
     assert hdu[1].header["TTYPE3"] == "FLUX_ERR"
     assert lc_new.meta['FLUX_ORIGIN'] == 'lightkurve.LightCurve.to_fits()' #1371
 
-    
+
 
     # Test aperture mask support in to_fits
     for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
@@ -2133,7 +2134,11 @@ def test_pickle_basic():
     do_test_pickle(lc, "Basic minimal LC")
 
 
-@pytest.mark.xfail  # https://github.com/astropy/astropy/issues/19040 (still works with `dill`)
+@pytest.mark.xfail(
+    astropy.__version__ < '7.2.1',
+    # https://github.com/astropy/astropy/issues/19040 (still works with `dill`)
+    reason="astropy issue fixed in 7.2.1 / 8.0.0"
+)
 @pytest.mark.remote_data
 @pytest.mark.parametrize("lc_url, lc_label", [
     (TABBY_Q8, "Kepler LC"),
