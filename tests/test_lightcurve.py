@@ -8,6 +8,7 @@ from astropy.time import Time, TimeDelta
 from astropy.timeseries import aggregate_downsample
 
 import matplotlib.pyplot as plt
+import astropy
 import numpy as np
 
 from numpy.testing import assert_almost_equal, assert_array_equal, assert_allclose, assert_equal
@@ -2133,6 +2134,11 @@ def test_pickle_basic():
     do_test_pickle(lc, "Basic minimal LC")
 
 
+@pytest.mark.xfail(
+    astropy.__version__ < '7.2.1',
+    # https://github.com/astropy/astropy/issues/19040 (still works with `dill`)
+    reason="astropy issue fixed in 7.2.1 / 8.0.0"
+)
 @pytest.mark.remote_data
 @pytest.mark.parametrize("lc_url, lc_label", [
     (TABBY_Q8, "Kepler LC"),
