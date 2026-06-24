@@ -58,7 +58,7 @@ You can set up the environment as follows:
 .. code-block:: bash
 
     $ cd lightkurve
-    $ curl -sSL https://install.python-poetry.org | python -
+    $ curl -sSL https://install.python-poetry.org | python3 -
     # add "--with dev" to include packages useful for development, e.g., pytest
     $ poetry install --with dev
 
