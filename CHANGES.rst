@@ -1,7 +1,10 @@
 2.6.1dev
 =====================
+- Update search URL for query_solar_system_objects [#1556]
 - Fixed search result sort order for the cases involving TESS sectors 99 and 100, etc. [#1558]
 - Fixed CBV plotting with pandas 3 and removed the pandas <3.0 dependency cap.
+- Fixed nifty-ls support for cases a) ``fastnifty_chi2`` with ``nterms > 1``, b) non-even
+  frequency grid [#1568]
 
 2.6.0 (2026-04-16)
 =====================
