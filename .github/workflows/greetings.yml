@@ -2,6 +2,10 @@ name: Greetings
 
 on: [pull_request, issues]
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   greeting:
     name: Greet First-Time Contributors
@@ -9,6 +13,6 @@ jobs:
     steps:
     - uses: actions/first-interaction@v3
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        # repo_token: ${{ secrets.GITHUB_TOKEN }}
         issue_message: 'Hi there! 👋  Thank you for opening your first Lightkurve issue! 🙏  One of our maintainers will get back to you as soon as possible. 👩‍🚀  You can expect a response within 7 days. 📅  If you haven’t heard anything by then, feel free to ping this thread. 🛎️  We love that you are using Lightkurve and appreciate your feedback. 👍'
         pr_message: 'Hi there! 👋  Thank you for opening your first Lightkurve pull request! 🙏  One of our maintainers will get back to you as soon as possible. 👩‍🚀  You can expect a response within 7 days. 📅  If you haven’t heard anything by then, feel free to ping this thread. 🛎️  We love that you are using Lightkurve and appreciate your input. 👍'
