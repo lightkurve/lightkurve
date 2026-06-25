@@ -32,7 +32,9 @@ jobs:
         include:
           - name: "3.9-remote-data"
             python-version: "3.9"
-            pytest-command: ./poetry/bin/poetry run pytest --remote-data --doctest-modules
+            # re-run failed tests at the end using "pytest --last-failed"
+            # goal: retry the typical intermittent network failures
+            pytest-command: ./poetry/bin/poetry run .github/workflows/pytest_with_retry_failed.sh --remote-data --doctest-modules
           - name: "3.9-memtest"
             python-version: "3.9"
             pytest-command: ./poetry/bin/poetry run pytest -m memtest --remote-data
