@@ -99,6 +99,7 @@ commonly apply to time series data.
     3-science-examples/exoplanets-recover-first-tess-candidate.ipynb
     3-science-examples/exoplanets-machine-learning-preprocessing.ipynb
     3-science-examples/exoplanets-visualizing-periodic-signals-using-a-river-plot.ipynb
+    3-science-examples/exoplanets-comparing-combining-tess-kepler.ipynb
 
 3.2. Rotation rates and periodic signals
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
