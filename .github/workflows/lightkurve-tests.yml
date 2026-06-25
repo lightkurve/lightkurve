@@ -1,15 +1,16 @@
 # GitHub Actions workflow for Lightkurve's continuous integration.
 #
-# This file configures nine different jobs:
+# This file configures the following jobs:
 # 1) pytest on Linux, Python 3.9, with -m memtest (i.e. stress memory)
 # 2) pytest on Linux, Python 3.9, with --remote-data enabled (i.e. get data from MAST).
 # 3) pytest on Linux, Python 3.10.
 # 4) pytest on Linux, Python 3.11.
 # 5) pytest on Linux, Python 3.12.
 # 6) pytest on Linux, Python 3.13.
-# 7) pytest on Windows, Python 3.9.
-# 8) pytest on OSX, Python 3.9.
-# 9) flake8 syntax check.
+# 7) pytest on Linux, Python 3.14.
+# 8) pytest on Windows, Python 3.9.
+# 9) pytest on OSX, Python 3.9.
+# 10) flake8 syntax check.
 
 name: Lightkurve-tests
 
@@ -28,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: ["3.9-remote-data", "3.9-memtest", "3.10", "3.11", "3.12", "3.13"]
+        name: ["3.9-remote-data", "3.9-memtest", "3.10", "3.11", "3.12", "3.13", "3.14"]
         include:
           - name: "3.9-remote-data"
             python-version: "3.9"
@@ -47,6 +48,9 @@ jobs:
             pytest-command: ./poetry/bin/poetry run pytest
           - name: "3.13"
             python-version: "3.13"
+            pytest-command: ./poetry/bin/poetry run pytest
+          - name: "3.14"
+            python-version: "3.14"
             pytest-command: ./poetry/bin/poetry run pytest
     steps:
     - uses: actions/checkout@v5
