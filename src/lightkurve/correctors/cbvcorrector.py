@@ -1171,7 +1171,7 @@ class CotrendingBasisVectors(TimeSeries):
             # Get the CBV arrays that were requested
             for idx, cbv_name in enumerate(cbv_designmatrix.columns):
                 cbvIndex = cbv_name[7:]
-                cbv = cbv_designmatrix[cbv_name]
+                cbv = np.array(cbv_designmatrix[cbv_name], copy=True)
                 # Plot gaps as NaN
                 cbv[np.nonzero(self.gap_indicators)[0]] = np.nan
                 ax.plot(timeArray, cbv-idx/10., label='{}'.format(cbvIndex), **kwargs)
