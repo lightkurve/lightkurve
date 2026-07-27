@@ -7,6 +7,7 @@
   frequency grid [#1568]
 - Added basic tests for ``ls_methods`` in ``Periodogram``, ``nifty-ls`` support and made ``nifty_ls`` an explicit optional dependency [#1576]
 - Added io for the TARS HLSP [#1587]
+- ``flatten(niters=0)`` now raises a clear ``ValueError`` instead of an ``UnboundLocalError`` [#1579]
 
 2.6.0 (2026-04-16)
 =====================
