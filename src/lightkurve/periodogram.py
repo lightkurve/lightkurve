@@ -1018,6 +1018,78 @@ class LombScarglePeriodogram(Periodogram):
         return lc.normalize()
 
 
+    def select_nterms(self, max_nterms=10, criterion="bic"):
+        """Select the number of Fourier terms using a model selection criterion.
+
+        Parameters
+        ----------
+        max_nterms : int
+            Maximum number of Fourier terms to consider.
+        criterion : str
+            Model selection criterion. Supported values are ``"bic"`` and
+            ``"aic"``.
+
+        Returns
+        -------
+        int
+            Number of Fourier terms with the lowest information criterion.
+
+        Notes
+        -----
+        The frequency is fixed to the frequency corresponding to the
+        maximum power of the current periodogram. For each candidate
+        number of Fourier terms, a Lomb-Scargle model is fitted and its
+        information criterion is calculated from the residuals.
+        """
+        if self._LS_object is None:
+            raise ValueError("No `astropy` Lomb Scargle object exists.")
+
+        if not isinstance(max_nterms, int) or max_nterms < 1:
+            raise ValueError("`max_nterms` must be a positive integer.")
+
+        criterion = criterion.lower()
+
+        if criterion not in ["bic", "aic"]:
+            raise ValueError("`criterion` must be either 'bic' or 'aic'.")
+
+        time = self._LS_object.t
+        y = self._LS_object.y
+        dy = self._LS_object.dy
+
+        n = len(y)
+        frequency = self.frequency_at_max_power
+
+        scores = []
+
+        for nterms in range(1, max_nterms + 1):
+            ls = LombScargle(
+                time,
+                y,
+                dy=dy,
+                nterms=nterms,
+            )
+            model = ls.model(time, frequency)
+            residuals = y - model
+
+            if dy is not None:
+                chi2 = np.sum((residuals / dy) ** 2)
+            else:
+                chi2 = np.sum(residuals ** 2)
+
+            # One constant term plus two coefficients
+            # (sine and cosine) for each Fourier term.
+            k = 1 + 2 * nterms
+            if criterion == "bic":
+                score = chi2 + k * np.log(n)
+            else:
+                score = chi2 + 2 * k
+
+            scores.append(score)
+        return int(np.argmin(scores) + 1)
+    
+    
+
+
 class BoxLeastSquaresPeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
     representing a power spectrum generated using the Box Least Squares (BLS) method.

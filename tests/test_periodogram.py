@@ -10,7 +10,7 @@ from astropy.time import Time
 from astropy.utils.masked import Masked
 
 from lightkurve.lightcurve import LightCurve
-from lightkurve.periodogram import Periodogram
+from lightkurve.periodogram import Periodogram,LombScarglePeriodogram
 from lightkurve.utils import LightkurveWarning
 
 HAS_NIFTY_LS = True
@@ -112,6 +112,35 @@ def test_periodogram_can_find_periods():
     lc = lc.normalize()
     p = lc.to_periodogram(normalization="amplitude")
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
+
+
+
+
+def test_lomb_scargle_select_nterms():
+    time = np.linspace(0, 10, 500)
+
+    flux = (
+        1.0
+        + 0.3 * np.sin(2 * np.pi * 0.5 * time)
+        + 0.1 * np.cos(2 * np.pi * 0.5 * time)
+        + 0.05 * np.sin(2 * np.pi * 1.0 * time)
+    )
+
+    lc = LightCurve(time=time, flux=flux)
+
+    pg = LombScarglePeriodogram.from_lightcurve(
+        lc,
+        minimum_frequency=0.45,
+        maximum_frequency=0.55,
+        nterms=1,
+    )
+
+    best_nterms = pg.select_nterms(
+        max_nterms=5,
+        criterion="bic",
+    )
+
+    assert 1 <= best_nterms <= 5
 
 
 def test_periodogram_slicing():
