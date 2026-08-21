@@ -253,7 +253,7 @@ class TessQualityFlags(QualityFlags):
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
     # See https://outerspace.stsci.edu/display/TESS/2.0+-+Data+Product+Overview
     DEFAULT_BITMASK = (
-        AttitudeTweak | SafeMode | CoarsePoint | EarthPoint | Argabrightening | 
+        AttitudeTweak | SafeMode | CoarsePoint | EarthPoint | Argabrightening |
         Desat | ManualExclude | ImpulsiveOutlier | BadCalibrationExclude
     )
     #: HARD bitmask is conservative and may identify cadences which are useful.
@@ -724,7 +724,7 @@ def _query_solar_system_objects(
         Spacecraft location. Options include `'kepler'` and `'tess'`.
     cache : bool or "update"
         Whether to cache the search result. Default is True.
-        Note the astropy cache is used. See download_file for details. 
+        Note the astropy cache is used. See download_file for details.
     show_progress : bool
         Whether to display a progress bar during the download. Default is True.
 
@@ -732,7 +732,7 @@ def _query_solar_system_objects(
     -------
     result : `pandas.DataFrame`
         DataFrame containing the list of known solar system objects at the
-        requested time and location. Note a unique line in the table is created for 
+        requested time and location. Note a unique line in the table is created for
         each timestamp in which an object is present.
     """
     # We import pandas locally, because it takes quite a bit of time to import,
@@ -755,8 +755,8 @@ def _query_solar_system_objects(
 
     df = None
     times = np.atleast_1d(times)
-    for time in tqdm(times, desc="Querying for SSOs", disable=~show_progress):
-        url_queried = url + "EPOCH={}".format(time)
+    for t in tqdm(times, desc="Querying for SSOs", disable=~show_progress):
+        url_queried = url + "EPOCH={}".format(t)
         for attempt in range(5):
             try:
                 response = download_file(url_queried, cache=cache, show_progress=show_progress)
@@ -773,10 +773,10 @@ def _query_solar_system_objects(
             )
         try:
             res = pd.read_csv(response, delimiter="|", skiprows=2)
-        except EmptyDataError: 
+        except EmptyDataError:
             res = []
         if len(res) > 0:
-            res["epoch"] = time
+            res["epoch"] = t
             res.rename(
                 {"# Num ": "Num", " Name ": "Name", " Class ": "Class", " Mv ": "Mv"},
                 inplace=True,
