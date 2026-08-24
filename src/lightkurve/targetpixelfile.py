@@ -16,7 +16,7 @@ from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
-from astropy.utils.decorators import deprecated
+from astropy.utils.decorators import deprecated, deprecated_renamed_argument
 from astropy.time import Time
 from astropy.units import Quantity
 import astropy.units as u
@@ -440,24 +440,27 @@ class TargetPixelFile(object):
                     mywcs[newkey] = self.hdu[1].header[oldkey]
             return WCS(mywcs)
 
-    def get_coordinates(self, cadence="all"):
+    @deprecated_renamed_argument(
+        "cadence", "frame", "2.6.1", warning_type=LightkurveDeprecationWarning
+    )
+    def get_coordinates(self, frame="all"):
         """Returns two 3D arrays of RA and Dec values in decimal degrees.
 
-        If cadence number is given, returns 2D arrays for that cadence. If
-        cadence is 'all' returns one RA, Dec value for each pixel in every cadence.
+        If frame number is given, returns 2D arrays for that frame. If
+        frame is 'all' returns one RA, Dec value for each pixel in every frame.
         Uses the WCS solution and the POS_CORR data from TPF header.
 
         Parameters
         ----------
-        cadence : 'all' or int
-            Which cadences to return the RA Dec coordinates for.
+        frame : 'all' or int
+            Which frames to return the RA Dec coordinates for.
 
         Returns
         -------
-        ra : numpy array, same shape as tpf.flux[cadence]
-            Array containing RA values for every pixel, for every cadence.
-        dec : numpy array, same shape as tpf.flux[cadence]
-            Array containing Dec values for every pixel, for every cadence.
+        ra : numpy array, same shape as tpf.flux[frame]
+            Array containing RA values for every pixel, for every frame.
+        dec : numpy array, same shape as tpf.flux[frame]
+            Array containing Dec values for every pixel, for every frame.
         """
         w = self.wcs
         X, Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
@@ -491,8 +494,8 @@ class TargetPixelFile(object):
         ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
         dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
         ra, dec = ra[self.quality_mask], dec[self.quality_mask]
-        if cadence != "all":
-            return ra[cadence], dec[cadence]
+        if frame != "all":
+            return ra[frame], dec[frame]
         return ra, dec
 
     def show_properties(self):
@@ -1519,7 +1522,7 @@ class TargetPixelFile(object):
         hdu = self.hdu[0].copy()
 
         # Find the new object coordinates
-        r, d = self.get_coordinates(cadence=len(self.flux) // 2)
+        r, d = self.get_coordinates(frame=len(self.flux) // 2)
         hdu.header["RA_OBJ"] = np.nanmean(
             r[row_edges[0] : row_edges[1], col_edges[0] : col_edges[1]]
         )

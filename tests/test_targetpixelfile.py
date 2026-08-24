@@ -262,6 +262,24 @@ def test_wcs_tabby(method):
     assert np.isclose(ra[x, y], 301.5643971, 1e-4)
     assert np.isclose(dec[x, y], 44.4568869, 1e-4)
 
+def test_get_coordinates_frame_keyword():
+    """The `frame` keyword replaces the deprecated `cadence` keyword"""
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+
+    ra_all, dec_all = tpf.get_coordinates()
+    ra_kw, dec_kw = tpf.get_coordinates(frame=0)
+    ra_pos, dec_pos = tpf.get_coordinates(0)
+    assert ra_kw.shape == tpf.shape[1:]
+    assert_array_equal(ra_kw, ra_all[0])
+    assert_array_equal(dec_kw, dec_all[0])
+    assert_array_equal(ra_kw, ra_pos)
+    assert_array_equal(dec_kw, dec_pos)
+
+    # the old `cadence` keyword still works, but warns
+    with pytest.warns(LightkurveDeprecationWarning, match='"cadence" was deprecated'):
+        ra_old, dec_old = tpf.get_coordinates(cadence=0)
+    assert_array_equal(ra_old, ra_kw)
+    assert_array_equal(dec_old, dec_kw)
 
 def test_centroid_methods_consistency():
     """Are the centroid methods consistent for a well behaved target?"""
@@ -437,8 +455,6 @@ def test_tpf_factory():
         hdu0_keywords={"creator": "Christina TargetPixelFileWriter", "TELESCOP": "TESS"}
     )
     assert tpf.get_keyword("CREATOR") == "Christina TargetPixelFileWriter"
-
-
 def _create_image_array(header=None, shape=(5, 5)):
     """Helper function for tests below."""
     if header is None:
