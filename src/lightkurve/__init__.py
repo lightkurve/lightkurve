@@ -65,6 +65,9 @@ class Conf(_config.ConfigNamespace):
     search_result_display_extra_columns
         List of extra columns to be included when displaying a SearchResult object.
 
+    search_result_use_cloud_uri
+        If set to True, use an S3 URI rather than download a search result.
+
     cache_dir
         Default cache directory for data files downloaded, etc. Defaults to ``~/.lightkurve/cache`` if not specified.
 
@@ -81,6 +84,13 @@ class Conf(_config.ConfigNamespace):
         [],
         "List of extra columns to be included when displaying a SearchResult object.",
         cfgtype="string_list",
+        module="lightkurve.search"
+    )
+
+    search_result_use_cloud_uri = _config.ConfigItem(
+        False,
+        "If set to True, use an S3 URI rather than download a search result.",
+        cfgtype="boolean",
         module="lightkurve.search"
     )
 
