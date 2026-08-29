@@ -8,6 +8,7 @@ import numpy as np
 from astropy.table import vstack
 from astropy.utils.decorators import deprecated
 
+import lightkurve
 from . import MPLSTYLE
 from .utils import LightkurveWarning, LightkurveDeprecationWarning
 
@@ -16,7 +17,8 @@ __all__ = ["LightCurveCollection", "TargetPixelFileCollection"]
 
 
 class Collection(object):
-    """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
+    """Base class for `LightCurveCollection`, `PeriodogramCollection`
+    and `TargetPixelFileCollection`.
 
     A collection can be indexed by standard Python list syntax.
     Additionally, it can be indexed by a subset of `numpy.ndarray` syntax:
@@ -84,7 +86,7 @@ class Collection(object):
         Parameters
         ----------
         obj : object
-            Typically a LightCurve or TargetPixelFile object
+            Typically a LightCurve, Periodogram or TargetPixelFile object
         """
         self.data.append(obj)
 
@@ -107,7 +109,7 @@ class Collection(object):
 
     @property
     def sector(self):
-        """(TESS-specific) the quarters of the lightcurves / target pixel files.
+        """(TESS-specific) the quarters of the lightcurves / periodograms / target pixel files.
 
         Returns `numpy.nan` for data products with lack a sector meta data keyword.
         The attribute is useful for filtering a collection by sector.
@@ -127,9 +129,10 @@ class Collection(object):
 
     @property
     def quarter(self):
-        """(Kepler-specific) the quarters of the lightcurves / target pixel files.
+        """(Kepler-specific) the quarters of the lightcurves / periodograms / target pixel files.
 
-        The Kepler quarters of the lightcurves / target pixel files; `numpy.nan` for those with none.
+        The Kepler quarters of the lightcurves / periodograms / target pixel files; `numpy.nan` for 
+        those with none.
         """
         return self._safeGetScalarAttr("quarter")
 
@@ -227,6 +230,111 @@ class LightCurveCollection(Collection):
         # Need `join_type='inner'` until AstroPy supports masked Quantities
         return vstack(lcs, join_type="inner", metadata_conflicts="silent")
 
+    def stitch_similar(self, corrector_func=lambda x: x.normalize()):
+        """Stitch together similar `LightCurve` objects into a new `LightCurveCollection`.
+        Lightcurves which share the following properites are stitched together:
+        - Have the same author
+        - Have the same exposure time
+        - Are observed consecutively
+
+        Any function passed to `corrector_func` will be applied to each light curve
+        before stitching. For example, passing "lambda x: x.normalize().flatten()"
+        will normalize and flatten each light curve before stitching.
+
+        Parameters
+        ----------
+        corrector_func : function
+            Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
+            This function is applied to each light curve in the collection
+            prior to stitching. The default is to normalize each light curve.
+
+        Returns
+        -------
+        lc : `~lightkurve.lightcurve.LightCurve`
+            Stitched light curve.
+        """        
+        new_lcc_list = []
+        
+        # Generate list of exptimes
+        exptimes = np.array([np.round(np.median(np.diff(lc.time.value)) \
+                            * 24 *60 * 60).astype(int) for lc in self])
+            
+        # Generate list of sectors
+        # TODO: Change language so it's Kepler-friendly
+        # TODO: Fix ordering of the sectorlist, which isn't increasing in number
+        sectors = np.array([lc.sector for lc in self])
+        
+        # Generate list of authors
+        authors = np.array([lc.author for lc in self])
+            
+        new_lcc_list = []
+        for exptime in np.unique(exptimes):
+            sx = exptimes == exptime
+            for author in np.unique(authors[sx]):
+                sa = authors[sx] == author
+
+                # Combine adjacent sectors within these groups
+                sectorlist = sectors[sx][sa]
+                target = [sectorlist[0]]
+
+                for i in np.arange(1, 1+len(sectorlist)):
+                    diff = np.diff(sectorlist[i-1 : i+1])
+                    if not any(diff):
+                        output_stitch = self[sx][sa][np.isin(sectorlist,target)].stitch(corrector_func=corrector_func)
+                        output_stitch.meta['SECTORS'] = sectorlist
+                        output_stitch.meta['AUTHOR'] = author
+                        output_stitch.meta['EXPTIME'] = exptime
+                        new_lcc_list.append(output_stitch)
+                        break      
+                        
+                    if diff == 1:
+                        target.append(sectorlist[i])
+                        if i == len(sectorlist)-1:
+                            output_stitch = self[sx][sa][np.isin(sectorlist,target)].stitch(corrector_func=corrector_func)
+                            output_stitch.meta['SECTORS'] = sectorlist
+                            output_stitch.meta['AUTHOR'] = author
+                            output_stitch.meta['EXPTIME'] = exptime
+                            new_lcc_list.append(output_stitch)
+                            break
+                        continue
+                        
+                    elif diff > 1:
+                        output_stitch = self[sx][sa][np.isin(sectorlist,target)].stitch(corrector_func=corrector_func)
+                        output_stitch.meta['SECTORS'] = sectorlist
+                        output_stitch.meta['AUTHOR'] = author
+                        output_stitch.meta['EXPTIME'] = exptime
+                        new_lcc_list.append(output_stitch)
+                        target = [sectorlist[i]]
+                        continue
+                    else:
+                        break
+                            
+        return LightCurveCollection(new_lcc_list)
+
+    def to_periodograms(self, **kwargs):
+        """Converts all light curves in the collection into periodograms.
+        These periodograms are stored in a PeriodogramCollection.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.to_periodogram`.
+
+        Returns
+        -------
+        pgc : `~lightkurve.collections.PeriodogramCollection`
+            A collection of periodograms.
+        """
+        periodograms = []
+        for idx, lc in enumerate(self):
+            lc_clean = lc.normalize().remove_nans().remove_outliers()
+
+            #TODO: pop keyword arguments
+            periodograms.append(lc_clean.to_periodogram(*kwargs))
+        
+        return PeriodogramCollection(periodograms)
+
+
     def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
         """Plots all light curves in the collection on a single plot.
 
@@ -275,6 +383,115 @@ class LightCurveCollection(Collection):
 
         return ax
 
+class PeriodogramCollection(Collection):
+    """Class to hold a collection of Periodogram objects.
+
+    #TODO: We need some way to stitch adjacent tess sectors!
+
+    Attributes
+    ----------
+    periodograms : array-like
+        List of Periodogram objects.
+    """
+
+    def __init__(self, periodograms):
+        super(PeriodogramCollection, self).__init__(periodograms)
+
+    def rebase(self, lc_collection, frequency = None, **kwargs):
+        """The periodograms are re-done from their light curves to match the
+        lowest frequency resolution of the collected periodograms. Alternatively
+        a custom grid of frequencies can be passed for all periodograms to be
+        added to. The Nyquist frequency can also be set. If it is not set, the
+        lowest Nyquist frequency in the `PeriodogramCollection` will be used.
+
+        Parameters
+        ----------
+        lc_collection : `~lightkurve.collections.LightCurveCollection`
+            The collection of light curves used to create the `PeriodogramCollection`
+        frequency :  array-like
+            The grid of frequencies to use. If given a unit, it is converted to
+            units of freq_unit.
+        **kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.to_periodogram`.
+
+        Returns
+        -------
+        pgc : `~lightkurve.collections.PeriodogramCollection`
+            A collection of periodograms.
+        """
+        # If no frequency is passed, we use an equal grid of frequencies
+        # of the length of the shortest periodogram to the lowest nyquist frequency
+        if frequency is None:
+            len_frequency = np.min([len(pg.frequency) for pg in self])
+            max_frequency = np.min([pg.frequency.value[-1] for pg in self])
+            min_frequency = np.min([pg.frequency.value[0] for pg in self])
+            frequency = np.linspace(min_frequency, max_frequency, len_frequency)
+
+        new_periodogram_list= []
+        for lc in lc_collection:
+            pg = lc.to_periodogram(frequency = frequency, *kwargs)
+            new_periodogram_list.append(pg)
+
+        #TODO: Add checks for the input and for the collection all being on the same baseline.
+        #TODO: Add checks that the input LCC is the same as the one that geneated the PGC originally.
+
+        return PeriodogramCollection(new_periodogram_list)
+
+    def average(self):
+        """ Average two time-separated periodograms (useful for TESS).
+       
+
+        # TODO: Write this out properly and include the link to the relevant paper.
+        """
+        # TODO: Raise warnings for incompatible frequency spacings.
+
+        raise NotImplementError
+    
+    def normalize(self):
+        """ Apply the `Periodogram.normalize()` function to all constituent periodogram objects
+        """
+        raise NotImplementError
+
+    def flatten(self):
+        """ Apply the `Periodogram.flatten()` function to all constituent periodogram objects
+        """
+        raise NotImplementError
+
+    def plot(self, ax=None, offset=0.0, **kwargs) -> matplotlib.axes.Axes:
+        """Plots all periodograms in the collection on a single plot.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+        offset : float
+            Offset to add to targets with different labels, to prevent periodograms
+            from being plotted on top of each other.  For example, if
+            the collection contains periodograms with unique labels "A", "B",
+            and "C", periodograms "A" will have `0*offset` added to their power/amplitude,
+            periodograms "B" will have `1*offset` offset added, and "C" will
+            have `2*offset` added.
+        **kwargs : dict
+            Dictionary of arguments to be passed to `Periodogram.plot`.
+
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        with plt.style.context(MPLSTYLE):
+            if ax is None:
+                _, ax = plt.subplots()
+            for kwarg in ["c", "color", "label"]:
+                if kwarg in kwargs:
+                    kwargs.pop(kwarg)
+
+            for idx, pg in enumerate(self):
+                kwargs["label"] = f"{idx}: {pg.meta.get('LABEL', '(missing label)')}"
+                (pg+idx*offset).plot(ax=ax, c=f"C{idx}", **kwargs)
+
+        return ax
 
 class TargetPixelFileCollection(Collection):
     """Class to hold a collection of `~lightkurve.targetpixelfile.TargetPixelFile` objects.
