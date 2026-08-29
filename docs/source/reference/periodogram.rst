@@ -39,6 +39,7 @@ Methods
 
   Periodogram.bin
   Periodogram.copy
+  Periodogram.find_peaks
   Periodogram.flatten
   Periodogram.plot
   Periodogram.show_properties
