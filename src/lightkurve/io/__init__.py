@@ -11,6 +11,7 @@ from . import (
     kepseismic,
     pathos,
     qlp,
+    tars,
     tasoc,
     tess,
     tglc,
@@ -38,6 +39,7 @@ try:
         "kepseismic", LightCurve, kepseismic.read_kepseismic_lightcurve
     )
     registry.register_reader("tglc", LightCurve, tglc.read_tglc_lightcurve)
+    registry.register_reader("tars", LightCurve, tars.read_tars_lightcurve)
     registry.register_reader("folded", LightCurve, folded.read_folded_lightcurve)
 except registry.IORegistryError:
     pass  # necessary to enable autoreload during debugging

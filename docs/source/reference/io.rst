@@ -46,5 +46,6 @@ TESS Data Products
     eleanor.read_eleanor_lightcurve
     pathos.read_pathos_lightcurve
     qlp.read_qlp_lightcurve
+    tars.read_tars_lightcurve
     tasoc.read_tasoc_lightcurve
     tglc.read_tglc_lightcurve

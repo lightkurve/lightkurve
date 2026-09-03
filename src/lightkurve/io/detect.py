@@ -28,6 +28,7 @@ def detect_filetype(hdulist: HDUList) -> str:
         * `'KEPSEISMIC'`
         * `'CDIPS'`
         * `'TGLC'`
+        * `'TARS'`
         * `'Folded'`
 
     If the data product cannot be detected, `None` will be returned.
@@ -49,6 +50,11 @@ def detect_filetype(hdulist: HDUList) -> str:
     # cf. http://archive.stsci.edu/hlsp/qlp
     if "mit/qlp" in hdulist[0].header.get("origin", "").lower():
         return "QLP"
+
+    # Is it a TESS All-Sky Rotation Survey (TARS) light curve?
+    # cf. https://archive.stsci.edu/hlsp/tars
+    if hdulist[0].header.get("HLSPID", "").strip().upper() == "TARS":
+        return "TARS"
 
     # Is it a vanilla eleanor or GSFC-ELEANOR-LITE light curve?
     if (

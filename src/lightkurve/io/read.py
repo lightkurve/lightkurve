@@ -134,6 +134,8 @@ def read(path_or_url, **kwargs):
             return KeplerLightCurve.read(path_or_url, format="kepseismic", **kwargs)
         elif filetype == "TGLC":
             return TessLightCurve.read(path_or_url, format="tglc", **kwargs)
+        elif filetype == "TARS":
+            return TessLightCurve.read(path_or_url, format="tars", **kwargs)
         elif filetype == "Folded":
             return read_folded_lightcurve(path_or_url, **kwargs)
         elif filetype == "generic":
