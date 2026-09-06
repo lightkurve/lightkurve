@@ -1341,6 +1341,20 @@ def test_flatten_returns_normalized():
     trend_lc.normalize(unit="percent")
 
 
+def test_flatten_niters_validation():
+    """flatten() should raise a clear error for niters < 1, not UnboundLocalError.
+
+    Regression test for https://github.com/lightkurve/lightkurve/issues/1579
+    """
+    lc = LightCurve(time=[1, 2, 3, 4, 5, 6], flux=[10, 20, 30, 40, 50, 60])
+    for bad_niters in (0, -1):
+        with pytest.raises(ValueError, match="niters"):
+            lc.flatten(niters=bad_niters, window_length=3)
+    # A valid niters value still works.
+    flat_lc = lc.flatten(niters=1, window_length=3, polyorder=1)
+    assert len(flat_lc.flux) == 6
+
+
 def test_iterative_flatten():
     """Test the iterative sigma clipping in flatten """
     # Test a light curve with a single, buried outlier.

@@ -973,8 +973,10 @@ class LightCurve(TimeSeries):
             `break_tolerance` times the median gap.  To disable this feature,
             set `break_tolerance` to None.
         niters : int
-            Number of iterations to iteratively sigma clip and flatten. If more than one, will
-            perform the flatten several times, removing outliers each time.
+            Number of iterations to iteratively sigma clip and flatten. Must be a
+            positive integer (``>= 1``); ``flatten()`` always performs at least one
+            pass. If more than one, will perform the flatten several times, removing
+            outliers each time.
         sigma : int
             Number of sigma above which to remove outliers from the flatten
         mask : boolean array with length of self.time
@@ -993,6 +995,13 @@ class LightCurve(TimeSeries):
         trend_lc : `LightCurve`
             New light curve object containing the trend that was removed.
         """
+        if niters < 1:
+            raise ValueError(
+                f"`niters` must be a positive integer, got {niters}. "
+                "`flatten()` always performs at least one filtering pass; a "
+                "value less than 1 would leave the light curve unflattened."
+            )
+
         if mask is None:
             mask = np.ones(len(self.time), dtype=bool)
         else:
