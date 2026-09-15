@@ -9,7 +9,10 @@ from numpy.testing import (
     assert_raises,
 )
 
+import shutil
 import warnings
+from pathlib import Path
+
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -329,6 +332,32 @@ def test_cbv_local():
     assert cbvs.campaign == 15
     assert cbvs.module == 8
     assert cbvs.output == 4
+
+
+def test_cbv_local_tess_spoc_hlsp_filename(tmp_path):
+    """Local TESS CBVs named with the TESS-SPOC HLSP convention are found.
+
+    SPOC bulk-download CBVs are named ``s{sector}-{camera}-{ccd}``, while the
+    TESS-SPOC HLSP products name the same camera/CCD/sector as
+    ``{camera}-{ccd}-s{sector}``. Both orderings must be found in ``cbv_dir``.
+    """
+    spoc_file = Path(TESTDATA) / "tess2019085135100-s0010-2-4-0140-s_cbv.fits"
+    hlsp_file = tmp_path / "hlsp_tess-spoc_tess_phot_2-4-s0010_tess_v1_cbv.fits"
+    shutil.copy(spoc_file, hlsp_file)
+
+    cbvs = load_tess_cbvs(
+        cbv_dir=str(tmp_path), sector=10, camera=2, ccd=4, cbv_type="SingleScale"
+    )
+    assert isinstance(cbvs, TessCotrendingBasisVectors)
+    assert cbvs.sector == 10
+    assert cbvs.camera == 2
+    assert cbvs.ccd == 4
+
+    # A different sector must still miss.
+    with pytest.raises(Exception):
+        load_tess_cbvs(
+            cbv_dir=str(tmp_path), sector=11, camera=2, ccd=4, cbv_type="SingleScale"
+        )
 
 # *******************************************************************************
 # *******************************************************************************

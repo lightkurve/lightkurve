@@ -1920,6 +1920,9 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
 
     try:
         SearchString = 's%04d-%s-%s-' % (sector, str(camera),str(ccd))
+        # TESS-SPOC HLSP CBV products name the same camera/CCD/sector
+        # as '{camera}-{ccd}-s{sector}' instead of the SPOC ordering.
+        HlspSearchString = '%s-%s-s%04d' % (str(camera), str(ccd), sector)
     except:
         raise Exception('Error parsing sector string when getting TESS CBV FITS files')
 
@@ -1931,7 +1934,7 @@ def load_tess_cbvs(cbv_dir=None,sector=None, camera=None,
             fname = None
             for line in data:
                 strLine = str(line)
-                if SearchString in strLine:
+                if SearchString in strLine or HlspSearchString in strLine:
                     fname = strLine
                     break
             if (fname is None):
