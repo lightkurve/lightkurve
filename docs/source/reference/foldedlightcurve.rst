@@ -35,6 +35,15 @@ Extra attributes
    FoldedLightCurve.even_mask
 
 
+Modified methods
+~~~~~~~~~~~~~~~~
+
+.. autosummary::
+  :toctree: api/
+
+  FoldedLightCurve.bin
+
+
 Modified plotting methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
