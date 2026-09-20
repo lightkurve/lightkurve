@@ -36,3 +36,14 @@ def test_search_tglc():
     assert lc.sector == 1
     assert lc.camera == 4
     assert lc.ccd == 2
+
+def test_tglc_hardest_bitmask_no_int16_overflow():
+    """TGLC reader must not overflow int16 when HARDEST_BITMASK is used."""
+    from lightkurve.utils import TessQualityFlags
+
+    quality = np.zeros(8, dtype=np.int16)
+    mask = TessQualityFlags.create_quality_mask(
+        quality_array=np.asarray(quality, dtype=np.int32),
+        bitmask=TessQualityFlags.HARDEST_BITMASK,
+    )
+    assert mask.all()
