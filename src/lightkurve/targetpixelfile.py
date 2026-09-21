@@ -100,6 +100,7 @@ class TargetPixelFile(object):
 
     def __init__(self, path, quality_bitmask="default", targetid=None, **kwargs):
         self.path = path
+        self._owns_hdu = False
         if isinstance(path, fits.HDUList):
             self.hdu = path
         elif isinstance(path, str) and path.startswith("s3://"):
@@ -107,8 +108,10 @@ class TargetPixelFile(object):
             self.hdu = fits.open(
                 path, use_fsspec=True, fsspec_kwargs={"anon": True}, **kwargs
             )
+            self._owns_hdu = True
         else:
             self.hdu = fits.open(self.path, **kwargs)
+            self._owns_hdu = True
         try:
             self.quality_bitmask = quality_bitmask
             self.targetid = targetid
@@ -119,6 +122,23 @@ class TargetPixelFile(object):
             # Cannot instantiate TargetPixelFile, close the HDU to release the file handle
             self.hdu.close()
             raise e
+
+    def close(self):
+        """Close the underlying FITS HDUList."""
+        self.hdu.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def __del__(self):
+        if getattr(self, "_owns_hdu", False):
+            try:
+                self.close()
+            except Exception:
+                pass
 
     def __getitem__(self, key):
         """Implements indexing and slicing.
