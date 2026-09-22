@@ -1165,6 +1165,11 @@ def _query_mast(
     # We pass the following `query_criteria` to MAST regardless of whether
     # we search by position or target name:
     query_criteria = {"project": project, **extra_query_criteria}
+    identity_query_criteria = {"project": project}
+    if "dataproduct_type" in extra_query_criteria:
+        identity_query_criteria["dataproduct_type"] = extra_query_criteria[
+            "dataproduct_type"
+        ]
     if provenance_name is not None:
         query_criteria["provenance_name"] = provenance_name
     if sequence_number is not None:
@@ -1209,7 +1214,20 @@ def _query_mast(
             obs["distance"] = 0.0
             return obs
         else:
-            log.debug(f"No observations found. Now performing a cone search instead.")
+            identity_obs = obs
+            if query_criteria.keys() != identity_query_criteria.keys():
+                with warnings.catch_warnings():
+                    warnings.filterwarnings("ignore", category=NoResultsWarning)
+                    identity_obs = Observations.query_criteria(
+                        target_name=exact_target_name, **identity_query_criteria
+                    )
+            if len(identity_obs) > 0:
+                log.debug(
+                    "The exact target exists, but no observations matched "
+                    "the requested filters."
+                )
+                return obs
+            log.debug("No observations found. Now performing a cone search instead.")
 
     # If the above did not return a result, then do a cone search using the MAST name resolver
     # `radius` defaults to 0.0001 and unit arcsecond

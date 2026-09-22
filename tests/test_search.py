@@ -25,6 +25,7 @@ from lightkurve.search import (
     search_tesscut,
     SearchResult,
     SearchError,
+    _query_mast,
     log,
 )
 from lightkurve import (
@@ -34,6 +35,162 @@ from lightkurve import (
 )
 
 from .test_conf import use_custom_config_file, remove_custom_config
+
+
+def _mock_query_criteria(monkeypatch, existing_exact_target=None):
+    """Mock MAST exact-target and cone queries without using remote data."""
+    from astroquery.mast import Observations
+
+    calls = []
+
+    def fake_query_criteria(**criteria):
+        calls.append(criteria.copy())
+        if "objectname" in criteria:
+            return Table(
+                {
+                    "target_name": ["203892745"],
+                    "t_exptime": [120.0],
+                    "distance": [4.5],
+                }
+            )
+        identity_criteria = {
+            "target_name",
+            "project",
+            "dataproduct_type",
+        }
+        if (
+            existing_exact_target is not None
+            and set(criteria) == identity_criteria
+            and criteria["target_name"] == existing_exact_target
+        ):
+            return Table(
+                {
+                    "target_name": [existing_exact_target],
+                    "t_exptime": [200.0],
+                }
+            )
+        return Table(
+            names=("target_name", "t_exptime", "distance"),
+            dtype=("U20", "f8", "f8"),
+        )
+
+    monkeypatch.setattr(Observations, "query_criteria", fake_query_criteria)
+    return calls
+
+
+def test_query_mast_filtered_exact_target_does_not_fall_back(monkeypatch):
+    """Optional filters must not change a no-radius exact ID into a cone search.
+
+    Regression test for #1531.
+    """
+    calls = _mock_query_criteria(monkeypatch, existing_exact_target="203892751")
+    result = _query_mast(
+        "TIC 203892751",
+        project=["TESS"],
+        provenance_name=["SPOC"],
+        sequence_number=80,
+        exptime=(119, 121),
+        dataproduct_type=["cube", "timeseries"],
+    )
+
+    assert calls == [
+        {
+            "target_name": "203892751",
+            "project": ["TESS"],
+            "dataproduct_type": ["cube", "timeseries"],
+            "provenance_name": ["SPOC"],
+            "sequence_number": 80,
+            "t_exptime": (119, 121),
+        },
+        {
+            "target_name": "203892751",
+            "project": ["TESS"],
+            "dataproduct_type": ["cube", "timeseries"],
+        },
+    ]
+    assert len(result) == 0
+
+
+def test_query_mast_absent_exact_target_falls_back(monkeypatch):
+    """A genuinely absent exact target retains the historical cone fallback."""
+    calls = _mock_query_criteria(monkeypatch)
+    result = _query_mast(
+        "TIC 0",
+        project=["TESS"],
+        provenance_name=["SPOC"],
+        dataproduct_type=["cube", "timeseries"],
+    )
+
+    assert result["target_name"][0] == "203892745"
+    assert calls[1] == {
+        "target_name": "0",
+        "project": ["TESS"],
+        "dataproduct_type": ["cube", "timeseries"],
+    }
+    assert len(calls) == 3
+    assert "objectname" in calls[2]
+    assert calls[2]["objectname"] == "TIC 0"
+    assert "target_name" not in calls[2]
+    assert u.Quantity(calls[2]["radius"]).to_value(u.arcsec) == pytest.approx(0.0001)
+
+
+def test_query_mast_unfiltered_absent_target_does_not_repeat_exact_query(monkeypatch):
+    """An identity-only exact query need not be repeated before cone fallback."""
+    calls = _mock_query_criteria(monkeypatch)
+    result = _query_mast(
+        "TIC 0",
+        project=["TESS"],
+        exptime=None,
+        dataproduct_type=["cube", "timeseries"],
+    )
+
+    assert result["target_name"][0] == "203892745"
+    assert calls[0] == {
+        "target_name": "0",
+        "project": ["TESS"],
+        "dataproduct_type": ["cube", "timeseries"],
+    }
+    assert len(calls) == 2
+    assert calls[1]["objectname"] == "TIC 0"
+
+
+def test_query_mast_explicit_radius_uses_cone_search(monkeypatch):
+    """An explicit radius continues to opt into nearby cone-search results."""
+    calls = _mock_query_criteria(monkeypatch, existing_exact_target="203892751")
+    result = _query_mast(
+        "TIC 203892751",
+        radius=1 * u.arcsec,
+        project=["TESS"],
+        provenance_name=["SPOC"],
+        dataproduct_type=["cube", "timeseries"],
+    )
+
+    assert result["target_name"][0] == "203892745"
+    assert len(calls) == 1
+    assert calls[0]["objectname"] == "TIC 203892751"
+    assert "target_name" not in calls[0]
+    assert u.Quantity(calls[0]["radius"]).to_value(u.arcsec) == pytest.approx(1)
+
+
+def test_query_mast_cross_mission_identifier_falls_back(monkeypatch):
+    """A KIC absent from TESS still uses the resolver to find TESS products."""
+    calls = _mock_query_criteria(monkeypatch)
+    result = _query_mast(
+        "KIC 8462852",
+        project=["TESS"],
+        provenance_name=["SPOC"],
+        dataproduct_type=["cube", "timeseries"],
+    )
+
+    assert result["target_name"][0] == "203892745"
+    assert calls[1] == {
+        "target_name": "kplr008462852",
+        "project": ["TESS"],
+        "dataproduct_type": ["cube", "timeseries"],
+    }
+    assert len(calls) == 3
+    assert calls[2]["objectname"] == "KIC 8462852"
+    assert "target_name" not in calls[2]
 
 
 @pytest.mark.remote_data
