@@ -13,8 +13,8 @@ from .generic import read_generic_lightcurve
 log = logging.getLogger(__name__)
 
 def read_cdips_lightcurve(filename,
-                            flux_column="IRM1",
-                            include_inst_errs=False,
+                            flux_column="IFL1",
+                            include_inst_errs=True,
                             quality_bitmask=None):
     """Returns a TESS CDIPS `~lightkurve.lightcurve.LightCurve`.
 
@@ -24,6 +24,11 @@ def read_cdips_lightcurve(filename,
     are removed according to Bouma et al. 2019, and no other quality filtering
     is allowed. The `quality_bitmask` parameter is ignored but accepted for
     compatibility with other data format readers.
+
+    There are several kinds of flux and  magnitudes provided. For consistancy
+    we have chosen to display as default 'IFL1', the flux in aperture 1. 
+    This is given in ADU. 
+    The flux_err is also provided as 'IFE1' in ADU
 
     More information: https://archive.stsci.edu/hlsp/cdips
 
@@ -40,28 +45,32 @@ def read_cdips_lightcurve(filename,
     """
     ap = flux_column[-1]
 
-    # Only the instrumental magnitudes are provided, and are not provided for
-    # trend-filtered light curves. User should select whether to include the
-    # instrumental errors or ignore them
+    # A user can chose to dipsplay the magnitudes or any of the other flux values,
+    # They can do this by using the flux_column key
+    # By default the flux_err for the given flux specified is returned
+    
     if include_inst_errs:
         # If fluxes are requested, return flux errors
         if flux_column[:-1].lower()=="ifl":
-            flux_err_column = f"ife{ap}"
+            flux_err_column = f"ife{ap}" 
         # Otherwise magnitudes are being requested, return magnitude errors
         else:
-            flux_err_column = f"ire{ap}"
+            flux_err_column = f"ire{ap}" 
     else:
         flux_err_column = ""
 
     # Set the appropriate error column for this aperture
     quality_column = f"irq{ap}"
 
+    # The time is in jd not btjd as such the time_format was changes to jd.
     lc = read_generic_lightcurve(filename,
                                  time_column="tmid_bjd",
                                  flux_column=flux_column.lower(),
                                  flux_err_column=flux_err_column,
                                  quality_column=quality_column,
-                                 time_format='btjd')
+                                 time_format='jd')
+
+
 
     # Filter out poor-quality data
     # NOTE: Unfortunately Astropy Table masking does not yet work for columns
@@ -74,9 +83,21 @@ def read_cdips_lightcurve(filename,
     quality_mask = (lc['quality']=="G") | (lc['quality']=="0")
     lc = lc[quality_mask]
 
+
+    #This makes sure that the TIC ID is obtained and returned as the plot label
+    tic = lc.meta.get('TICID')
+    if tic is not None:
+        # compatibility with SPOC, QLP, etc.
+        lc.meta["TARGETID"] = tic
+        lc.meta["TICID"] = tic
+        lc.meta["OBJECT"] = f"TIC {tic}"
+        # for Lightkurve's plotting methods
+        lc.meta["LABEL"] = f"TIC {tic}"
+
+    
     lc.meta["AUTHOR"] = "CDIPS"
-    lc.meta['TARGETID'] = lc.meta.get('TICID')
-    lc.meta['QUALITY_BITMASK'] = 36
+    #Adjusting the bitmaks to the TESS default value of 175
+    lc.meta['QUALITY_BITMASK'] = 175
     lc.meta['QUALITY_MASK'] = quality_mask
 
     return TessLightCurve(data=lc)
