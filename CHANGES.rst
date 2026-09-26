@@ -7,7 +7,7 @@
   frequency grid [#1568]
 - Added basic tests for ``ls_methods`` in ``Periodogram``, ``nifty-ls`` support and made ``nifty_ls`` an explicit optional dependency [#1576]
 - Added io for the TARS HLSP [#1587]
-- Fixed ``TargetPixelFile.cutout()`` using the row count as the default column centre and vice versa, so a non-square TPF was cut around the wrong pixel [#1586]
+- Fixed ``TargetPixelFile.cutout()`` to select the standard (column, row) dimensions when the center is specified [#1586]
 
 2.6.0 (2026-04-16)
 =====================

@@ -31,8 +31,7 @@ filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.f
 filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
 # a local version of TABBY_TPF with ~ 2 days of data; should be sufficient for most tests
 filename_tpf_tabby_lite = get_pkg_data_filename("data/test-tpf-kplr-tabby-100-cadences.fits")
-# 7 rows x 8 columns, the only non-square fixture whose row and column half-counts
-# differ (3 vs 4); asteroid_test.fits is 10x11, where both halves are 5.
+# a 7 rows x 8 columns cutout region
 filename_tpf_tabby_first_cadence = get_pkg_data_filename(
     "data/test-tpf-kplr-tabby-first-cadence.fits"
 )
@@ -741,22 +740,14 @@ def test_cutout():
         assert np.prod(ntpf.flux.shape[1:]) == 4
         assert ntpf.targetid == tpf.targetid
 
-
-def test_cutout_default_center_non_square():
-    """The default cutout center must be the middle of a non-square TPF.
-
-    TESSCut accepts a tuple ``cutout_size``, so rectangular TPFs are a normal
-    product of ``search_tesscut().download()``.
-    """
+    # On a non-square TPF the default center is the geometric middle, so it
+    # must agree with passing that (column, row) explicitly.
     tpf = KeplerTargetPixelFile(filename_tpf_tabby_first_cadence)
-    # (cadence, row, column)
-    assert tpf.flux.shape[1:] == (7, 8)
-
-    # the default center is the geometric centre, so it must agree with
-    # passing that (column, row) explicitly
-    default = tpf.cutout(size=5)
-    explicit = tpf.cutout(center=(8 // 2, 7 // 2), size=5)
-    assert_array_equal(default.flux.value, explicit.flux.value)
+    assert tpf.flux.shape[1:] == (7, 8)  # (cadence, row, column)
+    assert_array_equal(
+        tpf.cutout(size=5).flux.value,
+        tpf.cutout(center=(8 // 2, 7 // 2), size=5).flux.value,
+    )
 
 
 def test_aperture_photometry_nan():
