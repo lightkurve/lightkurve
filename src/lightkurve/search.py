@@ -54,6 +54,7 @@ AUTHOR_LINKS = {
     "TESScut": "https://mast.stsci.edu/tesscut/",
     "GSFC-ELEANOR-LITE": "https://archive.stsci.edu/hlsp/gsfc-eleanor-lite",
     "TGLC": "https://archive.stsci.edu/hlsp/tglc",
+    "TARS": "https://archive.stsci.edu/hlsp/tars",
     "KBONUS-BKG":"https://archive.stsci.edu/hlsp/kbonus-bkg",
 }
 
