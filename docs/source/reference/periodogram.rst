@@ -13,6 +13,7 @@ Constructor
   :toctree: api/
 
   Periodogram
+  SNRPeriodogram
   LombScarglePeriodogram.from_lightcurve
   BoxLeastSquaresPeriodogram.from_lightcurve
 
