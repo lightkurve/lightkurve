@@ -6,7 +6,7 @@
 - Fixed nifty-ls support for cases a) ``fastnifty_chi2`` with ``nterms > 1``, b) non-even
   frequency grid [#1568]
 - Added basic tests for ``ls_methods`` in ``Periodogram``, ``nifty-ls`` support and made ``nifty_ls`` an explicit optional dependency [#1576]
-- Added io for the TARS HLSP [#1587]
+- Added io for the TARS HLSP [#1587, #1591]
 
 2.6.0 (2026-04-16)
 =====================
@@ -24,7 +24,7 @@
 - Capped pandas version at <3.0.0 for breaking changes [#1534]
 - Added ability to download 20-s CBV products for TESS [#1537]
 - Changed search so that it longer emits ERROR log message when the search result is empty [#1540]
-- Fixed search by exact match for TICs with fewer than 9 digits, avoiding the extra 
+- Fixed search by exact match for TICs with fewer than 9 digits, avoiding the extra
   fallback cone search [#1541]
 - Modified how SAP_QUALITY is treated when reading/writing TESS and Kepler data [#1538]
 - Added ability to use nifty-ls for periodograms [#1550]
