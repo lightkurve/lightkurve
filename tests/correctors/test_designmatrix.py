@@ -4,8 +4,13 @@ import warnings
 import numpy as np
 from numpy.testing import assert_array_equal
 import pandas as pd
+from scipy.sparse import csr_matrix
 
-from lightkurve.correctors import DesignMatrix, DesignMatrixCollection
+from lightkurve.correctors import (
+    DesignMatrix,
+    DesignMatrixCollection,
+    SparseDesignMatrix,
+)
 from lightkurve import LightkurveWarning
 
 
@@ -24,7 +29,9 @@ def test_designmatrix_basics():
     dm.plot_priors()
     assert dm.append_constant().shape == (size, 4)  # expect one column more
     assert dm.pca(nterms=2).shape == (size, 2)  # expect one column less
-    assert dm.split([10]).shape == (size, 6)  # expect double columns
+    # vector2 is all zeros, and the split index is the last row, so only the
+    # two nonzero pieces of the first segment remain.
+    assert dm.split([10]).shape == (size, 2)
     dm.__repr__()
 
     dm = DesignMatrix(df, name=name)
@@ -33,7 +40,7 @@ def test_designmatrix_basics():
 
     dm = DesignMatrix(df, name=name)
     dm.split([10], inplace=True)
-    assert dm.shape == (size, 6)  # expect double columns
+    assert dm.shape == (size, 2)
 
 
 def test_designmatrix_from_numpy():
@@ -68,6 +75,46 @@ def test_split():
     assert (dm.split([2, 8]).values[:8, 4:] == 0).all()
     # Are all the column names unique?
     assert len(set(dm.split(2).columns)) == 4
+
+
+def test_split_drops_all_zero_columns():
+    """An all-zero piece is omitted, as SparseDesignMatrix.split already does."""
+    values = np.array(
+        [
+            [1.0, 1.0],
+            [1.0, 1.0],
+            [1.0, 1.0],
+            [1.0, 0.0],
+            [1.0, 0.0],
+            [1.0, 0.0],
+        ]
+    )
+    prior_mu = [0.2, 0.4]
+    prior_sigma = [1.0, 2.0]
+    dm = DesignMatrix(
+        values, columns=["a", "b"], prior_mu=prior_mu, prior_sigma=prior_sigma
+    )
+    split = dm.split([3])
+    assert split.shape == (6, 3)
+    assert list(split.columns) == ["a 1", "b 1", "a 2"]
+    assert not (split.values == 0).all(axis=0).any()
+    assert_array_equal(split.prior_mu, [0.2, 0.4, 0.2])
+    assert_array_equal(split.prior_sigma, [1.0, 2.0, 1.0])
+    assert dm.shape == (6, 2)
+
+    sparse = SparseDesignMatrix(
+        csr_matrix(values),
+        columns=["a", "b"],
+        prior_mu=prior_mu,
+        prior_sigma=prior_sigma,
+    ).split([3])
+    assert_array_equal(split.values, np.asarray(sparse.values))
+    assert_array_equal(split.prior_mu, sparse.prior_mu)
+    assert_array_equal(split.prior_sigma, sparse.prior_sigma)
+
+    dm.split([3], inplace=True)
+    assert dm.shape == (6, 3)
+    assert_array_equal(dm.prior_mu, [0.2, 0.4, 0.2])
 
 
 def test_standardize():
