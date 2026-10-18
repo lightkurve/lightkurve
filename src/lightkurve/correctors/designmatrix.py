@@ -182,7 +182,8 @@ class DesignMatrix:
         Returns
         -------
         `.DesignMatrix`
-            A new design matrix with shape (n_rows, len(row_indices)*n_columns).
+            A new design matrix. Pieces that are all zero are omitted, matching
+            `SparseDesignMatrix.split`.
         """
         if isinstance(row_indices, int):
             row_indices = [row_indices]
@@ -208,9 +209,13 @@ class DesignMatrix:
         else:
             dm = self.copy()
         dm.df = pd.concat(dfs, axis=1).fillna(0)
+        # An all-zero piece is not a regressor. SparseDesignMatrix.split drops
+        # the same columns, and keeping them makes the matrix rank-deficient.
+        nonzero = np.asarray(dm.df.to_numpy().sum(axis=0)) != 0
+        dm.df = dm.df.loc[:, nonzero]
         dm.columns = dm.df.columns
-        dm.prior_mu = prior_mu
-        dm.prior_sigma = prior_sigma
+        dm.prior_mu = prior_mu[nonzero]
+        dm.prior_sigma = prior_sigma[nonzero]
         return dm
 
     def standardize(self, inplace=False):
