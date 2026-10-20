@@ -6,6 +6,7 @@
 - Fixed nifty-ls support for cases a) ``fastnifty_chi2`` with ``nterms > 1``, b) non-even
   frequency grid [#1568]
 - Added basic tests for ``ls_methods`` in ``Periodogram``, ``nifty-ls`` support and made ``nifty_ls`` an explicit optional dependency [#1576]
+- Fixed ``TargetPixelFile.cutout()`` to select the standard (column, row) dimensions when the center is specified [#1586]
 - Added io for the TARS HLSP [#1587, #1591]
 
 2.6.0 (2026-04-16)
