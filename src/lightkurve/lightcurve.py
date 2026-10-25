@@ -993,6 +993,8 @@ class LightCurve(TimeSeries):
         trend_lc : `LightCurve`
             New light curve object containing the trend that was removed.
         """
+        if niters < 1:
+            raise ValueError("flatten() requires niters >= 1.")
         if mask is None:
             mask = np.ones(len(self.time), dtype=bool)
         else:

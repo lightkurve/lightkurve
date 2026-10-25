@@ -1317,6 +1317,17 @@ def test_flatten_robustness():
     assert_allclose(lc.flux, flat_lc.flux * trend_lc.flux)
 
 
+def test_flatten_niters_zero_raises():
+    """flatten(niters=0) should raise a clear error instead of UnboundLocalError.
+
+    Regression test for https://github.com/lightkurve/lightkurve/issues/1579
+    """
+    lc = LightCurve(time=np.arange(100, dtype=float), flux=np.ones(100, dtype=float))
+    lc.flatten(window_length=11, niters=1)  # sanity check, should still work
+    with pytest.raises(ValueError, match="niters"):
+        lc.flatten(window_length=11, niters=0)
+
+
 def test_flatten_returns_normalized():
     """Ensure returned lightcurves from flatten() can be normalized"""
     # Test for https://github.com/lightkurve/lightkurve/issues/838
