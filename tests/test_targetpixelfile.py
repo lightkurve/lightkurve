@@ -31,6 +31,10 @@ filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.f
 filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
 # a local version of TABBY_TPF with ~ 2 days of data; should be sufficient for most tests
 filename_tpf_tabby_lite = get_pkg_data_filename("data/test-tpf-kplr-tabby-100-cadences.fits")
+# a 7 rows x 8 columns cutout region
+filename_tpf_tabby_first_cadence = get_pkg_data_filename(
+    "data/test-tpf-kplr-tabby-first-cadence.fits"
+)
 
 TABBY_Q8 = (
     "https://archive.stsci.edu/missions/kepler/lightcurves"
@@ -735,6 +739,15 @@ def test_cutout():
         ntpf = tpf.cutout(size=2)
         assert np.prod(ntpf.flux.shape[1:]) == 4
         assert ntpf.targetid == tpf.targetid
+
+    # On a non-square TPF the default center is the geometric middle, so it
+    # must agree with passing that (column, row) explicitly.
+    tpf = KeplerTargetPixelFile(filename_tpf_tabby_first_cadence)
+    assert tpf.flux.shape[1:] == (7, 8)  # (cadence, row, column)
+    assert_array_equal(
+        tpf.cutout(size=5).flux.value,
+        tpf.cutout(center=(8 // 2, 7 // 2), size=5).flux.value,
+    )
 
 
 def test_aperture_photometry_nan():

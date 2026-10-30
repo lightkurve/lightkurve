@@ -1493,7 +1493,8 @@ class TargetPixelFile(object):
 
         # Parse the user input (``center``) into an (x, y) coordinate
         if center is None:
-            x, y = imshape[0] // 2, imshape[1] // 2
+            # imshape is (row, column), cf. the edges computed below
+            x, y = imshape[1] // 2, imshape[0] // 2
         elif isinstance(center, SkyCoord):
             x, y = self.wcs.world_to_pixel(center)
         elif isinstance(center, (tuple, list, np.ndarray)):
