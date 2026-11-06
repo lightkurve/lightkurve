@@ -53,7 +53,7 @@ def read_tglc_lightcurve(
     )
 
     quality_mask = TessQualityFlags.create_quality_mask(
-        quality_array=lc["quality"], bitmask=quality_bitmask
+        quality_array=np.asarray(lc["quality"], dtype=np.int32), bitmask=quality_bitmask
     )
 
     # TGLC FITS file do not have units specified. re-add them.
