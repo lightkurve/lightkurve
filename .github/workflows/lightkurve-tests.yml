@@ -25,11 +25,12 @@ on:
 jobs:
 
   # Run unit tests on Linux
-  pytest-linux:
-    runs-on: ubuntu-latest
+  
+  pytest-linux-39:
+    runs-on: ubuntu-22.04 #as of Nov 2026, ubuntu-latest is not compatible with python3.9
     strategy:
       matrix:
-        name: ["3.9-remote-data", "3.9-memtest", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        name: ["3.9-remote-data", "3.9-memtest"]
         include:
           - name: "3.9-remote-data"
             python-version: "3.9"
@@ -37,6 +38,29 @@ jobs:
           - name: "3.9-memtest"
             python-version: "3.9"
             pytest-command: ./poetry/bin/poetry run pytest -m memtest --remote-data
+    steps:
+    - uses: actions/checkout@v6
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v7
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        mkdir poetry
+        python -m venv ./poetry
+        ./poetry/bin/python -m pip install --upgrade pip
+        ./poetry/bin/pip install poetry==2.2.1
+        ./poetry/bin/poetry install --with dev --extras "nifty-ls"
+    - name: Test with ${{ matrix.pytest-command }}
+      run: |
+        ${{ matrix.pytest-command }}
+    
+  pytest-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        name: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        include:
           - name: "3.10"
             python-version: "3.10"
             pytest-command: ./poetry/bin/poetry run pytest
@@ -53,9 +77,9 @@ jobs:
             python-version: "3.14"
             pytest-command: ./poetry/bin/poetry run pytest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -77,9 +101,9 @@ jobs:
         name: [3.9]
         python-version: [3.9]
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -103,9 +127,9 @@ jobs:
       matrix:
         python-version: [3.9]
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -126,9 +150,9 @@ jobs:
       matrix:
         python-version: [3.9]
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
+      uses: actions/setup-python@v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install flake8
