@@ -378,7 +378,7 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
-    def flatten(self, method="logmedian", filter_width=0.01, return_trend=False):
+    def flatten(self, method="logmedian", filter_width=0.1):
         """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
         estimate of the noise background.
 
@@ -400,9 +400,6 @@ class Periodogram(object):
             in units of frequency.
             If method = `logmedian`, this is the width of the smoothing filter
             in log10(frequency) space.
-        return_trend : bool
-            If True, then the background estimate, alongside the SNR spectrum,
-            will be returned.
 
         Returns
         -------
@@ -410,22 +407,26 @@ class Periodogram(object):
             Returns a periodogram object where the power is an estimate of the
             signal-to-noise of the spectrum, creating by dividing the powers
             with a simple estimate of the noise background using a smoothing filter.
-        bkg : `Periodogram` object
-            The estimated power spectrum of the background noise. This is only
-            returned if `return_trend = True`.
+            This object also contains information on the subtracted background.
         """
+        # TODO: Add some intelligent decision making for the filter_width
+
         bkg = self.smooth(method=method, filter_width=filter_width)
+        bkg.meta['FLAT_METHOD'] = method
+        bkg.meta['FLAT_FILT_WIDTH'] = filter_width
+        
         snr_pg = self / bkg.power
+
         snr = SNRPeriodogram(
             snr_pg.frequency,
             snr_pg.power,
+            bkg,
             nyquist=self.nyquist,
             targetid=self.targetid,
             label=self.label,
             meta=self.meta,
         )
-        if return_trend:
-            return snr, bkg
+
         return snr
 
     def to_table(self):
@@ -594,10 +595,48 @@ class SNRPeriodogram(Periodogram):
     """
 
     def __init__(self, *args, **kwargs):
-        super(SNRPeriodogram, self).__init__(*args, **kwargs)
+        super(SNRPeriodogram, self).__init__(*args[:2], **kwargs)
+        
+        # Check if the SNRPeriodogram was initiated with its background
+        if len(args) == 3:
+            self.background = args[2]
+        else:
+            self.background = None
 
     def __repr__(self):
         return "SNRPeriodogram(ID: {})".format(self.label)
+
+    def diagnose_flatten(self, **kwargs):
+        """Plot the unflattened power spectrum with the subtracted background
+        overlaid. This can help users inspect whether the .flatten() function
+        is appropriate for the signal their investigating, and adjust the
+        filter width accordingly to avoid reducing the power of their signal.
+        
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `Periodogram.plot`.
+        
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        if self.background == None:
+            raise ValueError("This SNRPeriodogram was initiated without the removed " +
+                            "background trend, so it can't be viewed.")
+            
+
+        pg = self * self.background.power.value
+        pg.power *= 1 * self.background.power.unit
+
+        ax = pg.plot(**kwargs)
+        self.background.plot(ax=ax, scale='log', label='Background',
+                    lw = 2)
+        ax.set_title(f'Method: {self.background.meta["FLAT_METHOD"]}, ' +  
+                     f'filter width {self.background.meta["FLAT_FILT_WIDTH"]}')
+    
+        return ax
 
     def plot(self, **kwargs):
         """Plot the SNR spectrum using matplotlib's `plot` method.
@@ -606,7 +645,7 @@ class SNRPeriodogram(Periodogram):
         Parameters
         ----------
         kwargs : dict
-            Dictionary of arguments ot be passed to `Periodogram.plot`.
+            Dictionary of arguments to be passed to `Periodogram.plot`.
 
         Returns
         -------
