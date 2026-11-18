@@ -125,13 +125,15 @@ def read_generic_lightcurve(
             # make compatible with normalized light curves without absolute start sime (see #1502) 
             elif hdulist[ext].header.get("TIMESYS") == "local":
                 try:
-                    unit = u.Unit(hdulist[ext].header.get("TUNIT1"))    # Modified to account such that TUNIT1 dictates the astropy.time unit
+                    unit = u.Unit(tab["time"].unit)
                     time = TimeDelta(
                         tab["time"].data*unit,    # CHOICE: if you multiply by u.h, will turn values to fractional day which is in agreement with time_format
                     )
                     tab.remove_column("time")
                 except:
-                    raise KeyError(f"Unclear unit for local time system: TUNIT1 must be astropy.unit value.")            # Error handling for invalid astropy.unit value or if the TUNIT1 keyword is missing from header         
+                    raise KeyError(
+                        "Unclear unit for local time system: the time column must have a time unit."
+                    )
             # Check for nonstandard, format-flavored values of TIMESYS
             elif hdulist[ext].header.get("TIMESYS") == "mjd":
                 time_format = 'mjd'

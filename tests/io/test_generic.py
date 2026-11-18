@@ -132,3 +132,38 @@ def test_read_generic():
 
     # Is the time scale correctly read in as UTC?
     assert new_lc.time.scale.lower() == new_header1['TIMESYS'].lower()
+
+
+@pytest.mark.parametrize("time_first", [False, True])
+@pytest.mark.parametrize("time_unit", ["s", "h", "d"])
+def test_generic_local_time_column_unit(time_first, time_unit):
+    """Local time units follow the selected TIME column, regardless of column order."""
+    from numpy.testing import assert_allclose, assert_array_equal
+
+    time_col = fits.Column(name="TIME", format="D", unit=time_unit, array=[0., 1., 2.])
+    flux_col = fits.Column(name="FLUX", format="D", unit="electron/s", array=[1., 2., 3.])
+    cols = [time_col, flux_col] if time_first else [flux_col, time_col]
+    table = fits.BinTableHDU.from_columns(cols)
+    table.header["TIMESYS"] = "local"
+    with fits.HDUList([fits.PrimaryHDU(), table]) as hdul:
+        lc = read(hdul)
+
+    assert_allclose(lc.time.to_value("jd"), (np.arange(3) * u.Unit(time_unit)).to_value(u.d))
+    assert_array_equal(lc.flux.value, [1., 2., 3.])
+
+
+@pytest.mark.parametrize("time_unit", ["s", "h", "d"])
+def test_generic_local_time_with_auxiliary_time_column(time_unit):
+    """A different time column must not silently change the TIME column's scale."""
+    from numpy.testing import assert_allclose
+
+    table = fits.BinTableHDU.from_columns([
+        fits.Column(name="ELAPSED_DAYS", format="D", unit="d", array=[0., 1., 2.]),
+        fits.Column(name="TIME", format="D", unit=time_unit, array=[0., 1., 2.]),
+        fits.Column(name="FLUX", format="D", array=[1., 2., 3.]),
+    ])
+    table.header["TIMESYS"] = "local"
+    with fits.HDUList([fits.PrimaryHDU(), table]) as hdul:
+        lc = read(hdul)
+
+    assert_allclose(lc.time.to_value("jd"), (np.arange(3) * u.Unit(time_unit)).to_value(u.d))
