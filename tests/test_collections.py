@@ -56,11 +56,16 @@ def test_collection_stitch():
     """Does Collection.stitch() work?"""
     lc = LightCurve(time=np.arange(1, 5), flux=np.ones(4))
     lc2 = LightCurve(time=np.arange(5, 16), flux=np.ones(11))
-    lcc = LightCurveCollection([lc, lc2])
+    lcc = LightCurveCollection([lc2, lc])
     lc_stitched = lcc.stitch()
     assert len(lc_stitched.flux) == 15
+    assert_array_equal(lc_stitched.time.value, np.arange(1, 16))
     lc_stitched2 = lcc.stitch(corrector_func=lambda x: x * 2)
     assert_array_equal(lc_stitched.flux * 2, lc_stitched2.flux)
+    # Test sort_by argument with None
+    lc_stitched3 = lcc.stitch(sort_by=None)
+    assert_array_equal(lc_stitched3.time.value, np.append(np.arange(5, 16), np.arange(1, 5)))
+    
 
 
 def test_collection_stitch_with_masked_values():
