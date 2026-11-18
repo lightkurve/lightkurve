@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from astropy.table import vstack
+from astropy.time import TimeBase
 from astropy.utils.decorators import deprecated
 
 from . import MPLSTYLE
@@ -202,14 +203,20 @@ class LightCurveCollection(Collection):
                 if col in lc.columns:
                     if (
                         not (
-                         (issubclass(lcs[0][col].__class__, lc[col].__class__)
-                          or issubclass(lc[col].__class__, lcs[0][col].__class__)
-                          or (lcs[0][col].__class__.info is lc[col].__class__.info))
-                         )
-                        or not (
-                         np.can_cast(lcs[0][col].value.dtype, lc[col].value.dtype, "same_kind")
-                         and np.can_cast(lc[col].value.dtype, lcs[0][col].value.dtype, "same_kind"))
-                        ):
+                            issubclass(lcs[0][col].__class__, lc[col].__class__)
+                            or issubclass(lc[col].__class__, lcs[0][col].__class__)
+                            or lcs[0][col].__class__.info is lc[col].__class__.info
+                        )
+                        or (
+                            # Time formats may expose strings, datetimes, or numbers;
+                            # Astropy stacks the underlying instants independently.
+                            not isinstance(lcs[0][col], TimeBase)
+                            and not (
+                                np.can_cast(lcs[0][col].value.dtype, lc[col].value.dtype, "same_kind")
+                                and np.can_cast(lc[col].value.dtype, lcs[0][col].value.dtype, "same_kind")
+                            )
+                        )
+                    ):
                         columns_to_remove.add(col)
                         continue
 

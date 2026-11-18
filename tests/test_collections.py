@@ -408,3 +408,34 @@ def test_unmergeable_columns():
         LightCurveCollection([lc1, lc2]).stitch()
     with pytest.warns(LightkurveWarning, match="column types are incompatible"):
         lc1.append(lc2)
+
+
+@pytest.mark.parametrize("time_format", ["isot", "datetime"])
+@pytest.mark.parametrize("reverse", [False, True])
+def test_stitch_different_time_formats(time_format, reverse):
+    """Time display formats do not make otherwise compatible columns unmergeable."""
+    from astropy.time import Time
+
+    lc1 = LightCurve(time=Time([2459000., 2459001.], format="jd"), flux=[1., 2.])
+    lc2 = LightCurve(time=Time([2459002., 2459003.], format="jd"), flux=[3., 4.])
+    lc2.time.format = time_format
+    lcs = [lc2, lc1] if reverse else [lc1, lc2]
+
+    stitched = LightCurveCollection(lcs).stitch(corrector_func=None)
+
+    assert_array_equal(stitched.time.jd, np.concatenate([lc.time.jd for lc in lcs]))
+    assert_array_equal(stitched.flux.value, np.concatenate([lc.flux.value for lc in lcs]))
+    assert lc1.time.format == "jd"
+    assert lc2.time.format == time_format
+
+
+def test_stitch_incompatible_quality_dtypes():
+    """Retain the incompatible string/numeric column behavior from issue #1411."""
+    lc1 = LightCurve(time=[1, 2], flux=[1., 1.])
+    lc2 = LightCurve(time=[3, 4], flux=[1., 1.])
+    lc1["quality"] = [0, 1]
+    lc2["quality"] = ["G", "B"]
+    with pytest.warns(LightkurveWarning, match="quality"):
+        stitched = LightCurveCollection([lc1, lc2]).stitch(corrector_func=None)
+    assert "quality" not in stitched.colnames
+    assert_array_equal(stitched.time.value, [1, 2, 3, 4])
