@@ -1,6 +1,6 @@
 2.6.1dev
 =====================
-- Fixed ``LightCurveCollection.stitch()`` rejecting compatible time columns with different display formats. [#PRNUM]
+- Fixed ``LightCurveCollection.stitch()`` rejecting compatible time columns with different display formats. [#1596]
 - Update search URL for query_solar_system_objects [#1556, #1583]
 - Fixed search result sort order for the cases involving TESS sectors 99 and 100, etc. [#1558]
 - Fixed CBV plotting with pandas 3 and removed the pandas <3.0 dependency cap.
