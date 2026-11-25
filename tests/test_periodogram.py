@@ -219,6 +219,39 @@ def test_smooth():
         p.smooth(method="logmedian", filter_width=5.0 * u.day)
 
 
+@pytest.mark.parametrize("method", ["smooth", "flatten"])
+@pytest.mark.parametrize(
+    "frequency",
+    [
+        pytest.param([0.0, 1.0, 2.0], id="zero-first"),
+        pytest.param([1.0, 0.0, 2.0], id="zero-interior"),
+        pytest.param([-1.0, 1.0, 2.0], id="negative"),
+        pytest.param([1.0, np.nan, 2.0], id="nan"),
+        pytest.param([1.0, 2.0, np.inf], id="infinite"),
+    ],
+)
+def test_logmedian_requires_positive_finite_frequencies(frequency, method):
+    pg = Periodogram(np.array(frequency) * u.Hz, np.ones(3) * u.dimensionless_unscaled)
+    with pytest.raises(ValueError, match="positive.*frequenc"):
+        getattr(pg, method)(method="logmedian")
+
+
+def test_logmedian_smooth_accepts_small_positive_frequencies():
+    frequency = np.array([1e-8, 2e-8, 3e-8]) * u.Hz
+    pg = Periodogram(frequency, np.ones(3) * u.dimensionless_unscaled)
+    smoothed = pg.smooth(method="logmedian")
+    assert_array_equal(smoothed.frequency, frequency)
+    assert np.all(np.isfinite(smoothed.power))
+
+
+def test_boxkernel_smooth_accepts_zero_frequency():
+    frequency = np.array([0.0, 1.0, 2.0]) * u.Hz
+    pg = Periodogram(frequency, np.ones(3) * u.dimensionless_unscaled)
+    smoothed = pg.smooth(method="boxkernel", filter_width=1.0)
+    assert_array_equal(smoothed.frequency, frequency)
+    assert np.all(np.isfinite(smoothed.power))
+
+
 def test_flatten():
     npts = 10000
     np.random.seed(12069424)
