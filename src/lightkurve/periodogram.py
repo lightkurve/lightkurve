@@ -197,6 +197,8 @@ class Periodogram(object):
 
         where `filter width` is in log10(frequency) space. This is best for
         estimating the noise background, as it filters over the seismic peaks.
+        This method requires finite, strictly positive frequencies; a
+        `ValueError` exception will be raised otherwise.
 
         Periodograms that are unsmoothed have multiplicative noise that is
         distributed as chi squared 2 degrees of freedom.  This noise
@@ -267,6 +269,12 @@ class Periodogram(object):
                 raise ValueError(
                     "the 'logmedian' method requires a dimensionless "
                     "value for `filter_width` in log10(frequency) space."
+                )
+            if not np.all(
+                np.isfinite(self.frequency.value) & (self.frequency.value > 0)
+            ):
+                raise ValueError(
+                    "the 'logmedian' method requires finite, positive frequencies."
                 )
             count = np.zeros(len(self.frequency.value), dtype=int)
             bkg = np.zeros_like(self.frequency.value)
